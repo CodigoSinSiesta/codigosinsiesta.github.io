@@ -90,6 +90,7 @@ const config = {
         logo: {
           alt: 'Código Sin Siesta Logo',
           src: 'img/logo.svg',
+          srcDark: 'img/logo-light.svg',
         },
         items: [
           {
