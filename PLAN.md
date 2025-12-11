@@ -165,6 +165,58 @@ El sitio Docusaurus para Código Sin Siesta está completamente desplegado y fun
 
 ---
 
+## Recreación Completa del Repositorio (11 de diciembre de 2024)
+
+### ✅ Acción Tomada
+
+Después de la limpieza del historial, la caché de contributors de GitHub en la interfaz web persistía mostrando a Claude como contributor, a pesar de que el API REST mostraba solo a TellMeAlex. Para resolver esto de manera definitiva, se tomó la decisión de **eliminar completamente el repositorio remoto y recrearlo desde cero**.
+
+### Proceso Ejecutado
+
+**19. Eliminación y recreación del repositorio remoto**
+   - Eliminado repositorio remoto usando GitHub CLI con scope `delete_repo`
+   - Creado nuevo repositorio vacío: `CodigoSinSiesta/codigosinsiesta.github.io`
+   - Configurado GitHub Pages para usar GitHub Actions como fuente
+   - Push completo del código local limpio al nuevo repositorio
+
+**20. Corrección de configuración de Docusaurus**
+   - Eliminado flag experimental `future.v4: true` que causaba problemas de compatibilidad
+   - Docusaurus 3.9.2 no requiere este flag para funcionar correctamente
+
+**21. Verificación completa del deployment**
+   - Sitio desplegado exitosamente en https://codigosinsiesta.github.io/
+   - Contributors page muestra únicamente a TellMeAlex (7 commits)
+   - Sin ningún rastro de Claude en la interfaz web o API
+
+**22. Configuración de protección de rama**
+   - Aplicada protección estándar a la rama main
+   - Requiere 1 aprobación en Pull Requests
+   - Dismiss stale reviews habilitado
+   - Force pushes deshabilitados
+
+### Resultado Final
+
+- ✅ Repositorio completamente limpio sin referencias a Claude
+- ✅ Contributors page muestra solo a TellMeAlex
+- ✅ Sitio web funcionando perfectamente
+- ✅ GitHub Pages desplegando correctamente desde GitHub Actions
+- ✅ Protección de rama configurada
+- ✅ Hook local `prepare-commit-msg` previene futuras firmas de Claude
+
+### Commits en el Nuevo Repositorio
+
+| Hash    | Descripción |
+|---------|-------------|
+| 31238bb | Configuración inicial de Docusaurus para GitHub Pages |
+| a00f8ec | Agregar pnpm-lock.yaml y actualizar workflows para pnpm |
+| 7980d99 | Eliminar posts de blog de ejemplo con autores inválidos |
+| f6ddc23 | Actualizar PLAN.md - Proyecto completado |
+| f15f9f6 | Personalizar favicon y logos del sitio |
+| 300f927 | Trigger GitHub contributors cache refresh |
+| 0c68dc1 | Corregir configuración de Docusaurus - Eliminar flag future.v4 |
+
+---
+
 **Última actualización:** 11 de diciembre de 2024
-**Estado:** ✅ Completado, desplegado y con historial limpio
+**Estado:** ✅ Completado, desplegado, con historial limpio y repositorio recreado
 
