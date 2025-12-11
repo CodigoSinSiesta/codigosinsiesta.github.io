@@ -21,7 +21,7 @@
 }
 
 .heroLogo {
-  height: 200px;
+  height: 500px;
   width: auto;
   max-width: 100%;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
@@ -29,7 +29,7 @@
 
 @media screen and (max-width: 996px) {
   .heroLogo {
-    height: 150px;
+    height: 350px;
   }
 }
 
