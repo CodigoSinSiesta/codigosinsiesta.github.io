@@ -116,5 +116,55 @@ El sitio Docusaurus para Código Sin Siesta está completamente desplegado y fun
 
 ---
 
-**Última actualización:** 10 de diciembre de 2024
-**Estado:** ✅ Completado y desplegado
+---
+
+## Limpieza de Historial (11 de diciembre de 2024)
+
+### ✅ Cambios Realizados
+
+**15. Limpieza de firma de Claude Code en commits**
+   - **Problema detectado:** 1 commit contenía firma no deseada de Claude Code
+   - **Commit afectado:** 2f0fc89 "Eliminar posts de blog de ejemplo con autores inválidos"
+   - **Solución implementada:**
+     - Reescritura del historial usando `git filter-branch`
+     - Eliminación de líneas con firma de Claude
+     - Force push autorizado al repositorio remoto
+
+**16. Configuración de protección de rama**
+   - Deshabilitación temporal de protección usando GitHub API
+   - Force push exitoso con historial limpio
+   - Restauración de protección de rama main
+
+**17. Hook de Git para prevención automática**
+   - Creado hook `prepare-commit-msg` en `.git/hooks/`
+   - Elimina automáticamente firmas de Claude en futuros commits
+   - Implementado con filtros grep para máxima eficiencia
+
+**18. Renombrado de directorio local**
+   - Cambio de ruta: `/Users/alejandro/dev/codigosinsiesta.github.io` → `/Users/alejandro/dev/codigosinsiesta`
+   - Mantiene nombre del repositorio en GitHub para compatibilidad con GitHub Pages
+   - Simplifica navegación local
+
+### Nuevos Commits en Historial Limpio
+
+| Nuevo Hash | Commit Original | Descripción |
+|------------|-----------------|-------------|
+| 31238bb | bcc3e1b | Configuración inicial de Docusaurus para GitHub Pages |
+| a00f8ec | d32400d | Agregar pnpm-lock.yaml y actualizar workflows para pnpm |
+| 7980d99 | 2f0fc89 | Eliminar posts de blog de ejemplo con autores inválidos (LIMPIO) |
+| f6ddc23 | fcb0be0 | Actualizar PLAN.md - Proyecto completado |
+| f15f9f6 | 4b3dd7d | Personalizar favicon y logos del sitio |
+
+### Notas Importantes
+
+- ✅ El historial de git ha sido reescrito completamente
+- ✅ Todos los commits antiguos han sido reemplazados con nuevos hashes
+- ✅ El hook `prepare-commit-msg` previene futuras inclusiones de firma
+- ⚠️ Cualquier clon local existente necesita re-sincronizar con `git pull --force` o re-clonar
+- ✅ El sitio continúa funcionando correctamente en https://codigosinsiesta.github.io/
+
+---
+
+**Última actualización:** 11 de diciembre de 2024
+**Estado:** ✅ Completado, desplegado y con historial limpio
+
