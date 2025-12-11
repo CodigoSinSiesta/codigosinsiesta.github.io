@@ -1,0 +1,425 @@
+{
+  "project": {
+    "name": "ai-presentation",
+    "organization": "CodigoSinSiesta",
+    "repository": "https://github.com/CodigoSinSiesta/ai-presentation",
+    "type": "Interactive Web Presentation",
+    "description": "Interactive presentation on 'Vibe Coding vs Software Engineering' - A 21-slide exploration of the 4R Framework for responsible AI-assisted development, covering security, code quality, testing, and resilience patterns",
+    "liveURL": "https://codigosinsiesta.github.io/ai-presentation/",
+    "visibility": "public",
+    "status": "active"
+  },
+  "timestamps": {
+    "created": "2025-12-05T08:36:26Z",
+    "lastUpdated": "2025-12-11T12:19:38Z",
+    "lastCommit": "2025-12-11T12:16:50Z"
+  },
+  "versions": {
+    "node": ">=20.0",
+    "astro": "4.16.18",
+    "svelte": "5.45.5",
+    "typescript": "5.7.2",
+    "tailwindcss": "4.1.17",
+    "gsap": "3.13.0",
+    "swiper": "12.0.3"
+  },
+  "structure": {
+    "root_directories": [
+      ".github/workflows",
+      "src/components",
+      "src/layouts",
+      "src/pages",
+      "src/styles",
+      "src/utils",
+      "dist"
+    ],
+    "src_components": {
+      "navigation": [
+        "Navigation.svelte"
+      ],
+      "slides": 28,
+      "ui": [
+        "Button.astro",
+        "Card.astro"
+      ],
+      "layouts": [
+        "PresentationLayout.astro"
+      ],
+      "utils": [
+        "animations.ts"
+      ]
+    }
+  },
+  "slides": {
+    "total_count": 28,
+    "items": [
+      {
+        "number": 1,
+        "name": "Slide01Hero",
+        "format": "astro",
+        "title": "Portada con presentadores",
+        "interactive": false
+      },
+      {
+        "number": 2,
+        "name": "Slide02Paradox",
+        "format": "svelte",
+        "title": "Vibe Coding vs Software Engineering Paradox",
+        "interactive": true
+      },
+      {
+        "number": 3,
+        "name": "Slide03Metrics",
+        "format": "svelte",
+        "title": "Métricas relevantes",
+        "interactive": true
+      },
+      {
+        "number": 4,
+        "name": "Slide04Churn",
+        "format": "svelte",
+        "title": "Análisis de churn/rotación",
+        "interactive": true
+      },
+      {
+        "number": 5,
+        "name": "Slide05BestPractices",
+        "format": "svelte",
+        "title": "Best Practices",
+        "interactive": true
+      },
+      {
+        "number": "5b",
+        "name": "Slide05Context",
+        "format": "svelte",
+        "title": "Context",
+        "interactive": true
+      },
+      {
+        "number": "5c",
+        "name": "Slide05Security",
+        "format": "astro",
+        "title": "Security",
+        "interactive": false
+      },
+      {
+        "number": "6a",
+        "name": "Slide06PromptFormula",
+        "format": "svelte",
+        "title": "Prompt Formula",
+        "interactive": true
+      },
+      {
+        "number": "6b",
+        "name": "Slide06Agents",
+        "format": "svelte",
+        "title": "AI Agents",
+        "interactive": true
+      },
+      {
+        "number": "6c",
+        "name": "Slide06METR",
+        "format": "svelte",
+        "title": "METR Metrics",
+        "interactive": true
+      },
+      {
+        "number": 7,
+        "name": "Slide07Framework",
+        "format": "astro",
+        "title": "Framework 4R",
+        "interactive": false
+      },
+      {
+        "number": "7b",
+        "name": "Slide07MCPs",
+        "format": "svelte",
+        "title": "Model Context Protocol",
+        "interactive": true
+      },
+      {
+        "number": "8a",
+        "name": "Slide08Risk",
+        "format": "svelte",
+        "title": "Risk Analysis",
+        "interactive": true
+      },
+      {
+        "number": "8b",
+        "name": "Slide08Workshop",
+        "format": "svelte",
+        "title": "Workshop Info",
+        "interactive": true
+      },
+      {
+        "number": 9,
+        "name": "Slide09Readability",
+        "format": "astro",
+        "title": "Code Readability",
+        "interactive": false
+      },
+      {
+        "number": 10,
+        "name": "Slide10Reliability",
+        "format": "svelte",
+        "title": "Reliability",
+        "interactive": true
+      },
+      {
+        "number": "11a",
+        "name": "Slide11Resilience",
+        "format": "astro",
+        "title": "Resilience Patterns",
+        "interactive": false
+      },
+      {
+        "number": "11b",
+        "name": "Slide11Feedback",
+        "format": "svelte",
+        "title": "Audience Feedback Form",
+        "interactive": true
+      },
+      {
+        "number": 12,
+        "name": "Slide12Limits",
+        "format": "svelte",
+        "title": "Limits & Considerations",
+        "interactive": true
+      },
+      {
+        "number": 13,
+        "name": "Slide13StackPRs",
+        "format": "astro",
+        "title": "PR Stack",
+        "interactive": false
+      },
+      {
+        "number": 14,
+        "name": "Slide14Hooks",
+        "format": "svelte",
+        "title": "Hooks & Components",
+        "interactive": true
+      },
+      {
+        "number": "15a",
+        "name": "Slide15B",
+        "format": "svelte",
+        "title": "Additional Content B",
+        "interactive": true
+      },
+      {
+        "number": "15b",
+        "name": "Slide15Guardrails",
+        "format": "astro",
+        "title": "Security Guardrails",
+        "interactive": false
+      },
+      {
+        "number": 16,
+        "name": "Slide16Reviewers",
+        "format": "svelte",
+        "title": "Code Review",
+        "interactive": true
+      },
+      {
+        "number": "17a",
+        "name": "Slide17B",
+        "format": "svelte",
+        "title": "Additional Content",
+        "interactive": true
+      },
+      {
+        "number": "17b",
+        "name": "Slide17Cases",
+        "format": "svelte",
+        "title": "Case Studies",
+        "interactive": true
+      },
+      {
+        "number": "18a",
+        "name": "Slide18B",
+        "format": "astro",
+        "title": "Final Content",
+        "interactive": false
+      },
+      {
+        "number": "18b",
+        "name": "Slide18Closing",
+        "format": "astro",
+        "title": "Closing & Conclusions",
+        "interactive": false
+      }
+    ]
+  },
+  "git": {
+    "branches": [
+      {
+        "name": "main",
+        "sha": "cd3a9054dd553b439ce368a8d636ae235aa3ebbb",
+        "protected": true,
+        "type": "production"
+      },
+      {
+        "name": "master",
+        "sha": "ce58a349d2f1cfa00214082fc65f1d8d6b6680d4",
+        "protected": false,
+        "type": "legacy"
+      }
+    ],
+    "lastCommit": {
+      "sha": "cd3a9054dd553b439ce368a8d636ae235aa3ebbb",
+      "author": "Copilot",
+      "message": "Fix incorrect URL: tellmeales.dev → tellmealex.dev",
+      "date": "2025-12-11T12:16:50Z"
+    },
+    "pullRequests": {
+      "open": 0,
+      "closed": 1,
+      "lastMerged": {
+        "number": 2,
+        "title": "Fix incorrect URL: tellmeales.dev → tellmealex.dev",
+        "merged_date": "2025-12-11T12:16:51Z"
+      }
+    },
+    "issues": {
+      "open": 0,
+      "closed": 1
+    }
+  },
+  "scripts": {
+    "dev": "astro dev (port 4321)",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "start": "astro dev",
+    "astro": "astro (direct CLI)"
+  },
+  "cicd": {
+    "provider": "GitHub Actions",
+    "workflow_file": ".github/workflows/deploy.yml",
+    "triggers": [
+      "push to main",
+      "workflow_dispatch"
+    ],
+    "steps": [
+      {
+        "stage": "Build",
+        "runner": "ubuntu-latest",
+        "tasks": [
+          "Checkout",
+          "Setup pnpm 9",
+          "Setup Node 20",
+          "Install dependencies (frozen-lockfile)",
+          "Type checking with astro check",
+          "Build with astro build",
+          "Upload artifact"
+        ]
+      },
+      {
+        "stage": "Deploy",
+        "runner": "ubuntu-latest",
+        "tasks": [
+          "Deploy to GitHub Pages"
+        ]
+      }
+    ],
+    "buildPath": ".",
+    "artifactPath": "./dist",
+    "environment": {
+      "name": "github-pages",
+      "permissions": {
+        "pages": "write",
+        "id-token": "write",
+        "contents": "read"
+      }
+    }
+  },
+  "dependencies": {
+    "production": {
+      "@astrojs/svelte": "^7.2.2",
+      "@astrojs/tailwind": "^6.0.2",
+      "astro": "^4.16.18",
+      "gsap": "^3.13.0",
+      "lucide-svelte": "^0.555.0",
+      "svelte": "^5.45.5",
+      "swiper": "^12.0.3",
+      "tailwindcss": "^4.1.17"
+    },
+    "development": {
+      "@astrojs/check": "^0.9.4",
+      "@tailwindcss/postcss": "^4.1.17",
+      "postcss": "^8.5.6",
+      "typescript": "^5.7.2"
+    }
+  },
+  "configuration": {
+    "astro": {
+      "site": "https://codigosinsiesta.github.io",
+      "base": "/ai-presentation",
+      "integrations": [
+        "svelte"
+      ],
+      "serverPort": 4321
+    },
+    "tailwind": {
+      "contentPaths": [
+        "./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"
+      ],
+      "fonts": {
+        "display": "Space Grotesk",
+        "subheader": "Bricolage Grotesque",
+        "body": "IBM Plex Sans",
+        "mono": "JetBrains Mono"
+      }
+    },
+    "typescript": {
+      "strict": true,
+      "jsx": "react-jsx",
+      "moduleResolution": "bundler",
+      "paths": {
+        "@/*": [
+          "src/*"
+        ]
+      }
+    }
+  },
+  "statistics": {
+    "repositorySize": "174 KB",
+    "stars": 0,
+    "forks": 0,
+    "openIssues": 0,
+    "openPRs": 0,
+    "slideCount": 28,
+    "componentCount": 3,
+    "daysOld": 6
+  },
+  "collaborators": [
+    {
+      "username": "TellMeAlex",
+      "role": "author",
+      "email": "alejandrodlfdlr@ext.inditex.com",
+      "commits": "majority"
+    },
+    {
+      "username": "Copilot",
+      "role": "assistant",
+      "type": "bot",
+      "function": "automated fixes and refactors"
+    },
+    {
+      "name": "Jose David",
+      "role": "co-presenter",
+      "status": "recently added"
+    }
+  ],
+  "topics": [
+    "4r-framework",
+    "ai",
+    "ai-coding",
+    "astro",
+    "code-quality",
+    "presentation",
+    "software-engineering",
+    "svelte",
+    "web-presentation"
+  ]
+}
