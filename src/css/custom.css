@@ -1,36 +1,554 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * CÓDIGO SIN SIESTA - Custom Stylesheet
+ * Identidad Visual: Búho Nocturno Artesanal
+ * Paleta: Azules profundos + Blanco hueso
+ * Tipografía: Crimson Text (display) + Nunito (body) + JetBrains Mono (code)
  */
 
-/* You can override the default Infima variables here. */
+/* ============================================
+   IMPORTAR FUENTES - Google Fonts
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ============================================
+   VARIABLES CSS - LIGHT MODE (Tema Claro)
+   ============================================ */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* PALETA DE COLORES - Azules Profundos */
+  --owl-navy: #1E3A5F;           /* Navy oscuro - backgrounds principales */
+  --owl-navy-light: #2C5F8D;     /* Azul medio - navegación, bordes */
+  --owl-blue-bright: #4A90E2;    /* Azul brillante - CTAs, accents */
+  --owl-blue-dark: #15293D;      /* Azul casi negro - textos sobre claro */
+
+  /* PALETA DE COLORES - Blanco Hueso */
+  --owl-bone: #F5F1E8;           /* Blanco hueso base - backgrounds secundarios */
+  --owl-bone-dark: #E8E3D6;      /* Hueso oscuro - bordes sutiles, hover */
+  --owl-bone-darker: #D4CFC0;    /* Hueso más oscuro - separadores */
+
+  /* INFIMA OVERRIDES - Color Primario (usado en links, botones, etc) */
+  --ifm-color-primary: #2C5F8D;
+  --ifm-color-primary-dark: #26547A;
+  --ifm-color-primary-darker: #234F71;
+  --ifm-color-primary-darkest: #1D415D;
+  --ifm-color-primary-light: #3E6FA0;
+  --ifm-color-primary-lighter: #4A7AAA;
+  --ifm-color-primary-lightest: #5C8CB8;
+
+  /* BACKGROUNDS */
+  --ifm-background-color: #FFFFFF;
+  --ifm-background-surface-color: var(--owl-bone);
+
+  /* COLORES DE TEXTO */
+  --ifm-font-color-base: var(--owl-blue-dark);
+  --ifm-font-color-base-inverse: var(--owl-bone);
+  --ifm-heading-color: var(--owl-navy);
+
+  /* TIPOGRAFÍA */
+  --ifm-font-family-base: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ifm-heading-font-family: 'Crimson Text', Georgia, serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', 'SF Mono', Monaco, 'Courier New', monospace;
+
+  --ifm-font-size-base: 17px;
+  --ifm-line-height-base: 1.7;
+  --ifm-heading-line-height: 1.3;
+  --ifm-font-weight-normal: 400;
+  --ifm-font-weight-semibold: 600;
+  --ifm-font-weight-bold: 700;
+
+  /* ESPACIADO - Editorial generoso */
+  --ifm-spacing-horizontal: 1.5rem;
+  --ifm-spacing-vertical: 1.5rem;
+  --ifm-global-spacing: 2rem;
+
+  /* SOMBRAS EN CAPAS */
+  --owl-shadow-sm: 0 2px 8px rgba(30, 58, 95, 0.08);
+  --owl-shadow-md: 0 4px 16px rgba(30, 58, 95, 0.12);
+  --owl-shadow-lg: 0 8px 32px rgba(30, 58, 95, 0.16);
+  --owl-shadow-xl: 0 12px 48px rgba(30, 58, 95, 0.24);
+
+  /* BORDES */
+  --ifm-global-radius: 8px;
+  --owl-border-color: var(--owl-bone-darker);
+
+  /* CODE BLOCKS */
+  --ifm-code-font-size: 0.9em;
+  --docusaurus-highlighted-code-line-bg: rgba(74, 144, 226, 0.15);
+
+  /* NAVBAR */
+  --ifm-navbar-background-color: var(--owl-navy);
+  --ifm-navbar-link-color: var(--owl-bone);
+  --ifm-navbar-link-hover-color: var(--owl-blue-bright);
+  --ifm-navbar-height: 64px;
+  --ifm-navbar-shadow: var(--owl-shadow-md);
+
+  /* SIDEBAR */
+  --ifm-menu-color: var(--owl-blue-dark);
+  --ifm-menu-color-active: var(--owl-blue-bright);
+  --ifm-menu-color-background-active: rgba(74, 144, 226, 0.1);
+
+  /* TRANSICIONES */
+  --ifm-transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ifm-transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* ============================================
+    VARIABLES CSS - DARK MODE (Tema Oscuro)
+    ============================================ */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  /* AJUSTES PARA MODO OSCURO - FONDO AZUL PROFUNDO */
+  --owl-bone: #0f1419;           /* Azul muy oscuro - background principal */
+  --owl-bone-dark: #1a2332;      /* Azul oscuro - surfaces */
+  --owl-bone-darker: #2C5F8D;    /* Azul medio - accents */
+  --owl-navy: #ffffff;           /* Blanco puro - texto principal */
+  --owl-blue-bright: #6BA5F2;    /* Azul brillante - links y CTAs */
+
+  /* COLORES DE TEXTO DARK MODE - TEXTO BLANCO LEGIBLE */
+  --ifm-font-color-base: #ffffff;
+  --ifm-font-color-base-inverse: #0f1419;
+  --ifm-heading-color: #ffffff;
+  --ifm-color-content: #ffffff;
+  --ifm-color-content-secondary: #e6e6e6;
+  --ifm-color-content-inverse: #0f1419;
+
+  /* COLORES PRIMARIOS PARA DARK MODE */
+  --ifm-color-primary: #6BA5F2;
+  --ifm-color-primary-dark: #4A90E2;
+  --ifm-color-primary-darker: #3E82D6;
+  --ifm-color-primary-darkest: #2C6AB8;
+  --ifm-color-primary-light: #8BBAFF;
+  --ifm-color-primary-lighter: #A3C8FF;
+  --ifm-color-primary-lightest: #C4DCFF;
+
+  /* BACKGROUNDS AZUL PROFUNDO */
+  --ifm-background-color: #0f1419;
+  --ifm-background-surface-color: #1a2332;
+
+  /* SOMBRAS PARA DARK MODE */
+  --owl-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --owl-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --owl-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --owl-shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.7);
+
+  --owl-border-color: rgba(255, 255, 255, 0.1);
+
+  --docusaurus-highlighted-code-line-bg: rgba(107, 165, 242, 0.2);
+
+  /* NAVBAR CON FONDO AZUL */
+  --ifm-navbar-background-color: rgba(15, 20, 25, 0.95);
+  --ifm-navbar-link-color: #ffffff;
 }
 
-/* Tamaño del logo en el navbar - mantener tamaño por defecto por proporción */
+/* ============================================
+   TIPOGRAFÍA GLOBAL
+   ============================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 3rem;
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: 2.25rem;
+  margin-top: 3rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+/* Body text refinements */
+p {
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   NAVBAR - Nocturna con Logo Prominente
+   ============================================ */
+.navbar {
+  backdrop-filter: blur(12px);
+  background-color: rgb(30, 58, 95);
+  border-bottom: 1px solid rgba(245, 241, 232, 0.1);
+  box-shadow: var(--owl-shadow-md);
+  transition: all var(--ifm-transition-fast);
+}
+
+[data-theme='dark'] .navbar {
+  background-color: rgba(15, 20, 25, 0.95) !important;
+  backdrop-filter: blur(10px);
+}
+
+[data-theme='dark'] body {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%) !important;
+}
+
+[data-theme='dark'] .main-wrapper {
+  background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%) !important;
+}
+
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] h5,
+[data-theme='dark'] h6 {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] p,
+[data-theme='dark'] li,
+[data-theme='dark'] span,
+[data-theme='dark'] div {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .menu__link {
+  color: #e6e6e6 !important;
+}
+
+[data-theme='dark'] .menu__link:hover,
+[data-theme='dark'] .menu__link--active {
+  color: #ffffff !important;
+}
+
 .navbar__logo img {
-  height: 32px;
+  height: 40px;
   width: auto;
+  transition: transform var(--ifm-transition-fast);
+}
+
+.navbar__logo:hover img {
+  transform: scale(1.05);
+}
+
+.navbar__link {
+  color: var(--owl-bone);
+  font-weight: 600;
+  transition: color var(--ifm-transition-fast);
+}
+
+.navbar__link:hover {
+  color: var(--owl-blue-bright);
+}
+
+/* Navbar brand link - forzar color blanco hueso */
+.navbar__brand {
+  color: #F5F1E8 !important;
+}
+
+.navbar__brand:hover {
+  color: #F5F1E8 !important;
+}
+
+.navbar__brand .navbar__title,
+.navbar__title {
+  color: #F5F1E8 !important;
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Asegurar que el link del navbar brand no sobrescriba el color */
+.navbar__brand:hover .navbar__title {
+  color: #F5F1E8 !important;
+}
+
+/* ============================================
+   SIDEBAR - Blanco Hueso Artesanal
+   ============================================ */
+.theme-doc-sidebar-container {
+  background-color: var(--owl-bone) !important;
+  border-right: 2px solid var(--owl-border-color);
+}
+
+[data-theme='dark'] .theme-doc-sidebar-container {
+  background-color: var(--ifm-background-surface-color) !important;
+}
+
+.menu__link {
+  border-radius: 6px;
+  transition: all var(--ifm-transition-fast);
+}
+
+.menu__link:hover {
+  background-color: rgba(74, 144, 226, 0.08);
+  transform: translateX(4px);
+}
+
+.menu__link--active {
+  background-color: var(--ifm-menu-color-background-active);
+  border-left: 3px solid var(--owl-blue-bright);
+  color: var(--owl-blue-bright);
+  font-weight: 600;
+}
+
+.menu__list-item-collapsible:hover {
+  background-color: rgba(74, 144, 226, 0.05);
+}
+
+/* ============================================
+   FOOTER - Navy Nocturno
+   ============================================ */
+.footer {
+  background-color: var(--owl-navy);
+  color: var(--owl-bone);
+  padding: 3rem 0 2rem;
+}
+
+[data-theme='dark'] .footer {
+  background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%) !important;
+}
+
+.footer__title {
+  color: var(--owl-blue-bright);
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.footer__link-item {
+  color: var(--owl-bone);
+  transition: color var(--ifm-transition-fast);
+}
+
+.footer__link-item:hover {
+  color: var(--owl-blue-bright);
+  text-decoration: none;
+}
+
+.footer__copyright {
+  color: rgba(245, 241, 232, 0.7);
+  font-size: 0.9rem;
+  margin-top: 2rem;
+}
+
+/* ============================================
+   BUTTONS & CTAs - Brillantes y Pulidos
+   ============================================ */
+.button {
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all var(--ifm-transition-fast);
+}
+
+.button--primary {
+  background-color: var(--owl-blue-bright);
+  border-color: var(--owl-blue-bright);
+  box-shadow: var(--owl-shadow-sm);
+}
+
+.button--primary:hover {
+  background-color: var(--owl-navy-light);
+  border-color: var(--owl-navy-light);
+  box-shadow: var(--owl-shadow-md);
+  transform: translateY(-2px);
+}
+
+.button--secondary {
+  border: 2px solid var(--owl-navy-light);
+  color: var(--owl-navy-light);
+}
+
+.button--secondary:hover {
+  background-color: var(--owl-navy-light);
+  border-color: var(--owl-navy-light);
+  color: white;
+}
+
+/* ============================================
+   CARDS - Sombras en Capas
+   ============================================ */
+.card {
+  background-color: var(--ifm-background-surface-color);
+  border: 1px solid var(--owl-border-color);
+  border-radius: 12px;
+  box-shadow: var(--owl-shadow-sm);
+  transition: all var(--ifm-transition-slow);
+}
+
+.card:hover {
+  box-shadow: var(--owl-shadow-lg);
+  transform: translateY(-4px);
+}
+
+/* ============================================
+   CODE BLOCKS - Nocturno Coherente
+   ============================================ */
+code {
+  background-color: rgba(74, 144, 226, 0.08);
+  border: 1px solid rgba(74, 144, 226, 0.15);
+  border-radius: 4px;
+  color: var(--owl-navy-light);
+  font-family: var(--ifm-font-family-monospace);
+  padding: 0.15rem 0.4rem;
+}
+
+[data-theme='dark'] code {
+  background-color: rgba(107, 165, 242, 0.15);
+  border-color: rgba(107, 165, 242, 0.25);
+  color: var(--owl-blue-bright);
+}
+
+pre code {
+  background-color: transparent;
+  border: none;
+}
+
+.prism-code {
+  border-radius: 8px;
+  box-shadow: var(--owl-shadow-md);
+}
+
+/* ============================================
+   CONTENT CONTAINER - Espaciado Editorial
+   ============================================ */
+.container {
+  max-width: 1200px;
+}
+
+article {
+  max-width: 800px;
+}
+
+.markdown > h2 {
+  margin-top: 3rem;
+  padding-top: 1rem;
+}
+
+.markdown > h3 {
+  margin-top: 2rem;
+}
+
+/* ============================================
+   LINKS - Transiciones Suaves
+   ============================================ */
+a {
+  color: var(--owl-navy-light);
+  text-decoration: none;
+  transition: color var(--ifm-transition-fast);
+}
+
+a:hover {
+  color: var(--owl-blue-bright);
+  text-decoration: underline;
+  text-decoration-color: rgba(74, 144, 226, 0.4);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+[data-theme='dark'] a {
+  color: var(--owl-blue-bright);
+}
+
+/* ============================================
+   ANIMACIONES - Micro-interacciones
+   ============================================ */
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Fade in para elementos */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Parpadeo sutil para logo (usado en hover) */
+@keyframes owlBlink {
+  0%, 90%, 100% { opacity: 1; }
+  95% { opacity: 0.7; }
+}
+
+.navbar__logo:hover img {
+  animation: owlBlink 2s ease-in-out;
+}
+
+/* ============================================
+   TEXTURAS Y EFECTOS ATMOSFÉRICOS
+   ============================================ */
+
+/* Textura sutil de tela/papel */
+body {
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px);
+  z-index: 1;
+}
+
+[data-theme='dark'] body::before {
+  opacity: 0.03;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.08) 2px, rgba(255,255,255,.08) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,.08) 2px, rgba(255,255,255,.08) 4px);
+}
+
+/* ============================================
+   RESPONSIVE - Mobile Optimizations
+   ============================================ */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.25rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  .navbar__logo img {
+    height: 32px;
+  }
+
+  :root {
+    --ifm-font-size-base: 16px;
+    --ifm-spacing-horizontal: 1rem;
+  }
+}
+
+/* ============================================
+   ACCESIBILIDAD - Focus States
+   ============================================ */
+*:focus-visible {
+  outline: 3px solid var(--owl-blue-bright);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================
+   DARK MODE TOGGLE - Transición Suave
+   ============================================ */
+html[data-theme='dark'],
+html[data-theme='light'] {
+  transition: background-color var(--ifm-transition-slow), color var(--ifm-transition-slow);
 }
