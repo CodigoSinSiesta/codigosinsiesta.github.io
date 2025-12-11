@@ -4,7 +4,7 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 1rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -13,6 +13,23 @@
 @media screen and (max-width: 996px) {
   .heroBanner {
     padding: 2rem;
+  }
+}
+
+.logoContainer {
+  margin-bottom: 0.5rem;
+}
+
+.heroLogo {
+  height: 500px;
+  width: auto;
+  max-width: 100%;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+@media screen and (max-width: 996px) {
+  .heroLogo {
+    height: 350px;
   }
 }
 
