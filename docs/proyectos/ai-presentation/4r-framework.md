@@ -568,12 +568,64 @@ class PaymentService {
 
 ## Integración de los 4 Pilares
 
+### Decision Tree: ¿Cuándo aplicar cada pilar?
+
+```
+¿Qué tipo de código generas con IA?
+│
+├─ 🔴 Maneja datos sensibles o autenticación
+│  └─ PRIORIDAD: Risk + Reliability + Resilience
+│     (Ejemplo: APIs de usuario, pagos, auth)
+│
+├─ 🔵 Lógica compleja o crítica para negocio
+│  └─ PRIORIDAD: Readability + Reliability
+│     (Ejemplo: Algoritmos, cálculos, decisiones)
+│
+├─ 🟡 Integraciones externas o APIs
+│  └─ PRIORIDAD: Resilience + Risk
+│     (Ejemplo: Webhooks, llamadas a terceros)
+│
+├─ 🟢 Código utilitario o helpers
+│  └─ PRIORIDAD: Readability + Reliability
+│     (Ejemplo: Formatters, parsers, conversores)
+│
+└─ ⚫ Scaffolding o código boilerplate
+   └─ PRIORIDAD: Readability
+      (Ejemplo: tipos, configuraciones, setup)
+```
+
+### Matriz de Decisión por Contexto
+
+| Contexto | Risk | Readability | Reliability | Resilience |
+|----------|------|-------------|-------------|-----------|
+| **Startup MVP** | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐ |
+| **B2B SaaS** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Fintech** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Healthcare** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Internal Tools** | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
+| **CLI Tools** | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+
 ### Orden de Aplicación
 
 1. **Risk** primero: ¿Es seguro?
+   - Identifica qué datos maneja
+   - Valida inputs
+   - Verifica permisos
+
 2. **Readability**: ¿Se entiende?
+   - Reduce complejidad
+   - Documenta decisiones
+   - Lint automático
+
 3. **Reliability**: ¿Funciona?
+   - Escribe tests primero (TDD)
+   - Cubre caminos críticos
+   - Valida con mutation testing
+
 4. **Resilience**: ¿Aguanta?
+   - Añade timeouts
+   - Circuit breakers para dependencias
+   - Logging y monitoring
 
 ### Checklist de Validación
 

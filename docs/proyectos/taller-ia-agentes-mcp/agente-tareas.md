@@ -16,10 +16,52 @@ Un agente de IA es un sistema que puede:
 
 A diferencia de un chatbot que solo responde, un agente **toma decisiones y ejecuta acciones**.
 
+### Comparativa: Chatbot vs Agente
+
+| Aspecto | Chatbot | Agente |
+|---------|---------|--------|
+| **Entrada** | Pregunta del usuario | Tarea a completar |
+| **Proceso** | Genera respuesta directa | Planifica y ejecuta pasos |
+| **Herramientas** | Ninguna (solo contexto) | Múltiples (APIs, BD, etc.) |
+| **Decisiones** | Ninguna (solo respuesta) | Decide qué tool usar y parámetros |
+| **Salida** | Texto | Acción + Resultado |
+| **Ejemplo** | "¿Cuál es la capital de Francia?" | "Añade 3 tareas a mi lista" |
+
 ### El Ciclo Básico de un Agente
 
 ```
-Usuario → Prompt + Contexto → LLM → Decide usar herramienta → Ejecuta herramienta → Procesa resultado → Responde
+┌─────────────────────────────────────────┐
+│  Usuario: "Añade una tarea importante"  │
+└────────────┬────────────────────────────┘
+             ↓
+┌─────────────────────────────────────────┐
+│  Agente recibe y envía al LLM           │
+│  + contexto: tareas existentes          │
+│  + tools disponibles: add_task, list... │
+└────────────┬────────────────────────────┘
+             ↓
+┌─────────────────────────────────────────┐
+│  LLM razona:                            │
+│  "Usuario quiere añadir tarea"          │
+│  "Uso tool 'add_task' con parámetros"   │
+└────────────┬────────────────────────────┘
+             ↓
+┌─────────────────────────────────────────┐
+│  Agente ejecuta: add_task({             │
+│    title: "Tarea importante"            │
+│  })                                     │
+└────────────┬────────────────────────────┘
+             ↓
+┌─────────────────────────────────────────┐
+│  Resultado: Task{id: '123', ...}        │
+│  Agente envía resultado de vuelta       │
+│  al LLM para sintetizar respuesta       │
+└────────────┬────────────────────────────┘
+             ↓
+┌─────────────────────────────────────────┐
+│  Respuesta final al usuario:            │
+│  "✓ Añadí tu tarea importante (ID:123)" │
+└─────────────────────────────────────────┘
 ```
 
 Este ciclo se repite hasta completar la tarea. Es el patrón fundamental de todos los agentes modernos.
@@ -120,6 +162,7 @@ export class FileTaskManager implements TaskManager {
     this.filePath = filePath;
   }
 
+  // Cargar tareas del archivo
   private async loadTasks(): Promise<Task[]> {
     try {
       const data = await readFile(this.filePath, 'utf-8');
@@ -131,18 +174,21 @@ export class FileTaskManager implements TaskManager {
         completedAt: task.completedAt ? new Date(task.completedAt) : undefined
       }));
     } catch {
-      return [];
+      return []; // Si no existe el archivo, retornar lista vacía
     }
   }
 
+  // Guardar tareas al archivo
   private async saveTasks(tasks: Task[]): Promise<void> {
     await writeFile(this.filePath, JSON.stringify(tasks, null, 2));
   }
 
+  // Obtener todas las tareas
   async getTasks(): Promise<Task[]> {
     return this.loadTasks();
   }
 
+  // Añadir nueva tarea
   async addTask(title: string, description?: string): Promise<Task> {
     const tasks = await this.loadTasks();
     const newTask: Task = {
@@ -158,6 +204,7 @@ export class FileTaskManager implements TaskManager {
     return newTask;
   }
 
+  // Marcar tarea como completada
   async completeTask(id: string): Promise<Task> {
     const tasks = await this.loadTasks();
     const task = tasks.find(t => t.id === id);
@@ -176,6 +223,7 @@ export class FileTaskManager implements TaskManager {
     return task;
   }
 
+  // Obtener solo tareas pendientes
   async getPendingTasks(): Promise<Task[]> {
     const tasks = await this.loadTasks();
     return tasks.filter(task => !task.completed);
@@ -258,7 +306,7 @@ export const taskTools = [
 
 ### Paso 4: Crear el Agente Principal
 
-Ahora el agente que coordina todo:
+Ahora el agente que coordina todo. Este es el núcleo que ejecuta el ciclo:
 
 ```typescript:src/agents/task-agent.ts
 import { Anthropic } from '@anthropic-ai/sdk';
@@ -269,12 +317,20 @@ import { FileTaskManager } from '../tools/task-manager';
 export class TaskAgent {
   private client: Anthropic;
   private taskManager: TaskManager;
+  private maxIterations = 5; // Evitar loops infinitos
 
   constructor(apiKey: string, taskManager?: TaskManager) {
     this.client = new Anthropic({ apiKey });
     this.taskManager = taskManager || new FileTaskManager();
   }
 
+  /**
+   * Ejecuta el ciclo principal del agente
+   * 1. Envía el mensaje al LLM
+   * 2. Si el LLM quiere usar tools, las ejecuta
+   * 3. Vuelve a enviar al LLM con los resultados
+   * 4. Repite hasta que el LLM devuelva una respuesta final
+   */
   async execute(userMessage: string): Promise<string> {
     const messages = [
       {
@@ -285,20 +341,21 @@ export class TaskAgent {
 
     let response = await this.callLLM(messages);
     let iterations = 0;
-    const maxIterations = 5; // Previene loops infinitos
 
-    while (iterations < maxIterations) {
+    // Loop principal del agente
+    while (iterations < this.maxIterations) {
       // Si el LLM quiere usar tools
       if (response.toolCalls && response.toolCalls.length > 0) {
+        // Ejecutar las tools y obtener resultados
         const toolResults = await this.executeTools(response.toolCalls);
 
-        // Añadir la respuesta del LLM y resultados de tools al contexto
+        // Añadir respuesta del LLM al historial
         messages.push({
           role: 'assistant',
           content: response.message
         });
 
-        // Añadir resultados de tools
+        // Añadir resultados de cada tool
         for (const result of toolResults) {
           messages.push({
             role: 'user',
@@ -306,18 +363,22 @@ export class TaskAgent {
           });
         }
 
-        // Continuar el ciclo
+        // Siguiente iteración: enviar de vuelta al LLM
         response = await this.callLLM(messages);
         iterations++;
       } else {
-        // Respuesta final
+        // El LLM dio una respuesta final (sin tools)
         return response.message;
       }
     }
 
+    // Fallback si se alcanza max iteraciones
     return 'Lo siento, el agente alcanzó el límite máximo de iteraciones. ¿Puedes reformular tu solicitud?';
   }
 
+  /**
+   * Llama al LLM con el contexto actual y tools disponibles
+   */
   private async callLLM(messages: any[]): Promise<any> {
     try {
       const response = await this.client.messages.create({
@@ -329,9 +390,12 @@ export class TaskAgent {
 
       const content = response.content[0];
 
+      // Respuesta de texto (sin tools)
       if (content.type === 'text') {
         return { message: content.text };
-      } else if (content.type === 'tool_use') {
+      }
+      // Respuesta con tool use
+      else if (content.type === 'tool_use') {
         return {
           message: content.text || '',
           toolCalls: [{
@@ -347,6 +411,10 @@ export class TaskAgent {
     }
   }
 
+  /**
+   * Ejecuta las tools que el LLM indicó
+   * Mapea cada tool a su función correspondiente y valida parámetros
+   */
   private async executeTools(toolCalls: any[]): Promise<any[]> {
     const results = [];
 
@@ -357,7 +425,10 @@ export class TaskAgent {
         switch (call.tool) {
           case 'add_task':
             const addParams = AddTaskSchema.parse(call.parameters);
-            result = await this.taskManager.addTask(addParams.title, addParams.description);
+            result = await this.taskManager.addTask(
+              addParams.title,
+              addParams.description
+            );
             break;
 
           case 'complete_task':
@@ -367,17 +438,7 @@ export class TaskAgent {
 
           case 'list_tasks':
             const listParams = ListTasksSchema.parse(call.parameters);
-            switch (listParams.filter) {
-              case 'pending':
-                result = await this.taskManager.getPendingTasks();
-                break;
-              case 'completed':
-                const allTasks = await this.taskManager.getTasks();
-                result = allTasks.filter(t => t.completed);
-                break;
-              default:
-                result = await this.taskManager.getTasks();
-            }
+            result = await this.filterTasks(listParams.filter);
             break;
 
           default:
@@ -389,7 +450,8 @@ export class TaskAgent {
           result: JSON.stringify(result, null, 2)
         });
 
-      } catch (error) {
+      } catch (error: any) {
+        // Capturar errores de validación o ejecución
         results.push({
           tool: call.tool,
           result: `Error: ${error.message}`
@@ -398,6 +460,21 @@ export class TaskAgent {
     }
 
     return results;
+  }
+
+  /**
+   * Helper para filtrar tareas por estado
+   */
+  private async filterTasks(filter: 'all' | 'pending' | 'completed'): Promise<any> {
+    switch (filter) {
+      case 'pending':
+        return await this.taskManager.getPendingTasks();
+      case 'completed':
+        const allTasks = await this.taskManager.getTasks();
+        return allTasks.filter(t => t.completed);
+      default:
+        return await this.taskManager.getTasks();
+    }
   }
 }
 ```
@@ -609,11 +686,50 @@ Una vez que entiendes lo básico, puedes explorar:
 
 ## Próximos Pasos
 
-Ahora que tienes un agente básico funcionando:
+Ahora que tienes un agente básico funcionando, tienes varios caminos:
 
-1. **Experimenta** modificando las tools
-2. **Añade más funcionalidades** (borrar tareas, editar, etc.)
-3. **Lee sobre el [Agente Investigador](./agente-investigador.md)** para patrones avanzados
-4. **Explora los [Ejercicios](./ejercicios.md)** para practicar
+### Camino 1: Profundizar en Agentes (Recomendado)
+- **[Agente Investigador](./agente-investigador.md)** — Patrón Plan-Execute-Synthesize
+  - Aprende a construir agentes que planifican antes de actuar
+  - Cómo manejar contexto y memoria
+  - Agentes que se comunican con otros agentes
+
+### Camino 2: Explorar MCP (Model Context Protocol)
+- **[MCP Servers](./mcp-servers.md)** — Construir servidores que el LLM puede usar
+  - Diferencia entre Tool Use y MCP
+  - Integración con Claude Desktop
+  - Distribuir funcionalidad como MCP Server
+
+### Camino 3: Validar tu Conocimiento (Recomendado después)
+- **[Ejercicios Prácticos](./ejercicios.md)** — Desafíos sin soluciones
+  - Nivel 1: Fundamentals
+  - Nivel 2: Intermediate
+  - Nivel 3: Advanced
+
+### Camino 4: Mejorar Calidad de Código
+- **[4R Framework](/docs/proyectos/ai-presentation/4r-framework.md)** — Ingeniería responsable con IA
+  - Risk, Readability, Reliability, Resilience
+  - Aplicar estos principios a tu agente
+
+### Experimentación Local
+
+Antes de seguir adelante, prueba estas variaciones con tu agente:
+
+```bash
+# 1. Añade una nueva tool
+# Ejemplo: delete_task, edit_task
+
+# 2. Modifica el modelo (usa claude-3-5-sonnet para más potencia)
+# ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
+
+# 3. Aumenta max_tokens para respuestas más detalladas
+# max_tokens: 2000
+
+# 4. Añade persistencia entre sesiones
+# Guarda el historial de tareas en BD
+
+# 5. Añade logging para ver qué hace el LLM
+# Inspecciona qué tools elige y por qué
+```
 
 ¿Tu primer agente funciona? ¡Felicitaciones! Has dado el primer paso hacia sistemas de IA más sofisticados. 🚀

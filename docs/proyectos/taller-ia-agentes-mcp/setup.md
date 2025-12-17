@@ -6,6 +6,24 @@ sidebar_position: 2
 
 Guía completa para preparar tu entorno de desarrollo para construir agentes de IA y MCP Servers con TypeScript. Esta configuración te permitirá trabajar con Claude, DeepSeek y herramientas modernas de desarrollo.
 
+## Flujo de Setup (5 minutos)
+
+```
+1. Instalar dependencias del sistema (Node.js, pnpm)
+       ↓
+2. Crear estructura de proyecto
+       ↓
+3. Configurar TypeScript
+       ↓
+4. Instalar librerías
+       ↓
+5. Configurar variables de entorno
+       ↓
+6. Verificar que todo funciona ✓
+```
+
+**Total estimado:** 5-10 minutos (dependiendo de tu conexión)
+
 ## Requisitos del Sistema
 
 Antes de comenzar, asegúrate de tener instalado:
@@ -195,7 +213,24 @@ Añade estos scripts para facilitar el desarrollo:
 
 ## Verificación del Setup
 
-Ejecuta estos comandos para verificar que todo funciona:
+### Checklist de Verificación
+
+Ejecuta cada paso y marca como completado:
+
+- [ ] **Node.js 20+** instalado: `node --version`
+- [ ] **pnpm** instalado: `pnpm --version`
+- [ ] **Directorio del proyecto** creado
+- [ ] **package.json** inicializado
+- [ ] **tsconfig.json** configurado
+- [ ] **Dependencias** instaladas: `pnpm install`
+- [ ] **Variables de entorno** en `.env`
+- [ ] **TypeScript compila**: `pnpm run build`
+- [ ] **Tests corren**: `pnpm run test:run`
+- [ ] **API keys funcionan**: Script test-setup.ts
+
+### Comandos de Verificación
+
+Ejecuta estos en orden:
 
 ```bash
 # 1. Verificar instalación de dependencias
@@ -204,19 +239,36 @@ pnpm install
 # 2. Verificar compilación TypeScript
 pnpm run build
 
-# 3. Verificar configuración de entorno
-node -e "console.log('Node.js:', process.version)"
-node -e "console.log('Environment loaded:', !!process.env.ANTHROPIC_API_KEY)"
+# 3. Verificar versiones
+node --version  # Debe ser v20.x.x
+pnpm --version  # Debe ser 8.x.x
+```
 
-# 4. Ejecutar tests básicos
+**Salida esperada:**
+```
+v20.11.0 (o superior)
+8.15.0 (o superior)
+```
+
+```bash
+# 4. Verificar variables de entorno
+cat .env | grep API_KEY
+```
+
+**Salida esperada:**
+```
+ANTHROPIC_API_KEY=sk-ant-...
+DEEPSEEK_API_KEY=sk-...
+```
+
+```bash
+# 5. Ejecutar tests básicos
 pnpm run test:run
+```
 
-# 5. Verificar conectividad con APIs (opcional)
-node -e "
-import { Anthropic } from '@anthropic-ai/sdk';
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-console.log('Claude API key loaded:', !!client.apiKey);
-"
+**Salida esperada:**
+```
+✓ src/__tests__/... (n tests)
 ```
 
 ### Test básico de conectividad
@@ -275,30 +327,112 @@ tsx src/test-setup.ts
 
 ## Troubleshooting Común
 
-### Error: "Cannot find module '@anthropic-ai/sdk'"
+### ❌ Error: "Cannot find module '@anthropic-ai/sdk'"
+
+**Causa:** Dependencias no instaladas o versión incorrecta
+
 ```bash
-# Reinstalar dependencias
+# Solución 1: Reinstalar todo (nuclear)
 rm -rf node_modules pnpm-lock.yaml
 pnpm install
+
+# Solución 2: Actualizar solo la dependencia
+pnpm add @anthropic-ai/sdk@latest
+
+# Solución 3: Verificar que el módulo existe
+ls node_modules/@anthropic-ai/sdk/package.json
 ```
 
-### Error: "API key not found"
+### ❌ Error: "API key not found" o "401 Unauthorized"
+
+**Causa:** Variables de entorno no cargadas o key inválida
+
 ```bash
-# Verificar que .env existe y tiene las keys
+# Verificación 1: .env existe
+ls -la .env
+
+# Verificación 2: .env tiene contenido válido
 cat .env | grep API_KEY
+# Debe mostrar: ANTHROPIC_API_KEY=sk-ant-...
+
+# Verificación 3: .env está en .gitignore
+cat .gitignore | grep "^\.env$"
+
+# Verificación 4: Tu API key es válida
+# Accede a https://console.anthropic.com/account/keys
+# Verifica que la key no está revocada
 ```
 
-### Error: "TypeScript compilation failed"
+> **⚠️ Nota:** Si copias el .env desde otro proyecto, asegúrate de que las keys están vigentes.
+
+### ❌ Error: "TypeScript compilation failed"
+
+**Causa:** Errores de tipo en tu código o configuración tsconfig.json
+
 ```bash
-# Verificar tsconfig.json
+# Ver errores detallados
 pnpm run lint
+
+# Forzar recompilación limpia
+rm -rf dist
+pnpm run build
+
+# Si aún falla, verificar tsconfig.json
+cat tsconfig.json | grep -A 5 "strict"
 ```
 
-### Error: "Node.js version too old"
+**Errores comunes:**
+- `Type 'X' is not assignable to type 'Y'` → Falta casting o tipo incorrecto
+- `Cannot find name 'process'` → Falta `@types/node`
+- `Module not found` → Archivo no existe o path incorrecto
+
+### ❌ Error: "Node.js version too old"
+
+**Causa:** Tienes Node.js < 20
+
 ```bash
-# Actualizar Node.js
+# Verificar tu versión actual
+node --version
+
+# Si es menor a v20, actualizar
 nvm install 20
 nvm use 20
+nvm alias default 20
+
+# Verificar que cambió
+node --version  # Debe ser v20.x.x
+```
+
+### ❌ Error: "pnpm: command not found"
+
+**Causa:** pnpm no instalado o no en PATH
+
+```bash
+# Instalar globalmente
+npm install -g pnpm
+
+# Si aún no funciona, verificar PATH
+which pnpm
+
+# Si no aparece, reiniciar terminal
+# Si sigue sin funcionar, usar npm en lugar de pnpm
+npm install  # En lugar de pnpm install
+```
+
+### ❌ Error: ".env not found" en test-setup.ts
+
+**Causa:** El script no encuentra el archivo .env
+
+```bash
+# Verificación 1: Estás en la carpeta correcta
+pwd  # Debe terminar en /taller-ia-agentes
+
+# Verificación 2: .env existe en la raíz
+ls -la .env
+
+# Verificación 3: Ejecutar desde la carpeta correcta
+cd /ruta/a/taller-ia-agentes
+tsx src/test-setup.ts
 ```
 
 ## Siguientes Pasos
