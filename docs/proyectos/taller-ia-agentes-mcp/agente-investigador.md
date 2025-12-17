@@ -6,12 +6,14 @@ sidebar_position: 4
 
 El siguiente nivel en construcción de agentes: el patrón **Plan-Execute-Synthesize**. De agentes reactivos simples a investigadores inteligentes que planifican, ejecutan estrategias complejas, y sintetizan conocimiento profundo.
 
+**📦 Código del taller:** [github.com/CodigoSinSiesta/codigosinsiesta.github.io](https://github.com/CodigoSinSiesta/codigosinsiesta.github.io)
+
 ## Requisitos Previos
 
 - Completar [Setup](./setup.md) ✓
 - Entender [Agente de Tareas](./agente-tareas.md) ✓
 - Conocer patrón Tool Use ✓
-- Familiario con async/await en TypeScript ✓
+- Familiarizado con async/await en TypeScript ✓
 
 **Duración esperada**: 2-3 horas
 
@@ -99,6 +101,8 @@ export class InvestigationAgent {
   }
 
   async investigate(topic: string): Promise<InvestigationResult> {
+    const startTime = Date.now();
+
     // 1. PLAN: Crear plan de investigación
     const plan = await this.createInvestigationPlan(topic);
 
@@ -114,7 +118,7 @@ export class InvestigationAgent {
       synthesis,
       metadata: {
         topic,
-        duration: Date.now() - Date.now(), // Calcular duración real
+        duration: Date.now() - startTime, // Calcular duración real
         toolsUsed: this.getToolsUsed(executionResults),
         quality: this.assessQuality(synthesis)
       }
@@ -127,6 +131,7 @@ export class InvestigationAgent {
 
 ```typescript:src/agents/planning-engine.ts
 export class PlanningEngine {
+  private llm: LLMService; // Servicio de IA para generar planes
   async createPlan(topic: string): Promise<InvestigationPlan> {
     const prompt = `Create a comprehensive investigation plan for: "${topic}"
 
@@ -260,6 +265,7 @@ export class ExecutionEngine {
 
 ```typescript:src/agents/synthesis-engine.ts
 export class SynthesisEngine {
+  private llm: LLMService; // Servicio de IA para síntesis
   async synthesizeResults(
     plan: InvestigationPlan,
     executionResults: ExecutionResult[]
@@ -336,6 +342,7 @@ ${JSON.stringify(result.data, null, 2)}
 export class InvestigationMemory {
   private investigations: Map<string, Investigation> = new Map();
   private learnings: Learning[] = [];
+  private failurePatterns: FailurePattern[] = [];
 
   // Recordar patrones exitosos
   recordSuccessfulPattern(topic: string, plan: InvestigationPlan, result: InvestigationResult) {
@@ -347,7 +354,7 @@ export class InvestigationMemory {
       tools: result.metadata.toolsUsed
     };
 
-    this.learningPatterns.push(pattern);
+    this.learnings.push(pattern);
   }
 
   // Aprender de errores
@@ -388,6 +395,7 @@ export class InvestigationMemory {
 ```typescript:src/agents/context-manager.ts
 export class ContextManager {
   private contextStack: Context[] = [];
+  private insightEngine: InsightEngine;
 
   // Evolucionar contexto durante investigación
   updateContext(newFindings: any): void {
@@ -446,6 +454,8 @@ export class ContextManager {
 ```typescript:src/debugging/agent-debugger.ts
 export class AgentDebugger {
   private logs: DebugLog[] = [];
+  private currentContextId: string;
+  private performanceMetrics: PerformanceMetric[] = [];
 
   logPhase(phase: string, data: any): void {
     this.logs.push({
@@ -518,6 +528,7 @@ digraph Investigation {
 
 ```typescript:src/debugging/debug-tools.ts
 export class DebugTools {
+  private toolRegistry: Map<string, Tool> = new Map();
   // Simular ejecución paso a paso
   async debugExecute(plan: InvestigationPlan, stepCallback?: (step: any) => void): Promise<ExecutionResult[]> {
     const results: ExecutionResult[] = [];

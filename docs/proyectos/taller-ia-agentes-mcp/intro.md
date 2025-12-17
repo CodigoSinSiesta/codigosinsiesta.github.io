@@ -6,6 +6,9 @@ sidebar_position: 1
 
 Bienvenido al taller completo sobre construcción de **Agentes de IA** y **MCP Servers** (Model Context Protocol).
 
+**📦 Repositorio:** [github.com/CodigoSinSiesta/codigosinsiesta.github.io](https://github.com/CodigoSinSiesta/codigosinsiesta.github.io)  
+**🌐 Sitio en vivo:** [codigosinsiesta.github.io](https://codigosinsiesta.github.io/)
+
 ## 📚 En esta sección
 
 Este taller te enseñará a:
