@@ -6,6 +6,17 @@ sidebar_position: 4
 
 El siguiente nivel en construcción de agentes: el patrón **Plan-Execute-Synthesize**. De agentes reactivos simples a investigadores inteligentes que planifican, ejecutan estrategias complejas, y sintetizan conocimiento profundo.
 
+## Requisitos Previos
+
+- Completar [Setup](./setup.md) ✓
+- Entender [Agente de Tareas](./agente-tareas.md) ✓
+- Conocer patrón Tool Use ✓
+- Familiario con async/await en TypeScript ✓
+
+**Duración esperada**: 2-3 horas
+
+---
+
 ## Patrón Plan-Execute-Synthesize
 
 ### ¿Por Qué Este Patrón?
@@ -677,13 +688,44 @@ export class SmartCache {
 
 El patrón **Plan-Execute-Synthesize** eleva a los agentes de herramientas reactivas a **investigadores inteligentes**. La diferencia clave:
 
-- **Agentes simples**: Responden directamente
-- **Agentes investigadores**: Piensan, planifican, ejecutan sistemáticamente, y sintetizan conocimiento
+| Aspecto | Agente Simple | Agente Investigador |
+|---------|---------------|-------------------|
+| **Entrada** | Tarea inmediata | Pregunta abierta |
+| **Proceso** | 1 paso (Tool Use) | 3 pasos (Plan → Execute → Synthesize) |
+| **Salida** | Resultado directo | Reporte comprehensivo |
+| **Ejemplo** | "Añade tarea" | "Investiga tendencias en IA" |
+| **Tiempo** | Segundos | Minutos-horas |
+| **Complejidad** | Bajo-medio | Medio-alto |
 
-**Próximos pasos:**
-1. Experimenta con topics complejos
-2. Añade más tools especializadas
-3. Implementa caching y optimizaciones
-4. Explora [MCP Servers](./mcp-servers.md) para tools más poderosas
+---
+
+## Siguientes Caminos
+
+### Camino 1: Mejorar tu Agente Investigador
+- Experimenta con topics complejos
+- Añade más tools especializadas
+- Implementa caching y optimizaciones
+- Mejora el quality assessment
+
+### Camino 2: Explorar MCP Servers
+- **[MCP Servers](./mcp-servers.md)** — Tools más poderosas
+  - Distribuir funcionalidad como servicios
+  - Integrar con Claude Desktop
+  - Crear agentes que usan agentes
+
+### Camino 3: Validar Conocimiento
+- **[Ejercicios Prácticos](./ejercicios.md)** — Desafíos nivel avanzado
+  - Construir agentes multi-paso desde cero
+  - Optimizar planes complejos
+  - Manejar errores y fallbacks
+
+### Camino 4: Aplicar Buenas Prácticas
+- **[4R Framework](/docs/proyectos/ai-presentation/4r-framework.md)**
+  - Asegurar que tu agente es seguro (Risk)
+  - Code limpio y documentado (Readability)
+  - Testing comprehensivo (Reliability)
+  - Manejo de fallos robusto (Resilience)
+
+---
 
 ¿Tu agente investigador ya está funcionando? ¿Qué insights ha descubierto? 🔍
