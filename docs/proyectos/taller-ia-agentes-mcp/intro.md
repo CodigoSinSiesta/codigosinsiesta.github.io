@@ -18,10 +18,33 @@ Este taller te enseñará a:
 
 ## 🎯 Requisitos Previos
 
-- Conocimiento sólido de **TypeScript** y POO
-- Familiaridad con **Node.js** (v20+)
-- Entender conceptos básicos de APIs y prompts
-- Git y línea de comandos
+### ¿Por qué TypeScript? (No es opcional)
+
+Los agentes de IA no son "scripts de juguete". Manejan:
+- **Datos complejos** de APIs externas
+- **Estados distribuidos** entre múltiples llamadas
+- **Herramientas asíncronas** con timeouts y reintentos
+- **Validación estricta** de inputs/outputs del LLM
+
+**Sin TypeScript sólido:**
+- Un typo en un nombre de propiedad → runtime error silencioso
+- Tool calls mal formateados → agente que "se vuelve loco"
+- Estados inconsistentes → bugs imposibles de debuggear
+- Refactoring → semanas de testing manual
+
+**Con TypeScript:**
+- El compilador atrapa errores antes de ejecutar
+- IntelliSense acelera desarrollo 3x
+- Refactoring seguro con "Find All References"
+- Contratos claros entre componentes
+
+> **Dato real**: El 80% de bugs en agentes IA vienen de errores de tipos o estados mal manejados. TypeScript previene la mayoría.
+
+### Otros Requisitos
+
+- **Node.js 20+**: ES modules nativos, performance crítica para agentes
+- **APIs/LLMs**: Entender que Claude no es magia, es un API con límites
+- **Git/CLI**: Version control y debugging de sistemas distribuidos
 
 ## 📖 Contenido del Taller
 
