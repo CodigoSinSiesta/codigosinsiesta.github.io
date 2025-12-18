@@ -1,7 +1,7 @@
 ---
 slug: mgrep-busqueda-semantica-codigo
 title: mgrep - Búsqueda Semántica de Código que Entiende Tu Intención
-authors: [codigosinsiesta]
+authors: [TellMeAlex]
 tags: [herramientas, cli, búsqueda, ia, productividad]
 ---
 
