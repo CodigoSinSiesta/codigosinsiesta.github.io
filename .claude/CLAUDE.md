@@ -7,7 +7,7 @@ Sitio web oficial de Código Sin Siesta construido con Docusaurus 3. Incluye doc
 ## Stack Tecnológico
 
 - **Framework**: Docusaurus 3.9.2
-- **Package Manager**: pnpm 10
+- **Package Manager**: bun
 - **Node**: v20
 - **Lenguaje**: JavaScript (opcionalmente TypeScript)
 - **Deployment**: GitHub Pages con GitHub Actions
@@ -40,23 +40,23 @@ Sitio web oficial de Código Sin Siesta construido con Docusaurus 3. Incluye doc
 ├── docusaurus.config.js # Configuración principal
 ├── sidebars.js          # Configuración de navegación lateral
 ├── package.json
-└── pnpm-lock.yaml       # Lockfile de dependencias
+└── bun.lockb            # Lockfile de dependencias
 ```
 
 ## Comandos Importantes
 
 ```bash
 # Desarrollo local
-pnpm start                # Servidor de desarrollo en http://localhost:3000
+bun start                 # Servidor de desarrollo en http://localhost:3000
 
 # Build para producción
-pnpm run build            # Genera build en ./build
+bun run build             # Genera build en ./build
 
 # Testing local del build
-pnpm run serve            # Sirve el build localmente
+bun run serve             # Sirve el build localmente
 
 # Limpiar cache
-pnpm run clear            # Limpia cache de Docusaurus
+bun run clear             # Limpia cache de Docusaurus
 ```
 
 ## Workflow de Desarrollo
@@ -66,7 +66,7 @@ pnpm run clear            # Limpia cache de Docusaurus
 Para editar contenido (docs, blog, páginas):
 
 1. Editar archivos correspondientes en `docs/`, `blog/`, o `src/pages/`
-2. Probar localmente con `pnpm start`
+2. Probar localmente con `bun start`
 3. Commit y push a main
 4. GitHub Actions desplegará automáticamente
 
@@ -126,7 +126,7 @@ Contenido completo...
 ### Workflows
 
 1. **deploy.yml**: Deploy automático en push a `main`
-   - Instala dependencias con pnpm
+   - Instala dependencias con bun
    - Ejecuta build
    - Despliega a GitHub Pages
 
@@ -148,7 +148,7 @@ gh run view [RUN_ID] --log
 
 ### Build falla en GitHub Actions
 
-1. Verificar que `pnpm-lock.yaml` esté committeado
+1. Verificar que `bun.lockb` esté committeado
 2. Verificar que no haya errores de sintaxis en archivos `.md`
 3. Ver logs: `gh run view --log`
 
@@ -179,7 +179,7 @@ Cada proyecto tiene su propio repositorio y deployment independiente.
 
 ## Notas Importantes
 
-1. **NO usar npm/yarn**: Este proyecto usa pnpm exclusivamente
+1. **Usar bun**: Este proyecto usa bun exclusivamente (NO usar npm/yarn/pnpm)
 2. **Archivo .nojekyll**: No eliminar `static/.nojekyll` - previene procesamiento Jekyll
 3. **Idioma**: El sitio está en español. Mantener consistencia en contenido nuevo
 4. **Autores**: Añadir nuevos autores en `blog/authors.yml` antes de usarlos en posts

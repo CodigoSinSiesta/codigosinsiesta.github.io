@@ -19,18 +19,18 @@ Este sitio está construido con [Docusaurus 3](https://docusaurus.io/), un gener
 ### Requisitos Previos
 
 - Node.js 20 o superior
-- pnpm (recomendado) o npm/yarn
+- bun (recomendado)
 
 ### Instalación
 
 ```bash
-pnpm install
+bun install
 ```
 
 ### Servidor de Desarrollo
 
 ```bash
-pnpm start
+bun start
 ```
 
 Esto inicia un servidor local en `http://localhost:3000` con recarga automática.
@@ -38,7 +38,7 @@ Esto inicia un servidor local en `http://localhost:3000` con recarga automática
 ### Build de Producción
 
 ```bash
-pnpm build
+bun run build
 ```
 
 Genera el contenido estático en el directorio `build/`.
@@ -46,7 +46,7 @@ Genera el contenido estático en el directorio `build/`.
 ### Previsualizar Build
 
 ```bash
-pnpm serve
+bun run serve
 ```
 
 Sirve el contenido del directorio `build/` para previsualizar antes de desplegar.
@@ -60,7 +60,7 @@ El sitio se despliega automáticamente a GitHub Pages mediante GitHub Actions cu
 El archivo `.github/workflows/deploy.yml` maneja el proceso de deployment:
 
 1. Checkout del código
-2. Configuración de pnpm y Node.js 20
+2. Instalación de bun y Node.js 20
 3. Instalación de dependencias
 4. Build del sitio
 5. Deploy a GitHub Pages

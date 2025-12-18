@@ -1,7 +1,7 @@
 ---
 slug: bienvenida
 title: Código Sin Siesta - Donde la Disciplina Gana a la Velocidad
-authors: [codigosinsiesta]
+authors: [TellMeAlex]
 tags: [bienvenida, filosofia, calidad-codigo, ia-responsable]
 ---
 
