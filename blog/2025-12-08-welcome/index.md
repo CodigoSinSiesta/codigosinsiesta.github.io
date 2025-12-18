@@ -1,7 +1,7 @@
 ---
 slug: bienvenida
 title: Bienvenidos a Código Sin Siesta
-authors: [codigosinsiesta]
+authors: [TellMeAlex]
 tags: [bienvenida, introduccion]
 ---
 

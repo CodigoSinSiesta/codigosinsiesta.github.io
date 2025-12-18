@@ -1,7 +1,7 @@
 ---
 slug: vibe-coding-vs-software-engineering
 title: "Vibe Coding vs Software Engineering: La Paradoja del Desarrollo Moderno"
-authors: [codigosinsiesta]
+authors: [TellMeAlex]
 tags: [ai, software-engineering, best-practices, framework-4r, calidad-codigo]
 image: /img/blog-header.jpg
 ---
