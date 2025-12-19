@@ -28,7 +28,7 @@ Antes de comparar Skills, MCP, Sub-agents y Slash Commands, es crucial entender 
 4. **Herramientas**: Las capacidades que el agente puede invocar (Read, Write, Bash, Grep, MCP servers personalizados, etc.).
 
 ```mermaid
-graph TB
+flowchart TB
     A["📚 Contexto<br/>(Memoria de trabajo)"]
     B["🧠 Modelo<br/>(Claude Opus/Sonnet/Haiku)"]
     C["💬 Prompt<br/>(Instrucción fundamental)"]
@@ -74,7 +74,7 @@ Los cuatro mecanismos (Skills, Slash Commands, MCP, Sub-agents) son formas de **
 La clave del diseño arquitectónico efectivo es entender qué estás modificando y por qué.
 
 ```mermaid
-graph TB
+flowchart TB
     subgraph CoreFour["Core Four Fundamental"]
         CTX["📚 Contexto"]
         MODEL["🧠 Modelo"]
@@ -276,7 +276,7 @@ Eres un especialista en testing. Solo te enfocas en escribir tests unitarios con
 ### Árbol de Decisión
 
 ```mermaid
-graph TD
+flowchart TD
     A["¿Necesitas conectividad<br/>externa?<br/>(API, DB, servicio)"]
     A -->|SÍ| MCP["🔌 MCP Server"]
     A -->|NO| B["¿Necesitas<br/>paralelizar<br/>procesamiento?"]
@@ -497,7 +497,7 @@ Para cada issue encontrado, reporta:
 **Por qué funciona**: Los sub-agents procesan batches en paralelo, el agente principal agrega resultados. Sin paralelización, analizar 1000 archivos sería lentísimo.
 
 ```mermaid
-graph TB
+flowchart TB
     MAIN["🎯 Agente Principal"]
 
     MAIN -->|Divide en batches| BATCH["10 archivos x batch"]
@@ -634,7 +634,7 @@ Cuando el usuario solicite crear un commit o mencione "commit these changes":
 - **Slash Command → Skill**: Es parte del workflow de todos los commits, la automatización elimina fricción
 
 ```mermaid
-graph LR
+flowchart LR
     A["Día 1<br/>Prompt"] -->|Funciona| B["Semana 1<br/>/commit"]
     B -->|Se repite diariamente| C["Mes 1<br/>⚡ Skill<br/>automático"]
 
@@ -720,7 +720,7 @@ Claude: [Skill se activa]
 ```
 
 ```mermaid
-graph TB
+flowchart TB
     subgraph User["Usuario"]
         REQ["Procesa facturas"]
     end
@@ -745,7 +745,7 @@ graph TB
     SKILL -->|Usa| PDF
     SKILL -->|Estructura| PROC
 
-    GDRIVE ↔️ DRIVE
+    GDRIVE <-->|Sincroniza| DRIVE
     PDF -.->|Lee de| DRIVE
 
     PROC -->|Genera| OUTPUT["📊 JSON<br/>estructurado"]
