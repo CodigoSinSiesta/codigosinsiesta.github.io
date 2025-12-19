@@ -61,6 +61,17 @@ const sidebars = {
       items: [
         'arquitectura-ia/patrones',
         'arquitectura-ia/design-decisions',
+        {
+          type: 'category',
+          label: 'Guía de Composición',
+          items: [
+            'arquitectura-ia/guia-composicion/fundamentos-core-four',
+            'arquitectura-ia/guia-composicion/comparativa-y-decision',
+            'arquitectura-ia/guia-composicion/patrones-de-diseno',
+            'arquitectura-ia/guia-composicion/casos-practicos',
+            'arquitectura-ia/guia-composicion/mejores-practicas-y-recursos',
+          ],
+        },
         'arquitectura-ia/testing-strategies',
         'arquitectura-ia/security-patterns',
       ],

@@ -38,6 +38,10 @@ const config = {
     locales: ['es'],
   },
 
+  markdown: {
+    mermaid: true,
+  },
+
   presets: [
     [
       'classic',
@@ -72,6 +76,8 @@ const config = {
     ],
   ],
 
+  themes: ['@docusaurus/theme-mermaid'],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -79,6 +85,9 @@ const config = {
       image: 'img/docusaurus-social-card.jpg',
       colorMode: {
         respectPrefersColorScheme: true,
+      },
+      mermaid: {
+        theme: { light: 'default', dark: 'dark' },
       },
       navbar: {
         title: 'Código Sin Siesta',
