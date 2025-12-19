@@ -27,6 +27,31 @@ Antes de comparar Skills, MCP, Sub-agents y Slash Commands, es crucial entender 
 
 4. **Herramientas**: Las capacidades que el agente puede invocar (Read, Write, Bash, Grep, MCP servers personalizados, etc.).
 
+```mermaid
+graph TB
+    A["📚 Contexto<br/>(Memoria de trabajo)"]
+    B["🧠 Modelo<br/>(Claude Opus/Sonnet/Haiku)"]
+    C["💬 Prompt<br/>(Instrucción fundamental)"]
+    D["🔧 Herramientas<br/>(Read, Write, Bash, MCP...)"]
+
+    E["Agente Coherente"]
+
+    A --> E
+    B --> E
+    C --> E
+    D --> E
+
+    style A fill:#e1f5ff
+    style B fill:#f3e5f5
+    style C fill:#e8f5e9
+    style D fill:#fff3e0
+    style E fill:#fff9c4
+```
+
+★ Insight ─────────────────────────────────────
+Los Core Four son **elementos independientes** que se combinan para formar un agente funcional. Modificar cualquiera de ellos (cambiar modelo, mejorar prompt, agregar herramientas) afecta el comportamiento total. Las cuatro extensiones que veremos (Skills, Slash Commands, MCP, Sub-agents) son simplemente formas de modificar estos elementos de manera composicional.
+─────────────────────────────────────────────────
+
 ### El Prompt Sigue Siendo Fundamental
 
 Aquí está la verdad incómoda que muchos desarrolladores olvidan al emocionarse con Skills y Sub-agents: **el prompt es la unidad fundamental de todo**. No importa cuán sofisticada sea tu arquitectura de skills o cuántos MCP servers tengas configurados, todo se reduce a qué le estás diciendo al modelo que haga.
@@ -47,6 +72,46 @@ Los cuatro mecanismos (Skills, Slash Commands, MCP, Sub-agents) son formas de **
 - **Sub-agents** crean instancias separadas con su propio contexto, modelo, prompt y herramientas
 
 La clave del diseño arquitectónico efectivo es entender qué estás modificando y por qué.
+
+```mermaid
+graph TB
+    subgraph CoreFour["Core Four Fundamental"]
+        CTX["📚 Contexto"]
+        MODEL["🧠 Modelo"]
+        PROMPT["💬 Prompt"]
+        TOOLS["🔧 Herramientas"]
+    end
+
+    subgraph Extensiones["Cuatro Mecanismos de Extensión"]
+        SKILL["⚡ Skills<br/>(Contexto + Prompt)"]
+        SLASH["⌨️ Slash Commands<br/>(Prompt + Manual)"]
+        MCP["🔌 MCP Servers<br/>(Herramientas)"]
+        SUBAGENT["🤖 Sub-agents<br/>(Todos separados)"]
+    end
+
+    CTX -.->|modifica| SKILL
+    PROMPT -.->|modifica| SKILL
+
+    PROMPT -.->|invoca| SLASH
+
+    TOOLS -.->|extiende| MCP
+
+    CTX -.->|aislado| SUBAGENT
+    MODEL -.->|aislado| SUBAGENT
+    PROMPT -.->|aislado| SUBAGENT
+    TOOLS -.->|aislado| SUBAGENT
+
+    style CoreFour fill:#fffacd,stroke:#333,stroke-width:2px
+    style Extensiones fill:#f0f8ff,stroke:#333,stroke-width:2px
+    style SKILL fill:#e8f5e9
+    style SLASH fill:#fff3e0
+    style MCP fill:#f3e5f5
+    style SUBAGENT fill:#ffe0b2
+```
+
+★ Insight ─────────────────────────────────────
+Cada mecanismo de extensión **modifica un subconjunto diferente** de los Core Four. Un skill modifica contexto y prompt (automáticamente), un slash command solo invoca un prompt (manualmente), MCP extiende herramientas, y los sub-agents crean una **copia completamente aislada** de todos los elementos. Esto es la razón por la cual no son intercambiables - cada uno resuelve un problema diferente.
+─────────────────────────────────────────────────
 
 ## Comparativa: Cuatro Tipos de Extensión
 
@@ -210,21 +275,26 @@ Eres un especialista en testing. Solo te enfocas en escribir tests unitarios con
 
 ### Árbol de Decisión
 
-```
-┌─ ¿Necesitas conectividad externa (API, DB, servicio)?
-│  └─ SÍ → MCP Server
-│
-├─ ¿Necesitas paralelizar procesamiento?
-│  └─ SÍ → Sub-agents
-│
-├─ ¿Es un procedimiento recurrente que debería ser automático?
-│  └─ SÍ → Skill
-│
-├─ ¿Es un flujo one-off que el usuario dispara manualmente?
-│  └─ SÍ → Slash Command
-│
-└─ ¿Es una solicitud única sin patrón recurrente?
-   └─ SÍ → Prompt conversacional simple
+```mermaid
+graph TD
+    A["¿Necesitas conectividad<br/>externa?<br/>(API, DB, servicio)"]
+    A -->|SÍ| MCP["🔌 MCP Server"]
+    A -->|NO| B["¿Necesitas<br/>paralelizar<br/>procesamiento?"]
+
+    B -->|SÍ| SUBAGENT["🤖 Sub-agents"]
+    B -->|NO| C["¿Es un procedimiento<br/>recurrente que debería<br/>ser automático?"]
+
+    C -->|SÍ| SKILL["⚡ Skill"]
+    C -->|NO| D["¿Es un flujo one-off<br/>que el usuario<br/>dispara manualmente?"]
+
+    D -->|SÍ| SLASH["⌨️ Slash Command"]
+    D -->|NO| PROMPT["💬 Prompt<br/>conversacional simple"]
+
+    style MCP fill:#f3e5f5
+    style SUBAGENT fill:#ffe0b2
+    style SKILL fill:#e8f5e9
+    style SLASH fill:#fff3e0
+    style PROMPT fill:#f5f5f5
 ```
 
 ### Ejemplos Concretos por Camino
@@ -297,6 +367,38 @@ Cuando el usuario pida "generar reporte de ventas" o similar:
 
 **Por qué funciona**: El skill proporciona el procedimiento automático, el MCP proporciona la conectividad. Claude activa el skill cuando detecta la intención y usa el MCP como herramienta.
 
+```mermaid
+sequenceDiagram
+    actor Usuario
+    participant Claude
+    participant Skill
+    participant MCP as MCP Google Drive
+    participant Drive as Google Drive
+
+    Usuario->>Claude: "Generar reporte de ventas"
+    Claude->>Claude: Detecta intención 'reporte de ventas'
+    Claude->>Skill: Activa skill automáticamente
+
+    Skill->>MCP: Listar archivos en carpeta 'Ventas'
+    MCP->>Drive: Lee carpeta
+    Drive-->>MCP: Lista de archivos
+    MCP-->>Skill: Archivos JSON
+
+    Skill->>MCP: Descargar hoja de cálculo
+    MCP->>Drive: Obtiene contenido
+    Drive-->>MCP: Datos de la hoja
+    MCP-->>Skill: Datos estructurados
+
+    Skill->>Skill: Procesa y extrae métricas
+    Skill->>Claude: Datos listos para reportar
+
+    Claude->>Usuario: Reporte generado ✅
+```
+
+★ Insight ─────────────────────────────────────
+**Composición Skill + MCP = Automatización potente**. El skill define el "qué y cuándo", el MCP define el "cómo conectar". Docusaurus renderizará este diagrama automáticamente - la sintaxis Mermaid es nativa en Docusaurus 3.
+─────────────────────────────────────────────────
+
 ### Patrón 2: Prompt → Slash Command → Skill (Escalada Gradual)
 
 **Evolución de una funcionalidad de testing**:
@@ -329,6 +431,26 @@ Cuando detectes que se ha creado un archivo .jsx o .tsx nuevo:
 ```
 
 **Lección**: No saltar directamente a skills. Dejar que el patrón de uso emerja naturalmente.
+
+```mermaid
+timeline
+    title Patrón: Escalada Gradual
+    section Día 1
+        Prompt conversacional: Usuario pregunta en chat
+    section Semana 1
+        Se repite diariamente: Crear Slash Command
+    section Mes 1
+        Parte del workflow estándar: Convertir en Skill
+
+    section Métrica
+        Conversacional: Manual, único
+        Slash Command: Manual, reutilizable
+        Skill: Automático, integrado
+```
+
+★ Insight ─────────────────────────────────────
+**Esta escalada no es aleatoria**. Cada etapa proporciona retroalimentación sobre si el siguiente nivel de abstracción está justificado. Si un prompt conversacional se usa una sola vez, no necesita slash command. Si un slash command se invoca manualmente cada día, merece automatización como skill.
+─────────────────────────────────────────────────
 
 ### Patrón 3: Sub-agents para Procesamiento Paralelo con Agregación
 
@@ -373,6 +495,37 @@ Para cada issue encontrado, reporta:
 ```
 
 **Por qué funciona**: Los sub-agents procesan batches en paralelo, el agente principal agrega resultados. Sin paralelización, analizar 1000 archivos sería lentísimo.
+
+```mermaid
+graph TB
+    MAIN["🎯 Agente Principal"]
+
+    MAIN -->|Divide en batches| BATCH["10 archivos x batch"]
+    BATCH --> SUB1["🤖 Sub-agent 1<br/>(Archivos 1-10)"]
+    BATCH --> SUB2["🤖 Sub-agent 2<br/>(Archivos 11-20)"]
+    BATCH --> SUB3["🤖 Sub-agent 3<br/>(Archivos 21-30)"]
+    BATCH --> SUBN["🤖 Sub-agent N<br/>(...)"]
+
+    SUB1 -->|Analiza en paralelo| RESULTS["Resultados"]
+    SUB2 -->|Analiza en paralelo| RESULTS
+    SUB3 -->|Analiza en paralelo| RESULTS
+    SUBN -->|Analiza en paralelo| RESULTS
+
+    RESULTS -->|Agrega| REPORT["📊 Reporte Final<br/>Vulnerabilidades compiladas"]
+
+    style MAIN fill:#fff9c4
+    style BATCH fill:#e0e0e0
+    style SUB1 fill:#ffe0b2
+    style SUB2 fill:#ffe0b2
+    style SUB3 fill:#ffe0b2
+    style SUBN fill:#ffe0b2
+    style RESULTS fill:#e0e0e0
+    style REPORT fill:#c8e6c9
+```
+
+★ Insight ─────────────────────────────────────
+**Paralelización = Aceleración exponencial**. Si analizas 100 archivos secuencialmente a 2 minutos por agente = 200 minutos. Con 10 sub-agents en paralelo = 20 minutos. Pero cada sub-agent es una instancia completamente aislada, lo que mantiene el contexto manejable y evita contaminación entre batches.
+─────────────────────────────────────────────────
 
 ### Patrón 4: CLAUDE.md como Contexto Base + Skills como Especialización
 
@@ -480,6 +633,23 @@ Cuando el usuario solicite crear un commit o mencione "commit these changes":
 - **Prompt → Slash Command**: Se usa diariamente, merece un comando rápido
 - **Slash Command → Skill**: Es parte del workflow de todos los commits, la automatización elimina fricción
 
+```mermaid
+graph LR
+    A["Día 1<br/>Prompt"] -->|Funciona| B["Semana 1<br/>/commit"]
+    B -->|Se repite diariamente| C["Mes 1<br/>⚡ Skill<br/>automático"]
+
+    A -.->|Costo: Manual cada vez| COST1["⚠️ Fricción"]
+    B -.->|Costo: Escribir /command| COST2["📌 Tolerable"]
+    C -.->|Costo: 0, automático| COST3["✅ Óptimo"]
+
+    style A fill:#fff3e0
+    style B fill:#e3f2fd
+    style C fill:#e8f5e9
+    style COST1 fill:#ffcdd2
+    style COST2 fill:#fff9c4
+    style COST3 fill:#c8e6c9
+```
+
 ### Ejemplo 2: Procesamiento de Documentos (Skill + MCP)
 
 **Contexto**: Startup que necesita procesar facturas PDF subidas a Google Drive.
@@ -549,11 +719,55 @@ Claude: [Skill se activa]
          → Reporta resultados
 ```
 
+```mermaid
+graph TB
+    subgraph User["Usuario"]
+        REQ["Procesa facturas"]
+    end
+
+    subgraph System["Sistema Claude Code"]
+        SKILL["⚡ Invoice<br/>Processor Skill"]
+
+        subgraph MCPs["MCP Servers"]
+            GDRIVE["📁 Google Drive<br/>(listar, mover)"]
+            PDF["📄 PDF Parser<br/>(extraer texto)"]
+        end
+
+        PROC["Procesar datos<br/>(JSON)"]
+    end
+
+    subgraph External["Servicios Externos"]
+        DRIVE["Google Drive<br/>(Carpetas: Pendientes,<br/>Procesadas)"]
+    end
+
+    REQ -->|Activa| SKILL
+    SKILL -->|Usa| GDRIVE
+    SKILL -->|Usa| PDF
+    SKILL -->|Estructura| PROC
+
+    GDRIVE ↔️ DRIVE
+    PDF -.->|Lee de| DRIVE
+
+    PROC -->|Genera| OUTPUT["📊 JSON<br/>estructurado"]
+
+    style REQ fill:#fff9c4
+    style SKILL fill:#e8f5e9
+    style GDRIVE fill:#f3e5f5
+    style PDF fill:#f3e5f5
+    style PROC fill:#e3f2fd
+    style DRIVE fill:#eeeeee
+    style OUTPUT fill:#c8e6c9
+```
+
 **Por qué esta arquitectura**:
 - **Skill**: Procedimiento recurrente (cada mes), debe ser automático
 - **MCP Google Drive**: Conectividad externa a Drive
 - **MCP PDF Parser**: Funcionalidad especializada no nativa en Claude Code
 - **No sub-agents**: No hay necesidad de paralelización (pocas facturas) ni especialización de contexto
+
+★ Insight ─────────────────────────────────────
+Observa cómo **Skill + MCP** permite a Claude "razonar" sobre tareas complejas sin escribir código. El skill describe el flujo conceptualmente, los MCPs manejan la conectividad técnica. Sin this pattern, terminarías escribiendo scripts bash complejos o aplicaciones personalizadas.
+─────────────────────────────────────────────────
 
 ### Ejemplo 3: Análisis Paralelo de Codebase (Sub-agents)
 
