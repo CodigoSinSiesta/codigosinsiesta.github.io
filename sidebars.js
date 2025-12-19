@@ -53,6 +53,7 @@ const sidebars = {
         'herramientas/tmux',
         'herramientas/zellij',
         'herramientas/dev-tools',
+        'herramientas/claude-code-skills-mcp',
       ],
     },
     {
