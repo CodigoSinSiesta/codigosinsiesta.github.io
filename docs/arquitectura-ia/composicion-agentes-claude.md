@@ -1,6 +1,6 @@
 ---
-sidebar_position: 5
-title: Skills, MCP Servers, Sub-agents y Slash Commands en Claude Code
+sidebar_position: 3
+title: Composición de Agentes
 ---
 
 # Skills, MCP Servers, Sub-agents y Slash Commands en Claude Code: Guía Comparativa y Patrones de Uso

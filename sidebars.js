@@ -53,7 +53,6 @@ const sidebars = {
         'herramientas/tmux',
         'herramientas/zellij',
         'herramientas/dev-tools',
-        'herramientas/claude-code-skills-mcp',
       ],
     },
     {
@@ -62,6 +61,7 @@ const sidebars = {
       items: [
         'arquitectura-ia/patrones',
         'arquitectura-ia/design-decisions',
+        'arquitectura-ia/composicion-agentes-claude',
         'arquitectura-ia/testing-strategies',
         'arquitectura-ia/security-patterns',
       ],
