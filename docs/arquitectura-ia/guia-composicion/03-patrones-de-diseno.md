@@ -128,11 +128,18 @@ const results = await Promise.all(
     invokeSubAgent("security-analyzer", { files: batch })
   )
 );
+```
+
+> **Nota técnica**: `invokeSubAgent` es una función conceptual que representa la capacidad de Claude Code para delegar tareas. La implementación real puede variar según la versión de las herramientas o si estás usando la API de agentes directamente.
 
 // Agregar resultados
 const vulnerabilities = results.flat();
 generateReport(vulnerabilities);
 ```
+
+---
+
+**Siguiente paso:** [Casos Prácticos: Implementaciones reales](./04-casos-practicos.md)
 
 **Sub-agent `security-analyzer`**:
 ```yaml

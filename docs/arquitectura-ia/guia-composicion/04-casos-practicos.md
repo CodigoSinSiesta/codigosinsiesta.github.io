@@ -86,6 +86,8 @@ graph LR
 
 **Solución**: Skill + MCP Google Drive + MCP PDF Parser
 
+> 💡 **Requisito**: Este ejemplo asume que tienes configurados los servidores MCP correspondientes en tu `claude_desktop_config.json` o en los settings de Claude Code.
+
 **MCP Setup** (en settings):
 ```json
 {
@@ -188,6 +190,10 @@ graph TB
     style DRIVE fill:#616161,stroke:#fff,stroke-width:2px,color:#fff
     style OUTPUT fill:#388e3c,stroke:#fff,stroke-width:2px,color:#fff
 ```
+
+---
+
+**Siguiente paso:** [Mejores Prácticas y Recursos](./05-mejores-practicas-y-recursos.md)
 
 **Por qué esta arquitectura**:
 - **Skill**: Procedimiento recurrente (cada mes), debe ser automático

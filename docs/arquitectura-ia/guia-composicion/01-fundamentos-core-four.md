@@ -112,3 +112,8 @@ graph TB
 ★ Insight ─────────────────────────────────────
 Cada mecanismo de extensión **modifica un subconjunto diferente** de los Core Four. Un skill modifica contexto y prompt (automáticamente), un slash command solo invoca un prompt (manualmente), MCP extiende herramientas, y los sub-agents crean una **copia completamente aislada** de todos los elementos. Esto es la razón por la cual no son intercambiables - cada uno resuelve un problema diferente.
 ─────────────────────────────────────────────────
+
+---
+
+**Siguiente paso:** [Comparativa y Decisión: Cuándo usar cada mecanismo](./02-comparativa-y-decision.md)
+

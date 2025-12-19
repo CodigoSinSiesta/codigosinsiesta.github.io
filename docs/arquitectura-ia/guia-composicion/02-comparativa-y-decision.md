@@ -153,13 +153,16 @@ Eres un especialista en testing. Solo te enfocas en escribir tests unitarios con
 
 | Característica | Skills | Slash Commands | MCP Servers | Sub-agents |
 |----------------|--------|----------------|-------------|------------|
-| **Invocación** | Automática (modelo) | Manual (usuario) | Automática (como tool) | Explícita (llamada) |
-| **Cuándo se activa** | Cuando descripción coincide con contexto | Cuando usuario escribe `/cmd` | Cuando modelo necesita capacidad externa | Cuando se invoca programáticamente |
-| **Contexto** | Compartido con conversación | Compartido con conversación | N/A (es una herramienta) | Aislado, independiente |
-| **Reusabilidad** | Alta (automática) | Media (manual repetible) | Muy alta (global) | Media (especialización) |
-| **Paralelización** | No | No | No directamente | Sí (core use case) |
-| **Complejidad setup** | Media (SKILL.md) | Baja (JSON simple) | Alta (protocolo MCP) | Media (agent config) |
-| **Caso típico** | "Siempre sigue estos pasos de testing" | "Analiza este PR ahora" | "Conéctate a Slack" | "Procesa estos 10 archivos en paralelo" |
+| **Invocación** | Automática (modelo) | Manual (usuario) | Automática (tool) | Explícita (llamada) |
+| **Cuándo se activa** | Contexto relevante | Escribir `/cmd` | Necesidad externa | Llamada directa |
+| **Contexto** | ✅ Compartido | ✅ Compartido | ❌ N/A | 🔒 Aislado |
+| **Reusabilidad** | ⭐ Alta | 🆗 Media | 🔥 Muy alta | 🆗 Media |
+| **Paralelización** | ❌ No | ❌ No | ❌ No | ✅ Sí (Core use case) |
+| **Complejidad setup**| 🆗 Media | ⚡ Baja | ⚙️ Alta | 🆗 Media |
+
+---
+
+**Siguiente paso:** [Patrones de Diseño: Componiendo con elegancia](./03-patrones-de-diseno.md)
 
 ## Matriz de Decisión: Cuándo Usar Cada Uno
 
