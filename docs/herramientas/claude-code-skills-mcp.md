@@ -28,7 +28,7 @@ Antes de comparar Skills, MCP, Sub-agents y Slash Commands, es crucial entender 
 4. **Herramientas**: Las capacidades que el agente puede invocar (Read, Write, Bash, Grep, MCP servers personalizados, etc.).
 
 ```mermaid
-flowchart TB
+graph TB
     A["📚 Contexto<br/>(Memoria de trabajo)"]
     B["🧠 Modelo<br/>(Claude Opus/Sonnet/Haiku)"]
     C["💬 Prompt<br/>(Instrucción fundamental)"]
@@ -41,11 +41,11 @@ flowchart TB
     C --> E
     D --> E
 
-    style A fill:#e1f5ff
-    style B fill:#f3e5f5
-    style C fill:#e8f5e9
-    style D fill:#fff3e0
-    style E fill:#fff9c4
+    style A fill:#0288d1,stroke:#fff,stroke-width:2px,color:#fff
+    style B fill:#7b1fa2,stroke:#fff,stroke-width:2px,color:#fff
+    style C fill:#2e7d32,stroke:#fff,stroke-width:2px,color:#fff
+    style D fill:#e65100,stroke:#fff,stroke-width:2px,color:#fff
+    style E fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
 ```
 
 ★ Insight ─────────────────────────────────────
@@ -74,7 +74,7 @@ Los cuatro mecanismos (Skills, Slash Commands, MCP, Sub-agents) son formas de **
 La clave del diseño arquitectónico efectivo es entender qué estás modificando y por qué.
 
 ```mermaid
-flowchart TB
+graph TB
     subgraph CoreFour["Core Four Fundamental"]
         CTX["📚 Contexto"]
         MODEL["🧠 Modelo"]
@@ -101,12 +101,12 @@ flowchart TB
     PROMPT -.->|aislado| SUBAGENT
     TOOLS -.->|aislado| SUBAGENT
 
-    style CoreFour fill:#fffacd,stroke:#333,stroke-width:2px
-    style Extensiones fill:#f0f8ff,stroke:#333,stroke-width:2px
-    style SKILL fill:#e8f5e9
-    style SLASH fill:#fff3e0
-    style MCP fill:#f3e5f5
-    style SUBAGENT fill:#ffe0b2
+    style CoreFour fill:#37474f,stroke:#fff,stroke-width:2px,color:#fff
+    style Extensiones fill:#455a64,stroke:#fff,stroke-width:2px,color:#fff
+    style SKILL fill:#2e7d32,stroke:#fff,stroke-width:2px,color:#fff
+    style SLASH fill:#1976d2,stroke:#fff,stroke-width:2px,color:#fff
+    style MCP fill:#9c27b0,stroke:#fff,stroke-width:2px,color:#fff
+    style SUBAGENT fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
 ```
 
 ★ Insight ─────────────────────────────────────
@@ -276,7 +276,7 @@ Eres un especialista en testing. Solo te enfocas en escribir tests unitarios con
 ### Árbol de Decisión
 
 ```mermaid
-flowchart TD
+graph TD
     A["¿Necesitas conectividad<br/>externa?<br/>(API, DB, servicio)"]
     A -->|SÍ| MCP["🔌 MCP Server"]
     A -->|NO| B["¿Necesitas<br/>paralelizar<br/>procesamiento?"]
@@ -290,11 +290,15 @@ flowchart TD
     D -->|SÍ| SLASH["⌨️ Slash Command"]
     D -->|NO| PROMPT["💬 Prompt<br/>conversacional simple"]
 
-    style MCP fill:#f3e5f5
-    style SUBAGENT fill:#ffe0b2
-    style SKILL fill:#e8f5e9
-    style SLASH fill:#fff3e0
-    style PROMPT fill:#f5f5f5
+    style MCP fill:#9c27b0,stroke:#fff,stroke-width:2px,color:#fff
+    style SUBAGENT fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
+    style SKILL fill:#2e7d32,stroke:#fff,stroke-width:2px,color:#fff
+    style SLASH fill:#1976d2,stroke:#fff,stroke-width:2px,color:#fff
+    style PROMPT fill:#616161,stroke:#fff,stroke-width:2px,color:#fff
+    style A fill:#455a64,stroke:#fff,stroke-width:2px,color:#fff
+    style B fill:#455a64,stroke:#fff,stroke-width:2px,color:#fff
+    style C fill:#455a64,stroke:#fff,stroke-width:2px,color:#fff
+    style D fill:#455a64,stroke:#fff,stroke-width:2px,color:#fff
 ```
 
 ### Ejemplos Concretos por Camino
@@ -369,6 +373,7 @@ Cuando el usuario pida "generar reporte de ventas" o similar:
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Usuario
     participant Claude
     participant Skill
@@ -497,7 +502,7 @@ Para cada issue encontrado, reporta:
 **Por qué funciona**: Los sub-agents procesan batches en paralelo, el agente principal agrega resultados. Sin paralelización, analizar 1000 archivos sería lentísimo.
 
 ```mermaid
-flowchart TB
+graph TB
     MAIN["🎯 Agente Principal"]
 
     MAIN -->|Divide en batches| BATCH["10 archivos x batch"]
@@ -513,14 +518,14 @@ flowchart TB
 
     RESULTS -->|Agrega| REPORT["📊 Reporte Final<br/>Vulnerabilidades compiladas"]
 
-    style MAIN fill:#fff9c4
-    style BATCH fill:#e0e0e0
-    style SUB1 fill:#ffe0b2
-    style SUB2 fill:#ffe0b2
-    style SUB3 fill:#ffe0b2
-    style SUBN fill:#ffe0b2
-    style RESULTS fill:#e0e0e0
-    style REPORT fill:#c8e6c9
+    style MAIN fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
+    style BATCH fill:#616161,stroke:#fff,stroke-width:2px,color:#fff
+    style SUB1 fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
+    style SUB2 fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
+    style SUB3 fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
+    style SUBN fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
+    style RESULTS fill:#616161,stroke:#fff,stroke-width:2px,color:#fff
+    style REPORT fill:#2e7d32,stroke:#fff,stroke-width:2px,color:#fff
 ```
 
 ★ Insight ─────────────────────────────────────
@@ -634,7 +639,7 @@ Cuando el usuario solicite crear un commit o mencione "commit these changes":
 - **Slash Command → Skill**: Es parte del workflow de todos los commits, la automatización elimina fricción
 
 ```mermaid
-flowchart LR
+graph LR
     A["Día 1<br/>Prompt"] -->|Funciona| B["Semana 1<br/>/commit"]
     B -->|Se repite diariamente| C["Mes 1<br/>⚡ Skill<br/>automático"]
 
@@ -642,12 +647,12 @@ flowchart LR
     B -.->|Costo: Escribir /command| COST2["📌 Tolerable"]
     C -.->|Costo: 0, automático| COST3["✅ Óptimo"]
 
-    style A fill:#fff3e0
-    style B fill:#e3f2fd
-    style C fill:#e8f5e9
-    style COST1 fill:#ffcdd2
-    style COST2 fill:#fff9c4
-    style COST3 fill:#c8e6c9
+    style A fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
+    style B fill:#1976d2,stroke:#fff,stroke-width:2px,color:#fff
+    style C fill:#2e7d32,stroke:#fff,stroke-width:2px,color:#fff
+    style COST1 fill:#c62828,stroke:#fff,stroke-width:2px,color:#fff
+    style COST2 fill:#f57f17,stroke:#fff,stroke-width:2px,color:#fff
+    style COST3 fill:#388e3c,stroke:#fff,stroke-width:2px,color:#fff
 ```
 
 ### Ejemplo 2: Procesamiento de Documentos (Skill + MCP)
@@ -720,7 +725,7 @@ Claude: [Skill se activa]
 ```
 
 ```mermaid
-flowchart TB
+graph TB
     subgraph User["Usuario"]
         REQ["Procesa facturas"]
     end
@@ -745,18 +750,18 @@ flowchart TB
     SKILL -->|Usa| PDF
     SKILL -->|Estructura| PROC
 
-    GDRIVE <-->|Sincroniza| DRIVE
+    GDRIVE ↔️ DRIVE
     PDF -.->|Lee de| DRIVE
 
     PROC -->|Genera| OUTPUT["📊 JSON<br/>estructurado"]
 
-    style REQ fill:#fff9c4
-    style SKILL fill:#e8f5e9
-    style GDRIVE fill:#f3e5f5
-    style PDF fill:#f3e5f5
-    style PROC fill:#e3f2fd
-    style DRIVE fill:#eeeeee
-    style OUTPUT fill:#c8e6c9
+    style REQ fill:#f57c00,stroke:#fff,stroke-width:2px,color:#fff
+    style SKILL fill:#2e7d32,stroke:#fff,stroke-width:2px,color:#fff
+    style GDRIVE fill:#9c27b0,stroke:#fff,stroke-width:2px,color:#fff
+    style PDF fill:#9c27b0,stroke:#fff,stroke-width:2px,color:#fff
+    style PROC fill:#1976d2,stroke:#fff,stroke-width:2px,color:#fff
+    style DRIVE fill:#616161,stroke:#fff,stroke-width:2px,color:#fff
+    style OUTPUT fill:#388e3c,stroke:#fff,stroke-width:2px,color:#fff
 ```
 
 **Por qué esta arquitectura**:
