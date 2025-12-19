@@ -86,6 +86,9 @@ const config = {
       colorMode: {
         respectPrefersColorScheme: true,
       },
+      mermaid: {
+        theme: { light: 'default', dark: 'dark' },
+      },
       navbar: {
         title: 'Código Sin Siesta',
         logo: {
