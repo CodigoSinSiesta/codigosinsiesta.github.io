@@ -1,0 +1,8 @@
+{
+  "label": "Guía de Composición de Agentes",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Aprende a combinar Skills, MCP Servers, Sub-agents y Slash Commands para construir sistemas agenticos robustos."
+  }
+}

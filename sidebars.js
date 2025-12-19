@@ -61,7 +61,17 @@ const sidebars = {
       items: [
         'arquitectura-ia/patrones',
         'arquitectura-ia/design-decisions',
-        'arquitectura-ia/composicion-agentes-claude',
+        {
+          type: 'category',
+          label: 'Guía de Composición',
+          items: [
+            'arquitectura-ia/guia-composicion/01-fundamentos-core-four',
+            'arquitectura-ia/guia-composicion/02-comparativa-y-decision',
+            'arquitectura-ia/guia-composicion/03-patrones-de-diseno',
+            'arquitectura-ia/guia-composicion/04-casos-practicos',
+            'arquitectura-ia/guia-composicion/05-mejores-practicas-y-recursos',
+          ],
+        },
         'arquitectura-ia/testing-strategies',
         'arquitectura-ia/security-patterns',
       ],
