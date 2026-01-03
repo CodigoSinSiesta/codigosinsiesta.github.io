@@ -11,8 +11,8 @@ module.exports = {
       // URLs to audit (homepage and key pages)
       url: [
         'http://localhost/',
-        'http://localhost/docs/intro',
-        'http://localhost/blog',
+        'http://localhost/docs/intro.html',
+        'http://localhost/blog.html',
       ],
       // Number of runs per URL for more stable results
       numberOfRuns: 3,
