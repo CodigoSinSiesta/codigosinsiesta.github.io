@@ -19,6 +19,19 @@ const sidebars = {
     'intro',
     {
       type: 'category',
+      label: 'Ruta de Aprendizaje IA Agents',
+      items: [
+        'ruta-aprendizaje-ia-agents/intro',
+        'ruta-aprendizaje-ia-agents/01-fundamentos',
+        'ruta-aprendizaje-ia-agents/02-typescript',
+        'ruta-aprendizaje-ia-agents/03-conceptos',
+        'ruta-aprendizaje-ia-agents/04-agentes-avanzados',
+        'ruta-aprendizaje-ia-agents/05-mcp-servers',
+        'ruta-aprendizaje-ia-agents/06-produccion',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Proyectos',
       items: [
         {
