@@ -1,0 +1,65 @@
+name: License Check
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    paths:
+      - 'package.json'
+      - 'bun.lockb'
+
+permissions:
+  contents: read
+
+jobs:
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install license-checker
+        run: npm install -g license-checker
+
+      - name: Check licenses
+        run: |
+          license-checker --summary --excludePrivatePackages
+
+      - name: Check for problematic licenses
+        run: |
+          # Define allowed licenses (permissive open source licenses)
+          ALLOWED="MIT;ISC;BSD-2-Clause;BSD-3-Clause;Apache-2.0;CC0-1.0;CC-BY-3.0;CC-BY-4.0;Unlicense;0BSD;Python-2.0;BlueOak-1.0.0;MPL-2.0"
+
+          # Check for any packages with disallowed licenses
+          # This will fail if any package has a license not in the allowed list
+          license-checker --onlyAllow "$ALLOWED" --excludePrivatePackages || {
+            echo "::error::Found packages with non-approved licenses. Please review the dependencies."
+            exit 1
+          }
+
+      - name: Generate license report
+        run: |
+          license-checker --csv --out license-report.csv --excludePrivatePackages
+          echo "### License Report Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | License |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|---------|" >> $GITHUB_STEP_SUMMARY
+          license-checker --summary --excludePrivatePackages | tail -n +2 | while read line; do
+            if [ -n "$line" ]; then
+              echo "| - | $line |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
