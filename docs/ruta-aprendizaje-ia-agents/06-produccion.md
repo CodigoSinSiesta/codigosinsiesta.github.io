@@ -1,0 +1,1993 @@
+---
+sidebar_position: 7
+---
+
+# Módulo 6: Producción y Deployment
+
+Este módulo final te enseñará a llevar tus agentes de IA y MCP Servers a producción de forma segura, escalable y monitoreable. Aprenderás patrones de testing, seguridad, rate limiting, observabilidad y estrategias de deployment.
+
+**⏱️ Duración estimada:** 3 horas
+
+## 🎯 Requisitos Previos
+
+- **Módulo 5 completado**: Tienes un MCP Server funcional con herramientas
+- **Proyecto del Módulo 5 funcionando**: Tu servidor MCP se integra con Claude Desktop
+- **Entiendes el ecosistema completo**: Agentes, tools, MCP, memoria persistente
+
+### Lo que NO necesitas
+
+- Experiencia con Kubernetes o contenedores avanzados
+- Conocimiento de infraestructura cloud específica (AWS, GCP, Azure)
+- Certificaciones de seguridad
+
+## 📖 Contenido
+
+### 1. Estrategias de Testing para Agentes de IA
+
+Testing de agentes es diferente al testing tradicional porque la respuesta del LLM no es determinística.
+
+#### Niveles de Testing
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    PIRÁMIDE DE TESTING IA                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                          ┌─────────┐                             │
+│                          │  E2E    │  ← Flujos completos         │
+│                          │ Tests   │    (menos, más lentos)      │
+│                         /└─────────┘\                            │
+│                        /             \                           │
+│                    ┌─────────────────────┐                       │
+│                    │  Integration Tests  │  ← Tools + LLM mock   │
+│                    │                     │                       │
+│                   /└─────────────────────┘\                      │
+│                  /                         \                     │
+│              ┌─────────────────────────────────┐                 │
+│              │        Unit Tests               │  ← Lógica pura  │
+│              │  (Tools, Validators, Helpers)   │    (muchos)     │
+│              └─────────────────────────────────┘                 │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Unit Tests para Tools
+
+```typescript
+// src/__tests__/tools/calculator.test.ts
+import { describe, it, expect } from 'vitest';
+import { z } from 'zod';
+
+// La lógica de la tool extraída para testing
+const CalculatorInputSchema = z.object({
+  operation: z.enum(['add', 'subtract', 'multiply', 'divide']),
+  a: z.number(),
+  b: z.number()
+});
+
+function calculate(input: z.infer<typeof CalculatorInputSchema>): number {
+  switch (input.operation) {
+    case 'add': return input.a + input.b;
+    case 'subtract': return input.a - input.b;
+    case 'multiply': return input.a * input.b;
+    case 'divide':
+      if (input.b === 0) throw new Error('Division by zero');
+      return input.a / input.b;
+  }
+}
+
+describe('Calculator Tool', () => {
+  describe('schema validation', () => {
+    it('should accept valid input', () => {
+      const input = { operation: 'add' as const, a: 5, b: 3 };
+      expect(() => CalculatorInputSchema.parse(input)).not.toThrow();
+    });
+
+    it('should reject invalid operation', () => {
+      const input = { operation: 'power', a: 5, b: 3 };
+      expect(() => CalculatorInputSchema.parse(input)).toThrow();
+    });
+
+    it('should reject non-numeric values', () => {
+      const input = { operation: 'add', a: 'five', b: 3 };
+      expect(() => CalculatorInputSchema.parse(input)).toThrow();
+    });
+  });
+
+  describe('calculations', () => {
+    it('should add correctly', () => {
+      expect(calculate({ operation: 'add', a: 5, b: 3 })).toBe(8);
+    });
+
+    it('should handle negative numbers', () => {
+      expect(calculate({ operation: 'add', a: -5, b: 3 })).toBe(-2);
+    });
+
+    it('should handle floating point', () => {
+      expect(calculate({ operation: 'multiply', a: 0.1, b: 0.2 })).toBeCloseTo(0.02);
+    });
+
+    it('should throw on division by zero', () => {
+      expect(() => calculate({ operation: 'divide', a: 10, b: 0 }))
+        .toThrow('Division by zero');
+    });
+  });
+});
+```
+
+#### Integration Tests con LLM Mocks
+
+```typescript
+// src/__tests__/integration/agent.test.ts
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import Anthropic from '@anthropic-ai/sdk';
+
+// Mock del cliente de Anthropic
+vi.mock('@anthropic-ai/sdk', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    messages: {
+      create: vi.fn()
+    }
+  }))
+}));
+
+// Simula respuestas del LLM
+function createMockResponse(
+  content: string,
+  stopReason: 'end_turn' | 'tool_use' = 'end_turn'
+): Anthropic.Message {
+  return {
+    id: 'msg_mock',
+    type: 'message',
+    role: 'assistant',
+    content: [{ type: 'text', text: content }],
+    model: 'claude-sonnet-4-20250514',
+    stop_reason: stopReason,
+    stop_sequence: null,
+    usage: { input_tokens: 100, output_tokens: 50 }
+  };
+}
+
+function createMockToolUseResponse(
+  toolName: string,
+  toolInput: object
+): Anthropic.Message {
+  return {
+    id: 'msg_mock',
+    type: 'message',
+    role: 'assistant',
+    content: [
+      {
+        type: 'tool_use',
+        id: 'tool_mock',
+        name: toolName,
+        input: toolInput
+      }
+    ],
+    model: 'claude-sonnet-4-20250514',
+    stop_reason: 'tool_use',
+    stop_sequence: null,
+    usage: { input_tokens: 100, output_tokens: 50 }
+  };
+}
+
+describe('Agent Integration', () => {
+  let mockClient: Anthropic;
+
+  beforeEach(() => {
+    mockClient = new Anthropic();
+    vi.clearAllMocks();
+  });
+
+  it('should handle simple text response', async () => {
+    const mockCreate = vi.mocked(mockClient.messages.create);
+    mockCreate.mockResolvedValueOnce(createMockResponse('Hola, soy tu asistente'));
+
+    const response = await mockClient.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: 'Hola' }]
+    });
+
+    expect(response.content[0]).toEqual({
+      type: 'text',
+      text: 'Hola, soy tu asistente'
+    });
+  });
+
+  it('should handle tool use flow', async () => {
+    const mockCreate = vi.mocked(mockClient.messages.create);
+
+    // Primera llamada: el modelo quiere usar una tool
+    mockCreate.mockResolvedValueOnce(
+      createMockToolUseResponse('search', { query: 'TypeScript' })
+    );
+
+    // Segunda llamada: respuesta final después de tool result
+    mockCreate.mockResolvedValueOnce(
+      createMockResponse('Encontré información sobre TypeScript.')
+    );
+
+    // Simular flujo del agente
+    const response1 = await mockClient.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: 'Busca info sobre TypeScript' }]
+    });
+
+    expect(response1.stop_reason).toBe('tool_use');
+
+    // Simular ejecución de tool y continuación
+    const response2 = await mockClient.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      messages: [
+        { role: 'user', content: 'Busca info sobre TypeScript' },
+        { role: 'assistant', content: response1.content },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'tool_result',
+              tool_use_id: 'tool_mock',
+              content: 'TypeScript es un superset de JavaScript...'
+            }
+          ]
+        }
+      ]
+    });
+
+    expect(response2.stop_reason).toBe('end_turn');
+    expect(mockCreate).toHaveBeenCalledTimes(2);
+  });
+});
+```
+
+#### E2E Tests con LLM Real (Cuidado con Costos)
+
+```typescript
+// src/__tests__/e2e/agent.e2e.test.ts
+import { describe, it, expect } from 'vitest';
+import Anthropic from '@anthropic-ai/sdk';
+
+// Solo ejecutar si hay API key
+const SKIP_E2E = !process.env.ANTHROPIC_API_KEY;
+
+describe.skipIf(SKIP_E2E)('Agent E2E Tests', () => {
+  const client = new Anthropic();
+
+  it('should complete a simple task', async () => {
+    const response = await client.messages.create({
+      model: 'claude-3-haiku-20240307', // Modelo barato para E2E
+      max_tokens: 100,
+      messages: [
+        {
+          role: 'user',
+          content: 'Responde SOLO con la palabra "OK" sin explicación adicional.'
+        }
+      ]
+    });
+
+    const textBlock = response.content[0];
+    expect(textBlock.type).toBe('text');
+    if (textBlock.type === 'text') {
+      expect(textBlock.text.trim()).toBe('OK');
+    }
+  }, 30000); // Timeout largo para API
+
+  it('should use tools correctly', async () => {
+    const tools: Anthropic.Tool[] = [
+      {
+        name: 'get_current_time',
+        description: 'Obtiene la hora actual',
+        input_schema: {
+          type: 'object',
+          properties: {},
+          required: []
+        }
+      }
+    ];
+
+    const response = await client.messages.create({
+      model: 'claude-3-haiku-20240307',
+      max_tokens: 100,
+      tools,
+      messages: [{ role: 'user', content: '¿Qué hora es?' }]
+    });
+
+    // El modelo debería intentar usar la tool
+    const toolUse = response.content.find(b => b.type === 'tool_use');
+    expect(toolUse).toBeDefined();
+    if (toolUse && toolUse.type === 'tool_use') {
+      expect(toolUse.name).toBe('get_current_time');
+    }
+  }, 30000);
+});
+```
+
+#### Testing de MCP Servers
+
+```typescript
+// src/__tests__/mcp/server.test.ts
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { spawn, ChildProcess } from 'child_process';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+
+describe('MCP Server Tests', () => {
+  let client: Client;
+  let transport: StdioClientTransport;
+
+  beforeAll(async () => {
+    // Iniciar cliente que conecta al servidor
+    transport = new StdioClientTransport({
+      command: 'node',
+      args: ['dist/index.js']
+    });
+
+    client = new Client(
+      { name: 'test-client', version: '1.0.0' },
+      { capabilities: {} }
+    );
+
+    await client.connect(transport);
+  });
+
+  afterAll(async () => {
+    await client.close();
+  });
+
+  it('should list available tools', async () => {
+    const { tools } = await client.listTools();
+
+    expect(tools.length).toBeGreaterThan(0);
+    expect(tools[0]).toHaveProperty('name');
+    expect(tools[0]).toHaveProperty('description');
+    expect(tools[0]).toHaveProperty('inputSchema');
+  });
+
+  it('should execute tool successfully', async () => {
+    const result = await client.callTool({
+      name: 'create_note',
+      arguments: {
+        title: 'Test Note',
+        content: 'This is a test'
+      }
+    });
+
+    expect(result.content).toBeDefined();
+    expect(result.isError).toBeFalsy();
+  });
+
+  it('should handle invalid tool gracefully', async () => {
+    await expect(
+      client.callTool({
+        name: 'nonexistent_tool',
+        arguments: {}
+      })
+    ).rejects.toThrow();
+  });
+});
+```
+
+### 2. Patrones de Seguridad
+
+La seguridad es crítica cuando los agentes tienen acceso a herramientas que pueden ejecutar acciones en el mundo real.
+
+#### Principio de Mínimo Privilegio
+
+```typescript
+// Definir permisos granulares
+interface ToolPermissions {
+  canRead: boolean;
+  canWrite: boolean;
+  canDelete: boolean;
+  canExecute: boolean;
+  allowedPaths?: string[];
+  blockedPaths?: string[];
+  maxOperationsPerMinute?: number;
+}
+
+const TOOL_PERMISSIONS: Record<string, ToolPermissions> = {
+  read_file: {
+    canRead: true,
+    canWrite: false,
+    canDelete: false,
+    canExecute: false,
+    allowedPaths: ['./data/', './config/'],
+    blockedPaths: ['.env', 'secrets/', 'credentials/']
+  },
+  write_file: {
+    canRead: false,
+    canWrite: true,
+    canDelete: false,
+    canExecute: false,
+    allowedPaths: ['./output/', './temp/'],
+    maxOperationsPerMinute: 10
+  },
+  search_web: {
+    canRead: true,
+    canWrite: false,
+    canDelete: false,
+    canExecute: false,
+    maxOperationsPerMinute: 30
+  }
+};
+
+function checkPermission(
+  toolName: string,
+  operation: keyof ToolPermissions,
+  path?: string
+): boolean {
+  const perms = TOOL_PERMISSIONS[toolName];
+  if (!perms) return false;
+
+  // Verificar operación permitida
+  if (!perms[operation]) return false;
+
+  // Verificar path si aplica
+  if (path) {
+    // Bloquear paths prohibidos
+    if (perms.blockedPaths?.some(blocked => path.includes(blocked))) {
+      return false;
+    }
+
+    // Verificar paths permitidos
+    if (perms.allowedPaths) {
+      const isAllowed = perms.allowedPaths.some(allowed =>
+        path.startsWith(allowed)
+      );
+      if (!isAllowed) return false;
+    }
+  }
+
+  return true;
+}
+```
+
+#### Validación de Input Estricta
+
+```typescript
+import { z } from 'zod';
+import path from 'path';
+
+// Schema con validación de seguridad
+const FileOperationSchema = z.object({
+  path: z.string()
+    .min(1)
+    .max(500)
+    // Prevenir path traversal
+    .refine(
+      (p) => !p.includes('..'),
+      'Path traversal no permitido'
+    )
+    // Prevenir paths absolutos
+    .refine(
+      (p) => !path.isAbsolute(p),
+      'Solo paths relativos permitidos'
+    )
+    // Prevenir caracteres peligrosos
+    .refine(
+      (p) => !/[<>:"|?*\x00-\x1f]/.test(p),
+      'Caracteres inválidos en path'
+    )
+    .transform((p) => path.normalize(p)),
+
+  content: z.string()
+    .max(1_000_000, 'Contenido muy largo (máx 1MB)')
+    .optional()
+});
+
+// Sanitizar output antes de enviar al LLM
+function sanitizeForLLM(data: unknown): string {
+  const str = typeof data === 'string' ? data : JSON.stringify(data);
+
+  // Remover información sensible
+  return str
+    .replace(/api[_-]?key['":\s]*['"]?[a-zA-Z0-9-_]+['"]?/gi, 'API_KEY=[REDACTED]')
+    .replace(/password['":\s]*['"]?[^'"\s,}]+['"]?/gi, 'password=[REDACTED]')
+    .replace(/secret['":\s]*['"]?[^'"\s,}]+['"]?/gi, 'secret=[REDACTED]')
+    .replace(/token['":\s]*['"]?[a-zA-Z0-9-_.]+['"]?/gi, 'token=[REDACTED]');
+}
+```
+
+#### Sandboxing de Ejecución
+
+```typescript
+import { spawn } from 'child_process';
+
+interface SandboxConfig {
+  timeout: number;
+  maxMemoryMB: number;
+  allowedCommands: string[];
+  env: Record<string, string>;
+}
+
+async function executeInSandbox(
+  command: string,
+  args: string[],
+  config: SandboxConfig
+): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+  // Verificar comando permitido
+  if (!config.allowedCommands.includes(command)) {
+    throw new Error(`Comando no permitido: ${command}`);
+  }
+
+  return new Promise((resolve, reject) => {
+    const process = spawn(command, args, {
+      timeout: config.timeout,
+      env: {
+        ...config.env,
+        // Limitar recursos
+        NODE_OPTIONS: `--max-old-space-size=${config.maxMemoryMB}`
+      },
+      // No heredar stdin para prevenir injection
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    process.stdout.on('data', (data) => {
+      stdout += data.toString();
+      // Limitar tamaño de output
+      if (stdout.length > 1_000_000) {
+        process.kill();
+        reject(new Error('Output demasiado grande'));
+      }
+    });
+
+    process.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    process.on('close', (code) => {
+      resolve({ stdout, stderr, exitCode: code || 0 });
+    });
+
+    process.on('error', reject);
+  });
+}
+
+// Uso
+const result = await executeInSandbox('node', ['script.js'], {
+  timeout: 30000,
+  maxMemoryMB: 256,
+  allowedCommands: ['node', 'npm', 'npx'],
+  env: { NODE_ENV: 'sandbox' }
+});
+```
+
+#### Auditoría y Logging
+
+```typescript
+import { z } from 'zod';
+
+const AuditLogSchema = z.object({
+  timestamp: z.date(),
+  eventType: z.enum([
+    'tool_invocation',
+    'tool_result',
+    'permission_denied',
+    'rate_limit_exceeded',
+    'error',
+    'security_alert'
+  ]),
+  toolName: z.string().optional(),
+  userId: z.string().optional(),
+  sessionId: z.string(),
+  input: z.unknown(),
+  output: z.unknown().optional(),
+  durationMs: z.number().optional(),
+  metadata: z.record(z.unknown()).optional()
+});
+
+type AuditLog = z.infer<typeof AuditLogSchema>;
+
+class AuditLogger {
+  private logs: AuditLog[] = [];
+
+  log(entry: Omit<AuditLog, 'timestamp'>): void {
+    const log: AuditLog = {
+      ...entry,
+      timestamp: new Date()
+    };
+
+    this.logs.push(log);
+
+    // En producción, enviar a servicio de logging
+    console.log(JSON.stringify(log));
+
+    // Alertas para eventos de seguridad
+    if (
+      log.eventType === 'security_alert' ||
+      log.eventType === 'permission_denied'
+    ) {
+      this.sendAlert(log);
+    }
+  }
+
+  private sendAlert(log: AuditLog): void {
+    // Integrar con Slack, PagerDuty, etc.
+    console.error('🚨 SECURITY ALERT:', log);
+  }
+
+  getRecentLogs(minutes: number = 60): AuditLog[] {
+    const cutoff = new Date(Date.now() - minutes * 60 * 1000);
+    return this.logs.filter(log => log.timestamp > cutoff);
+  }
+}
+
+// Uso en agente
+const audit = new AuditLogger();
+
+async function executeToolWithAudit(
+  toolName: string,
+  input: unknown,
+  sessionId: string
+): Promise<unknown> {
+  const startTime = Date.now();
+
+  try {
+    // Verificar permisos primero
+    if (!checkPermission(toolName, 'canExecute')) {
+      audit.log({
+        eventType: 'permission_denied',
+        toolName,
+        sessionId,
+        input,
+        metadata: { reason: 'Tool execution not permitted' }
+      });
+      throw new Error('Permiso denegado');
+    }
+
+    audit.log({
+      eventType: 'tool_invocation',
+      toolName,
+      sessionId,
+      input
+    });
+
+    const result = await executeTool(toolName, input);
+
+    audit.log({
+      eventType: 'tool_result',
+      toolName,
+      sessionId,
+      input,
+      output: sanitizeForLLM(result),
+      durationMs: Date.now() - startTime
+    });
+
+    return result;
+  } catch (error) {
+    audit.log({
+      eventType: 'error',
+      toolName,
+      sessionId,
+      input,
+      metadata: { error: (error as Error).message },
+      durationMs: Date.now() - startTime
+    });
+    throw error;
+  }
+}
+```
+
+### 3. Rate Limiting y Control de Costos
+
+#### Token Bucket Algorithm
+
+```typescript
+class TokenBucket {
+  private tokens: number;
+  private lastRefill: number;
+
+  constructor(
+    private readonly maxTokens: number,
+    private readonly refillRate: number, // tokens por segundo
+    private readonly refillInterval: number = 1000
+  ) {
+    this.tokens = maxTokens;
+    this.lastRefill = Date.now();
+  }
+
+  private refill(): void {
+    const now = Date.now();
+    const elapsed = now - this.lastRefill;
+    const tokensToAdd = (elapsed / this.refillInterval) * this.refillRate;
+
+    this.tokens = Math.min(this.maxTokens, this.tokens + tokensToAdd);
+    this.lastRefill = now;
+  }
+
+  consume(amount: number = 1): boolean {
+    this.refill();
+
+    if (this.tokens >= amount) {
+      this.tokens -= amount;
+      return true;
+    }
+
+    return false;
+  }
+
+  getAvailableTokens(): number {
+    this.refill();
+    return Math.floor(this.tokens);
+  }
+
+  getWaitTime(amount: number = 1): number {
+    this.refill();
+
+    if (this.tokens >= amount) return 0;
+
+    const tokensNeeded = amount - this.tokens;
+    return Math.ceil((tokensNeeded / this.refillRate) * this.refillInterval);
+  }
+}
+
+// Rate limiter por usuario/sesión
+class RateLimiter {
+  private buckets: Map<string, TokenBucket> = new Map();
+
+  constructor(
+    private readonly maxRequestsPerMinute: number = 60,
+    private readonly maxTokensPerMinute: number = 100000
+  ) {}
+
+  private getBucket(key: string, type: 'requests' | 'tokens'): TokenBucket {
+    const bucketKey = `${key}:${type}`;
+
+    if (!this.buckets.has(bucketKey)) {
+      const max = type === 'requests'
+        ? this.maxRequestsPerMinute
+        : this.maxTokensPerMinute;
+
+      this.buckets.set(
+        bucketKey,
+        new TokenBucket(max, max / 60, 1000) // Refill por segundo
+      );
+    }
+
+    return this.buckets.get(bucketKey)!;
+  }
+
+  checkLimit(
+    userId: string,
+    estimatedTokens: number
+  ): { allowed: boolean; waitMs?: number; reason?: string } {
+    const requestBucket = this.getBucket(userId, 'requests');
+    const tokenBucket = this.getBucket(userId, 'tokens');
+
+    // Verificar límite de requests
+    if (!requestBucket.consume(1)) {
+      return {
+        allowed: false,
+        waitMs: requestBucket.getWaitTime(1),
+        reason: 'Rate limit exceeded (requests)'
+      };
+    }
+
+    // Verificar límite de tokens
+    if (!tokenBucket.consume(estimatedTokens)) {
+      // Devolver el token de request que consumimos
+      requestBucket.consume(-1);
+
+      return {
+        allowed: false,
+        waitMs: tokenBucket.getWaitTime(estimatedTokens),
+        reason: 'Token limit exceeded'
+      };
+    }
+
+    return { allowed: true };
+  }
+}
+```
+
+#### Control de Costos
+
+```typescript
+interface CostConfig {
+  maxDailySpend: number;  // USD
+  alertThreshold: number; // Porcentaje (0.8 = 80%)
+  modelCosts: Record<string, { inputPer1M: number; outputPer1M: number }>;
+}
+
+const DEFAULT_COST_CONFIG: CostConfig = {
+  maxDailySpend: 10.00,
+  alertThreshold: 0.8,
+  modelCosts: {
+    'claude-sonnet-4-20250514': { inputPer1M: 3.00, outputPer1M: 15.00 },
+    'claude-3-haiku-20240307': { inputPer1M: 0.25, outputPer1M: 1.25 },
+    'claude-3-opus-20240229': { inputPer1M: 15.00, outputPer1M: 75.00 }
+  }
+};
+
+class CostTracker {
+  private dailySpend: number = 0;
+  private lastReset: Date = new Date();
+  private config: CostConfig;
+
+  constructor(config: Partial<CostConfig> = {}) {
+    this.config = { ...DEFAULT_COST_CONFIG, ...config };
+    this.resetIfNewDay();
+  }
+
+  private resetIfNewDay(): void {
+    const now = new Date();
+    if (now.toDateString() !== this.lastReset.toDateString()) {
+      this.dailySpend = 0;
+      this.lastReset = now;
+    }
+  }
+
+  calculateCost(
+    model: string,
+    inputTokens: number,
+    outputTokens: number
+  ): number {
+    const costs = this.config.modelCosts[model];
+    if (!costs) {
+      console.warn(`Costos no configurados para modelo: ${model}`);
+      return 0;
+    }
+
+    const inputCost = (inputTokens / 1_000_000) * costs.inputPer1M;
+    const outputCost = (outputTokens / 1_000_000) * costs.outputPer1M;
+
+    return inputCost + outputCost;
+  }
+
+  trackUsage(
+    model: string,
+    inputTokens: number,
+    outputTokens: number
+  ): { cost: number; dailyTotal: number; withinBudget: boolean } {
+    this.resetIfNewDay();
+
+    const cost = this.calculateCost(model, inputTokens, outputTokens);
+    this.dailySpend += cost;
+
+    // Alertar si llegamos al umbral
+    if (
+      this.dailySpend >= this.config.maxDailySpend * this.config.alertThreshold &&
+      this.dailySpend - cost < this.config.maxDailySpend * this.config.alertThreshold
+    ) {
+      console.warn(`⚠️ Alerta: Gasto diario al ${(this.config.alertThreshold * 100).toFixed(0)}% del límite`);
+    }
+
+    return {
+      cost,
+      dailyTotal: this.dailySpend,
+      withinBudget: this.dailySpend < this.config.maxDailySpend
+    };
+  }
+
+  canAfford(model: string, estimatedInputTokens: number): boolean {
+    this.resetIfNewDay();
+
+    // Estimar costo (asumiendo output similar al input)
+    const estimatedCost = this.calculateCost(
+      model,
+      estimatedInputTokens,
+      estimatedInputTokens * 0.5
+    );
+
+    return (this.dailySpend + estimatedCost) < this.config.maxDailySpend;
+  }
+
+  getDailyStats(): { spent: number; remaining: number; percentUsed: number } {
+    this.resetIfNewDay();
+
+    return {
+      spent: this.dailySpend,
+      remaining: Math.max(0, this.config.maxDailySpend - this.dailySpend),
+      percentUsed: (this.dailySpend / this.config.maxDailySpend) * 100
+    };
+  }
+}
+```
+
+### 4. Monitoring y Observabilidad
+
+#### Métricas Clave para Agentes
+
+```typescript
+interface AgentMetrics {
+  // Latencia
+  apiLatencyMs: number[];
+  toolExecutionMs: Record<string, number[]>;
+  totalRequestMs: number[];
+
+  // Uso
+  requestCount: number;
+  toolInvocations: Record<string, number>;
+  tokensUsed: { input: number; output: number };
+
+  // Errores
+  errorCount: number;
+  errorsByType: Record<string, number>;
+  retryCount: number;
+
+  // Calidad
+  toolSuccessRate: Record<string, number>;
+  conversationTurns: number[];
+}
+
+class MetricsCollector {
+  private metrics: AgentMetrics = {
+    apiLatencyMs: [],
+    toolExecutionMs: {},
+    totalRequestMs: [],
+    requestCount: 0,
+    toolInvocations: {},
+    tokensUsed: { input: 0, output: 0 },
+    errorCount: 0,
+    errorsByType: {},
+    retryCount: 0,
+    toolSuccessRate: {},
+    conversationTurns: []
+  };
+
+  recordApiLatency(ms: number): void {
+    this.metrics.apiLatencyMs.push(ms);
+    this.metrics.requestCount++;
+
+    // Mantener solo últimas 1000 muestras
+    if (this.metrics.apiLatencyMs.length > 1000) {
+      this.metrics.apiLatencyMs.shift();
+    }
+  }
+
+  recordToolExecution(toolName: string, ms: number, success: boolean): void {
+    // Tiempo de ejecución
+    if (!this.metrics.toolExecutionMs[toolName]) {
+      this.metrics.toolExecutionMs[toolName] = [];
+    }
+    this.metrics.toolExecutionMs[toolName].push(ms);
+
+    // Conteo de invocaciones
+    this.metrics.toolInvocations[toolName] =
+      (this.metrics.toolInvocations[toolName] || 0) + 1;
+
+    // Tasa de éxito (promedio móvil)
+    const currentRate = this.metrics.toolSuccessRate[toolName] || 1;
+    this.metrics.toolSuccessRate[toolName] =
+      currentRate * 0.9 + (success ? 1 : 0) * 0.1;
+  }
+
+  recordTokens(input: number, output: number): void {
+    this.metrics.tokensUsed.input += input;
+    this.metrics.tokensUsed.output += output;
+  }
+
+  recordError(errorType: string): void {
+    this.metrics.errorCount++;
+    this.metrics.errorsByType[errorType] =
+      (this.metrics.errorsByType[errorType] || 0) + 1;
+  }
+
+  recordRetry(): void {
+    this.metrics.retryCount++;
+  }
+
+  getStats(): {
+    avgApiLatency: number;
+    p95ApiLatency: number;
+    p99ApiLatency: number;
+    errorRate: number;
+    tokensPerRequest: number;
+    topTools: Array<{ name: string; count: number; successRate: number }>;
+  } {
+    const sortedLatency = [...this.metrics.apiLatencyMs].sort((a, b) => a - b);
+
+    return {
+      avgApiLatency: this.average(this.metrics.apiLatencyMs),
+      p95ApiLatency: this.percentile(sortedLatency, 95),
+      p99ApiLatency: this.percentile(sortedLatency, 99),
+      errorRate: this.metrics.requestCount > 0
+        ? this.metrics.errorCount / this.metrics.requestCount
+        : 0,
+      tokensPerRequest: this.metrics.requestCount > 0
+        ? (this.metrics.tokensUsed.input + this.metrics.tokensUsed.output) /
+          this.metrics.requestCount
+        : 0,
+      topTools: Object.entries(this.metrics.toolInvocations)
+        .map(([name, count]) => ({
+          name,
+          count,
+          successRate: this.metrics.toolSuccessRate[name] || 0
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
+    };
+  }
+
+  private average(arr: number[]): number {
+    if (arr.length === 0) return 0;
+    return arr.reduce((a, b) => a + b, 0) / arr.length;
+  }
+
+  private percentile(sortedArr: number[], p: number): number {
+    if (sortedArr.length === 0) return 0;
+    const index = Math.ceil((p / 100) * sortedArr.length) - 1;
+    return sortedArr[Math.max(0, index)] ?? 0;
+  }
+}
+```
+
+#### Health Checks
+
+```typescript
+interface HealthStatus {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  checks: Record<string, {
+    status: 'pass' | 'warn' | 'fail';
+    message?: string;
+    latencyMs?: number;
+  }>;
+  timestamp: Date;
+}
+
+class HealthChecker {
+  async check(): Promise<HealthStatus> {
+    const checks: HealthStatus['checks'] = {};
+
+    // Check 1: API de Anthropic
+    checks.anthropic_api = await this.checkAnthropicApi();
+
+    // Check 2: Memoria/Storage
+    checks.storage = await this.checkStorage();
+
+    // Check 3: Rate limits
+    checks.rate_limits = this.checkRateLimits();
+
+    // Check 4: Costos
+    checks.costs = this.checkCosts();
+
+    // Determinar estado global
+    const statuses = Object.values(checks).map(c => c.status);
+    let overallStatus: HealthStatus['status'] = 'healthy';
+
+    if (statuses.some(s => s === 'fail')) {
+      overallStatus = 'unhealthy';
+    } else if (statuses.some(s => s === 'warn')) {
+      overallStatus = 'degraded';
+    }
+
+    return {
+      status: overallStatus,
+      checks,
+      timestamp: new Date()
+    };
+  }
+
+  private async checkAnthropicApi(): Promise<HealthStatus['checks'][string]> {
+    const start = Date.now();
+
+    try {
+      const client = new Anthropic();
+      await client.messages.create({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 5,
+        messages: [{ role: 'user', content: 'ping' }]
+      });
+
+      return {
+        status: 'pass',
+        latencyMs: Date.now() - start
+      };
+    } catch (error) {
+      return {
+        status: 'fail',
+        message: (error as Error).message,
+        latencyMs: Date.now() - start
+      };
+    }
+  }
+
+  private async checkStorage(): Promise<HealthStatus['checks'][string]> {
+    try {
+      // Verificar que podemos escribir/leer
+      const testPath = './data/.health_check';
+      await writeFile(testPath, 'test');
+      await readFile(testPath);
+      await unlink(testPath);
+
+      return { status: 'pass' };
+    } catch {
+      return {
+        status: 'fail',
+        message: 'Storage no accesible'
+      };
+    }
+  }
+
+  private checkRateLimits(): HealthStatus['checks'][string] {
+    // Implementar según tu rate limiter
+    return { status: 'pass' };
+  }
+
+  private checkCosts(): HealthStatus['checks'][string] {
+    const stats = costTracker.getDailyStats();
+
+    if (stats.percentUsed >= 100) {
+      return {
+        status: 'fail',
+        message: 'Límite de costos alcanzado'
+      };
+    }
+
+    if (stats.percentUsed >= 80) {
+      return {
+        status: 'warn',
+        message: `${stats.percentUsed.toFixed(1)}% del presupuesto usado`
+      };
+    }
+
+    return { status: 'pass' };
+  }
+}
+
+// Endpoint de health check para Docker/K8s
+import { createServer } from 'http';
+
+const healthChecker = new HealthChecker();
+
+createServer(async (req, res) => {
+  if (req.url === '/health') {
+    const health = await healthChecker.check();
+
+    res.writeHead(
+      health.status === 'healthy' ? 200 : health.status === 'degraded' ? 200 : 503,
+      { 'Content-Type': 'application/json' }
+    );
+    res.end(JSON.stringify(health, null, 2));
+  }
+}).listen(3001);
+```
+
+### 5. Estrategias de Deployment
+
+#### Configuración por Entorno
+
+```typescript
+// src/config/index.ts
+import { z } from 'zod';
+
+const ConfigSchema = z.object({
+  environment: z.enum(['development', 'staging', 'production']),
+
+  anthropic: z.object({
+    apiKey: z.string().min(1),
+    model: z.string().default('claude-sonnet-4-20250514'),
+    maxTokens: z.number().default(4096),
+    timeout: z.number().default(60000)
+  }),
+
+  rateLimits: z.object({
+    requestsPerMinute: z.number().default(60),
+    tokensPerMinute: z.number().default(100000)
+  }),
+
+  costs: z.object({
+    maxDailySpend: z.number().default(10),
+    alertThreshold: z.number().default(0.8)
+  }),
+
+  logging: z.object({
+    level: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+    format: z.enum(['json', 'pretty']).default('json')
+  }),
+
+  storage: z.object({
+    basePath: z.string().default('./data'),
+    maxFileSizeMB: z.number().default(10)
+  })
+});
+
+type Config = z.infer<typeof ConfigSchema>;
+
+function loadConfig(): Config {
+  const env = process.env.NODE_ENV || 'development';
+
+  const rawConfig = {
+    environment: env,
+    anthropic: {
+      apiKey: process.env.ANTHROPIC_API_KEY || '',
+      model: process.env.ANTHROPIC_MODEL,
+      maxTokens: parseInt(process.env.ANTHROPIC_MAX_TOKENS || '4096'),
+      timeout: parseInt(process.env.ANTHROPIC_TIMEOUT || '60000')
+    },
+    rateLimits: {
+      requestsPerMinute: parseInt(process.env.RATE_LIMIT_RPM || '60'),
+      tokensPerMinute: parseInt(process.env.RATE_LIMIT_TPM || '100000')
+    },
+    costs: {
+      maxDailySpend: parseFloat(process.env.MAX_DAILY_SPEND || '10'),
+      alertThreshold: parseFloat(process.env.COST_ALERT_THRESHOLD || '0.8')
+    },
+    logging: {
+      level: process.env.LOG_LEVEL,
+      format: env === 'development' ? 'pretty' : 'json'
+    },
+    storage: {
+      basePath: process.env.STORAGE_PATH || './data',
+      maxFileSizeMB: parseInt(process.env.MAX_FILE_SIZE_MB || '10')
+    }
+  };
+
+  const result = ConfigSchema.safeParse(rawConfig);
+
+  if (!result.success) {
+    console.error('Configuration error:', result.error.format());
+    process.exit(1);
+  }
+
+  return result.data;
+}
+
+export const config = loadConfig();
+```
+
+#### Dockerfile para MCP Server
+
+```dockerfile
+# Dockerfile
+FROM node:20-slim AS builder
+
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Copiar código fuente
+COPY src ./src
+
+# Compilar TypeScript
+RUN npm run build
+
+# Imagen de producción
+FROM node:20-slim AS production
+
+WORKDIR /app
+
+# Crear usuario no-root
+RUN groupadd -r agent && useradd -r -g agent agent
+
+# Copiar solo lo necesario
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
+
+# Crear directorio de datos
+RUN mkdir -p /app/data && chown -R agent:agent /app
+
+USER agent
+
+# Variables de entorno
+ENV NODE_ENV=production
+ENV STORAGE_PATH=/app/data
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+
+# Comando de inicio
+CMD ["node", "dist/index.js"]
+```
+
+#### Docker Compose para Desarrollo
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  agent:
+    build:
+      context: .
+      target: production
+    environment:
+      - NODE_ENV=production
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - LOG_LEVEL=info
+      - MAX_DAILY_SPEND=5
+    volumes:
+      - agent-data:/app/data
+    ports:
+      - "3001:3001"  # Health check
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # Opcional: Prometheus para métricas
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  # Opcional: Grafana para dashboards
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  agent-data:
+  grafana-data:
+```
+
+#### Script de Deploy
+
+```bash
+#!/bin/bash
+# deploy.sh
+
+set -e
+
+echo "🚀 Iniciando deploy..."
+
+# Variables
+ENVIRONMENT=${1:-production}
+IMAGE_TAG=${2:-latest}
+REGISTRY="ghcr.io/your-org/your-agent"
+
+# Verificar variables de entorno
+if [ -z "$ANTHROPIC_API_KEY" ]; then
+    echo "❌ Error: ANTHROPIC_API_KEY no configurada"
+    exit 1
+fi
+
+# Build
+echo "📦 Construyendo imagen..."
+docker build -t $REGISTRY:$IMAGE_TAG .
+
+# Tests
+echo "🧪 Ejecutando tests..."
+docker run --rm $REGISTRY:$IMAGE_TAG npm test
+
+# Push (si es producción)
+if [ "$ENVIRONMENT" == "production" ]; then
+    echo "📤 Subiendo imagen..."
+    docker push $REGISTRY:$IMAGE_TAG
+fi
+
+# Deploy
+echo "🔄 Desplegando..."
+docker-compose up -d
+
+# Verificar health
+echo "⏳ Esperando health check..."
+sleep 10
+
+HEALTH=$(curl -s http://localhost:3001/health | jq -r '.status')
+if [ "$HEALTH" != "healthy" ]; then
+    echo "❌ Health check fallido"
+    docker-compose logs agent
+    exit 1
+fi
+
+echo "✅ Deploy completado exitosamente"
+```
+
+### 6. Graceful Shutdown
+
+```typescript
+// src/shutdown.ts
+
+class GracefulShutdown {
+  private isShuttingDown = false;
+  private activeConnections = new Set<string>();
+  private shutdownCallbacks: Array<() => Promise<void>> = [];
+
+  constructor() {
+    // Manejar señales de terminación
+    process.on('SIGTERM', () => this.shutdown('SIGTERM'));
+    process.on('SIGINT', () => this.shutdown('SIGINT'));
+    process.on('uncaughtException', (error) => {
+      console.error('Uncaught exception:', error);
+      this.shutdown('uncaughtException');
+    });
+  }
+
+  registerConnection(id: string): void {
+    this.activeConnections.add(id);
+  }
+
+  unregisterConnection(id: string): void {
+    this.activeConnections.delete(id);
+  }
+
+  onShutdown(callback: () => Promise<void>): void {
+    this.shutdownCallbacks.push(callback);
+  }
+
+  private async shutdown(signal: string): Promise<void> {
+    if (this.isShuttingDown) return;
+    this.isShuttingDown = true;
+
+    console.log(`\n⏳ Recibida señal ${signal}, iniciando shutdown graceful...`);
+
+    // Esperar a que terminen conexiones activas (máx 30 segundos)
+    const maxWait = 30000;
+    const startTime = Date.now();
+
+    while (this.activeConnections.size > 0 && Date.now() - startTime < maxWait) {
+      console.log(`   Esperando ${this.activeConnections.size} conexiones activas...`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    if (this.activeConnections.size > 0) {
+      console.warn(`⚠️ Forzando cierre con ${this.activeConnections.size} conexiones activas`);
+    }
+
+    // Ejecutar callbacks de cleanup
+    console.log('🧹 Ejecutando cleanup...');
+    for (const callback of this.shutdownCallbacks) {
+      try {
+        await callback();
+      } catch (error) {
+        console.error('Error en cleanup:', error);
+      }
+    }
+
+    console.log('✅ Shutdown completado');
+    process.exit(0);
+  }
+
+  isActive(): boolean {
+    return !this.isShuttingDown;
+  }
+}
+
+export const shutdown = new GracefulShutdown();
+
+// Uso en el agente
+shutdown.onShutdown(async () => {
+  // Guardar estado
+  await memory.save();
+  console.log('   - Memoria guardada');
+
+  // Cerrar conexiones de base de datos
+  // await db.close();
+
+  // Flush de logs
+  // await logger.flush();
+});
+```
+
+## 🛠️ Proyecto Práctico: Deploy de Agente Completo
+
+Vamos a deployar el agente investigador del Módulo 4 junto con el MCP Server del Módulo 5 en un entorno de producción.
+
+### Paso 1: Estructura del Proyecto
+
+```
+production-agent/
+├── packages/
+│   ├── agent/           # Agente investigador
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   └── mcp-server/      # MCP Server de notas
+│       ├── src/
+│       ├── Dockerfile
+│       └── package.json
+├── docker-compose.yml
+├── prometheus.yml
+├── deploy.sh
+└── .env.example
+```
+
+### Paso 2: Configurar el Agente para Producción
+
+Crea `packages/agent/src/index.ts`:
+
+```typescript
+import Anthropic from '@anthropic-ai/sdk';
+import { config } from './config/index.js';
+import { MetricsCollector } from './monitoring/metrics.js';
+import { CostTracker } from './monitoring/costs.js';
+import { RateLimiter } from './middleware/rate-limiter.js';
+import { AuditLogger } from './middleware/audit.js';
+import { shutdown } from './shutdown.js';
+import { MemoryStore } from './memory/store.js';
+
+// Inicializar componentes
+const client = new Anthropic();
+const metrics = new MetricsCollector();
+const costs = new CostTracker(config.costs);
+const rateLimiter = new RateLimiter(config.rateLimits);
+const audit = new AuditLogger();
+const memory = new MemoryStore(config.storage.basePath);
+
+// Middleware wrapper para todas las llamadas a la API
+async function callWithMiddleware(
+  params: Anthropic.MessageCreateParams,
+  sessionId: string
+): Promise<Anthropic.Message> {
+  // 1. Rate limiting
+  const rateCheck = rateLimiter.checkLimit(
+    sessionId,
+    estimateTokens(params.messages)
+  );
+
+  if (!rateCheck.allowed) {
+    audit.log({
+      eventType: 'rate_limit_exceeded',
+      sessionId,
+      metadata: { waitMs: rateCheck.waitMs, reason: rateCheck.reason }
+    });
+    throw new Error(`Rate limit: ${rateCheck.reason}. Espera ${rateCheck.waitMs}ms`);
+  }
+
+  // 2. Verificar presupuesto
+  if (!costs.canAfford(params.model, estimateTokens(params.messages))) {
+    audit.log({
+      eventType: 'error',
+      sessionId,
+      metadata: { reason: 'Budget exceeded' }
+    });
+    throw new Error('Presupuesto diario agotado');
+  }
+
+  // 3. Ejecutar con métricas
+  const startTime = Date.now();
+
+  try {
+    const response = await client.messages.create(params);
+
+    // Registrar métricas
+    metrics.recordApiLatency(Date.now() - startTime);
+    metrics.recordTokens(response.usage.input_tokens, response.usage.output_tokens);
+
+    // Registrar costos
+    const costResult = costs.trackUsage(
+      params.model,
+      response.usage.input_tokens,
+      response.usage.output_tokens
+    );
+
+    audit.log({
+      eventType: 'tool_result',
+      sessionId,
+      metadata: {
+        model: params.model,
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens,
+        cost: costResult.cost,
+        latencyMs: Date.now() - startTime
+      }
+    });
+
+    return response;
+  } catch (error) {
+    metrics.recordError((error as Error).name);
+    audit.log({
+      eventType: 'error',
+      sessionId,
+      metadata: { error: (error as Error).message }
+    });
+    throw error;
+  }
+}
+
+function estimateTokens(messages: Anthropic.MessageParam[]): number {
+  return messages.reduce((sum, msg) => {
+    const content = typeof msg.content === 'string'
+      ? msg.content
+      : JSON.stringify(msg.content);
+    return sum + Math.ceil(content.length / 3.5);
+  }, 0);
+}
+
+// Registrar cleanup
+shutdown.onShutdown(async () => {
+  await memory.save();
+  console.log('   - Memoria guardada');
+
+  // Exportar métricas finales
+  const stats = metrics.getStats();
+  console.log('   - Métricas finales:', JSON.stringify(stats));
+});
+
+// Health check server
+import { createServer } from 'http';
+import { HealthChecker } from './monitoring/health.js';
+
+const healthChecker = new HealthChecker(client, memory, costs);
+
+createServer(async (req, res) => {
+  if (req.url === '/health') {
+    const health = await healthChecker.check();
+    res.writeHead(health.status === 'healthy' ? 200 : 503);
+    res.end(JSON.stringify(health));
+    return;
+  }
+
+  if (req.url === '/metrics') {
+    res.writeHead(200);
+    res.end(JSON.stringify(metrics.getStats()));
+    return;
+  }
+
+  res.writeHead(404);
+  res.end('Not found');
+}).listen(config.healthPort || 3001);
+
+console.log(`🚀 Agente iniciado en modo ${config.environment}`);
+console.log(`📊 Health check en puerto ${config.healthPort || 3001}`);
+
+// Exportar para uso externo
+export { callWithMiddleware, memory, metrics, costs };
+```
+
+### Paso 3: Docker Compose para el Stack Completo
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  agent:
+    build:
+      context: ./packages/agent
+    environment:
+      - NODE_ENV=production
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - HEALTH_PORT=3001
+      - LOG_LEVEL=info
+      - MAX_DAILY_SPEND=${MAX_DAILY_SPEND:-10}
+      - STORAGE_PATH=/app/data
+    volumes:
+      - agent-data:/app/data
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
+  mcp-server:
+    build:
+      context: ./packages/mcp-server
+    environment:
+      - NODE_ENV=production
+      - STORAGE_PATH=/app/data
+    volumes:
+      - mcp-data:/app/data
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+    ports:
+      - "3000:3000"
+
+volumes:
+  agent-data:
+  mcp-data:
+  prometheus-data:
+  grafana-data:
+```
+
+### Paso 4: Configuración de Prometheus
+
+```yaml
+# prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'agent'
+    static_configs:
+      - targets: ['agent:3001']
+    metrics_path: '/metrics'
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+```
+
+### Paso 5: Script de Deploy Completo
+
+```bash
+#!/bin/bash
+# deploy.sh
+
+set -euo pipefail
+
+# Colores
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Funciones de log
+log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+# Verificar requisitos
+check_requirements() {
+    log_info "Verificando requisitos..."
+
+    if ! command -v docker &> /dev/null; then
+        log_error "Docker no instalado"
+        exit 1
+    fi
+
+    if ! command -v docker-compose &> /dev/null; then
+        log_error "Docker Compose no instalado"
+        exit 1
+    fi
+
+    if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+        log_error "ANTHROPIC_API_KEY no configurada"
+        exit 1
+    fi
+
+    log_info "✅ Requisitos verificados"
+}
+
+# Build
+build() {
+    log_info "Construyendo imágenes..."
+    docker-compose build --parallel
+    log_info "✅ Build completado"
+}
+
+# Tests
+run_tests() {
+    log_info "Ejecutando tests..."
+
+    # Tests del agente
+    docker-compose run --rm agent npm test
+
+    # Tests del MCP server
+    docker-compose run --rm mcp-server npm test
+
+    log_info "✅ Tests pasaron"
+}
+
+# Deploy
+deploy() {
+    log_info "Desplegando servicios..."
+
+    # Detener servicios existentes gracefully
+    docker-compose down --timeout 30
+
+    # Iniciar nuevos servicios
+    docker-compose up -d
+
+    log_info "⏳ Esperando health checks..."
+    sleep 15
+
+    # Verificar health
+    HEALTH=$(curl -sf http://localhost:3001/health | jq -r '.status' || echo "failed")
+
+    if [ "$HEALTH" != "healthy" ]; then
+        log_error "Health check fallido"
+        docker-compose logs agent
+        exit 1
+    fi
+
+    log_info "✅ Deploy completado"
+}
+
+# Mostrar estado
+show_status() {
+    echo ""
+    log_info "Estado del sistema:"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    # Health del agente
+    HEALTH=$(curl -sf http://localhost:3001/health || echo '{"status":"unknown"}')
+    echo "Agente: $(echo $HEALTH | jq -r '.status')"
+
+    # Métricas
+    METRICS=$(curl -sf http://localhost:3001/metrics || echo '{}')
+    echo "API Latency (avg): $(echo $METRICS | jq -r '.avgApiLatency // "N/A"')ms"
+    echo "Error Rate: $(echo $METRICS | jq -r '.errorRate // "N/A"')"
+
+    # Recursos Docker
+    echo ""
+    docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
+
+    echo ""
+    log_info "URLs:"
+    echo "  - Health: http://localhost:3001/health"
+    echo "  - Metrics: http://localhost:3001/metrics"
+    echo "  - Prometheus: http://localhost:9090"
+    echo "  - Grafana: http://localhost:3000"
+}
+
+# Main
+main() {
+    case "${1:-deploy}" in
+        build)
+            check_requirements
+            build
+            ;;
+        test)
+            check_requirements
+            run_tests
+            ;;
+        deploy)
+            check_requirements
+            build
+            run_tests
+            deploy
+            show_status
+            ;;
+        status)
+            show_status
+            ;;
+        logs)
+            docker-compose logs -f "${2:-agent}"
+            ;;
+        stop)
+            docker-compose down --timeout 30
+            log_info "Servicios detenidos"
+            ;;
+        *)
+            echo "Uso: $0 {build|test|deploy|status|logs|stop}"
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
+```
+
+### Paso 6: Ejecutar
+
+```bash
+# Configurar variables
+export ANTHROPIC_API_KEY=tu_api_key
+export MAX_DAILY_SPEND=10
+export GRAFANA_PASSWORD=tu_password_seguro
+
+# Deploy completo
+./deploy.sh deploy
+
+# Ver estado
+./deploy.sh status
+
+# Ver logs
+./deploy.sh logs agent
+
+# Detener
+./deploy.sh stop
+```
+
+## 🎯 Verificación de Aprendizaje
+
+Antes de considerar completa esta ruta de aprendizaje, asegúrate de poder responder:
+
+1. ¿Cuáles son las diferencias entre unit tests, integration tests y E2E tests para agentes?
+2. ¿Cómo implementarías rate limiting para controlar costos de API?
+3. ¿Qué métricas son críticas para monitorear un agente en producción?
+4. ¿Cómo asegurarías que un agente no acceda a recursos no autorizados?
+5. ¿Qué estrategia usarías para hacer un deployment sin downtime?
+
+## 🚀 Reto Final
+
+Con todo lo aprendido en esta ruta, construye un sistema completo:
+
+1. **Agente de Soporte Técnico**: Agente que puede investigar problemas, consultar documentación, y sugerir soluciones
+2. **MCP Server de Tickets**: Servidor que gestiona tickets de soporte con persistencia
+3. **Dashboard de Monitoreo**: Visualización de métricas, costos, y estado del sistema
+4. **Pipeline de CI/CD**: Automatización de tests y deploy con GitHub Actions
+
+## ⚠️ Errores Comunes
+
+### Error: Tests E2E fallan intermitentemente
+
+```
+Error: Response did not match expected format
+```
+**Solución**: Los LLMs no son deterministas. Usa aserciones flexibles o patrones en lugar de comparaciones exactas. Para tests críticos, usa mocks.
+
+### Error: Rate limit en producción
+
+```
+Error: Rate limit exceeded. Retry after 60s
+```
+**Solución**: Implementa cola de requests con backoff exponencial. Considera usar modelos más baratos (Haiku) para operaciones frecuentes.
+
+### Error: Container se queda sin memoria
+
+```
+FATAL ERROR: CALL_AND_RETRY_LAST Allocation failed
+```
+**Solución**: Configura límites de memoria en Docker y en Node.js (`--max-old-space-size`). Implementa limpieza periódica de caches.
+
+### Error: Health check fallando
+
+```
+Health check failed: connection refused
+```
+**Solución**: Asegúrate de que el servidor de health esté escuchando en la interfaz correcta (`0.0.0.0` dentro de Docker, no `localhost`).
+
+### Error: Datos no persisten entre reinicios
+
+```
+Memory cleared on restart
+```
+**Solución**: Verifica que los volúmenes de Docker estén correctamente configurados y que el path de datos coincida con el volumen montado.
+
+## 📚 Recursos Adicionales
+
+- [Anthropic Best Practices](https://docs.anthropic.com/claude/docs/building-effective-agents)
+- [12-Factor App Methodology](https://12factor.net/)
+- [Docker Best Practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+- [Prometheus Monitoring](https://prometheus.io/docs/introduction/overview/)
+- [OpenTelemetry for LLM Applications](https://opentelemetry.io/)
+- [OWASP LLM Security Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+
+---
+
+**Anterior**: [Módulo 5: MCP Servers - Model Context Protocol](./05-mcp-servers.md)
+
+**Volver al inicio**: [Ruta de Aprendizaje: IA Agents](./intro.md)
+
+---
+
+## 🎉 ¡Felicitaciones!
+
+Has completado la **Ruta de Aprendizaje de IA Agents**. Ahora tienes las herramientas para:
+
+- Construir agentes de IA robustos con TypeScript
+- Crear MCP Servers que extienden las capacidades de Claude
+- Llevar agentes a producción de forma segura y monitoreable
+
+### ¿Qué sigue?
+
+- Explora el [Taller de IA, Agentes y MCP](/docs/proyectos/taller-ia-agentes-mcp/intro) para ejercicios adicionales
+- Aplica el [4R Framework](/docs/proyectos/ai-presentation/4r-framework.md) para mejorar la calidad de tus agentes
+- Contribuye a la comunidad compartiendo tus MCP Servers y aprendizajes
