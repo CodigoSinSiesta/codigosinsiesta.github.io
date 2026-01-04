@@ -4,7 +4,12 @@
       "description": "Added Mermaid diagram support configuration with 'markdown: { mermaid: true }' and 'themes: [\"@docusaurus/theme-mermaid\"]'",
       "category": "configuration",
       "discovered_at": "2026-01-04T10:23:37.513028+00:00"
+    },
+    "docs/ruta-aprendizaje-ia-agents/": {
+      "description": "AI Agent Development Learning Path with 6 modules, visual roadmap with localStorage progress tracking, mobile responsive design, Mermaid diagrams, and ModuleCompleteButton components. Uses BrowserOnly for SSR compatibility.",
+      "category": "feature",
+      "discovered_at": "2026-01-04T10:30:21.100349+00:00"
     }
   },
-  "last_updated": "2026-01-04T10:23:37.513050+00:00"
+  "last_updated": "2026-01-04T10:30:21.100360+00:00"
 }
