@@ -1,0 +1,94 @@
+{
+  "project_root": "/Users/alejandro/dev/codigosinsiesta",
+  "project_type": "single",
+  "services": {
+    "main": {
+      "name": "main",
+      "path": "/Users/alejandro/dev/codigosinsiesta",
+      "language": "JavaScript",
+      "framework": "React",
+      "type": "frontend",
+      "package_manager": "npm",
+      "default_port": 3000,
+      "dev_command": "npm run start",
+      "key_directories": {
+        "src": {
+          "path": "src",
+          "purpose": "Source code"
+        }
+      },
+      "dependencies": [
+        "@docusaurus/core",
+        "@docusaurus/preset-classic",
+        "@docusaurus/theme-mermaid",
+        "@mdx-js/react",
+        "clsx",
+        "prism-react-renderer",
+        "react",
+        "react-dom"
+      ],
+      "dev_dependencies": [
+        "@docusaurus/module-type-aliases",
+        "@docusaurus/types"
+      ],
+      "api": {
+        "routes": [
+          {
+            "path": "/register",
+            "methods": [
+              "POST"
+            ],
+            "file": "build/assets/js/99dd3c78.510c015d.js",
+            "framework": "Express",
+            "requires_auth": true
+          },
+          {
+            "path": "/api/user",
+            "methods": [
+              "POST"
+            ],
+            "file": "build/assets/js/109388fd.17c8af13.js",
+            "framework": "Express",
+            "requires_auth": true
+          },
+          {
+            "path": "/api/user",
+            "methods": [
+              "POST"
+            ],
+            "file": "build/assets/js/109388fd.17c8af13.js",
+            "framework": "Express",
+            "requires_auth": true
+          },
+          {
+            "path": "/api/user/profile",
+            "methods": [
+              "POST"
+            ],
+            "file": "build/assets/js/33f04733.e147b00f.js",
+            "framework": "Express",
+            "requires_auth": true
+          }
+        ],
+        "total_routes": 4,
+        "methods": [
+          "POST"
+        ],
+        "protected_routes": [
+          "/register",
+          "/api/user",
+          "/api/user",
+          "/api/user/profile"
+        ]
+      }
+    }
+  },
+  "infrastructure": {
+    "ci": "GitHub Actions",
+    "ci_workflows": [
+      "deploy.yml",
+      "test-deploy.yml"
+    ]
+  },
+  "conventions": {}
+}

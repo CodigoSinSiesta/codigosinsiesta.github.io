@@ -1,0 +1,526 @@
+{
+  "feature": "AI Agent Development Learning Path",
+  "workflow_type": "feature",
+  "workflow_rationale": "This is new functionality being added to an existing Docusaurus site. We're creating new content pages, navigation structure, interactive UI components (visual roadmap, bookmark system), and enhancing the existing documentation architecture. The phases follow a logical dependency order: structure first, then content, then interactive components, then integration.",
+  "phases": [
+    {
+      "id": "phase-1-structure",
+      "name": "Structure Setup",
+      "type": "setup",
+      "description": "Create directory structure, intro page with roadmap overview, and update sidebar navigation",
+      "depends_on": [],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "description": "Create directory and intro page structure",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "docs/ruta-aprendizaje-ia-agents/intro.md"
+          ],
+          "patterns_from": [
+            "docs/proyectos/taller-ia-agentes-mcp/intro.md"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "test -f docs/ruta-aprendizaje-ia-agents/intro.md && echo 'OK'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "notes": "Created docs/ruta-aprendizaje-ia-agents/intro.md with complete learning path structure including 6 modules, skill assessment table, and three learning routes. Verification passed. Committed as c395563.",
+          "updated_at": "2026-01-03T10:55:05.670876+00:00"
+        },
+        {
+          "id": "subtask-1-2",
+          "description": "Update sidebar configuration with new learning path category",
+          "service": "main",
+          "files_to_modify": [
+            "sidebars.js"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "sidebars.js"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "grep -q 'Ruta de Aprendizaje IA Agents' sidebars.js && echo 'OK'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "notes": "Updated sidebars.js with new 'Ruta de Aprendizaje IA Agents' category containing intro and all 6 modules (01-fundamentos through 06-produccion). Verification passed. Committed as da054ee.",
+          "updated_at": "2026-01-03T10:56:37.324003+00:00"
+        }
+      ]
+    },
+    {
+      "id": "phase-2-module-content",
+      "name": "Module Content Creation",
+      "type": "implementation",
+      "description": "Write complete content for all 6 learning modules with prerequisites, objectives, and hands-on projects",
+      "depends_on": [
+        "phase-1-structure"
+      ],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "description": "Create Module 1: Fundamentos de IA para Desarrolladores",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "docs/ruta-aprendizaje-ia-agents/01-fundamentos.md"
+          ],
+          "patterns_from": [
+            "docs/proyectos/taller-ia-agentes-mcp/intro.md"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Verify module has frontmatter, prerequisites section (\ud83c\udfaf), content section (\ud83d\udcd6), and hands-on project (\ud83d\udee0\ufe0f)"
+          },
+          "status": "completed",
+          "notes": "Created docs/ruta-aprendizaje-ia-agents/01-fundamentos.md with complete module content. Includes: frontmatter, \ud83c\udfaf Requisitos Previos section, \ud83d\udcd6 Contenido section covering agentes de IA, LLMs, APIs, prompting b\u00e1sico, \ud83d\udee0\ufe0f Proyecto Pr\u00e1ctico (Primer prompt a Claude API). Committed as 86d9609.",
+          "updated_at": "2026-01-03T10:59:34.974220+00:00"
+        },
+        {
+          "id": "subtask-2-2",
+          "description": "Create Module 2: TypeScript Esencial para Agentes",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "docs/ruta-aprendizaje-ia-agents/02-typescript.md"
+          ],
+          "patterns_from": [
+            "docs/proyectos/taller-ia-agentes-mcp/intro.md"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Verify module has frontmatter, prerequisites section, content section, and hands-on project"
+          },
+          "status": "completed",
+          "notes": "Created docs/ruta-aprendizaje-ia-agents/02-typescript.md with complete module content. Includes: frontmatter, \ud83c\udfaf Requisitos Previos section (M\u00f3dulo 1, JavaScript ES6+), \ud83d\udcd6 Contenido section covering TypeScript for agents (why TypeScript, basic types, Zod validation, API types, error handling, tsconfig), \ud83d\udee0\ufe0f Proyecto Pr\u00e1ctico (Typed Tool Function with calculator example), \ud83c\udfaf Verificaci\u00f3n de Aprendizaje, \u26a0\ufe0f Errores Comunes, \ud83d\udcda Recursos Adicionales, and navigation links. Committed as 4fa39c1.",
+          "updated_at": "2026-01-03T15:13:44.346404+00:00"
+        },
+        {
+          "id": "subtask-2-3",
+          "description": "Create Module 3: Conceptos Clave de IA Agents",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "docs/ruta-aprendizaje-ia-agents/03-conceptos.md"
+          ],
+          "patterns_from": [
+            "docs/proyectos/taller-ia-agentes-mcp/intro.md"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Verify module has frontmatter, prerequisites section, content section, and hands-on project"
+          },
+          "status": "completed",
+          "notes": "Created docs/ruta-aprendizaje-ia-agents/03-conceptos.md with complete module content. Includes: frontmatter with sidebar_position: 4, \ud83c\udfaf Requisitos Previos section (M\u00f3dulo 2 completado, TypeScript, Zod), \ud83d\udcd6 Contenido section covering Tool Calling, ReAct Pattern, State Management, Multi-turn Conversations, and Complete Architecture. \ud83d\udee0\ufe0f Proyecto Pr\u00e1ctico: Agente Simple de Tareas (to-do list with add_task, complete_task, list_tasks tools), \ud83c\udfaf Verificaci\u00f3n de Aprendizaje, \ud83d\ude80 Reto Extra, \u26a0\ufe0f Errores Comunes, \ud83d\udcda Recursos Adicionales, and navigation links. Committed as d12af4b.",
+          "updated_at": "2026-01-03T15:19:19.204761+00:00"
+        },
+        {
+          "id": "subtask-2-4",
+          "description": "Create Module 4: Agentes Avanzados con Claude",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "docs/ruta-aprendizaje-ia-agents/04-agentes-avanzados.md"
+          ],
+          "patterns_from": [
+            "docs/proyectos/taller-ia-agentes-mcp/intro.md"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Verify module has frontmatter, prerequisites section, content section, and hands-on project"
+          },
+          "status": "completed",
+          "notes": "Created docs/ruta-aprendizaje-ia-agents/04-agentes-avanzados.md with complete module content. Includes: frontmatter with sidebar_position: 5, \ud83c\udfaf Requisitos Previos section (M\u00f3dulo 3 completado, proyecto funcionando), \ud83d\udcd6 Contenido section covering advanced prompt engineering, context windows, streaming, error recovery, and persistent memory. \ud83d\udee0\ufe0f Proyecto Pr\u00e1ctico: Agente Investigador con Memoria (complete implementation with memory store, research tools, and agent). Also includes \ud83c\udfaf Verificaci\u00f3n de Aprendizaje, \ud83d\ude80 Reto Extra, \u26a0\ufe0f Errores Comunes, \ud83d\udcda Recursos Adicionales, and navigation links. Committed as 5603c76.",
+          "updated_at": "2026-01-03T15:26:54.966709+00:00"
+        },
+        {
+          "id": "subtask-2-5",
+          "description": "Create Module 5: MCP Servers - Model Context Protocol",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "docs/ruta-aprendizaje-ia-agents/05-mcp-servers.md"
+          ],
+          "patterns_from": [
+            "docs/proyectos/taller-ia-agentes-mcp/intro.md"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Verify module has frontmatter, prerequisites section, content section, and hands-on project"
+          },
+          "status": "completed",
+          "notes": "Created docs/ruta-aprendizaje-ia-agents/05-mcp-servers.md with complete module content. Includes: frontmatter with sidebar_position: 6, \ud83c\udfaf Requisitos Previos section (M\u00f3dulo 4 completado, proyecto funcionando, tool calling), \ud83d\udcd6 Contenido section covering 7 topics: What is MCP, Server Anatomy, Creating First MCP Server, FastMCP Development, Tool Schemas, Claude Desktop Integration, and Testing. \ud83d\udee0\ufe0f Proyecto Pr\u00e1ctico: MCP Server de Notas (complete implementation with storage, server, and configuration). Also includes \ud83c\udfaf Verificaci\u00f3n de Aprendizaje, \ud83d\ude80 Reto Extra, \u26a0\ufe0f Errores Comunes, \ud83d\udcda Recursos Adicionales, and navigation links. Committed as fadff6d.",
+          "updated_at": "2026-01-03T15:36:06.665258+00:00"
+        },
+        {
+          "id": "subtask-2-6",
+          "description": "Create Module 6: Producci\u00f3n y Deployment",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "docs/ruta-aprendizaje-ia-agents/06-produccion.md"
+          ],
+          "patterns_from": [
+            "docs/proyectos/taller-ia-agentes-mcp/intro.md"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Verify module has frontmatter, prerequisites section, content section, and hands-on project"
+          },
+          "status": "completed",
+          "notes": "Created docs/ruta-aprendizaje-ia-agents/06-produccion.md with complete module content. Includes: frontmatter with sidebar_position: 7, \ud83c\udfaf Requisitos Previos section (M\u00f3dulo 5 completado, MCP Server funcionando), \ud83d\udcd6 Contenido section covering 6 topics: Testing Strategies, Security Patterns, Rate Limiting/Cost Control, Monitoring/Observability, Deployment Strategies, and Graceful Shutdown. \ud83d\udee0\ufe0f Proyecto Pr\u00e1ctico: Deploy de Agente Completo (production setup with Docker, Prometheus, Grafana). Also includes \ud83c\udfaf Verificaci\u00f3n de Aprendizaje, \ud83d\ude80 Reto Final, \u26a0\ufe0f Errores Comunes, \ud83d\udcda Recursos Adicionales, and navigation links. Committed as 86a426b.",
+          "updated_at": "2026-01-03T21:16:00.981292+00:00"
+        }
+      ]
+    },
+    {
+      "id": "phase-3-interactive-components",
+      "name": "Interactive Components",
+      "type": "implementation",
+      "description": "Build React components for visual roadmap, progress tracking, and bookmark functionality",
+      "depends_on": [
+        "phase-1-structure"
+      ],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-3-1",
+          "description": "Create LearningPathRoadmap React component",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "src/components/LearningPathRoadmap/index.js",
+            "src/components/LearningPathRoadmap/styles.module.css"
+          ],
+          "patterns_from": [
+            "src/components/HomepageFeatures/index.js"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "test -f src/components/LearningPathRoadmap/index.js && test -f src/components/LearningPathRoadmap/styles.module.css && echo 'OK'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "notes": "Created LearningPathRoadmap React component with: 6 module cards (Fundamentos, TypeScript, Conceptos, Agentes Avanzados, MCP Servers, Producci\u00f3n), progress bar showing completion percentage, visual progression arrows, responsive CSS for mobile, dark mode support. Following HomepageFeatures pattern with clsx and CSS modules. Verification passed. Committed as 84012a3.",
+          "updated_at": "2026-01-03T21:18:55.290539+00:00"
+        },
+        {
+          "id": "subtask-3-2",
+          "description": "Create useProgressTracking React hook for localStorage",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "src/hooks/useProgressTracking.js"
+          ],
+          "patterns_from": [],
+          "verification": {
+            "type": "command",
+            "command": "test -f src/hooks/useProgressTracking.js && echo 'OK'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "notes": "Created src/hooks/useProgressTracking.js with: useState/useEffect hooks for localStorage persistence, toggleModuleComplete/markComplete/markIncomplete methods, isModuleComplete/getCompletedCount/getProgressPercentage utilities, graceful degradation when localStorage unavailable, clearProgress method for resetting. Verification passed. Committed as 33d1106.",
+          "updated_at": "2026-01-03T21:22:51.022153+00:00"
+        },
+        {
+          "id": "subtask-3-3",
+          "description": "Create ModuleCompleteButton component",
+          "service": "main",
+          "files_to_modify": [],
+          "files_to_create": [
+            "src/components/ModuleCompleteButton/index.js",
+            "src/components/ModuleCompleteButton/styles.module.css"
+          ],
+          "patterns_from": [
+            "src/components/HomepageFeatures/index.js"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "test -f src/components/ModuleCompleteButton/index.js && echo 'OK'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "notes": "Created src/components/ModuleCompleteButton/index.js and styles.module.css. Component uses useProgressTracking hook for localStorage persistence, displays toggle button to mark modules complete/incomplete, shows warning when localStorage unavailable, includes optional next module navigation, responsive with mobile support, dark mode compatible. Verification passed. Committed as f86720f.",
+          "updated_at": "2026-01-03T21:25:08.853249+00:00"
+        }
+      ]
+    },
+    {
+      "id": "phase-4-integration",
+      "name": "Integration & Polish",
+      "type": "integration",
+      "description": "Wire components together, add Mermaid diagrams, cross-link content, and verify all functionality",
+      "depends_on": [
+        "phase-2-module-content",
+        "phase-3-interactive-components"
+      ],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-4-1",
+          "description": "Integrate LearningPathRoadmap component into intro.md",
+          "service": "main",
+          "files_to_modify": [
+            "docs/ruta-aprendizaje-ia-agents/intro.md"
+          ],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "browser",
+            "url": "http://localhost:3000/docs/ruta-aprendizaje-ia-agents/intro",
+            "checks": [
+              "Roadmap component renders",
+              "All 6 modules visible",
+              "No console errors"
+            ]
+          },
+          "status": "completed",
+          "notes": "Successfully integrated LearningPathRoadmap component into intro.mdx. Created LearningPathRoadmapWithProgress wrapper that handles SSR and localStorage-based progress tracking. Fixed broken module links.",
+          "updated_at": "2026-01-03T21:29:23.662770+00:00"
+        },
+        {
+          "id": "subtask-4-2",
+          "description": "Add ModuleCompleteButton to each module page",
+          "service": "main",
+          "files_to_modify": [
+            "docs/ruta-aprendizaje-ia-agents/01-fundamentos.md",
+            "docs/ruta-aprendizaje-ia-agents/02-typescript.md",
+            "docs/ruta-aprendizaje-ia-agents/03-conceptos.md",
+            "docs/ruta-aprendizaje-ia-agents/04-agentes-avanzados.md",
+            "docs/ruta-aprendizaje-ia-agents/05-mcp-servers.md",
+            "docs/ruta-aprendizaje-ia-agents/06-produccion.md"
+          ],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "browser",
+            "url": "http://localhost:3000/docs/ruta-aprendizaje-ia-agents/01-fundamentos",
+            "checks": [
+              "ModuleCompleteButton renders",
+              "Button toggles completion state",
+              "localStorage persists state"
+            ]
+          },
+          "status": "completed",
+          "notes": "Converted all 6 module files from .md to .mdx. Added ModuleCompleteButton import and component to each module with appropriate moduleId and next module navigation. Module 1-5 have nextModuleLink and nextModuleTitle props; Module 6 (final) has no next module. Updated navigation links to use extensionless paths. Committed as 7ce506f.",
+          "updated_at": "2026-01-03T22:40:23.903790+00:00"
+        },
+        {
+          "id": "subtask-4-3",
+          "description": "Add Mermaid diagrams to key modules (intro, module 3, module 5)",
+          "service": "main",
+          "files_to_modify": [
+            "docs/ruta-aprendizaje-ia-agents/intro.md",
+            "docs/ruta-aprendizaje-ia-agents/03-conceptos.md",
+            "docs/ruta-aprendizaje-ia-agents/05-mcp-servers.md"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "docs/arquitectura-ia/guia-composicion/01-fundamentos-core-four.md"
+          ],
+          "verification": {
+            "type": "browser",
+            "url": "http://localhost:3000/docs/ruta-aprendizaje-ia-agents/intro",
+            "checks": [
+              "Mermaid diagram renders",
+              "Diagram readable in light/dark mode"
+            ]
+          },
+          "status": "completed",
+          "notes": "Added Mermaid diagrams to key modules:\n- intro.mdx: 3 learning path flow diagrams (Ruta R\u00e1pida, Ruta Completa, Ruta Empresarial)\n- 03-conceptos.mdx: Tool Calling flow diagram, ReAct cycle diagram\n- 05-mcp-servers.mdx: Before/After MCP comparison, Architecture diagram, Request lifecycle sequence diagram\nAlso configured Mermaid support in docusaurus.config.js. Note: Requires @docusaurus/theme-mermaid package installation.",
+          "updated_at": "2026-01-04T10:24:04.133700+00:00"
+        },
+        {
+          "id": "subtask-4-4",
+          "description": "Add cross-references to existing content (4R Framework, taller-ia-agentes-mcp)",
+          "service": "main",
+          "files_to_modify": [
+            "docs/ruta-aprendizaje-ia-agents/intro.md",
+            "docs/ruta-aprendizaje-ia-agents/04-agentes-avanzados.md",
+            "docs/ruta-aprendizaje-ia-agents/06-produccion.md"
+          ],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "manual",
+            "instructions": "Verify links to /docs/proyectos/ai-presentation/4r-framework and /docs/proyectos/taller-ia-agentes-mcp/ exist and work"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-4-5",
+          "description": "Verify production build and mobile responsiveness",
+          "service": "main",
+          "all_services": true,
+          "files_to_modify": [],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "e2e",
+            "steps": [
+              "Run 'npm run build' - must succeed with no errors",
+              "Test roadmap on mobile viewport (< 768px) - should stack vertically",
+              "Test localStorage persistence - mark module complete, refresh page, verify still marked",
+              "Verify sidebar navigation shows new category with all 6 modules",
+              "Check no console errors in browser console",
+              "Verify all internal links work (no broken links)"
+            ]
+          },
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_phases": 4,
+    "total_subtasks": 15,
+    "services_involved": [
+      "main"
+    ],
+    "parallelism": {
+      "max_parallel_phases": 2,
+      "parallel_groups": [
+        {
+          "phases": [
+            "phase-2-module-content",
+            "phase-3-interactive-components"
+          ],
+          "reason": "Both depend only on phase-1-structure, work on different files - content vs components"
+        }
+      ],
+      "recommended_workers": 2,
+      "speedup_estimate": "1.3x faster than sequential - Phase 2 and 3 can run in parallel"
+    },
+    "startup_command": "npm run start"
+  },
+  "verification_strategy": {
+    "risk_level": "low",
+    "skip_validation": false,
+    "test_creation_phase": "post_implementation",
+    "test_types_required": [
+      "unit"
+    ],
+    "security_scanning_required": false,
+    "staging_deployment_required": false,
+    "acceptance_criteria": [
+      "All 6 modules have complete content (not placeholder text)",
+      "Visual roadmap component renders correctly in light and dark mode",
+      "localStorage progress tracking works across browser sessions",
+      "Sidebar navigation includes new category with correct structure",
+      "Mobile responsiveness verified on viewport < 768px",
+      "No console errors or warnings in browser console",
+      "Production build (npm run build) succeeds",
+      "No regressions in existing documentation sections"
+    ],
+    "verification_steps": [
+      {
+        "name": "Unit Tests (if test framework exists)",
+        "command": "npm test -- --testPathPattern=LearningPath",
+        "expected_outcome": "All tests pass or test framework not configured",
+        "type": "test",
+        "required": false,
+        "blocking": false
+      },
+      {
+        "name": "Production Build",
+        "command": "npm run build",
+        "expected_outcome": "Build succeeds with no errors",
+        "type": "build",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Browser Verification - Intro Page",
+        "command": "Open http://localhost:3000/docs/ruta-aprendizaje-ia-agents/intro in browser",
+        "expected_outcome": "Roadmap renders, rutas section visible, no console errors",
+        "type": "browser",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Browser Verification - Module 1",
+        "command": "Open http://localhost:3000/docs/ruta-aprendizaje-ia-agents/01-fundamentos in browser",
+        "expected_outcome": "Module complete button works, progress persists on refresh",
+        "type": "browser",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Mobile Responsiveness",
+        "command": "Test roadmap on mobile viewport (DevTools responsive mode, width < 768px)",
+        "expected_outcome": "Roadmap stacks vertically, buttons tappable, text readable",
+        "type": "manual",
+        "required": true,
+        "blocking": false
+      }
+    ],
+    "reasoning": "Low risk content and UI feature with no security implications. Unit tests for React components only if test framework exists. Focus on browser verification and production build success."
+  },
+  "qa_acceptance": {
+    "unit_tests": {
+      "required": false,
+      "commands": [
+        "npm test -- --testPathPattern=LearningPath"
+      ],
+      "minimum_coverage": null
+    },
+    "integration_tests": {
+      "required": false,
+      "commands": [],
+      "services_to_test": []
+    },
+    "e2e_tests": {
+      "required": false,
+      "commands": [],
+      "flows": []
+    },
+    "browser_verification": {
+      "required": true,
+      "pages": [
+        {
+          "url": "http://localhost:3000/docs/ruta-aprendizaje-ia-agents/intro",
+          "checks": [
+            "Roadmap component renders",
+            "All 6 modules visible",
+            "Rutas section present",
+            "Skill assessment visible",
+            "No console errors"
+          ]
+        },
+        {
+          "url": "http://localhost:3000/docs/ruta-aprendizaje-ia-agents/01-fundamentos",
+          "checks": [
+            "Prerequisites section exists",
+            "Learning objectives listed",
+            "Hands-on project section exists",
+            "ModuleCompleteButton renders and works",
+            "Navigation links to next module work"
+          ]
+        },
+        {
+          "url": "http://localhost:3000/docs/ruta-aprendizaje-ia-agents/06-produccion",
+          "checks": [
+            "Final module content complete",
+            "Links to additional resources exist"
+          ]
+        }
+      ]
+    },
+    "database_verification": {
+      "required": false,
+      "checks": []
+    }
+  },
+  "qa_signoff": null,
+  "last_updated": "2026-01-04T10:24:04.133711+00:00",
+  "status": "in_progress",
+  "planStatus": "in_progress",
+  "updated_at": "2026-01-03T20:59:43.513Z",
+  "recoveryNote": "Task recovered from stuck state at 2026-01-03T20:59:43.514Z"
+}

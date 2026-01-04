@@ -1,0 +1,69 @@
+{
+  "complexity": "standard",
+  "workflow_type": "feature",
+  "confidence": 0.85,
+  "reasoning": "Standard feature development for Docusaurus site. 10-15 files estimated across content and UI components. Single service, no external integrations, minimal config changes. Well-established patterns exist for documentation sites.",
+
+  "analysis": {
+    "scope": {
+      "estimated_files": 12,
+      "estimated_services": 1,
+      "is_cross_cutting": false,
+      "notes": "5+ MDX modules, 4-6 React components for roadmap and progress tracking, 1-2 config files"
+    },
+    "integrations": {
+      "external_services": [],
+      "new_dependencies": [],
+      "research_needed": false,
+      "notes": "May need lightweight state management for progress tracking, but localStorage likely sufficient"
+    },
+    "infrastructure": {
+      "docker_changes": false,
+      "database_changes": false,
+      "config_changes": true,
+      "notes": "Minor Docusaurus config changes for new learning path section"
+    },
+    "knowledge": {
+      "patterns_exist": true,
+      "research_required": false,
+      "unfamiliar_tech": [],
+      "notes": "Docusaurus documentation patterns well-established. Standard React component development."
+    },
+    "risk": {
+      "level": "low",
+      "concerns": [
+        "Content organization and navigation UX",
+        "Progress tracking state management",
+        "Visual roadmap design implementation"
+      ],
+      "notes": "Low risk - additive feature with no security-sensitive areas or breaking changes"
+    }
+  },
+
+  "recommended_phases": [
+    "discovery",
+    "requirements",
+    "context",
+    "spec_writing",
+    "planning",
+    "validation"
+  ],
+
+  "flags": {
+    "needs_research": false,
+    "needs_self_critique": false,
+    "needs_infrastructure_setup": false
+  },
+
+  "validation_recommendations": {
+    "risk_level": "low",
+    "skip_validation": false,
+    "minimal_mode": true,
+    "test_types_required": ["unit"],
+    "security_scan_required": false,
+    "staging_deployment_required": false,
+    "reasoning": "Content and UI feature with no security implications. Unit tests for React components if test framework exists. Low risk documentation site allows for minimal validation."
+  },
+
+  "created_at": "2026-01-03T00:00:00Z"
+}
