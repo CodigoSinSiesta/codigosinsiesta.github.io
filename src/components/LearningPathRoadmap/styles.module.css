@@ -1,0 +1,241 @@
+/* LearningPathRoadmap Component Styles */
+
+.roadmap {
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.roadmapHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.roadmapSubtitle {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+/* Progress Summary */
+.progressSummary {
+  max-width: 400px;
+  margin: 1.5rem auto 0;
+}
+
+.progressBar {
+  height: 8px;
+  background-color: var(--ifm-color-emphasis-200);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ifm-color-primary), var(--ifm-color-primary-darker));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+/* Modules Container */
+.modulesContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.moduleWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Module Card */
+.moduleCard {
+  width: 100%;
+  background: var(--ifm-card-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.moduleCard:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.moduleCard.completed {
+  border-color: var(--ifm-color-success);
+  background: linear-gradient(135deg, var(--ifm-card-background-color) 0%, rgba(46, 125, 50, 0.05) 100%);
+}
+
+.moduleHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.moduleEmoji {
+  font-size: 1.5rem;
+}
+
+.moduleNumber {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--ifm-color-primary);
+  letter-spacing: 0.5px;
+}
+
+.moduleDuration {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--ifm-color-emphasis-500);
+  background: var(--ifm-color-emphasis-100);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.moduleContent {
+  margin-bottom: 1rem;
+}
+
+.moduleTitle {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.moduleTitle a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.moduleTitle a:hover {
+  color: var(--ifm-color-primary);
+  text-decoration: underline;
+}
+
+.moduleDescription {
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-600);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.moduleFooter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.moduleFooter :global(.button) {
+  color: #fff !important;
+  background-color: var(--ifm-color-primary) !important;
+  border: 1px solid var(--ifm-color-primary) !important;
+  font-weight: 600 !important;
+}
+
+.moduleFooter :global(.button:hover) {
+  color: #fff !important;
+  background-color: var(--ifm-color-primary-darker) !important;
+  border-color: var(--ifm-color-primary-darker) !important;
+}
+
+.completedBadge {
+  font-size: 0.75rem;
+  color: var(--ifm-color-success);
+  font-weight: 600;
+}
+
+/* Progress Arrow */
+.progressArrow {
+  color: var(--ifm-color-emphasis-300);
+  padding: 0.25rem 0;
+}
+
+.progressArrow svg {
+  display: block;
+}
+
+/* Roadmap Footer */
+.roadmapFooter {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.footerNote {
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-600);
+  background: var(--ifm-color-emphasis-100);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  display: inline-block;
+  max-width: 500px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .roadmap {
+    padding: 1.5rem 0;
+  }
+
+  .roadmapSubtitle {
+    font-size: 1rem;
+  }
+
+  .moduleCard {
+    padding: 1rem;
+  }
+
+  .moduleHeader {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .moduleDuration {
+    margin-left: 0;
+    order: 3;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.25rem;
+  }
+
+  .moduleTitle {
+    font-size: 1rem;
+  }
+
+  .moduleDescription {
+    font-size: 0.8125rem;
+  }
+
+  .footerNote {
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .moduleCard {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .moduleCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .progressArrow {
+  color: var(--ifm-color-emphasis-400);
+}

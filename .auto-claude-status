@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "003-ai-agent-development-learning-path",
+  "state": "complete",
+  "subtasks": {
+    "completed": 16,
+    "total": 16,
+    "in_progress": 0,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Integration & Polish",
+    "id": null,
+    "total": 5
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 3,
+    "started_at": "2026-01-04T11:19:40.219147"
+  },
+  "last_update": "2026-01-04T11:30:33.285073"
+}
