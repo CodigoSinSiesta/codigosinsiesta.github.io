@@ -50,31 +50,26 @@ interface Tool {
 
 #### El flujo de Tool Calling
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    FLUJO DE TOOL CALLING                        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  1. Usuario envía mensaje                                       │
-│     "¿Cuál es el clima en Madrid?"                              │
-│                          │                                      │
-│                          ▼                                      │
-│  2. LLM analiza y decide usar herramienta                       │
-│     { tool: "get_weather", input: { city: "Madrid" } }          │
-│                          │                                      │
-│                          ▼                                      │
-│  3. Tu código ejecuta la herramienta                            │
-│     const result = await weatherAPI.get("Madrid");              │
-│                          │                                      │
-│                          ▼                                      │
-│  4. Envías resultado de vuelta al LLM                           │
-│     { tool_result: { temperature: 22, condition: "sunny" } }    │
-│                          │                                      │
-│                          ▼                                      │
-│  5. LLM genera respuesta final                                  │
-│     "El clima en Madrid es soleado con 22°C"                    │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph flow["🔧 FLUJO DE TOOL CALLING"]
+        A["👤 Usuario envía mensaje<br/>'¿Cuál es el clima en Madrid?'"]
+        B["🧠 LLM analiza y decide usar herramienta<br/>tool: 'get_weather', input: { city: 'Madrid' }"]
+        C["⚙️ Tu código ejecuta la herramienta<br/>weatherAPI.get('Madrid')"]
+        D["📤 Envías resultado al LLM<br/>{ temperature: 22, condition: 'sunny' }"]
+        E["💬 LLM genera respuesta final<br/>'El clima en Madrid es soleado con 22°C'"]
+
+        A --> B
+        B --> C
+        C --> D
+        D --> E
+    end
+
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#0d47a1
+    style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+    style C fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20
+    style D fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100
+    style E fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#01579b
 ```
 
 #### Implementación con Claude API
@@ -166,38 +161,27 @@ for (const block of response.content) {
 
 #### El ciclo ReAct
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                    CICLO ReAct                             │
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│    ┌──────────────┐                                        │
-│    │   THOUGHT    │  "Necesito buscar información sobre    │
-│    │  (Razonar)   │   TypeScript para responder..."        │
-│    └──────┬───────┘                                        │
-│           │                                                │
-│           ▼                                                │
-│    ┌──────────────┐                                        │
-│    │    ACTION    │  search_web({ query: "TypeScript" })   │
-│    │   (Actuar)   │                                        │
-│    └──────┬───────┘                                        │
-│           │                                                │
-│           ▼                                                │
-│    ┌──────────────┐                                        │
-│    │ OBSERVATION  │  [{ title: "TS Handbook", ... }]       │
-│    │  (Observar)  │                                        │
-│    └──────┬───────┘                                        │
-│           │                                                │
-│           ▼                                                │
-│    ┌──────────────┐                                        │
-│    │   ¿Listo?    │──── Sí ───▶ Respuesta final            │
-│    └──────┬───────┘                                        │
-│           │                                                │
-│           No                                               │
-│           │                                                │
-│           └────────────▶ Volver a THOUGHT                  │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph react["🔄 CICLO ReAct"]
+        T["💭 THOUGHT<br/>(Razonar)<br/>'Necesito buscar información<br/>sobre TypeScript...'"]
+        A["⚡ ACTION<br/>(Actuar)<br/>search_web({ query: 'TypeScript' })"]
+        O["👁️ OBSERVATION<br/>(Observar)<br/>[{ title: 'TS Handbook', ... }]"]
+        Q{"¿Listo?"}
+        F["✅ Respuesta Final"]
+    end
+
+    T --> A
+    A --> O
+    O --> Q
+    Q -->|Sí| F
+    Q -->|No| T
+
+    style T fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#1a237e
+    style A fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#e65100
+    style O fill:#e0f2f1,stroke:#009688,stroke-width:2px,color:#004d40
+    style Q fill:#fce4ec,stroke:#e91e63,stroke-width:2px,color:#880e4f
+    style F fill:#e8f5e9,stroke:#4caf50,stroke-width:2px,color:#1b5e20
 ```
 
 #### Implementación del patrón ReAct
