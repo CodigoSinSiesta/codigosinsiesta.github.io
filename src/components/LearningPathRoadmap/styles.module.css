@@ -141,6 +141,19 @@
   gap: 1rem;
 }
 
+.moduleFooter :global(.button) {
+  color: #fff !important;
+  background-color: var(--ifm-color-primary) !important;
+  border: 1px solid var(--ifm-color-primary) !important;
+  font-weight: 600 !important;
+}
+
+.moduleFooter :global(.button:hover) {
+  color: #fff !important;
+  background-color: var(--ifm-color-primary-darker) !important;
+  border-color: var(--ifm-color-primary-darker) !important;
+}
+
 .completedBadge {
   font-size: 0.75rem;
   color: var(--ifm-color-success);
