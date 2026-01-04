@@ -89,6 +89,14 @@ const config = {
     ({
       // Project's social card for Open Graph meta tags
       image: 'img/codigo-sin-siesta-social-card.png',
+      // Open Graph and Twitter Card metadata
+      metadata: [
+        {property: 'og:image', content: 'img/codigo-sin-siesta-social-card.png'},
+        {property: 'og:type', content: 'website'},
+        {property: 'og:site_name', content: 'Código Sin Siesta'},
+        {name: 'twitter:card', content: 'summary_large_image'},
+        {name: 'twitter:image', content: 'img/codigo-sin-siesta-social-card.png'},
+      ],
       colorMode: {
         respectPrefersColorScheme: true,
       },
