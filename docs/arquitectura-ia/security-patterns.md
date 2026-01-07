@@ -1917,19 +1917,2515 @@ class ModerationPipeline {
 
 ---
 
+## 🔧 Tool Execution
+
+La ejecución segura de herramientas es crítica en sistemas de agentes IA. Un LLM puede decidir ejecutar herramientas basándose en la conversación, pero esas herramientas pueden tener acceso a recursos sensibles como el filesystem, la red, o bases de datos.
+
+### Sandboxing de Herramientas
+
+**Aislamiento de ejecución para herramientas potencialmente peligrosas.**
+
+El sandboxing garantiza que aunque una herramienta sea comprometida o ejecute código malicioso, el daño esté contenido dentro del sandbox sin afectar el sistema host.
+
+```typescript
+interface SandboxConfig {
+  maxMemoryMB: number;
+  maxCpuPercent: number;
+  timeoutMs: number;
+  networkAccess: 'none' | 'restricted' | 'full';
+  filesystemAccess: 'none' | 'readonly' | 'restricted' | 'full';
+  allowedPaths?: string[];
+  allowedDomains?: string[];
+}
+
+interface SandboxResult<T> {
+  success: boolean;
+  result?: T;
+  error?: string;
+  metrics: ExecutionMetrics;
+  securityEvents: SecurityEvent[];
+}
+
+interface ExecutionMetrics {
+  executionTimeMs: number;
+  memoryUsedMB: number;
+  cpuTimeMs: number;
+  networkCallsCount: number;
+  filesystemOpsCount: number;
+}
+
+class ToolSandbox {
+  private config: SandboxConfig;
+  private containerPool: ContainerPool;
+
+  constructor(config: SandboxConfig) {
+    this.config = config;
+    this.containerPool = new ContainerPool({
+      maxContainers: 10,
+      idleTimeoutMs: 30000,
+    });
+  }
+
+  async execute<T>(
+    tool: Tool,
+    params: Record<string, unknown>,
+    context: ExecutionContext
+  ): Promise<SandboxResult<T>> {
+    const securityEvents: SecurityEvent[] = [];
+    const startTime = Date.now();
+
+    // 1. Crear o reutilizar container aislado
+    const container = await this.getContainer(tool.riskLevel);
+
+    try {
+      // 2. Configurar restricciones según el tool
+      await this.applyRestrictions(container, tool);
+
+      // 3. Inyectar código del tool en el sandbox
+      await container.loadTool(tool.code, tool.dependencies);
+
+      // 4. Ejecutar con timeout
+      const resultPromise = container.execute(tool.name, params);
+      const timeoutPromise = this.createTimeout(this.config.timeoutMs);
+
+      const result = await Promise.race([resultPromise, timeoutPromise]);
+
+      if (result === 'TIMEOUT') {
+        securityEvents.push({
+          type: 'timeout',
+          severity: 'warning',
+          message: `Tool ${tool.name} exceeded timeout of ${this.config.timeoutMs}ms`,
+        });
+        await container.forceKill();
+        return {
+          success: false,
+          error: 'Execution timeout exceeded',
+          metrics: this.getMetrics(container, startTime),
+          securityEvents,
+        };
+      }
+
+      // 5. Validar resultado antes de devolver
+      const validatedResult = await this.validateResult<T>(result, tool);
+
+      return {
+        success: true,
+        result: validatedResult,
+        metrics: this.getMetrics(container, startTime),
+        securityEvents,
+      };
+
+    } catch (error) {
+      securityEvents.push({
+        type: 'execution_error',
+        severity: 'error',
+        message: error.message,
+        stack: error.stack,
+      });
+
+      return {
+        success: false,
+        error: this.sanitizeError(error),
+        metrics: this.getMetrics(container, startTime),
+        securityEvents,
+      };
+
+    } finally {
+      // 6. Limpiar y reciclar container
+      await this.cleanupContainer(container);
+    }
+  }
+
+  private async getContainer(riskLevel: string): Promise<SandboxContainer> {
+    // Configuración más restrictiva para tools de alto riesgo
+    const containerConfig = this.getContainerConfig(riskLevel);
+
+    return this.containerPool.acquire({
+      image: 'secure-runtime:latest',
+      ...containerConfig,
+    });
+  }
+
+  private getContainerConfig(riskLevel: string): Partial<SandboxConfig> {
+    const configs: Record<string, Partial<SandboxConfig>> = {
+      low: {
+        maxMemoryMB: 512,
+        maxCpuPercent: 50,
+        timeoutMs: 30000,
+        networkAccess: 'restricted',
+        filesystemAccess: 'readonly',
+      },
+      medium: {
+        maxMemoryMB: 256,
+        maxCpuPercent: 25,
+        timeoutMs: 15000,
+        networkAccess: 'restricted',
+        filesystemAccess: 'none',
+      },
+      high: {
+        maxMemoryMB: 128,
+        maxCpuPercent: 10,
+        timeoutMs: 5000,
+        networkAccess: 'none',
+        filesystemAccess: 'none',
+      },
+      critical: {
+        maxMemoryMB: 64,
+        maxCpuPercent: 5,
+        timeoutMs: 2000,
+        networkAccess: 'none',
+        filesystemAccess: 'none',
+      },
+    };
+
+    return configs[riskLevel] || configs.high;
+  }
+
+  private async applyRestrictions(
+    container: SandboxContainer,
+    tool: Tool
+  ): Promise<void> {
+    // Restricciones de red
+    if (this.config.networkAccess === 'restricted' && this.config.allowedDomains) {
+      await container.setNetworkRules({
+        allowedDomains: this.config.allowedDomains,
+        blockPrivateRanges: true,
+        maxConnectionsPerSecond: 10,
+      });
+    } else if (this.config.networkAccess === 'none') {
+      await container.disableNetwork();
+    }
+
+    // Restricciones de filesystem
+    if (this.config.filesystemAccess === 'restricted' && this.config.allowedPaths) {
+      await container.setFilesystemRules({
+        allowedPaths: this.config.allowedPaths,
+        readOnly: false,
+        maxFileSizeMB: 10,
+      });
+    } else if (this.config.filesystemAccess === 'readonly') {
+      await container.setFilesystemRules({
+        allowedPaths: this.config.allowedPaths || ['/data'],
+        readOnly: true,
+        maxFileSizeMB: 0,
+      });
+    } else if (this.config.filesystemAccess === 'none') {
+      await container.disableFilesystem();
+    }
+
+    // Límites de recursos
+    await container.setResourceLimits({
+      memoryMB: this.config.maxMemoryMB,
+      cpuPercent: this.config.maxCpuPercent,
+      pidsMax: 50,
+      noNewPrivileges: true,
+    });
+  }
+
+  private sanitizeError(error: Error): string {
+    // No exponer stack traces o información sensible
+    const sanitizedMessage = error.message
+      .replace(/\/[^\s]+/g, '[PATH]')
+      .replace(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g, '[IP]')
+      .slice(0, 500);
+
+    return `Tool execution failed: ${sanitizedMessage}`;
+  }
+
+  private async validateResult<T>(result: unknown, tool: Tool): Promise<T> {
+    // Validar contra schema del tool
+    if (tool.outputSchema) {
+      return tool.outputSchema.parse(result) as T;
+    }
+    return result as T;
+  }
+
+  private getMetrics(container: SandboxContainer, startTime: number): ExecutionMetrics {
+    return {
+      executionTimeMs: Date.now() - startTime,
+      memoryUsedMB: container.getMemoryUsage(),
+      cpuTimeMs: container.getCpuTime(),
+      networkCallsCount: container.getNetworkCallsCount(),
+      filesystemOpsCount: container.getFilesystemOpsCount(),
+    };
+  }
+
+  private createTimeout(ms: number): Promise<'TIMEOUT'> {
+    return new Promise(resolve => setTimeout(() => resolve('TIMEOUT'), ms));
+  }
+
+  private async cleanupContainer(container: SandboxContainer): Promise<void> {
+    await container.reset();
+    this.containerPool.release(container);
+  }
+}
+
+// Ejemplo de uso con Docker
+class DockerSandbox extends ToolSandbox {
+  async createSecureContainer(riskLevel: string): Promise<Docker.Container> {
+    const config = this.getContainerConfig(riskLevel);
+
+    return Docker.createContainer({
+      Image: 'tool-sandbox:latest',
+      HostConfig: {
+        Memory: config.maxMemoryMB * 1024 * 1024,
+        CpuPeriod: 100000,
+        CpuQuota: config.maxCpuPercent * 1000,
+        NetworkMode: config.networkAccess === 'none' ? 'none' : 'bridge',
+        ReadonlyRootfs: config.filesystemAccess !== 'full',
+        SecurityOpt: ['no-new-privileges'],
+        CapDrop: ['ALL'],
+        CapAdd: [], // Sin capabilities adicionales
+        Tmpfs: { '/tmp': 'rw,noexec,nosuid,size=64m' },
+      },
+      NetworkDisabled: config.networkAccess === 'none',
+    });
+  }
+}
+```
+
+**Cuándo usar:**
+- ✅ Ejecución de código generado por LLM
+- ✅ Tools que acceden a filesystem o red
+- ✅ Plugins o extensiones de terceros
+- ✅ Entornos multi-tenant
+
+**Tradeoffs:**
+- **Pros**: Aislamiento fuerte, contención de daños, auditoría completa
+- **Cons**: Overhead de containerización, latencia adicional, complejidad operacional
+
+---
+
+### Control de Permisos Granular
+
+**Sistema de permisos basado en roles para herramientas de agentes IA.**
+
+```typescript
+interface Permission {
+  resource: string;
+  actions: Action[];
+  conditions?: PermissionCondition[];
+}
+
+type Action = 'read' | 'write' | 'delete' | 'execute' | 'admin';
+
+interface PermissionCondition {
+  type: 'time_based' | 'ip_based' | 'rate_limited' | 'approval_required';
+  params: Record<string, unknown>;
+}
+
+interface Role {
+  name: string;
+  permissions: Permission[];
+  inherits?: string[];
+}
+
+interface ToolExecutionRequest {
+  toolName: string;
+  params: Record<string, unknown>;
+  userId: string;
+  sessionId: string;
+  context: ExecutionContext;
+}
+
+class PermissionManager {
+  private roles: Map<string, Role> = new Map();
+  private userRoles: Map<string, string[]> = new Map();
+  private auditLog: AuditLogger;
+
+  constructor(auditLog: AuditLogger) {
+    this.auditLog = auditLog;
+    this.initializeDefaultRoles();
+  }
+
+  private initializeDefaultRoles(): void {
+    // Role básico para usuarios autenticados
+    this.roles.set('user', {
+      name: 'user',
+      permissions: [
+        { resource: 'tools:search', actions: ['execute'] },
+        { resource: 'tools:calculate', actions: ['execute'] },
+        { resource: 'data:own', actions: ['read', 'write'] },
+      ],
+    });
+
+    // Role con más permisos
+    this.roles.set('power_user', {
+      name: 'power_user',
+      inherits: ['user'],
+      permissions: [
+        { resource: 'tools:web_fetch', actions: ['execute'] },
+        { resource: 'tools:code_execute', actions: ['execute'], conditions: [
+          { type: 'rate_limited', params: { maxPerHour: 100 } },
+        ]},
+        { resource: 'data:shared', actions: ['read'] },
+      ],
+    });
+
+    // Role administrativo
+    this.roles.set('admin', {
+      name: 'admin',
+      inherits: ['power_user'],
+      permissions: [
+        { resource: 'tools:*', actions: ['execute', 'admin'] },
+        { resource: 'data:*', actions: ['read', 'write', 'delete'] },
+        { resource: 'users:*', actions: ['read', 'write'] },
+      ],
+    });
+
+    // Role para tools de alto riesgo
+    this.roles.set('elevated', {
+      name: 'elevated',
+      inherits: ['power_user'],
+      permissions: [
+        {
+          resource: 'tools:file_write',
+          actions: ['execute'],
+          conditions: [
+            { type: 'approval_required', params: { approverRole: 'admin' } },
+          ],
+        },
+        {
+          resource: 'tools:database_modify',
+          actions: ['execute'],
+          conditions: [
+            { type: 'approval_required', params: { approverRole: 'admin' } },
+            { type: 'time_based', params: { allowedHours: [9, 17] } },
+          ],
+        },
+      ],
+    });
+  }
+
+  async checkPermission(request: ToolExecutionRequest): Promise<PermissionResult> {
+    const userRoles = this.userRoles.get(request.userId) || ['user'];
+    const requiredResource = `tools:${request.toolName}`;
+    const requiredAction: Action = 'execute';
+
+    // Recopilar todos los permisos del usuario
+    const allPermissions = this.collectPermissions(userRoles);
+
+    // Buscar permiso que coincida
+    const matchingPermission = this.findMatchingPermission(
+      allPermissions,
+      requiredResource,
+      requiredAction
+    );
+
+    if (!matchingPermission) {
+      await this.auditLog.log({
+        type: 'permission_denied',
+        userId: request.userId,
+        resource: requiredResource,
+        action: requiredAction,
+        reason: 'no_matching_permission',
+      });
+
+      return {
+        allowed: false,
+        reason: 'No tienes permisos para ejecutar esta herramienta',
+      };
+    }
+
+    // Verificar condiciones
+    if (matchingPermission.conditions) {
+      const conditionResult = await this.checkConditions(
+        matchingPermission.conditions,
+        request
+      );
+
+      if (!conditionResult.passed) {
+        await this.auditLog.log({
+          type: 'permission_denied',
+          userId: request.userId,
+          resource: requiredResource,
+          action: requiredAction,
+          reason: 'condition_failed',
+          details: conditionResult.failedCondition,
+        });
+
+        return {
+          allowed: false,
+          reason: conditionResult.message,
+          requiresApproval: conditionResult.requiresApproval,
+        };
+      }
+    }
+
+    await this.auditLog.log({
+      type: 'permission_granted',
+      userId: request.userId,
+      resource: requiredResource,
+      action: requiredAction,
+    });
+
+    return { allowed: true };
+  }
+
+  private collectPermissions(roleNames: string[]): Permission[] {
+    const permissions: Permission[] = [];
+    const visited = new Set<string>();
+
+    const collectFromRole = (roleName: string) => {
+      if (visited.has(roleName)) return;
+      visited.add(roleName);
+
+      const role = this.roles.get(roleName);
+      if (!role) return;
+
+      // Primero recopilar de roles heredados
+      if (role.inherits) {
+        role.inherits.forEach(collectFromRole);
+      }
+
+      // Luego agregar permisos propios
+      permissions.push(...role.permissions);
+    };
+
+    roleNames.forEach(collectFromRole);
+    return permissions;
+  }
+
+  private findMatchingPermission(
+    permissions: Permission[],
+    resource: string,
+    action: Action
+  ): Permission | null {
+    for (const perm of permissions) {
+      // Verificar recurso (soporta wildcards)
+      if (this.matchResource(perm.resource, resource)) {
+        // Verificar acción
+        if (perm.actions.includes(action) || perm.actions.includes('admin')) {
+          return perm;
+        }
+      }
+    }
+    return null;
+  }
+
+  private matchResource(pattern: string, resource: string): boolean {
+    if (pattern === resource) return true;
+    if (pattern.endsWith(':*')) {
+      const prefix = pattern.slice(0, -1);
+      return resource.startsWith(prefix);
+    }
+    return false;
+  }
+
+  private async checkConditions(
+    conditions: PermissionCondition[],
+    request: ToolExecutionRequest
+  ): Promise<ConditionResult> {
+    for (const condition of conditions) {
+      switch (condition.type) {
+        case 'time_based': {
+          const allowedHours = condition.params.allowedHours as number[];
+          const currentHour = new Date().getHours();
+          if (!allowedHours.includes(currentHour)) {
+            return {
+              passed: false,
+              failedCondition: 'time_based',
+              message: `Esta herramienta solo está disponible entre las ${allowedHours[0]}:00 y ${allowedHours[allowedHours.length - 1]}:00`,
+            };
+          }
+          break;
+        }
+
+        case 'rate_limited': {
+          const maxPerHour = condition.params.maxPerHour as number;
+          const currentUsage = await this.getRateLimitUsage(request.userId, request.toolName);
+          if (currentUsage >= maxPerHour) {
+            return {
+              passed: false,
+              failedCondition: 'rate_limited',
+              message: `Has excedido el límite de ${maxPerHour} ejecuciones por hora para esta herramienta`,
+            };
+          }
+          break;
+        }
+
+        case 'approval_required': {
+          const approverRole = condition.params.approverRole as string;
+          const hasApproval = await this.checkApproval(request, approverRole);
+          if (!hasApproval) {
+            return {
+              passed: false,
+              failedCondition: 'approval_required',
+              message: 'Esta acción requiere aprobación de un administrador',
+              requiresApproval: true,
+            };
+          }
+          break;
+        }
+
+        case 'ip_based': {
+          const allowedIPs = condition.params.allowedIPs as string[];
+          if (!allowedIPs.includes(request.context.clientIP)) {
+            return {
+              passed: false,
+              failedCondition: 'ip_based',
+              message: 'Esta herramienta no está disponible desde tu ubicación',
+            };
+          }
+          break;
+        }
+      }
+    }
+
+    return { passed: true };
+  }
+
+  private async getRateLimitUsage(userId: string, toolName: string): Promise<number> {
+    // Implementar con Redis o similar
+    return 0;
+  }
+
+  private async checkApproval(request: ToolExecutionRequest, approverRole: string): Promise<boolean> {
+    // Implementar sistema de aprobaciones
+    return false;
+  }
+}
+
+interface PermissionResult {
+  allowed: boolean;
+  reason?: string;
+  requiresApproval?: boolean;
+}
+
+interface ConditionResult {
+  passed: boolean;
+  failedCondition?: string;
+  message?: string;
+  requiresApproval?: boolean;
+}
+```
+
+**Cuándo usar:**
+- ✅ Sistemas multi-tenant con diferentes niveles de acceso
+- ✅ Herramientas con diferentes niveles de riesgo
+- ✅ Cumplimiento con políticas de seguridad corporativas
+- ✅ Auditorías de acceso y compliance
+
+**Tradeoffs:**
+- **Pros**: Control granular, auditoría completa, escalable
+- **Cons**: Complejidad de configuración, overhead de verificación
+
+---
+
+### Logging Seguro de Ejecuciones
+
+**Trazabilidad completa de todas las ejecuciones de herramientas sin exponer datos sensibles.**
+
+```typescript
+interface ExecutionLog {
+  id: string;
+  timestamp: Date;
+  toolName: string;
+  userId: string;
+  sessionId: string;
+  requestHash: string;        // Hash de params (no params directos)
+  status: 'started' | 'success' | 'failure' | 'timeout';
+  durationMs: number;
+  resourcesUsed: ResourceUsage;
+  securityFlags: SecurityFlag[];
+  errorType?: string;         // Categoría de error, no mensaje completo
+}
+
+interface SecurityFlag {
+  type: string;
+  severity: 'info' | 'warning' | 'critical';
+  details: string;
+}
+
+interface ResourceUsage {
+  memoryMB: number;
+  cpuMs: number;
+  networkCalls: number;
+  filesystemOps: number;
+}
+
+class SecureExecutionLogger {
+  private logger: StructuredLogger;
+  private sensitivePatterns: RegExp[];
+  private metricsCollector: MetricsCollector;
+
+  constructor() {
+    this.sensitivePatterns = [
+      /password[=:]\s*\S+/gi,
+      /api[_-]?key[=:]\s*\S+/gi,
+      /token[=:]\s*\S+/gi,
+      /secret[=:]\s*\S+/gi,
+      /bearer\s+\S+/gi,
+      /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+      /\b\d{3}-\d{2}-\d{4}\b/g,  // SSN
+      /\b\d{16}\b/g,              // Credit cards
+    ];
+  }
+
+  async logExecution(
+    tool: Tool,
+    params: Record<string, unknown>,
+    result: SandboxResult<unknown>,
+    context: ExecutionContext
+  ): Promise<void> {
+    // 1. Crear hash de parámetros (no guardar valores directos)
+    const requestHash = this.hashParams(params);
+
+    // 2. Detectar y sanitizar cualquier dato sensible que se haya filtrado
+    const sanitizedSecurityEvents = result.securityEvents.map(event => ({
+      ...event,
+      message: this.sanitize(event.message),
+      stack: event.stack ? this.sanitize(event.stack) : undefined,
+    }));
+
+    // 3. Crear log entry
+    const logEntry: ExecutionLog = {
+      id: generateSecureId(),
+      timestamp: new Date(),
+      toolName: tool.name,
+      userId: context.userId,
+      sessionId: context.sessionId,
+      requestHash,
+      status: this.determineStatus(result),
+      durationMs: result.metrics.executionTimeMs,
+      resourcesUsed: {
+        memoryMB: result.metrics.memoryUsedMB,
+        cpuMs: result.metrics.cpuTimeMs,
+        networkCalls: result.metrics.networkCallsCount,
+        filesystemOps: result.metrics.filesystemOpsCount,
+      },
+      securityFlags: sanitizedSecurityEvents.map(e => ({
+        type: e.type,
+        severity: e.severity as SecurityFlag['severity'],
+        details: e.message,
+      })),
+      errorType: result.error ? this.categorizeError(result.error) : undefined,
+    };
+
+    // 4. Enviar a sistema de logging estructurado
+    await this.logger.info('tool_execution', logEntry);
+
+    // 5. Actualizar métricas
+    this.metricsCollector.recordExecution(tool.name, {
+      duration: result.metrics.executionTimeMs,
+      success: result.success,
+      resourceUsage: logEntry.resourcesUsed,
+    });
+
+    // 6. Alertar si hay flags críticos
+    const criticalFlags = logEntry.securityFlags.filter(f => f.severity === 'critical');
+    if (criticalFlags.length > 0) {
+      await this.alertSecurityTeam(logEntry, criticalFlags);
+    }
+  }
+
+  private hashParams(params: Record<string, unknown>): string {
+    // Hash determinístico para poder correlacionar requests similares
+    // sin exponer los valores
+    const sorted = JSON.stringify(params, Object.keys(params).sort());
+    return createHash('sha256').update(sorted).digest('hex').slice(0, 16);
+  }
+
+  private sanitize(text: string): string {
+    let sanitized = text;
+    for (const pattern of this.sensitivePatterns) {
+      sanitized = sanitized.replace(pattern, '[REDACTED]');
+    }
+    return sanitized;
+  }
+
+  private determineStatus(result: SandboxResult<unknown>): ExecutionLog['status'] {
+    if (result.success) return 'success';
+    if (result.error?.includes('timeout')) return 'timeout';
+    return 'failure';
+  }
+
+  private categorizeError(error: string): string {
+    // Categorizar errores sin exponer detalles
+    if (error.includes('timeout')) return 'TIMEOUT';
+    if (error.includes('permission')) return 'PERMISSION_DENIED';
+    if (error.includes('network')) return 'NETWORK_ERROR';
+    if (error.includes('validation')) return 'VALIDATION_ERROR';
+    if (error.includes('resource')) return 'RESOURCE_LIMIT';
+    return 'UNKNOWN_ERROR';
+  }
+
+  private async alertSecurityTeam(
+    log: ExecutionLog,
+    criticalFlags: SecurityFlag[]
+  ): Promise<void> {
+    // Implementar alertas a Slack, PagerDuty, etc.
+  }
+}
+
+// Middleware de logging para el pipeline de ejecución
+class LoggingMiddleware {
+  private logger = new SecureExecutionLogger();
+
+  async wrap<T>(
+    tool: Tool,
+    params: Record<string, unknown>,
+    context: ExecutionContext,
+    executor: () => Promise<SandboxResult<T>>
+  ): Promise<SandboxResult<T>> {
+    const startTime = Date.now();
+    let result: SandboxResult<T>;
+
+    try {
+      result = await executor();
+    } catch (error) {
+      result = {
+        success: false,
+        error: error.message,
+        metrics: {
+          executionTimeMs: Date.now() - startTime,
+          memoryUsedMB: 0,
+          cpuTimeMs: 0,
+          networkCallsCount: 0,
+          filesystemOpsCount: 0,
+        },
+        securityEvents: [{
+          type: 'unhandled_error',
+          severity: 'critical',
+          message: error.message,
+        }],
+      };
+    }
+
+    // Siempre loguear, incluso en caso de error
+    await this.logger.logExecution(tool, params, result, context);
+
+    return result;
+  }
+}
+```
+
+**Cuándo usar:**
+- ✅ Todos los sistemas de producción
+- ✅ Requisitos de auditoría y compliance
+- ✅ Debugging y troubleshooting
+- ✅ Detección de anomalías y abusos
+
+**Tradeoffs:**
+- **Pros**: Trazabilidad completa, no expone datos sensibles, útil para debugging
+- **Cons**: Overhead de logging, almacenamiento de logs, complejidad de análisis
+
+---
+
+### Error Handling Seguro
+
+**Manejo de errores que no expone información sensible al usuario pero mantiene trazabilidad interna.**
+
+```typescript
+interface SafeError {
+  code: ErrorCode;
+  message: string;           // Mensaje seguro para el usuario
+  requestId: string;         // Para correlacionar con logs internos
+  retryable: boolean;
+  suggestedAction?: string;
+}
+
+type ErrorCode =
+  | 'TOOL_EXECUTION_FAILED'
+  | 'PERMISSION_DENIED'
+  | 'RATE_LIMITED'
+  | 'VALIDATION_ERROR'
+  | 'TIMEOUT'
+  | 'RESOURCE_EXHAUSTED'
+  | 'INTERNAL_ERROR'
+  | 'SERVICE_UNAVAILABLE';
+
+interface InternalErrorContext {
+  originalError: Error;
+  stack: string;
+  toolName: string;
+  params: Record<string, unknown>;
+  context: ExecutionContext;
+  timestamp: Date;
+}
+
+class SecureErrorHandler {
+  private errorLogger: StructuredLogger;
+  private alertThresholds: Map<ErrorCode, number> = new Map([
+    ['INTERNAL_ERROR', 5],      // 5 errores en 5 min
+    ['TIMEOUT', 10],
+    ['RESOURCE_EXHAUSTED', 3],
+  ]);
+  private errorCounts: Map<string, number[]> = new Map();
+
+  async handleError(
+    error: Error,
+    toolName: string,
+    params: Record<string, unknown>,
+    context: ExecutionContext
+  ): Promise<SafeError> {
+    const requestId = generateSecureId();
+    const timestamp = new Date();
+
+    // 1. Clasificar el error
+    const errorCode = this.classifyError(error);
+
+    // 2. Guardar contexto completo internamente
+    const internalContext: InternalErrorContext = {
+      originalError: error,
+      stack: error.stack || '',
+      toolName,
+      params: this.sanitizeParams(params),
+      context,
+      timestamp,
+    };
+
+    await this.logInternalError(requestId, errorCode, internalContext);
+
+    // 3. Verificar si necesita alerta
+    await this.checkAlertThreshold(errorCode, toolName);
+
+    // 4. Generar respuesta segura para el usuario
+    return this.createSafeError(errorCode, requestId);
+  }
+
+  private classifyError(error: Error): ErrorCode {
+    const message = error.message.toLowerCase();
+    const name = error.name.toLowerCase();
+
+    if (message.includes('permission') || message.includes('forbidden')) {
+      return 'PERMISSION_DENIED';
+    }
+    if (message.includes('timeout') || name.includes('timeout')) {
+      return 'TIMEOUT';
+    }
+    if (message.includes('rate') || message.includes('limit')) {
+      return 'RATE_LIMITED';
+    }
+    if (message.includes('validation') || message.includes('invalid')) {
+      return 'VALIDATION_ERROR';
+    }
+    if (message.includes('memory') || message.includes('resource')) {
+      return 'RESOURCE_EXHAUSTED';
+    }
+    if (message.includes('unavailable') || message.includes('connection')) {
+      return 'SERVICE_UNAVAILABLE';
+    }
+
+    return 'INTERNAL_ERROR';
+  }
+
+  private createSafeError(code: ErrorCode, requestId: string): SafeError {
+    const errorMessages: Record<ErrorCode, { message: string; retryable: boolean; suggestion?: string }> = {
+      TOOL_EXECUTION_FAILED: {
+        message: 'La herramienta no pudo completar la operación.',
+        retryable: true,
+        suggestion: 'Intenta de nuevo en unos momentos.',
+      },
+      PERMISSION_DENIED: {
+        message: 'No tienes permisos para realizar esta acción.',
+        retryable: false,
+        suggestion: 'Contacta a un administrador si necesitas acceso.',
+      },
+      RATE_LIMITED: {
+        message: 'Has excedido el límite de solicitudes.',
+        retryable: true,
+        suggestion: 'Espera unos minutos antes de intentar de nuevo.',
+      },
+      VALIDATION_ERROR: {
+        message: 'Los datos proporcionados no son válidos.',
+        retryable: false,
+        suggestion: 'Verifica los datos e intenta de nuevo.',
+      },
+      TIMEOUT: {
+        message: 'La operación tardó demasiado tiempo.',
+        retryable: true,
+        suggestion: 'Intenta con una solicitud más simple.',
+      },
+      RESOURCE_EXHAUSTED: {
+        message: 'El sistema está temporalmente sobrecargado.',
+        retryable: true,
+        suggestion: 'Intenta de nuevo en unos minutos.',
+      },
+      INTERNAL_ERROR: {
+        message: 'Ocurrió un error interno.',
+        retryable: true,
+        suggestion: 'Si el problema persiste, contacta a soporte.',
+      },
+      SERVICE_UNAVAILABLE: {
+        message: 'El servicio no está disponible temporalmente.',
+        retryable: true,
+        suggestion: 'Intenta de nuevo en unos minutos.',
+      },
+    };
+
+    const errorConfig = errorMessages[code];
+
+    return {
+      code,
+      message: errorConfig.message,
+      requestId,
+      retryable: errorConfig.retryable,
+      suggestedAction: errorConfig.suggestion,
+    };
+  }
+
+  private sanitizeParams(params: Record<string, unknown>): Record<string, unknown> {
+    const sensitiveKeys = ['password', 'secret', 'token', 'key', 'credential'];
+    const sanitized: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(params)) {
+      if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk))) {
+        sanitized[key] = '[REDACTED]';
+      } else if (typeof value === 'string' && value.length > 1000) {
+        sanitized[key] = `[STRING:${value.length}chars]`;
+      } else {
+        sanitized[key] = value;
+      }
+    }
+
+    return sanitized;
+  }
+
+  private async logInternalError(
+    requestId: string,
+    code: ErrorCode,
+    context: InternalErrorContext
+  ): Promise<void> {
+    await this.errorLogger.error('tool_execution_error', {
+      requestId,
+      code,
+      tool: context.toolName,
+      params: context.params,
+      userId: context.context.userId,
+      sessionId: context.context.sessionId,
+      timestamp: context.timestamp.toISOString(),
+      error: {
+        name: context.originalError.name,
+        message: context.originalError.message,
+        stack: context.stack,
+      },
+    });
+  }
+
+  private async checkAlertThreshold(code: ErrorCode, toolName: string): Promise<void> {
+    const threshold = this.alertThresholds.get(code);
+    if (!threshold) return;
+
+    const key = `${code}:${toolName}`;
+    const now = Date.now();
+    const windowMs = 5 * 60 * 1000; // 5 minutos
+
+    const counts = this.errorCounts.get(key) || [];
+    const recentCounts = counts.filter(ts => now - ts < windowMs);
+    recentCounts.push(now);
+    this.errorCounts.set(key, recentCounts);
+
+    if (recentCounts.length >= threshold) {
+      await this.sendAlert(code, toolName, recentCounts.length);
+      this.errorCounts.set(key, []); // Reset después de alertar
+    }
+  }
+
+  private async sendAlert(code: ErrorCode, toolName: string, count: number): Promise<void> {
+    // Implementar alertas
+  }
+}
+
+// Uso en el pipeline de ejecución
+class SafeToolExecutor {
+  private sandbox: ToolSandbox;
+  private errorHandler: SecureErrorHandler;
+  private logger: LoggingMiddleware;
+
+  async execute<T>(
+    tool: Tool,
+    params: Record<string, unknown>,
+    context: ExecutionContext
+  ): Promise<T | SafeError> {
+    try {
+      const result = await this.logger.wrap(
+        tool,
+        params,
+        context,
+        () => this.sandbox.execute<T>(tool, params, context)
+      );
+
+      if (result.success) {
+        return result.result!;
+      }
+
+      // Convertir error del sandbox a error seguro
+      return this.errorHandler.handleError(
+        new Error(result.error || 'Unknown error'),
+        tool.name,
+        params,
+        context
+      );
+
+    } catch (error) {
+      return this.errorHandler.handleError(error, tool.name, params, context);
+    }
+  }
+}
+```
+
+**Cuándo usar:**
+- ✅ Cualquier API pública
+- ✅ Sistemas que manejan datos sensibles
+- ✅ Entornos de producción
+- ✅ Aplicaciones con requisitos de compliance
+
+**Tradeoffs:**
+- **Pros**: No expone información sensible, correlacionable con logs internos, UX profesional
+- **Cons**: Debugging más difícil para usuarios, requiere sistema de logging robusto
+
+---
+
+## 🔐 Data Protection
+
+La protección de datos en sistemas de IA es especialmente crítica porque los LLMs procesan y pueden memorizar información sensible. Esta sección cubre patrones para proteger datos en tránsito, en reposo, y durante el procesamiento.
+
+### Encryption de Datos Sensibles
+
+**Cifrado end-to-end para datos sensibles procesados por el sistema de IA.**
+
+```typescript
+interface EncryptionConfig {
+  algorithm: 'aes-256-gcm' | 'chacha20-poly1305';
+  keyRotationDays: number;
+  keyDerivation: 'pbkdf2' | 'argon2id';
+}
+
+interface EncryptedData {
+  ciphertext: string;     // Base64
+  iv: string;             // Base64
+  authTag: string;        // Base64
+  keyId: string;          // Para key rotation
+  algorithm: string;
+}
+
+interface SensitiveField {
+  path: string;           // JSON path al campo
+  classification: 'pii' | 'financial' | 'health' | 'credential';
+  encryptionRequired: boolean;
+}
+
+class DataEncryptor {
+  private keyManager: KeyManager;
+  private config: EncryptionConfig;
+
+  constructor(config: EncryptionConfig) {
+    this.config = config;
+    this.keyManager = new KeyManager(config);
+  }
+
+  async encrypt(plaintext: string, classification: string): Promise<EncryptedData> {
+    // 1. Obtener clave actual para esta clasificación
+    const key = await this.keyManager.getCurrentKey(classification);
+
+    // 2. Generar IV único
+    const iv = crypto.randomBytes(16);
+
+    // 3. Crear cipher
+    const cipher = crypto.createCipheriv(
+      this.config.algorithm,
+      key.material,
+      iv,
+      { authTagLength: 16 }
+    );
+
+    // 4. Cifrar
+    let ciphertext = cipher.update(plaintext, 'utf8', 'base64');
+    ciphertext += cipher.final('base64');
+
+    // 5. Obtener authentication tag
+    const authTag = cipher.getAuthTag();
+
+    return {
+      ciphertext,
+      iv: iv.toString('base64'),
+      authTag: authTag.toString('base64'),
+      keyId: key.id,
+      algorithm: this.config.algorithm,
+    };
+  }
+
+  async decrypt(encrypted: EncryptedData): Promise<string> {
+    // 1. Obtener clave por ID
+    const key = await this.keyManager.getKey(encrypted.keyId);
+
+    // 2. Decodificar componentes
+    const iv = Buffer.from(encrypted.iv, 'base64');
+    const authTag = Buffer.from(encrypted.authTag, 'base64');
+
+    // 3. Crear decipher
+    const decipher = crypto.createDecipheriv(
+      encrypted.algorithm,
+      key.material,
+      iv,
+      { authTagLength: 16 }
+    );
+    decipher.setAuthTag(authTag);
+
+    // 4. Descifrar
+    let plaintext = decipher.update(encrypted.ciphertext, 'base64', 'utf8');
+    plaintext += decipher.final('utf8');
+
+    return plaintext;
+  }
+
+  // Cifrar campos específicos en un objeto
+  async encryptFields<T extends object>(
+    data: T,
+    sensitiveFields: SensitiveField[]
+  ): Promise<T> {
+    const encrypted = JSON.parse(JSON.stringify(data));
+
+    for (const field of sensitiveFields) {
+      if (!field.encryptionRequired) continue;
+
+      const value = this.getNestedValue(encrypted, field.path);
+      if (value === undefined) continue;
+
+      const encryptedValue = await this.encrypt(
+        JSON.stringify(value),
+        field.classification
+      );
+
+      this.setNestedValue(encrypted, field.path, {
+        __encrypted: true,
+        data: encryptedValue,
+      });
+    }
+
+    return encrypted;
+  }
+
+  async decryptFields<T extends object>(data: T): Promise<T> {
+    const decrypted = JSON.parse(JSON.stringify(data));
+    await this.decryptNestedFields(decrypted);
+    return decrypted;
+  }
+
+  private async decryptNestedFields(obj: any): Promise<void> {
+    for (const key of Object.keys(obj)) {
+      const value = obj[key];
+
+      if (value && typeof value === 'object') {
+        if (value.__encrypted && value.data) {
+          const decryptedStr = await this.decrypt(value.data);
+          obj[key] = JSON.parse(decryptedStr);
+        } else {
+          await this.decryptNestedFields(value);
+        }
+      }
+    }
+  }
+
+  private getNestedValue(obj: any, path: string): any {
+    return path.split('.').reduce((o, k) => o?.[k], obj);
+  }
+
+  private setNestedValue(obj: any, path: string, value: any): void {
+    const keys = path.split('.');
+    const lastKey = keys.pop()!;
+    const target = keys.reduce((o, k) => o[k] = o[k] || {}, obj);
+    target[lastKey] = value;
+  }
+}
+
+// Key Manager con rotación automática
+class KeyManager {
+  private vault: SecretVault;
+  private config: EncryptionConfig;
+  private keyCache: Map<string, CachedKey> = new Map();
+
+  constructor(config: EncryptionConfig) {
+    this.config = config;
+    this.vault = new SecretVault();
+  }
+
+  async getCurrentKey(classification: string): Promise<EncryptionKey> {
+    const keyId = `${classification}_current`;
+    const cached = this.keyCache.get(keyId);
+
+    if (cached && !this.isExpired(cached)) {
+      return cached.key;
+    }
+
+    // Obtener de vault
+    const key = await this.vault.getKey(keyId);
+
+    // Verificar si necesita rotación
+    if (this.needsRotation(key)) {
+      return this.rotateKey(classification, key);
+    }
+
+    this.keyCache.set(keyId, { key, fetchedAt: Date.now() });
+    return key;
+  }
+
+  async getKey(keyId: string): Promise<EncryptionKey> {
+    const cached = this.keyCache.get(keyId);
+    if (cached) return cached.key;
+
+    const key = await this.vault.getKey(keyId);
+    this.keyCache.set(keyId, { key, fetchedAt: Date.now() });
+    return key;
+  }
+
+  private async rotateKey(
+    classification: string,
+    oldKey: EncryptionKey
+  ): Promise<EncryptionKey> {
+    // 1. Generar nueva clave
+    const newKeyMaterial = crypto.randomBytes(32);
+
+    // 2. Derivar clave con salt
+    const salt = crypto.randomBytes(16);
+    const derivedKey = await this.deriveKey(newKeyMaterial, salt);
+
+    // 3. Guardar nueva clave
+    const newKey: EncryptionKey = {
+      id: `${classification}_${Date.now()}`,
+      material: derivedKey,
+      createdAt: new Date(),
+      classification,
+    };
+
+    await this.vault.storeKey(newKey);
+
+    // 4. Actualizar referencia "current"
+    await this.vault.updateCurrentKey(classification, newKey.id);
+
+    // 5. Mantener clave antigua para descifrar datos existentes
+    // (no eliminar hasta que todos los datos sean re-cifrados)
+
+    return newKey;
+  }
+
+  private async deriveKey(keyMaterial: Buffer, salt: Buffer): Promise<Buffer> {
+    if (this.config.keyDerivation === 'argon2id') {
+      return argon2.hash(keyMaterial, {
+        salt,
+        type: argon2.argon2id,
+        memoryCost: 65536,
+        timeCost: 3,
+        parallelism: 4,
+        hashLength: 32,
+        raw: true,
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      crypto.pbkdf2(keyMaterial, salt, 100000, 32, 'sha256', (err, key) => {
+        if (err) reject(err);
+        else resolve(key);
+      });
+    });
+  }
+
+  private needsRotation(key: EncryptionKey): boolean {
+    const ageMs = Date.now() - key.createdAt.getTime();
+    const maxAgeMs = this.config.keyRotationDays * 24 * 60 * 60 * 1000;
+    return ageMs > maxAgeMs;
+  }
+
+  private isExpired(cached: CachedKey): boolean {
+    const cacheMaxAgeMs = 5 * 60 * 1000; // 5 minutos
+    return Date.now() - cached.fetchedAt > cacheMaxAgeMs;
+  }
+}
+
+interface EncryptionKey {
+  id: string;
+  material: Buffer;
+  createdAt: Date;
+  classification: string;
+}
+
+interface CachedKey {
+  key: EncryptionKey;
+  fetchedAt: number;
+}
+
+// Uso en el sistema de agentes
+class SecureDataHandler {
+  private encryptor: DataEncryptor;
+  private sensitiveFields: SensitiveField[] = [
+    { path: 'user.email', classification: 'pii', encryptionRequired: true },
+    { path: 'user.ssn', classification: 'pii', encryptionRequired: true },
+    { path: 'payment.cardNumber', classification: 'financial', encryptionRequired: true },
+    { path: 'medical.diagnosis', classification: 'health', encryptionRequired: true },
+  ];
+
+  async processUserData(userData: UserData): Promise<ProcessedData> {
+    // Cifrar antes de almacenar o procesar con LLM
+    const encrypted = await this.encryptor.encryptFields(userData, this.sensitiveFields);
+
+    // Para el LLM, crear versión con datos enmascarados (no cifrados)
+    const maskedForLLM = this.maskSensitiveData(userData);
+
+    return {
+      encrypted,      // Para almacenamiento
+      masked: maskedForLLM,  // Para procesamiento LLM
+    };
+  }
+
+  private maskSensitiveData(data: UserData): UserData {
+    const masked = JSON.parse(JSON.stringify(data));
+
+    // Enmascarar email: j***@example.com
+    if (masked.user?.email) {
+      const [local, domain] = masked.user.email.split('@');
+      masked.user.email = `${local[0]}***@${domain}`;
+    }
+
+    // Enmascarar SSN: ***-**-1234
+    if (masked.user?.ssn) {
+      masked.user.ssn = `***-**-${masked.user.ssn.slice(-4)}`;
+    }
+
+    // Enmascarar tarjeta: ****-****-****-1234
+    if (masked.payment?.cardNumber) {
+      masked.payment.cardNumber = `****-****-****-${masked.payment.cardNumber.slice(-4)}`;
+    }
+
+    return masked;
+  }
+}
+```
+
+**Cuándo usar:**
+- ✅ Almacenamiento de datos sensibles (PII, financieros, médicos)
+- ✅ Transmisión de datos entre servicios
+- ✅ Cumplimiento con GDPR, HIPAA, PCI-DSS
+- ✅ Sistemas multi-tenant
+
+**Tradeoffs:**
+- **Pros**: Protección fuerte de datos, cumplimiento normativo, key rotation
+- **Cons**: Overhead de cifrado/descifrado, complejidad de key management, latencia
+
+---
+
+### PII Redaction en Logs y Prompts
+
+**Sistema automático para detectar y redactar información personal identificable antes de logging o envío al LLM.**
+
+```typescript
+interface PIIConfig {
+  patterns: PIIPattern[];
+  customPatterns?: RegExp[];
+  replacementStyle: 'redact' | 'mask' | 'tokenize';
+  preserveFormat: boolean;
+}
+
+interface PIIPattern {
+  name: string;
+  regex: RegExp;
+  validator?: (match: string) => boolean;
+  replacement: string | ((match: string) => string);
+}
+
+interface PIIDetection {
+  type: string;
+  original: string;
+  redacted: string;
+  position: { start: number; end: number };
+  confidence: number;
+}
+
+interface RedactionResult {
+  text: string;
+  detections: PIIDetection[];
+  piiTokens?: Map<string, string>;  // Para tokenización reversible
+}
+
+class PIIRedactor {
+  private config: PIIConfig;
+  private tokenStore: TokenStore;
+
+  private readonly defaultPatterns: PIIPattern[] = [
+    // Emails
+    {
+      name: 'email',
+      regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+      validator: (match) => match.includes('.') && match.includes('@'),
+      replacement: (match) => {
+        if (!this.config.preserveFormat) return '[EMAIL]';
+        const [local, domain] = match.split('@');
+        return `${local[0]}***@${domain}`;
+      },
+    },
+
+    // Teléfonos (varios formatos)
+    {
+      name: 'phone',
+      regex: /\b(\+?1?[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
+      validator: (match) => match.replace(/\D/g, '').length >= 10,
+      replacement: (match) => {
+        if (!this.config.preserveFormat) return '[PHONE]';
+        const digits = match.replace(/\D/g, '');
+        return `***-***-${digits.slice(-4)}`;
+      },
+    },
+
+    // SSN (USA)
+    {
+      name: 'ssn',
+      regex: /\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g,
+      validator: (match) => {
+        const digits = match.replace(/\D/g, '');
+        // Validación básica de SSN
+        return digits.length === 9 &&
+          !digits.startsWith('000') &&
+          !digits.startsWith('666') &&
+          !digits.startsWith('9');
+      },
+      replacement: '[SSN]',
+    },
+
+    // Tarjetas de crédito
+    {
+      name: 'credit_card',
+      regex: /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g,
+      validator: (match) => this.luhnCheck(match.replace(/\D/g, '')),
+      replacement: (match) => {
+        if (!this.config.preserveFormat) return '[CARD]';
+        const digits = match.replace(/\D/g, '');
+        return `****-****-****-${digits.slice(-4)}`;
+      },
+    },
+
+    // Direcciones IP
+    {
+      name: 'ip_address',
+      regex: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
+      replacement: '[IP]',
+    },
+
+    // Fechas de nacimiento
+    {
+      name: 'dob',
+      regex: /\b(0?[1-9]|1[0-2])[\/\-](0?[1-9]|[12][0-9]|3[01])[\/\-](19|20)\d{2}\b/g,
+      replacement: '[DOB]',
+    },
+
+    // Números de pasaporte
+    {
+      name: 'passport',
+      regex: /\b[A-Z]{1,2}\d{6,9}\b/g,
+      replacement: '[PASSPORT]',
+    },
+
+    // API Keys (patrones comunes)
+    {
+      name: 'api_key',
+      regex: /\b(sk|pk|api|key|token|secret)[-_]?[A-Za-z0-9]{20,}\b/gi,
+      replacement: '[API_KEY]',
+    },
+
+    // Bearer tokens
+    {
+      name: 'bearer_token',
+      regex: /Bearer\s+[A-Za-z0-9\-_]+\.?[A-Za-z0-9\-_]*\.?[A-Za-z0-9\-_]*/gi,
+      replacement: 'Bearer [TOKEN]',
+    },
+  ];
+
+  constructor(config: Partial<PIIConfig> = {}) {
+    this.config = {
+      patterns: this.defaultPatterns,
+      replacementStyle: 'redact',
+      preserveFormat: false,
+      ...config,
+    };
+
+    if (config.customPatterns) {
+      this.addCustomPatterns(config.customPatterns);
+    }
+
+    this.tokenStore = new TokenStore();
+  }
+
+  redact(text: string): RedactionResult {
+    const detections: PIIDetection[] = [];
+    let redactedText = text;
+    const piiTokens = new Map<string, string>();
+
+    // Procesar cada patrón
+    for (const pattern of this.config.patterns) {
+      const matches = [...text.matchAll(new RegExp(pattern.regex.source, 'gi'))];
+
+      for (const match of matches) {
+        const original = match[0];
+        const position = { start: match.index!, end: match.index! + original.length };
+
+        // Validar si es necesario
+        if (pattern.validator && !pattern.validator(original)) {
+          continue;
+        }
+
+        // Calcular confianza basada en contexto
+        const confidence = this.calculateConfidence(text, match.index!, pattern.name);
+
+        // Determinar reemplazo
+        let replacement: string;
+        if (this.config.replacementStyle === 'tokenize') {
+          const token = this.tokenStore.createToken(original, pattern.name);
+          replacement = `[${token}]`;
+          piiTokens.set(token, original);
+        } else if (typeof pattern.replacement === 'function') {
+          replacement = pattern.replacement(original);
+        } else {
+          replacement = pattern.replacement;
+        }
+
+        detections.push({
+          type: pattern.name,
+          original,
+          redacted: replacement,
+          position,
+          confidence,
+        });
+      }
+    }
+
+    // Aplicar reemplazos de atrás hacia adelante para mantener posiciones
+    const sortedDetections = [...detections].sort((a, b) => b.position.start - a.position.start);
+    for (const detection of sortedDetections) {
+      redactedText =
+        redactedText.slice(0, detection.position.start) +
+        detection.redacted +
+        redactedText.slice(detection.position.end);
+    }
+
+    return {
+      text: redactedText,
+      detections,
+      piiTokens: this.config.replacementStyle === 'tokenize' ? piiTokens : undefined,
+    };
+  }
+
+  // Restaurar texto tokenizado (para casos donde sea necesario)
+  async restoreTokenized(text: string, tokens: Map<string, string>): Promise<string> {
+    let restored = text;
+    for (const [token, original] of tokens) {
+      restored = restored.replace(`[${token}]`, original);
+    }
+    return restored;
+  }
+
+  private calculateConfidence(text: string, position: number, type: string): number {
+    // Palabras contextuales que aumentan la confianza
+    const contextWords: Record<string, string[]> = {
+      email: ['email', 'correo', 'mail', 'contact'],
+      phone: ['phone', 'tel', 'teléfono', 'celular', 'mobile', 'call'],
+      ssn: ['ssn', 'social security', 'seguro social'],
+      credit_card: ['card', 'tarjeta', 'credit', 'visa', 'mastercard', 'amex'],
+    };
+
+    const words = contextWords[type] || [];
+    const contextWindow = text.slice(Math.max(0, position - 50), position + 50).toLowerCase();
+
+    let confidence = 0.7; // Base confidence
+    for (const word of words) {
+      if (contextWindow.includes(word)) {
+        confidence = Math.min(1, confidence + 0.1);
+      }
+    }
+
+    return confidence;
+  }
+
+  private luhnCheck(cardNumber: string): boolean {
+    let sum = 0;
+    let isEven = false;
+
+    for (let i = cardNumber.length - 1; i >= 0; i--) {
+      let digit = parseInt(cardNumber[i], 10);
+
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+
+      sum += digit;
+      isEven = !isEven;
+    }
+
+    return sum % 10 === 0;
+  }
+
+  private addCustomPatterns(patterns: RegExp[]): void {
+    patterns.forEach((regex, index) => {
+      this.config.patterns.push({
+        name: `custom_${index}`,
+        regex,
+        replacement: '[REDACTED]',
+      });
+    });
+  }
+}
+
+// Token store para tokenización reversible
+class TokenStore {
+  private tokens: Map<string, { original: string; type: string; createdAt: Date }> = new Map();
+  private ttlMs: number = 24 * 60 * 60 * 1000; // 24 horas
+
+  createToken(original: string, type: string): string {
+    const token = `PII_${crypto.randomBytes(8).toString('hex')}`;
+    this.tokens.set(token, { original, type, createdAt: new Date() });
+    return token;
+  }
+
+  getOriginal(token: string): string | null {
+    const entry = this.tokens.get(token);
+    if (!entry) return null;
+
+    // Verificar TTL
+    if (Date.now() - entry.createdAt.getTime() > this.ttlMs) {
+      this.tokens.delete(token);
+      return null;
+    }
+
+    return entry.original;
+  }
+
+  cleanup(): void {
+    const now = Date.now();
+    for (const [token, entry] of this.tokens) {
+      if (now - entry.createdAt.getTime() > this.ttlMs) {
+        this.tokens.delete(token);
+      }
+    }
+  }
+}
+
+// Integración con el sistema de logging
+class SecureLogger {
+  private piiRedactor: PIIRedactor;
+  private baseLogger: Logger;
+
+  constructor() {
+    this.piiRedactor = new PIIRedactor({ preserveFormat: false });
+    this.baseLogger = new Logger();
+  }
+
+  log(level: string, message: string, metadata?: Record<string, unknown>): void {
+    // Redactar mensaje
+    const redactedMessage = this.piiRedactor.redact(message);
+
+    // Redactar metadata recursivamente
+    const redactedMetadata = metadata ? this.redactObject(metadata) : undefined;
+
+    this.baseLogger.log(level, redactedMessage.text, {
+      ...redactedMetadata,
+      _piiDetected: redactedMessage.detections.length > 0,
+      _piiTypes: [...new Set(redactedMessage.detections.map(d => d.type))],
+    });
+  }
+
+  private redactObject(obj: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (typeof value === 'string') {
+        result[key] = this.piiRedactor.redact(value).text;
+      } else if (Array.isArray(value)) {
+        result[key] = value.map(item =>
+          typeof item === 'string'
+            ? this.piiRedactor.redact(item).text
+            : typeof item === 'object'
+              ? this.redactObject(item as Record<string, unknown>)
+              : item
+        );
+      } else if (value && typeof value === 'object') {
+        result[key] = this.redactObject(value as Record<string, unknown>);
+      } else {
+        result[key] = value;
+      }
+    }
+
+    return result;
+  }
+}
+
+// Uso antes de enviar al LLM
+class SecureLLMClient {
+  private piiRedactor: PIIRedactor;
+  private llm: LLM;
+
+  async chat(messages: Message[]): Promise<LLMResponse> {
+    // Redactar PII de todos los mensajes antes de enviar
+    const redactedMessages = messages.map(msg => ({
+      ...msg,
+      content: this.piiRedactor.redact(msg.content).text,
+    }));
+
+    return this.llm.chat(redactedMessages);
+  }
+}
+```
+
+**Cuándo usar:**
+- ✅ Logging de cualquier sistema en producción
+- ✅ Antes de enviar datos al LLM
+- ✅ Almacenamiento de conversaciones
+- ✅ Exportación de datos y reportes
+
+**Tradeoffs:**
+- **Pros**: Protección automática de PII, cumplimiento GDPR, debugging seguro
+- **Cons**: Falsos positivos, overhead de procesamiento, pérdida de información útil para debugging
+
+---
+
+### Secure Storage de API Keys y Secrets
+
+**Gestión segura de credenciales y secrets en sistemas de agentes IA.**
+
+```typescript
+interface Secret {
+  name: string;
+  value: string;
+  metadata: SecretMetadata;
+}
+
+interface SecretMetadata {
+  version: number;
+  createdAt: Date;
+  expiresAt?: Date;
+  rotationPolicy?: RotationPolicy;
+  accessPolicy: AccessPolicy;
+}
+
+interface RotationPolicy {
+  autoRotate: boolean;
+  rotationIntervalDays: number;
+  notifyBeforeDays: number;
+}
+
+interface AccessPolicy {
+  allowedServices: string[];
+  allowedEnvironments: string[];
+  requiresMFA: boolean;
+}
+
+interface SecretAccess {
+  secretName: string;
+  serviceName: string;
+  accessedAt: Date;
+  accessType: 'read' | 'write' | 'delete';
+}
+
+class SecretManager {
+  private vault: VaultClient;
+  private cache: Map<string, CachedSecret> = new Map();
+  private accessLog: AccessLogger;
+
+  constructor(vaultConfig: VaultConfig) {
+    this.vault = new VaultClient(vaultConfig);
+    this.accessLog = new AccessLogger();
+  }
+
+  async getSecret(
+    name: string,
+    context: AccessContext
+  ): Promise<string> {
+    // 1. Verificar permisos
+    await this.checkAccess(name, context);
+
+    // 2. Verificar cache
+    const cached = this.cache.get(name);
+    if (cached && !this.isExpired(cached)) {
+      return cached.value;
+    }
+
+    // 3. Obtener de vault
+    const secret = await this.vault.get(name);
+
+    // 4. Verificar si el secret está expirado
+    if (secret.metadata.expiresAt && new Date() > secret.metadata.expiresAt) {
+      throw new SecretExpiredError(`Secret ${name} has expired`);
+    }
+
+    // 5. Cachear
+    this.cache.set(name, {
+      value: secret.value,
+      fetchedAt: Date.now(),
+      expiresAt: secret.metadata.expiresAt,
+    });
+
+    // 6. Log de acceso
+    await this.accessLog.log({
+      secretName: name,
+      serviceName: context.serviceName,
+      accessedAt: new Date(),
+      accessType: 'read',
+    });
+
+    return secret.value;
+  }
+
+  async setSecret(
+    name: string,
+    value: string,
+    metadata: Partial<SecretMetadata>,
+    context: AccessContext
+  ): Promise<void> {
+    // 1. Verificar permisos de escritura
+    await this.checkAccess(name, context, 'write');
+
+    // 2. Obtener versión actual si existe
+    let version = 1;
+    try {
+      const existing = await this.vault.get(name);
+      version = existing.metadata.version + 1;
+    } catch {}
+
+    // 3. Crear metadata completa
+    const fullMetadata: SecretMetadata = {
+      version,
+      createdAt: new Date(),
+      accessPolicy: {
+        allowedServices: [context.serviceName],
+        allowedEnvironments: [context.environment],
+        requiresMFA: false,
+      },
+      ...metadata,
+    };
+
+    // 4. Guardar en vault
+    await this.vault.set(name, value, fullMetadata);
+
+    // 5. Invalidar cache
+    this.cache.delete(name);
+
+    // 6. Log de acceso
+    await this.accessLog.log({
+      secretName: name,
+      serviceName: context.serviceName,
+      accessedAt: new Date(),
+      accessType: 'write',
+    });
+  }
+
+  async rotateSecret(
+    name: string,
+    newValueGenerator: () => Promise<string>,
+    context: AccessContext
+  ): Promise<void> {
+    // 1. Verificar permisos
+    await this.checkAccess(name, context, 'write');
+
+    // 2. Generar nuevo valor
+    const newValue = await newValueGenerator();
+
+    // 3. Obtener secret actual para metadata
+    const current = await this.vault.get(name);
+
+    // 4. Guardar con nueva versión
+    await this.setSecret(name, newValue, {
+      ...current.metadata,
+      version: current.metadata.version + 1,
+      createdAt: new Date(),
+    }, context);
+
+    // 5. Mantener versión anterior por un periodo de gracia
+    await this.vault.archiveVersion(name, current.metadata.version);
+  }
+
+  private async checkAccess(
+    secretName: string,
+    context: AccessContext,
+    accessType: 'read' | 'write' = 'read'
+  ): Promise<void> {
+    try {
+      const secret = await this.vault.getMetadata(secretName);
+      const policy = secret.accessPolicy;
+
+      // Verificar servicio
+      if (!policy.allowedServices.includes(context.serviceName) &&
+          !policy.allowedServices.includes('*')) {
+        throw new AccessDeniedError(
+          `Service ${context.serviceName} not allowed to access ${secretName}`
+        );
+      }
+
+      // Verificar ambiente
+      if (!policy.allowedEnvironments.includes(context.environment) &&
+          !policy.allowedEnvironments.includes('*')) {
+        throw new AccessDeniedError(
+          `Environment ${context.environment} not allowed to access ${secretName}`
+        );
+      }
+
+      // Verificar MFA si es requerido
+      if (policy.requiresMFA && !context.mfaVerified) {
+        throw new MFARequiredError(`MFA required to access ${secretName}`);
+      }
+    } catch (error) {
+      if (error instanceof AccessDeniedError || error instanceof MFARequiredError) {
+        throw error;
+      }
+      // Si el secret no existe, permitir creación
+      if (accessType === 'write') {
+        return;
+      }
+      throw error;
+    }
+  }
+
+  private isExpired(cached: CachedSecret): boolean {
+    const maxCacheMs = 5 * 60 * 1000; // 5 minutos
+    if (Date.now() - cached.fetchedAt > maxCacheMs) {
+      return true;
+    }
+    if (cached.expiresAt && new Date() > cached.expiresAt) {
+      return true;
+    }
+    return false;
+  }
+
+  // Monitoreo de rotación
+  async checkRotationNeeded(): Promise<string[]> {
+    const needsRotation: string[] = [];
+    const secrets = await this.vault.listSecrets();
+
+    for (const name of secrets) {
+      const metadata = await this.vault.getMetadata(name);
+      if (metadata.rotationPolicy?.autoRotate) {
+        const age = Date.now() - metadata.createdAt.getTime();
+        const maxAge = metadata.rotationPolicy.rotationIntervalDays * 24 * 60 * 60 * 1000;
+
+        if (age > maxAge) {
+          needsRotation.push(name);
+        }
+      }
+    }
+
+    return needsRotation;
+  }
+}
+
+interface CachedSecret {
+  value: string;
+  fetchedAt: number;
+  expiresAt?: Date;
+}
+
+interface AccessContext {
+  serviceName: string;
+  environment: string;
+  mfaVerified?: boolean;
+}
+
+// Uso en la aplicación
+class SecureAgentConfig {
+  private secretManager: SecretManager;
+
+  async getLLMApiKey(): Promise<string> {
+    return this.secretManager.getSecret('llm_api_key', {
+      serviceName: 'agent-service',
+      environment: process.env.NODE_ENV || 'development',
+    });
+  }
+
+  async getDatabaseCredentials(): Promise<{ user: string; password: string }> {
+    const user = await this.secretManager.getSecret('db_user', {
+      serviceName: 'agent-service',
+      environment: process.env.NODE_ENV || 'development',
+    });
+
+    const password = await this.secretManager.getSecret('db_password', {
+      serviceName: 'agent-service',
+      environment: process.env.NODE_ENV || 'development',
+      mfaVerified: true, // Requiere MFA para credenciales de DB
+    });
+
+    return { user, password };
+  }
+}
+
+// Variables de entorno seguras (nunca en código)
+class SecureEnvLoader {
+  private secretManager: SecretManager;
+  private loadedSecrets: Map<string, string> = new Map();
+
+  async loadSecrets(requiredSecrets: string[]): Promise<void> {
+    const context: AccessContext = {
+      serviceName: process.env.SERVICE_NAME || 'unknown',
+      environment: process.env.NODE_ENV || 'development',
+    };
+
+    for (const secretName of requiredSecrets) {
+      try {
+        const value = await this.secretManager.getSecret(secretName, context);
+        this.loadedSecrets.set(secretName, value);
+      } catch (error) {
+        throw new Error(
+          `Failed to load required secret: ${secretName}. ` +
+          `Ensure it exists in the vault and this service has access.`
+        );
+      }
+    }
+  }
+
+  get(name: string): string {
+    const value = this.loadedSecrets.get(name);
+    if (!value) {
+      throw new Error(`Secret ${name} not loaded. Call loadSecrets first.`);
+    }
+    return value;
+  }
+
+  // Nunca exponer secrets en logs
+  toSafeEnv(): Record<string, string> {
+    const safe: Record<string, string> = {};
+    for (const [key] of this.loadedSecrets) {
+      safe[key] = '[LOADED]';
+    }
+    return safe;
+  }
+}
+```
+
+**Cuándo usar:**
+- ✅ Cualquier sistema que use API keys
+- ✅ Credenciales de bases de datos
+- ✅ Tokens de autenticación
+- ✅ Certificates y private keys
+
+**Tradeoffs:**
+- **Pros**: Centralización de secrets, auditoría de accesos, rotación automática
+- **Cons**: Dependencia de vault externo, latencia de red, complejidad operacional
+
+---
+
+### Compliance con GDPR/CCPA
+
+**Framework para cumplimiento de regulaciones de privacidad en sistemas de IA.**
+
+```typescript
+interface DataSubject {
+  id: string;
+  email: string;
+  consentStatus: ConsentStatus;
+  dataProcessingPurposes: DataPurpose[];
+  createdAt: Date;
+  lastUpdated: Date;
+}
+
+interface ConsentStatus {
+  marketing: boolean;
+  analytics: boolean;
+  aiProcessing: boolean;
+  thirdPartySharing: boolean;
+  consentDate: Date;
+  consentVersion: string;
+}
+
+type DataPurpose = 'service_provision' | 'ai_training' | 'analytics' | 'marketing' | 'legal_compliance';
+
+interface DataAccessRequest {
+  type: 'access' | 'rectification' | 'erasure' | 'portability' | 'restriction';
+  subjectId: string;
+  requestedAt: Date;
+  deadline: Date;
+  status: 'pending' | 'processing' | 'completed' | 'rejected';
+}
+
+class GDPRComplianceManager {
+  private dataStore: DataStore;
+  private auditLog: AuditLogger;
+  private notificationService: NotificationService;
+
+  // Derecho de acceso (Art. 15)
+  async handleAccessRequest(subjectId: string): Promise<DataExport> {
+    const request = await this.createRequest('access', subjectId);
+
+    try {
+      // Recopilar todos los datos del sujeto
+      const userData = await this.collectAllUserData(subjectId);
+
+      // Formatear para exportación
+      const export_data = await this.formatForExport(userData);
+
+      await this.completeRequest(request.id);
+      return export_data;
+
+    } catch (error) {
+      await this.failRequest(request.id, error.message);
+      throw error;
+    }
+  }
+
+  // Derecho al olvido (Art. 17)
+  async handleErasureRequest(
+    subjectId: string,
+    options?: ErasureOptions
+  ): Promise<ErasureResult> {
+    const request = await this.createRequest('erasure', subjectId);
+
+    try {
+      // 1. Verificar que no hay obligaciones legales que impidan borrado
+      const legalHolds = await this.checkLegalHolds(subjectId);
+      if (legalHolds.length > 0) {
+        return {
+          success: false,
+          reason: 'legal_hold',
+          retainedData: legalHolds.map(h => h.dataCategory),
+          deletedData: [],
+        };
+      }
+
+      // 2. Recopilar ubicaciones de datos
+      const dataLocations = await this.findAllDataLocations(subjectId);
+
+      // 3. Borrar de cada ubicación
+      const results = await Promise.allSettled(
+        dataLocations.map(loc => this.deleteFromLocation(subjectId, loc))
+      );
+
+      // 4. Registrar para auditoría
+      const deletedData = results
+        .filter((r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled')
+        .map(r => r.value);
+
+      const failedDeletions = results
+        .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+        .map(r => r.reason);
+
+      await this.auditLog.log({
+        action: 'data_erasure',
+        subjectId,
+        deletedLocations: deletedData,
+        failedLocations: failedDeletions.map(f => f.message),
+        timestamp: new Date(),
+      });
+
+      // 5. Notificar a terceros si hubo data sharing
+      if (options?.notifyThirdParties) {
+        await this.notifyThirdPartiesOfErasure(subjectId);
+      }
+
+      await this.completeRequest(request.id);
+
+      return {
+        success: failedDeletions.length === 0,
+        deletedData,
+        failedDeletions: failedDeletions.map(f => f.message),
+      };
+
+    } catch (error) {
+      await this.failRequest(request.id, error.message);
+      throw error;
+    }
+  }
+
+  // Derecho a la portabilidad (Art. 20)
+  async handlePortabilityRequest(
+    subjectId: string,
+    format: 'json' | 'csv' | 'xml' = 'json'
+  ): Promise<PortableData> {
+    const request = await this.createRequest('portability', subjectId);
+
+    try {
+      // Solo datos proporcionados directamente por el sujeto
+      // y procesados con consentimiento o contrato
+      const userData = await this.collectPortableData(subjectId);
+
+      const formatted = await this.formatData(userData, format);
+
+      await this.completeRequest(request.id);
+
+      return {
+        data: formatted,
+        format,
+        exportedAt: new Date(),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 días
+      };
+
+    } catch (error) {
+      await this.failRequest(request.id, error.message);
+      throw error;
+    }
+  }
+
+  // Gestión de consentimiento
+  async updateConsent(
+    subjectId: string,
+    newConsent: Partial<ConsentStatus>
+  ): Promise<void> {
+    const subject = await this.dataStore.getSubject(subjectId);
+
+    const updatedConsent: ConsentStatus = {
+      ...subject.consentStatus,
+      ...newConsent,
+      consentDate: new Date(),
+      consentVersion: this.getCurrentConsentVersion(),
+    };
+
+    await this.dataStore.updateSubject(subjectId, {
+      consentStatus: updatedConsent,
+      lastUpdated: new Date(),
+    });
+
+    // Ajustar procesamiento según nuevo consentimiento
+    if (!updatedConsent.aiProcessing) {
+      await this.disableAIProcessing(subjectId);
+    }
+
+    await this.auditLog.log({
+      action: 'consent_update',
+      subjectId,
+      previousConsent: subject.consentStatus,
+      newConsent: updatedConsent,
+      timestamp: new Date(),
+    });
+  }
+
+  // Verificar consentimiento antes de procesar
+  async checkConsentForProcessing(
+    subjectId: string,
+    purpose: DataPurpose
+  ): Promise<boolean> {
+    const subject = await this.dataStore.getSubject(subjectId);
+
+    // Mapear propósitos a campos de consentimiento
+    const consentMapping: Record<DataPurpose, keyof ConsentStatus> = {
+      ai_training: 'aiProcessing',
+      analytics: 'analytics',
+      marketing: 'marketing',
+      service_provision: 'aiProcessing', // Base legal puede ser diferente
+      legal_compliance: 'aiProcessing',  // Puede no requerir consentimiento
+    };
+
+    const requiredConsent = consentMapping[purpose];
+    const hasConsent = subject.consentStatus[requiredConsent];
+
+    // Log de verificación de consentimiento
+    await this.auditLog.log({
+      action: 'consent_check',
+      subjectId,
+      purpose,
+      hasConsent,
+      timestamp: new Date(),
+    });
+
+    return hasConsent;
+  }
+
+  // Data Retention Policy
+  async enforceRetentionPolicy(): Promise<RetentionReport> {
+    const retentionPolicies: Record<string, number> = {
+      conversation_logs: 30,    // 30 días
+      analytics_data: 365,      // 1 año
+      user_preferences: 730,    // 2 años
+      audit_logs: 2555,         // 7 años (requisito legal)
+    };
+
+    const results: RetentionResult[] = [];
+
+    for (const [dataType, retentionDays] of Object.entries(retentionPolicies)) {
+      const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
+
+      const deletedCount = await this.dataStore.deleteOlderThan(dataType, cutoffDate);
+
+      results.push({
+        dataType,
+        deletedCount,
+        cutoffDate,
+      });
+
+      await this.auditLog.log({
+        action: 'retention_cleanup',
+        dataType,
+        deletedCount,
+        cutoffDate,
+        timestamp: new Date(),
+      });
+    }
+
+    return { results, executedAt: new Date() };
+  }
+
+  private async createRequest(
+    type: DataAccessRequest['type'],
+    subjectId: string
+  ): Promise<DataAccessRequest> {
+    // GDPR requiere respuesta en 30 días
+    const deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+    const request: DataAccessRequest = {
+      type,
+      subjectId,
+      requestedAt: new Date(),
+      deadline,
+      status: 'processing',
+    };
+
+    await this.dataStore.saveRequest(request);
+    return request;
+  }
+
+  private async collectAllUserData(subjectId: string): Promise<UserDataCollection> {
+    return {
+      profile: await this.dataStore.getUserProfile(subjectId),
+      conversations: await this.dataStore.getConversations(subjectId),
+      preferences: await this.dataStore.getPreferences(subjectId),
+      analytics: await this.dataStore.getAnalyticsData(subjectId),
+      toolUsage: await this.dataStore.getToolUsageHistory(subjectId),
+    };
+  }
+
+  private async collectPortableData(subjectId: string): Promise<PortableUserData> {
+    // Solo datos proporcionados por el usuario directamente
+    return {
+      profile: await this.dataStore.getUserProfile(subjectId),
+      conversations: await this.dataStore.getUserGeneratedConversations(subjectId),
+      preferences: await this.dataStore.getPreferences(subjectId),
+    };
+  }
+
+  private async findAllDataLocations(subjectId: string): Promise<DataLocation[]> {
+    // Registrar todas las ubicaciones donde puede haber datos
+    return [
+      { type: 'database', table: 'users' },
+      { type: 'database', table: 'conversations' },
+      { type: 'database', table: 'preferences' },
+      { type: 'cache', key: `user:${subjectId}` },
+      { type: 'search_index', index: 'users' },
+      { type: 'analytics', dataset: 'user_events' },
+      { type: 'backup', location: 's3://backups' },
+    ];
+  }
+
+  private async deleteFromLocation(
+    subjectId: string,
+    location: DataLocation
+  ): Promise<string> {
+    // Implementar eliminación según tipo de ubicación
+    return `${location.type}:${location.table || location.key || location.index}`;
+  }
+
+  private getCurrentConsentVersion(): string {
+    return 'v2.1.0'; // Versión actual de la política de privacidad
+  }
+
+  private async disableAIProcessing(subjectId: string): Promise<void> {
+    // Marcar usuario para excluir de procesamiento IA
+  }
+
+  private async notifyThirdPartiesOfErasure(subjectId: string): Promise<void> {
+    // Notificar a servicios terceros
+  }
+
+  private async completeRequest(requestId: string): Promise<void> {
+    await this.dataStore.updateRequest(requestId, { status: 'completed' });
+  }
+
+  private async failRequest(requestId: string, reason: string): Promise<void> {
+    await this.dataStore.updateRequest(requestId, {
+      status: 'rejected',
+      rejectionReason: reason,
+    });
+  }
+
+  private async checkLegalHolds(subjectId: string): Promise<LegalHold[]> {
+    return [];
+  }
+
+  private async formatForExport(data: UserDataCollection): Promise<DataExport> {
+    return {
+      format: 'json',
+      data: JSON.stringify(data, null, 2),
+      exportedAt: new Date(),
+    };
+  }
+
+  private async formatData(data: PortableUserData, format: string): Promise<string> {
+    if (format === 'json') return JSON.stringify(data, null, 2);
+    // Implementar otros formatos
+    return JSON.stringify(data);
+  }
+}
+
+interface DataExport {
+  format: string;
+  data: string;
+  exportedAt: Date;
+}
+
+interface ErasureResult {
+  success: boolean;
+  reason?: string;
+  deletedData: string[];
+  failedDeletions?: string[];
+  retainedData?: string[];
+}
+
+interface PortableData {
+  data: string;
+  format: string;
+  exportedAt: Date;
+  expiresAt: Date;
+}
+
+interface ErasureOptions {
+  notifyThirdParties?: boolean;
+}
+
+interface DataLocation {
+  type: string;
+  table?: string;
+  key?: string;
+  index?: string;
+  dataset?: string;
+  location?: string;
+}
+
+interface LegalHold {
+  dataCategory: string;
+  reason: string;
+  expiresAt?: Date;
+}
+
+interface RetentionResult {
+  dataType: string;
+  deletedCount: number;
+  cutoffDate: Date;
+}
+
+interface RetentionReport {
+  results: RetentionResult[];
+  executedAt: Date;
+}
+
+interface UserDataCollection {
+  profile: any;
+  conversations: any[];
+  preferences: any;
+  analytics: any;
+  toolUsage: any[];
+}
+
+interface PortableUserData {
+  profile: any;
+  conversations: any[];
+  preferences: any;
+}
+```
+
+**Cuándo usar:**
+- ✅ Cualquier sistema que procese datos de usuarios en EU o California
+- ✅ Sistemas de IA que usan datos personales
+- ✅ Servicios B2C con usuarios internacionales
+- ✅ Organizaciones sujetas a auditorías de privacidad
+
+**Tradeoffs:**
+- **Pros**: Cumplimiento legal, confianza del usuario, procesos claros
+- **Cons**: Complejidad de implementación, overhead operacional, limitaciones en uso de datos
+
+---
+
 ## Próximas Secciones
-
-### Tool Execution
-- Sandboxing de herramientas
-- Permissions y access control
-- Logging de ejecuciones
-- Error handling seguro
-
-### Data Protection
-- Encryption de datos sensibles
-- PII redaction en logs
-- Secure storage de API keys
-- Compliance con GDPR/CCPA
 
 ### Model Security
 - Adversarial input detection
