@@ -1976,7 +1976,1188 @@ tests/
 
 ## 📊 Quality Evaluation
 
-> **📝 Próximamente:** BLEU/ROUGE scores para texto, métricas custom de calidad, human evaluation workflows, y automated quality gates.
+Evaluar la calidad de outputs de sistemas de IA es fundamentalmente diferente a testing tradicional. No hay una "respuesta correcta" única - hay un espectro de calidad que debe medirse con múltiples métricas.
+
+### Métricas de Evaluación de Texto
+
+**Las métricas automáticas proporcionan una línea base objetiva para comparar outputs.**
+
+#### BLEU Score (Bilingual Evaluation Understudy)
+
+**Mide la similitud entre texto generado y referencias humanas basándose en n-gramas.**
+
+```typescript
+// Implementación de BLEU score
+class BLEUScorer {
+  // Calcular precision de n-gramas
+  private calculateNgramPrecision(
+    candidate: string[],
+    references: string[][],
+    n: number
+  ): number {
+    const candidateNgrams = this.getNgrams(candidate, n);
+    const referenceNgrams = references.flatMap(ref => this.getNgrams(ref, n));
+
+    let matchCount = 0;
+    const refNgramCounts = this.countNgrams(referenceNgrams);
+
+    for (const ngram of candidateNgrams) {
+      const ngramStr = ngram.join(' ');
+      if (refNgramCounts.has(ngramStr) && refNgramCounts.get(ngramStr)! > 0) {
+        matchCount++;
+        refNgramCounts.set(ngramStr, refNgramCounts.get(ngramStr)! - 1);
+      }
+    }
+
+    return candidateNgrams.length > 0
+      ? matchCount / candidateNgrams.length
+      : 0;
+  }
+
+  // Brevity penalty para penalizar outputs muy cortos
+  private brevityPenalty(candidateLength: number, referenceLength: number): number {
+    if (candidateLength >= referenceLength) {
+      return 1;
+    }
+    return Math.exp(1 - referenceLength / candidateLength);
+  }
+
+  // Calcular BLEU score completo
+  calculate(
+    candidate: string,
+    references: string[],
+    maxN: number = 4
+  ): BLEUResult {
+    const candidateTokens = this.tokenize(candidate);
+    const referenceTokens = references.map(ref => this.tokenize(ref));
+
+    // Calcular precision para cada n
+    const precisions: number[] = [];
+    for (let n = 1; n <= maxN; n++) {
+      precisions.push(
+        this.calculateNgramPrecision(candidateTokens, referenceTokens, n)
+      );
+    }
+
+    // Geometric mean de precisions
+    const logSum = precisions.reduce((sum, p) => sum + Math.log(p || 1e-10), 0);
+    const geometricMean = Math.exp(logSum / maxN);
+
+    // Aplicar brevity penalty
+    const avgRefLength = referenceTokens.reduce((sum, ref) => sum + ref.length, 0)
+      / referenceTokens.length;
+    const bp = this.brevityPenalty(candidateTokens.length, avgRefLength);
+
+    const bleuScore = bp * geometricMean;
+
+    return {
+      score: bleuScore,
+      precisions,
+      brevityPenalty: bp,
+      candidateLength: candidateTokens.length,
+      referenceLength: avgRefLength
+    };
+  }
+
+  private getNgrams(tokens: string[], n: number): string[][] {
+    const ngrams: string[][] = [];
+    for (let i = 0; i <= tokens.length - n; i++) {
+      ngrams.push(tokens.slice(i, i + n));
+    }
+    return ngrams;
+  }
+
+  private countNgrams(ngrams: string[][]): Map<string, number> {
+    const counts = new Map<string, number>();
+    for (const ngram of ngrams) {
+      const key = ngram.join(' ');
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return counts;
+  }
+
+  private tokenize(text: string): string[] {
+    return text.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+  }
+}
+
+interface BLEUResult {
+  score: number;          // 0-1, higher is better
+  precisions: number[];   // Per n-gram precision
+  brevityPenalty: number;
+  candidateLength: number;
+  referenceLength: number;
+}
+```
+
+**Cuándo usar BLEU:**
+- ✅ Traducción automática
+- ✅ Generación de resúmenes
+- ✅ Comparación de modelos
+- ✅ Regression testing de prompts
+
+**Tradeoffs:**
+- **Pros**: Rápido, reproducible, estándar de la industria
+- **Cons**: No captura semántica, penaliza paráfrasis válidas
+
+---
+
+#### ROUGE Score (Recall-Oriented Understudy for Gisting Evaluation)
+
+**Mide overlap entre texto generado y referencias, enfocado en recall.**
+
+```typescript
+class ROUGEScorer {
+  // ROUGE-N: overlap de n-gramas
+  calculateROUGEN(
+    candidate: string,
+    reference: string,
+    n: number
+  ): ROUGEScore {
+    const candidateNgrams = this.getNgrams(this.tokenize(candidate), n);
+    const referenceNgrams = this.getNgrams(this.tokenize(reference), n);
+
+    const candidateSet = new Set(candidateNgrams.map(ng => ng.join(' ')));
+    const referenceSet = new Set(referenceNgrams.map(ng => ng.join(' ')));
+
+    // Calcular overlap
+    let overlap = 0;
+    for (const ngram of candidateSet) {
+      if (referenceSet.has(ngram)) {
+        overlap++;
+      }
+    }
+
+    const precision = candidateSet.size > 0 ? overlap / candidateSet.size : 0;
+    const recall = referenceSet.size > 0 ? overlap / referenceSet.size : 0;
+    const f1 = precision + recall > 0
+      ? (2 * precision * recall) / (precision + recall)
+      : 0;
+
+    return { precision, recall, f1 };
+  }
+
+  // ROUGE-L: Longest Common Subsequence
+  calculateROUGEL(candidate: string, reference: string): ROUGEScore {
+    const candidateTokens = this.tokenize(candidate);
+    const referenceTokens = this.tokenize(reference);
+
+    const lcsLength = this.longestCommonSubsequence(
+      candidateTokens,
+      referenceTokens
+    );
+
+    const precision = candidateTokens.length > 0
+      ? lcsLength / candidateTokens.length
+      : 0;
+    const recall = referenceTokens.length > 0
+      ? lcsLength / referenceTokens.length
+      : 0;
+    const f1 = precision + recall > 0
+      ? (2 * precision * recall) / (precision + recall)
+      : 0;
+
+    return { precision, recall, f1 };
+  }
+
+  // ROUGE-S: Skip-bigram co-occurrence
+  calculateROUGES(
+    candidate: string,
+    reference: string,
+    skipDistance: number = 4
+  ): ROUGEScore {
+    const candidateSkipBigrams = this.getSkipBigrams(
+      this.tokenize(candidate),
+      skipDistance
+    );
+    const referenceSkipBigrams = this.getSkipBigrams(
+      this.tokenize(reference),
+      skipDistance
+    );
+
+    const candidateSet = new Set(candidateSkipBigrams.map(sb => sb.join(' ')));
+    const referenceSet = new Set(referenceSkipBigrams.map(sb => sb.join(' ')));
+
+    let overlap = 0;
+    for (const skipBigram of candidateSet) {
+      if (referenceSet.has(skipBigram)) {
+        overlap++;
+      }
+    }
+
+    const precision = candidateSet.size > 0 ? overlap / candidateSet.size : 0;
+    const recall = referenceSet.size > 0 ? overlap / referenceSet.size : 0;
+    const f1 = precision + recall > 0
+      ? (2 * precision * recall) / (precision + recall)
+      : 0;
+
+    return { precision, recall, f1 };
+  }
+
+  // Calcular todas las métricas ROUGE
+  calculateAll(candidate: string, reference: string): ROUGEResults {
+    return {
+      rouge1: this.calculateROUGEN(candidate, reference, 1),
+      rouge2: this.calculateROUGEN(candidate, reference, 2),
+      rougeL: this.calculateROUGEL(candidate, reference),
+      rougeS: this.calculateROUGES(candidate, reference)
+    };
+  }
+
+  private longestCommonSubsequence(a: string[], b: string[]): number {
+    const dp: number[][] = Array(a.length + 1)
+      .fill(null)
+      .map(() => Array(b.length + 1).fill(0));
+
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        if (a[i - 1] === b[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1] + 1;
+        } else {
+          dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        }
+      }
+    }
+
+    return dp[a.length][b.length];
+  }
+
+  private getSkipBigrams(tokens: string[], maxSkip: number): string[][] {
+    const skipBigrams: string[][] = [];
+    for (let i = 0; i < tokens.length; i++) {
+      for (let j = i + 1; j < Math.min(i + maxSkip + 2, tokens.length); j++) {
+        skipBigrams.push([tokens[i], tokens[j]]);
+      }
+    }
+    return skipBigrams;
+  }
+
+  private getNgrams(tokens: string[], n: number): string[][] {
+    const ngrams: string[][] = [];
+    for (let i = 0; i <= tokens.length - n; i++) {
+      ngrams.push(tokens.slice(i, i + n));
+    }
+    return ngrams;
+  }
+
+  private tokenize(text: string): string[] {
+    return text.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+  }
+}
+
+interface ROUGEScore {
+  precision: number;
+  recall: number;
+  f1: number;
+}
+
+interface ROUGEResults {
+  rouge1: ROUGEScore;
+  rouge2: ROUGEScore;
+  rougeL: ROUGEScore;
+  rougeS: ROUGEScore;
+}
+```
+
+**Tests de métricas ROUGE:**
+
+```typescript
+import { describe, it, expect, beforeEach } from 'vitest';
+
+describe('ROUGEScorer', () => {
+  let scorer: ROUGEScorer;
+
+  beforeEach(() => {
+    scorer = new ROUGEScorer();
+  });
+
+  describe('ROUGE-1', () => {
+    it('should calculate perfect score for identical texts', () => {
+      const text = 'The quick brown fox jumps over the lazy dog';
+      const result = scorer.calculateROUGEN(text, text, 1);
+
+      expect(result.precision).toBe(1);
+      expect(result.recall).toBe(1);
+      expect(result.f1).toBe(1);
+    });
+
+    it('should calculate partial overlap correctly', () => {
+      const candidate = 'The quick brown fox';
+      const reference = 'The slow brown dog';
+      const result = scorer.calculateROUGEN(candidate, reference, 1);
+
+      // 'the' and 'brown' overlap
+      expect(result.recall).toBeCloseTo(0.5);
+    });
+  });
+
+  describe('ROUGE-L', () => {
+    it('should find longest common subsequence', () => {
+      const candidate = 'The cat sat on the mat';
+      const reference = 'The cat is on the mat';
+      const result = scorer.calculateROUGEL(candidate, reference);
+
+      // LCS: "the cat on the mat" (5 words)
+      expect(result.f1).toBeGreaterThan(0.7);
+    });
+  });
+
+  describe('calculateAll', () => {
+    it('should return all ROUGE variants', () => {
+      const candidate = 'AI systems require careful testing';
+      const reference = 'AI systems need thorough testing';
+
+      const results = scorer.calculateAll(candidate, reference);
+
+      expect(results.rouge1).toBeDefined();
+      expect(results.rouge2).toBeDefined();
+      expect(results.rougeL).toBeDefined();
+      expect(results.rougeS).toBeDefined();
+    });
+  });
+});
+```
+
+---
+
+### Métricas Customizadas de Calidad
+
+**Las métricas estándar no siempre capturan lo que importa para tu caso específico.** Crear métricas custom permite evaluar aspectos únicos de tu aplicación.
+
+```typescript
+// Framework para métricas customizadas
+interface QualityMetric<TInput, TOutput> {
+  name: string;
+  description: string;
+  calculate: (input: TInput, output: TOutput) => MetricResult;
+  threshold: number;
+}
+
+interface MetricResult {
+  score: number;        // 0-1 normalized
+  passed: boolean;
+  details: string;
+  metadata?: Record<string, any>;
+}
+
+// Evaluador de calidad multi-dimensional
+class QualityEvaluator<TInput, TOutput> {
+  private metrics: QualityMetric<TInput, TOutput>[] = [];
+
+  registerMetric(metric: QualityMetric<TInput, TOutput>): void {
+    this.metrics.push(metric);
+  }
+
+  async evaluate(input: TInput, output: TOutput): Promise<QualityReport> {
+    const results: MetricEvaluation[] = [];
+
+    for (const metric of this.metrics) {
+      const result = metric.calculate(input, output);
+      results.push({
+        metricName: metric.name,
+        description: metric.description,
+        ...result,
+        threshold: metric.threshold
+      });
+    }
+
+    // Calcular score agregado
+    const passedCount = results.filter(r => r.passed).length;
+    const avgScore = results.reduce((sum, r) => sum + r.score, 0) / results.length;
+
+    return {
+      overallScore: avgScore,
+      passed: passedCount === results.length,
+      passRate: passedCount / results.length,
+      metrics: results,
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+interface MetricEvaluation extends MetricResult {
+  metricName: string;
+  description: string;
+  threshold: number;
+}
+
+interface QualityReport {
+  overallScore: number;
+  passed: boolean;
+  passRate: number;
+  metrics: MetricEvaluation[];
+  timestamp: string;
+}
+```
+
+**Métricas customizadas comunes:**
+
+```typescript
+// 1. Métrica de Relevancia Semántica (usando embeddings)
+const semanticRelevanceMetric: QualityMetric<string, string> = {
+  name: 'semantic_relevance',
+  description: 'Measures semantic similarity between input and output',
+  threshold: 0.7,
+  calculate: (input, output) => {
+    // En producción, usar embeddings reales
+    const inputEmbedding = getEmbedding(input);
+    const outputEmbedding = getEmbedding(output);
+    const similarity = cosineSimilarity(inputEmbedding, outputEmbedding);
+
+    return {
+      score: similarity,
+      passed: similarity >= 0.7,
+      details: `Semantic similarity: ${(similarity * 100).toFixed(1)}%`,
+      metadata: { inputLength: input.length, outputLength: output.length }
+    };
+  }
+};
+
+// 2. Métrica de Completitud
+const completenessMetric: QualityMetric<TaskRequest, TaskResponse> = {
+  name: 'completeness',
+  description: 'Checks if all required elements are present in output',
+  threshold: 1.0,
+  calculate: (input, output) => {
+    const requiredElements = input.requiredOutputElements || [];
+    const presentElements = requiredElements.filter(elem =>
+      output.content.toLowerCase().includes(elem.toLowerCase())
+    );
+
+    const score = requiredElements.length > 0
+      ? presentElements.length / requiredElements.length
+      : 1;
+
+    const missingElements = requiredElements.filter(elem =>
+      !output.content.toLowerCase().includes(elem.toLowerCase())
+    );
+
+    return {
+      score,
+      passed: score === 1,
+      details: missingElements.length > 0
+        ? `Missing elements: ${missingElements.join(', ')}`
+        : 'All required elements present',
+      metadata: {
+        required: requiredElements.length,
+        present: presentElements.length
+      }
+    };
+  }
+};
+
+// 3. Métrica de Concisión
+const concisenessMetric: QualityMetric<string, string> = {
+  name: 'conciseness',
+  description: 'Penalizes unnecessarily verbose outputs',
+  threshold: 0.6,
+  calculate: (input, output) => {
+    const inputWords = input.split(/\s+/).length;
+    const outputWords = output.split(/\s+/).length;
+
+    // Ratio ideal: output no debería ser más de 3x el input para resúmenes
+    const ratio = outputWords / inputWords;
+
+    let score: number;
+    if (ratio <= 1) {
+      score = 1; // Más corto o igual es ideal
+    } else if (ratio <= 2) {
+      score = 1 - (ratio - 1) * 0.3; // Penalización leve
+    } else if (ratio <= 3) {
+      score = 0.7 - (ratio - 2) * 0.3; // Penalización moderada
+    } else {
+      score = Math.max(0, 0.4 - (ratio - 3) * 0.1); // Penalización fuerte
+    }
+
+    return {
+      score,
+      passed: score >= 0.6,
+      details: `Output/input ratio: ${ratio.toFixed(2)}x`,
+      metadata: { inputWords, outputWords, ratio }
+    };
+  }
+};
+
+// 4. Métrica de Factualidad (requiere fuente de verdad)
+const factualityMetric: QualityMetric<FactCheckRequest, string> = {
+  name: 'factuality',
+  description: 'Verifies claims against known facts',
+  threshold: 0.9,
+  calculate: (input, output) => {
+    const claims = extractClaims(output);
+    const knownFacts = input.groundTruth;
+
+    let verifiedCount = 0;
+    const issues: string[] = [];
+
+    for (const claim of claims) {
+      const verified = knownFacts.some(fact =>
+        verifyClaim(claim, fact)
+      );
+
+      if (verified) {
+        verifiedCount++;
+      } else {
+        issues.push(`Unverified: "${claim}"`);
+      }
+    }
+
+    const score = claims.length > 0 ? verifiedCount / claims.length : 1;
+
+    return {
+      score,
+      passed: score >= 0.9,
+      details: issues.length > 0
+        ? issues.join('; ')
+        : 'All claims verified',
+      metadata: {
+        totalClaims: claims.length,
+        verifiedClaims: verifiedCount
+      }
+    };
+  }
+};
+
+// 5. Métrica de Seguridad de Output
+const outputSafetyMetric: QualityMetric<any, string> = {
+  name: 'output_safety',
+  description: 'Checks for harmful or inappropriate content',
+  threshold: 1.0,
+  calculate: (_, output) => {
+    const safetyIssues: string[] = [];
+
+    // Verificar contenido potencialmente peligroso
+    const dangerousPatterns = [
+      { pattern: /\b(password|secret|api[_-]?key)\s*[:=]\s*\S+/i, issue: 'Potential credential leak' },
+      { pattern: /<script\b[^>]*>/i, issue: 'Script injection detected' },
+      { pattern: /\b(rm\s+-rf|drop\s+table|delete\s+from)\b/i, issue: 'Dangerous command detected' }
+    ];
+
+    for (const { pattern, issue } of dangerousPatterns) {
+      if (pattern.test(output)) {
+        safetyIssues.push(issue);
+      }
+    }
+
+    const score = safetyIssues.length === 0 ? 1 : 0;
+
+    return {
+      score,
+      passed: score === 1,
+      details: safetyIssues.length > 0
+        ? `Safety issues: ${safetyIssues.join(', ')}`
+        : 'No safety issues detected',
+      metadata: { issueCount: safetyIssues.length }
+    };
+  }
+};
+```
+
+**Uso del evaluador de calidad:**
+
+```typescript
+describe('Quality Evaluation', () => {
+  let evaluator: QualityEvaluator<string, string>;
+
+  beforeEach(() => {
+    evaluator = new QualityEvaluator();
+    evaluator.registerMetric(semanticRelevanceMetric);
+    evaluator.registerMetric(concisenessMetric);
+    evaluator.registerMetric(outputSafetyMetric);
+  });
+
+  it('should evaluate summary quality', async () => {
+    const input = 'Long article about climate change and its effects...';
+    const output = 'Climate change causes rising temperatures and sea levels.';
+
+    const report = await evaluator.evaluate(input, output);
+
+    expect(report.passed).toBe(true);
+    expect(report.overallScore).toBeGreaterThan(0.7);
+    expect(report.metrics).toHaveLength(3);
+  });
+
+  it('should fail on unsafe output', async () => {
+    const input = 'Generate a database query';
+    const output = 'Here is the query: DROP TABLE users; --';
+
+    const report = await evaluator.evaluate(input, output);
+
+    const safetyMetric = report.metrics.find(m => m.metricName === 'output_safety');
+    expect(safetyMetric?.passed).toBe(false);
+    expect(report.passed).toBe(false);
+  });
+});
+```
+
+---
+
+### Human Evaluation Workflows
+
+**Las métricas automáticas son útiles pero no reemplazan el juicio humano.** Un workflow de evaluación humana estructurado es esencial para medir calidad real.
+
+```typescript
+// Sistema de evaluación humana
+interface HumanEvaluationTask {
+  id: string;
+  input: string;
+  output: string;
+  context?: Record<string, any>;
+  criteria: EvaluationCriterion[];
+  assignedTo?: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  createdAt: Date;
+}
+
+interface EvaluationCriterion {
+  name: string;
+  description: string;
+  scale: 'binary' | 'likert5' | 'likert7' | 'numeric';
+  weight: number;
+}
+
+interface HumanEvaluation {
+  taskId: string;
+  evaluatorId: string;
+  ratings: CriterionRating[];
+  comments: string;
+  timeSpentMs: number;
+  completedAt: Date;
+}
+
+interface CriterionRating {
+  criterionName: string;
+  score: number;
+  confidence: number; // 0-1: qué tan seguro está el evaluador
+}
+
+class HumanEvaluationManager {
+  private tasks: Map<string, HumanEvaluationTask> = new Map();
+  private evaluations: HumanEvaluation[] = [];
+
+  // Crear batch de tareas de evaluación
+  createEvaluationBatch(
+    samples: Array<{ input: string; output: string }>,
+    criteria: EvaluationCriterion[]
+  ): string[] {
+    const taskIds: string[] = [];
+
+    for (const sample of samples) {
+      const taskId = generateId();
+      this.tasks.set(taskId, {
+        id: taskId,
+        input: sample.input,
+        output: sample.output,
+        criteria,
+        status: 'pending',
+        createdAt: new Date()
+      });
+      taskIds.push(taskId);
+    }
+
+    return taskIds;
+  }
+
+  // Asignar tareas a evaluadores (para inter-rater reliability)
+  assignWithOverlap(
+    taskIds: string[],
+    evaluatorIds: string[],
+    overlapPercentage: number = 0.2
+  ): AssignmentPlan {
+    const assignments: Map<string, string[]> = new Map();
+    const overlapCount = Math.ceil(taskIds.length * overlapPercentage);
+
+    // Tareas que todos evaluarán (para medir agreement)
+    const overlapTasks = taskIds.slice(0, overlapCount);
+
+    // Tareas distribuidas uniformemente
+    const uniqueTasks = taskIds.slice(overlapCount);
+    const tasksPerEvaluator = Math.ceil(uniqueTasks.length / evaluatorIds.length);
+
+    for (const evaluatorId of evaluatorIds) {
+      assignments.set(evaluatorId, [...overlapTasks]);
+    }
+
+    for (let i = 0; i < uniqueTasks.length; i++) {
+      const evaluatorIndex = i % evaluatorIds.length;
+      const evaluatorId = evaluatorIds[evaluatorIndex];
+      assignments.get(evaluatorId)!.push(uniqueTasks[i]);
+    }
+
+    // Marcar tareas asignadas
+    for (const [evaluatorId, tasks] of assignments) {
+      for (const taskId of tasks) {
+        const task = this.tasks.get(taskId);
+        if (task) {
+          task.assignedTo = evaluatorId;
+        }
+      }
+    }
+
+    return {
+      assignments,
+      overlapTasks,
+      totalTasks: taskIds.length,
+      evaluatorsCount: evaluatorIds.length
+    };
+  }
+
+  // Registrar evaluación
+  submitEvaluation(evaluation: HumanEvaluation): void {
+    this.evaluations.push(evaluation);
+
+    const task = this.tasks.get(evaluation.taskId);
+    if (task) {
+      task.status = 'completed';
+    }
+  }
+
+  // Calcular Inter-Rater Reliability (Cohen's Kappa para 2 evaluadores)
+  calculateInterRaterReliability(criterion: string): IRRResult {
+    // Encontrar tareas evaluadas por múltiples evaluadores
+    const taskEvaluations = new Map<string, HumanEvaluation[]>();
+
+    for (const evaluation of this.evaluations) {
+      const existing = taskEvaluations.get(evaluation.taskId) || [];
+      existing.push(evaluation);
+      taskEvaluations.set(evaluation.taskId, existing);
+    }
+
+    // Filtrar solo tareas con múltiples evaluaciones
+    const overlappingTasks = Array.from(taskEvaluations.entries())
+      .filter(([_, evals]) => evals.length >= 2);
+
+    if (overlappingTasks.length === 0) {
+      return { kappa: null, agreement: null, sampleSize: 0 };
+    }
+
+    // Calcular agreement observado
+    let agreementCount = 0;
+    const ratings: Array<[number, number]> = [];
+
+    for (const [_, evals] of overlappingTasks) {
+      const rating1 = evals[0].ratings.find(r => r.criterionName === criterion)?.score;
+      const rating2 = evals[1].ratings.find(r => r.criterionName === criterion)?.score;
+
+      if (rating1 !== undefined && rating2 !== undefined) {
+        ratings.push([rating1, rating2]);
+        if (rating1 === rating2) {
+          agreementCount++;
+        }
+      }
+    }
+
+    const observedAgreement = agreementCount / ratings.length;
+
+    // Calcular agreement esperado por azar
+    const allRatings = ratings.flat();
+    const ratingCounts = new Map<number, number>();
+    for (const rating of allRatings) {
+      ratingCounts.set(rating, (ratingCounts.get(rating) || 0) + 1);
+    }
+
+    let expectedAgreement = 0;
+    for (const count of ratingCounts.values()) {
+      const proportion = count / allRatings.length;
+      expectedAgreement += proportion * proportion;
+    }
+
+    // Cohen's Kappa
+    const kappa = (observedAgreement - expectedAgreement) / (1 - expectedAgreement);
+
+    return {
+      kappa,
+      agreement: observedAgreement,
+      sampleSize: ratings.length,
+      interpretation: this.interpretKappa(kappa)
+    };
+  }
+
+  private interpretKappa(kappa: number): string {
+    if (kappa < 0) return 'Poor (less than chance)';
+    if (kappa < 0.20) return 'Slight';
+    if (kappa < 0.40) return 'Fair';
+    if (kappa < 0.60) return 'Moderate';
+    if (kappa < 0.80) return 'Substantial';
+    return 'Almost Perfect';
+  }
+
+  // Generar reporte agregado
+  generateReport(): HumanEvaluationReport {
+    const completedTasks = Array.from(this.tasks.values())
+      .filter(t => t.status === 'completed');
+
+    // Agregar scores por criterio
+    const criteriaScores = new Map<string, number[]>();
+
+    for (const evaluation of this.evaluations) {
+      for (const rating of evaluation.ratings) {
+        const existing = criteriaScores.get(rating.criterionName) || [];
+        existing.push(rating.score);
+        criteriaScores.set(rating.criterionName, existing);
+      }
+    }
+
+    const aggregatedScores: CriterionAggregate[] = [];
+    for (const [criterion, scores] of criteriaScores) {
+      const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+      const variance = scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) / scores.length;
+
+      aggregatedScores.push({
+        criterion,
+        mean,
+        std: Math.sqrt(variance),
+        min: Math.min(...scores),
+        max: Math.max(...scores),
+        count: scores.length
+      });
+    }
+
+    return {
+      totalTasks: this.tasks.size,
+      completedTasks: completedTasks.length,
+      totalEvaluations: this.evaluations.length,
+      criteriaScores: aggregatedScores,
+      avgTimePerTask: this.evaluations.reduce((sum, e) => sum + e.timeSpentMs, 0)
+        / this.evaluations.length
+    };
+  }
+}
+
+interface AssignmentPlan {
+  assignments: Map<string, string[]>;
+  overlapTasks: string[];
+  totalTasks: number;
+  evaluatorsCount: number;
+}
+
+interface IRRResult {
+  kappa: number | null;
+  agreement: number | null;
+  sampleSize: number;
+  interpretation?: string;
+}
+
+interface CriterionAggregate {
+  criterion: string;
+  mean: number;
+  std: number;
+  min: number;
+  max: number;
+  count: number;
+}
+
+interface HumanEvaluationReport {
+  totalTasks: number;
+  completedTasks: number;
+  totalEvaluations: number;
+  criteriaScores: CriterionAggregate[];
+  avgTimePerTask: number;
+}
+```
+
+**Criterios de evaluación estándar:**
+
+```typescript
+// Criterios predefinidos para evaluación de LLMs
+const standardCriteria: EvaluationCriterion[] = [
+  {
+    name: 'relevance',
+    description: '¿La respuesta aborda directamente la pregunta/solicitud?',
+    scale: 'likert5',
+    weight: 1.0
+  },
+  {
+    name: 'accuracy',
+    description: '¿La información proporcionada es factualmente correcta?',
+    scale: 'likert5',
+    weight: 1.0
+  },
+  {
+    name: 'completeness',
+    description: '¿La respuesta cubre todos los aspectos importantes?',
+    scale: 'likert5',
+    weight: 0.8
+  },
+  {
+    name: 'clarity',
+    description: '¿La respuesta es clara y fácil de entender?',
+    scale: 'likert5',
+    weight: 0.7
+  },
+  {
+    name: 'helpfulness',
+    description: '¿La respuesta sería útil para el usuario promedio?',
+    scale: 'likert5',
+    weight: 0.9
+  },
+  {
+    name: 'harmlessness',
+    description: '¿La respuesta es segura y apropiada?',
+    scale: 'binary',
+    weight: 2.0  // Peso alto porque es crítico
+  }
+];
+```
+
+---
+
+### Automated Quality Gates
+
+**Los quality gates automáticos previenen que outputs de baja calidad lleguen a producción.**
+
+```typescript
+// Sistema de quality gates para pipelines de IA
+interface QualityGate {
+  name: string;
+  description: string;
+  check: (output: any) => Promise<GateResult>;
+  severity: 'blocker' | 'critical' | 'warning';
+}
+
+interface GateResult {
+  passed: boolean;
+  message: string;
+  details?: Record<string, any>;
+}
+
+class QualityGateRunner {
+  private gates: QualityGate[] = [];
+
+  registerGate(gate: QualityGate): void {
+    this.gates.push(gate);
+  }
+
+  async runAll(output: any): Promise<QualityGateReport> {
+    const results: GateEvaluation[] = [];
+
+    for (const gate of this.gates) {
+      const startTime = Date.now();
+      try {
+        const result = await gate.check(output);
+        results.push({
+          gateName: gate.name,
+          severity: gate.severity,
+          ...result,
+          duration: Date.now() - startTime
+        });
+      } catch (error) {
+        results.push({
+          gateName: gate.name,
+          severity: gate.severity,
+          passed: false,
+          message: `Gate error: ${error.message}`,
+          duration: Date.now() - startTime
+        });
+      }
+    }
+
+    const blockers = results.filter(r => !r.passed && r.severity === 'blocker');
+    const criticals = results.filter(r => !r.passed && r.severity === 'critical');
+    const warnings = results.filter(r => !r.passed && r.severity === 'warning');
+
+    return {
+      passed: blockers.length === 0 && criticals.length === 0,
+      results,
+      summary: {
+        total: results.length,
+        passed: results.filter(r => r.passed).length,
+        blockers: blockers.length,
+        criticals: criticals.length,
+        warnings: warnings.length
+      }
+    };
+  }
+}
+
+interface GateEvaluation extends GateResult {
+  gateName: string;
+  severity: 'blocker' | 'critical' | 'warning';
+  duration: number;
+}
+
+interface QualityGateReport {
+  passed: boolean;
+  results: GateEvaluation[];
+  summary: {
+    total: number;
+    passed: number;
+    blockers: number;
+    criticals: number;
+    warnings: number;
+  };
+}
+
+// Gates predefinidos
+const qualityGates: QualityGate[] = [
+  {
+    name: 'minimum_length',
+    description: 'Output must have minimum content',
+    severity: 'blocker',
+    check: async (output: string) => ({
+      passed: output.length >= 10,
+      message: output.length >= 10
+        ? 'Length check passed'
+        : `Output too short: ${output.length} chars (min: 10)`,
+      details: { length: output.length }
+    })
+  },
+  {
+    name: 'no_empty_response',
+    description: 'Output cannot be empty or just whitespace',
+    severity: 'blocker',
+    check: async (output: string) => ({
+      passed: output.trim().length > 0,
+      message: output.trim().length > 0
+        ? 'Non-empty check passed'
+        : 'Output is empty or whitespace only'
+    })
+  },
+  {
+    name: 'no_error_markers',
+    description: 'Output should not contain error indicators',
+    severity: 'critical',
+    check: async (output: string) => {
+      const errorPatterns = [
+        /\berror\b.*\boccurred\b/i,
+        /\bunable to\b.*\bcomplete\b/i,
+        /\bfailed to\b/i,
+        /\bI cannot\b/i,
+        /\bI don't have\b.*\baccess\b/i
+      ];
+
+      const matchedPatterns = errorPatterns.filter(p => p.test(output));
+
+      return {
+        passed: matchedPatterns.length === 0,
+        message: matchedPatterns.length === 0
+          ? 'No error markers found'
+          : `Found ${matchedPatterns.length} error patterns`,
+        details: { matchedPatterns: matchedPatterns.map(p => p.source) }
+      };
+    }
+  },
+  {
+    name: 'json_validity',
+    description: 'If output should be JSON, it must be valid',
+    severity: 'blocker',
+    check: async (output: string) => {
+      // Solo verificar si parece JSON
+      if (!output.trim().startsWith('{') && !output.trim().startsWith('[')) {
+        return { passed: true, message: 'Not JSON, skipping validation' };
+      }
+
+      try {
+        JSON.parse(output);
+        return { passed: true, message: 'Valid JSON' };
+      } catch (error) {
+        return {
+          passed: false,
+          message: `Invalid JSON: ${error.message}`,
+          details: { parseError: error.message }
+        };
+      }
+    }
+  },
+  {
+    name: 'confidence_threshold',
+    description: 'Model confidence must meet threshold',
+    severity: 'warning',
+    check: async (output: { content: string; confidence?: number }) => {
+      const confidence = output.confidence ?? 1;
+      return {
+        passed: confidence >= 0.7,
+        message: confidence >= 0.7
+          ? `Confidence OK: ${(confidence * 100).toFixed(1)}%`
+          : `Low confidence: ${(confidence * 100).toFixed(1)}% (threshold: 70%)`,
+        details: { confidence }
+      };
+    }
+  },
+  {
+    name: 'response_time',
+    description: 'Response must be generated within time limit',
+    severity: 'warning',
+    check: async (output: { content: string; generationTimeMs?: number }) => {
+      const timeMs = output.generationTimeMs ?? 0;
+      const limitMs = 5000;
+      return {
+        passed: timeMs <= limitMs,
+        message: timeMs <= limitMs
+          ? `Response time OK: ${timeMs}ms`
+          : `Slow response: ${timeMs}ms (limit: ${limitMs}ms)`,
+        details: { timeMs, limitMs }
+      };
+    }
+  }
+];
+```
+
+**Integración con CI/CD:**
+
+```typescript
+// Runner de quality gates para CI/CD
+async function runQualityGatesInCI(
+  outputs: any[],
+  gates: QualityGate[]
+): Promise<CIResult> {
+  const runner = new QualityGateRunner();
+  gates.forEach(gate => runner.registerGate(gate));
+
+  const reports: QualityGateReport[] = [];
+
+  for (const output of outputs) {
+    const report = await runner.runAll(output);
+    reports.push(report);
+  }
+
+  const allPassed = reports.every(r => r.passed);
+  const totalBlockers = reports.reduce((sum, r) => sum + r.summary.blockers, 0);
+  const totalCriticals = reports.reduce((sum, r) => sum + r.summary.criticals, 0);
+
+  // Formatear output para CI
+  if (!allPassed) {
+    console.error('❌ Quality Gates Failed!');
+    console.error(`   Blockers: ${totalBlockers}`);
+    console.error(`   Criticals: ${totalCriticals}`);
+
+    for (let i = 0; i < reports.length; i++) {
+      if (!reports[i].passed) {
+        console.error(`\nSample ${i + 1}:`);
+        for (const result of reports[i].results) {
+          if (!result.passed) {
+            console.error(`   [${result.severity}] ${result.gateName}: ${result.message}`);
+          }
+        }
+      }
+    }
+  } else {
+    console.log('✅ All Quality Gates Passed!');
+  }
+
+  return {
+    success: allPassed,
+    exitCode: allPassed ? 0 : 1,
+    reports
+  };
+}
+
+interface CIResult {
+  success: boolean;
+  exitCode: number;
+  reports: QualityGateReport[];
+}
+```
+
+**Cuándo usar quality gates:**
+- ✅ Validación pre-producción de outputs
+- ✅ CI/CD pipelines para cambios de prompts
+- ✅ Monitoreo de calidad en producción
+- ✅ A/B testing de diferentes modelos/prompts
+
+**Tradeoffs:**
+- **Pros**: Previene problemas antes de que lleguen a usuarios
+- **Cons**: Puede rechazar outputs aceptables (falsos positivos)
 
 ---
 
@@ -1994,7 +3175,1308 @@ tests/
 
 ## 🎲 Determinismo vs No-determinismo
 
-> **📝 Próximamente:** Strategies para consistent results, statistical testing approaches, confidence intervals, y A/B testing frameworks.
+El no-determinismo es inherente a los LLMs: la misma entrada puede producir diferentes salidas. Esto requiere estrategias de testing fundamentalmente diferentes a las del software tradicional.
+
+### Entendiendo el No-determinismo en LLMs
+
+**¿Por qué los LLMs son no-determinísticos?**
+
+```typescript
+// Factores que contribuyen al no-determinismo
+interface NonDeterminismFactors {
+  // 1. Temperature: controla aleatoriedad en sampling
+  temperature: number; // 0 = más determinístico, 1+ = más aleatorio
+
+  // 2. Top-p (nucleus sampling): probabilidad acumulada
+  topP: number; // 0.1 = más determinístico, 1.0 = considera todos los tokens
+
+  // 3. Top-k: limita tokens candidatos
+  topK: number; // 1 = más determinístico, infinito = considera todos
+
+  // 4. Random seed: si el modelo lo soporta
+  seed?: number; // Mismo seed = misma salida (cuando está disponible)
+
+  // 5. Batch processing: orden puede afectar resultados
+  batchSize: number;
+}
+
+// Configuración para máximo determinismo
+const deterministicConfig: NonDeterminismFactors = {
+  temperature: 0,
+  topP: 1,
+  topK: 1,
+  seed: 42,
+  batchSize: 1
+};
+
+// Configuración para creatividad
+const creativeConfig: NonDeterminismFactors = {
+  temperature: 0.8,
+  topP: 0.95,
+  topK: 50,
+  batchSize: 1
+};
+```
+
+**Implicaciones para testing:**
+
+```typescript
+// Problema: el mismo test puede pasar o fallar aleatoriamente
+describe('Non-deterministic LLM behavior', () => {
+  it('FLAKY: might pass or fail randomly', async () => {
+    const response = await llm.generate('Write a haiku about testing');
+
+    // Esta aserción puede fallar porque el output varía
+    expect(response).toContain('code');  // ❌ Flaky test
+  });
+
+  it('BETTER: test properties instead of exact values', async () => {
+    const response = await llm.generate('Write a haiku about testing');
+
+    // Verificar propiedades estructurales
+    const lines = response.split('\n').filter(l => l.trim());
+    expect(lines.length).toBe(3);  // ✅ Haiku tiene 3 líneas
+  });
+});
+```
+
+---
+
+### Estrategias para Resultados Consistentes
+
+#### 1. Fijar Parámetros de Generación
+
+**Usar temperature=0 y seeds fijos cuando sea posible.**
+
+```typescript
+class DeterministicLLMClient {
+  private baseClient: LLMClient;
+  private defaultConfig: GenerationConfig;
+
+  constructor(baseClient: LLMClient) {
+    this.baseClient = baseClient;
+    this.defaultConfig = {
+      temperature: 0,
+      topP: 1,
+      topK: 1,
+      maxTokens: 1000
+    };
+  }
+
+  async generate(prompt: string, config?: Partial<GenerationConfig>): Promise<string> {
+    const finalConfig = { ...this.defaultConfig, ...config };
+
+    // Agregar seed si el proveedor lo soporta
+    if (this.supportsSeeding()) {
+      finalConfig.seed = this.generateDeterministicSeed(prompt);
+    }
+
+    return this.baseClient.generate(prompt, finalConfig);
+  }
+
+  private generateDeterministicSeed(prompt: string): number {
+    // Generar seed basado en hash del prompt para reproducibilidad
+    let hash = 0;
+    for (let i = 0; i < prompt.length; i++) {
+      const char = prompt.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convertir a 32-bit integer
+    }
+    return Math.abs(hash);
+  }
+
+  private supportsSeeding(): boolean {
+    // Verificar si el modelo soporta seeding
+    return ['anthropic', 'openai-gpt4'].includes(this.baseClient.provider);
+  }
+}
+```
+
+#### 2. Caching de Respuestas
+
+**Cachear respuestas para garantizar consistencia en tests repetidos.**
+
+```typescript
+class CachedLLMClient {
+  private client: LLMClient;
+  private cache: Map<string, CachedResponse> = new Map();
+  private cacheFile: string;
+
+  constructor(client: LLMClient, cacheFile: string = '.llm-cache.json') {
+    this.client = client;
+    this.cacheFile = cacheFile;
+    this.loadCache();
+  }
+
+  async generate(prompt: string, options?: GenerationOptions): Promise<string> {
+    const cacheKey = this.createCacheKey(prompt, options);
+
+    // Verificar cache
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey)!;
+      if (!this.isExpired(cached)) {
+        return cached.response;
+      }
+    }
+
+    // Generar nueva respuesta
+    const response = await this.client.generate(prompt, options);
+
+    // Guardar en cache
+    this.cache.set(cacheKey, {
+      response,
+      timestamp: Date.now(),
+      prompt,
+      options
+    });
+    this.saveCache();
+
+    return response;
+  }
+
+  private createCacheKey(prompt: string, options?: GenerationOptions): string {
+    const normalized = {
+      prompt: prompt.trim().toLowerCase(),
+      options: options || {}
+    };
+    return Buffer.from(JSON.stringify(normalized)).toString('base64');
+  }
+
+  private isExpired(cached: CachedResponse, maxAgeMs: number = 86400000): boolean {
+    return Date.now() - cached.timestamp > maxAgeMs;
+  }
+
+  private loadCache(): void {
+    try {
+      const data = fs.readFileSync(this.cacheFile, 'utf-8');
+      const parsed = JSON.parse(data);
+      this.cache = new Map(Object.entries(parsed));
+    } catch {
+      this.cache = new Map();
+    }
+  }
+
+  private saveCache(): void {
+    const data = Object.fromEntries(this.cache);
+    fs.writeFileSync(this.cacheFile, JSON.stringify(data, null, 2));
+  }
+
+  // Para tests: forzar uso de cache
+  setCacheOnly(enabled: boolean): void {
+    if (enabled) {
+      this.client.generate = async () => {
+        throw new Error('Cache-only mode: no live LLM calls allowed');
+      };
+    }
+  }
+}
+
+interface CachedResponse {
+  response: string;
+  timestamp: number;
+  prompt: string;
+  options?: GenerationOptions;
+}
+```
+
+#### 3. Golden Sets y Regression Testing
+
+**Mantener un conjunto de respuestas "golden" para detectar regresiones.**
+
+```typescript
+interface GoldenTestCase {
+  id: string;
+  prompt: string;
+  expectedOutput: string;
+  acceptableVariations?: string[];
+  validationRules: ValidationRule[];
+}
+
+interface ValidationRule {
+  type: 'contains' | 'regex' | 'semantic_similarity' | 'structure';
+  value: any;
+  threshold?: number;
+}
+
+class GoldenSetManager {
+  private goldenSets: Map<string, GoldenTestCase[]> = new Map();
+
+  loadGoldenSet(name: string, path: string): void {
+    const data = JSON.parse(fs.readFileSync(path, 'utf-8'));
+    this.goldenSets.set(name, data.testCases);
+  }
+
+  async runGoldenTests(
+    setName: string,
+    llmClient: LLMClient
+  ): Promise<GoldenTestReport> {
+    const testCases = this.goldenSets.get(setName);
+    if (!testCases) {
+      throw new Error(`Golden set "${setName}" not found`);
+    }
+
+    const results: GoldenTestResult[] = [];
+
+    for (const testCase of testCases) {
+      const actualOutput = await llmClient.generate(testCase.prompt);
+      const validationResult = this.validateOutput(testCase, actualOutput);
+
+      results.push({
+        testCaseId: testCase.id,
+        prompt: testCase.prompt,
+        expectedOutput: testCase.expectedOutput,
+        actualOutput,
+        passed: validationResult.passed,
+        validationDetails: validationResult.details
+      });
+    }
+
+    return {
+      setName,
+      totalTests: testCases.length,
+      passed: results.filter(r => r.passed).length,
+      failed: results.filter(r => !r.passed).length,
+      results,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  private validateOutput(
+    testCase: GoldenTestCase,
+    actualOutput: string
+  ): { passed: boolean; details: string[] } {
+    const details: string[] = [];
+    let allPassed = true;
+
+    for (const rule of testCase.validationRules) {
+      const result = this.applyRule(rule, actualOutput, testCase.expectedOutput);
+      details.push(`${rule.type}: ${result.message}`);
+      if (!result.passed) {
+        allPassed = false;
+      }
+    }
+
+    return { passed: allPassed, details };
+  }
+
+  private applyRule(
+    rule: ValidationRule,
+    actual: string,
+    expected: string
+  ): { passed: boolean; message: string } {
+    switch (rule.type) {
+      case 'contains':
+        const contains = actual.toLowerCase().includes(rule.value.toLowerCase());
+        return {
+          passed: contains,
+          message: contains
+            ? `Contains "${rule.value}"`
+            : `Missing "${rule.value}"`
+        };
+
+      case 'regex':
+        const regex = new RegExp(rule.value);
+        const matches = regex.test(actual);
+        return {
+          passed: matches,
+          message: matches
+            ? `Matches pattern ${rule.value}`
+            : `Does not match pattern ${rule.value}`
+        };
+
+      case 'semantic_similarity':
+        const similarity = this.calculateSimilarity(actual, expected);
+        const threshold = rule.threshold || 0.8;
+        return {
+          passed: similarity >= threshold,
+          message: `Similarity: ${(similarity * 100).toFixed(1)}% (threshold: ${threshold * 100}%)`
+        };
+
+      case 'structure':
+        const structureValid = this.validateStructure(actual, rule.value);
+        return {
+          passed: structureValid,
+          message: structureValid
+            ? 'Structure valid'
+            : 'Structure mismatch'
+        };
+
+      default:
+        return { passed: false, message: `Unknown rule type: ${rule.type}` };
+    }
+  }
+
+  private calculateSimilarity(a: string, b: string): number {
+    // Implementación simplificada - en producción usar embeddings
+    const wordsA = new Set(a.toLowerCase().split(/\s+/));
+    const wordsB = new Set(b.toLowerCase().split(/\s+/));
+    const intersection = new Set([...wordsA].filter(x => wordsB.has(x)));
+    const union = new Set([...wordsA, ...wordsB]);
+    return intersection.size / union.size; // Jaccard similarity
+  }
+
+  private validateStructure(output: string, expectedStructure: any): boolean {
+    // Validar estructura JSON, número de secciones, etc.
+    try {
+      if (expectedStructure.type === 'json') {
+        JSON.parse(output);
+        return true;
+      }
+      if (expectedStructure.type === 'sections') {
+        const sections = output.split(/^##\s/m).length - 1;
+        return sections >= expectedStructure.minSections;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Actualizar golden set con nuevas respuestas aprobadas
+  updateGoldenSet(
+    setName: string,
+    testCaseId: string,
+    newExpectedOutput: string
+  ): void {
+    const testCases = this.goldenSets.get(setName);
+    if (!testCases) return;
+
+    const testCase = testCases.find(tc => tc.id === testCaseId);
+    if (testCase) {
+      testCase.expectedOutput = newExpectedOutput;
+    }
+  }
+}
+
+interface GoldenTestResult {
+  testCaseId: string;
+  prompt: string;
+  expectedOutput: string;
+  actualOutput: string;
+  passed: boolean;
+  validationDetails: string[];
+}
+
+interface GoldenTestReport {
+  setName: string;
+  totalTests: number;
+  passed: number;
+  failed: number;
+  results: GoldenTestResult[];
+  timestamp: string;
+}
+```
+
+---
+
+### Statistical Testing Approaches
+
+**Cuando el determinismo perfecto no es posible, usar métodos estadísticos para validar comportamiento.**
+
+#### Múltiples Ejecuciones con Análisis Estadístico
+
+```typescript
+class StatisticalTestRunner {
+  private llmClient: LLMClient;
+  private defaultSampleSize: number = 30;
+
+  constructor(llmClient: LLMClient) {
+    this.llmClient = llmClient;
+  }
+
+  // Ejecutar múltiples veces y analizar distribución
+  async runStatisticalTest(
+    prompt: string,
+    evaluator: (output: string) => number, // Función que puntúa el output 0-1
+    options: StatisticalTestOptions = {}
+  ): Promise<StatisticalTestResult> {
+    const sampleSize = options.sampleSize || this.defaultSampleSize;
+    const scores: number[] = [];
+    const outputs: string[] = [];
+
+    for (let i = 0; i < sampleSize; i++) {
+      const output = await this.llmClient.generate(prompt, {
+        temperature: options.temperature || 0.7
+      });
+      outputs.push(output);
+      scores.push(evaluator(output));
+    }
+
+    // Calcular estadísticas
+    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const variance = scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) / scores.length;
+    const std = Math.sqrt(variance);
+
+    // Calcular intervalo de confianza
+    const confidenceLevel = options.confidenceLevel || 0.95;
+    const zScore = this.getZScore(confidenceLevel);
+    const marginOfError = zScore * (std / Math.sqrt(sampleSize));
+
+    const confidenceInterval: [number, number] = [
+      mean - marginOfError,
+      mean + marginOfError
+    ];
+
+    // Test de hipótesis: ¿el score medio es >= threshold?
+    const threshold = options.threshold || 0.7;
+    const tStatistic = (mean - threshold) / (std / Math.sqrt(sampleSize));
+    const pValue = this.calculatePValue(tStatistic, sampleSize - 1);
+
+    return {
+      sampleSize,
+      mean,
+      std,
+      variance,
+      min: Math.min(...scores),
+      max: Math.max(...scores),
+      confidenceInterval,
+      confidenceLevel,
+      threshold,
+      passesThreshold: mean >= threshold,
+      pValue,
+      isStatisticallySignificant: pValue < 0.05,
+      scores,
+      outputs
+    };
+  }
+
+  // Test de comparación A/B entre dos prompts
+  async comparePrompts(
+    promptA: string,
+    promptB: string,
+    evaluator: (output: string) => number,
+    sampleSize: number = 30
+  ): Promise<ABTestResult> {
+    const resultsA = await this.runStatisticalTest(promptA, evaluator, { sampleSize });
+    const resultsB = await this.runStatisticalTest(promptB, evaluator, { sampleSize });
+
+    // Welch's t-test para comparar medias
+    const pooledVariance =
+      (resultsA.variance / sampleSize) + (resultsB.variance / sampleSize);
+    const tStatistic = (resultsA.mean - resultsB.mean) / Math.sqrt(pooledVariance);
+
+    // Grados de libertad aproximados (Welch-Satterthwaite)
+    const df = Math.pow(pooledVariance, 2) / (
+      Math.pow(resultsA.variance / sampleSize, 2) / (sampleSize - 1) +
+      Math.pow(resultsB.variance / sampleSize, 2) / (sampleSize - 1)
+    );
+
+    const pValue = this.calculatePValue(tStatistic, df);
+
+    // Effect size (Cohen's d)
+    const pooledStd = Math.sqrt(
+      ((sampleSize - 1) * resultsA.variance + (sampleSize - 1) * resultsB.variance) /
+      (2 * sampleSize - 2)
+    );
+    const cohensD = (resultsA.mean - resultsB.mean) / pooledStd;
+
+    return {
+      promptA: {
+        prompt: promptA,
+        ...resultsA
+      },
+      promptB: {
+        prompt: promptB,
+        ...resultsB
+      },
+      comparison: {
+        meanDifference: resultsA.mean - resultsB.mean,
+        tStatistic,
+        pValue,
+        isSignificant: pValue < 0.05,
+        effectSize: cohensD,
+        effectSizeInterpretation: this.interpretEffectSize(cohensD),
+        winner: resultsA.mean > resultsB.mean ? 'A' : 'B',
+        recommendation: this.generateRecommendation(resultsA, resultsB, pValue, cohensD)
+      }
+    };
+  }
+
+  private getZScore(confidenceLevel: number): number {
+    // Z-scores comunes
+    const zScores: Record<number, number> = {
+      0.90: 1.645,
+      0.95: 1.96,
+      0.99: 2.576
+    };
+    return zScores[confidenceLevel] || 1.96;
+  }
+
+  private calculatePValue(tStatistic: number, df: number): number {
+    // Aproximación simplificada - en producción usar librería estadística
+    const x = df / (df + tStatistic * tStatistic);
+    return this.incompleteBeta(df / 2, 0.5, x);
+  }
+
+  private incompleteBeta(a: number, b: number, x: number): number {
+    // Aproximación numérica simplificada
+    // En producción, usar jstat o similar
+    if (x < 0 || x > 1) return 0;
+    if (x === 0) return 0;
+    if (x === 1) return 1;
+
+    // Serie de aproximación
+    let result = 0;
+    for (let n = 0; n < 100; n++) {
+      const term = Math.pow(x, n) / (a + n);
+      result += term;
+      if (Math.abs(term) < 1e-10) break;
+    }
+    return result * Math.pow(x, a) / a;
+  }
+
+  private interpretEffectSize(d: number): string {
+    const absD = Math.abs(d);
+    if (absD < 0.2) return 'negligible';
+    if (absD < 0.5) return 'small';
+    if (absD < 0.8) return 'medium';
+    return 'large';
+  }
+
+  private generateRecommendation(
+    resultsA: StatisticalTestResult,
+    resultsB: StatisticalTestResult,
+    pValue: number,
+    effectSize: number
+  ): string {
+    if (pValue >= 0.05) {
+      return 'No significant difference detected. Both prompts perform similarly.';
+    }
+
+    const better = resultsA.mean > resultsB.mean ? 'A' : 'B';
+    const worse = better === 'A' ? 'B' : 'A';
+    const improvement = Math.abs(resultsA.mean - resultsB.mean) * 100;
+
+    if (Math.abs(effectSize) < 0.2) {
+      return `Prompt ${better} is statistically better but the effect is negligible (${improvement.toFixed(1)}% improvement).`;
+    }
+
+    if (Math.abs(effectSize) < 0.5) {
+      return `Prompt ${better} shows small but significant improvement (${improvement.toFixed(1)}%). Consider adopting it.`;
+    }
+
+    return `Strong recommendation: Use Prompt ${better}. It shows ${improvement.toFixed(1)}% improvement with ${this.interpretEffectSize(effectSize)} effect size.`;
+  }
+}
+
+interface StatisticalTestOptions {
+  sampleSize?: number;
+  temperature?: number;
+  confidenceLevel?: number;
+  threshold?: number;
+}
+
+interface StatisticalTestResult {
+  sampleSize: number;
+  mean: number;
+  std: number;
+  variance: number;
+  min: number;
+  max: number;
+  confidenceInterval: [number, number];
+  confidenceLevel: number;
+  threshold: number;
+  passesThreshold: boolean;
+  pValue: number;
+  isStatisticallySignificant: boolean;
+  scores: number[];
+  outputs: string[];
+}
+
+interface ABTestResult {
+  promptA: StatisticalTestResult & { prompt: string };
+  promptB: StatisticalTestResult & { prompt: string };
+  comparison: {
+    meanDifference: number;
+    tStatistic: number;
+    pValue: number;
+    isSignificant: boolean;
+    effectSize: number;
+    effectSizeInterpretation: string;
+    winner: 'A' | 'B';
+    recommendation: string;
+  };
+}
+```
+
+**Ejemplo de uso en tests:**
+
+```typescript
+import { describe, it, expect } from 'vitest';
+
+describe('Statistical LLM Testing', () => {
+  let runner: StatisticalTestRunner;
+
+  beforeAll(() => {
+    runner = new StatisticalTestRunner(llmClient);
+  });
+
+  it('should maintain quality threshold across multiple runs', async () => {
+    const result = await runner.runStatisticalTest(
+      'Summarize the benefits of test-driven development',
+      (output) => {
+        // Evaluador: verificar que menciona puntos clave
+        const keyPoints = ['quality', 'design', 'confidence', 'documentation'];
+        const mentioned = keyPoints.filter(kp =>
+          output.toLowerCase().includes(kp)
+        ).length;
+        return mentioned / keyPoints.length;
+      },
+      {
+        sampleSize: 30,
+        threshold: 0.6,
+        confidenceLevel: 0.95
+      }
+    );
+
+    expect(result.passesThreshold).toBe(true);
+    expect(result.isStatisticallySignificant).toBe(true);
+    expect(result.confidenceInterval[0]).toBeGreaterThan(0.5);
+  }, 120000); // Timeout largo para múltiples llamadas
+
+  it('should detect better prompt through A/B testing', async () => {
+    const promptA = 'Summarize TDD in one paragraph.';
+    const promptB = 'As a senior developer, explain test-driven development concisely.';
+
+    const result = await runner.comparePrompts(
+      promptA,
+      promptB,
+      (output) => {
+        // Evaluar calidad basada en longitud y contenido
+        const hasStructure = output.includes('.') && output.length > 100;
+        const mentionsCycle = output.toLowerCase().includes('red') ||
+                             output.toLowerCase().includes('green') ||
+                             output.toLowerCase().includes('refactor');
+        return (hasStructure ? 0.5 : 0) + (mentionsCycle ? 0.5 : 0);
+      },
+      20
+    );
+
+    console.log('A/B Test Results:');
+    console.log(`  Prompt A mean: ${result.promptA.mean.toFixed(3)}`);
+    console.log(`  Prompt B mean: ${result.promptB.mean.toFixed(3)}`);
+    console.log(`  p-value: ${result.comparison.pValue.toFixed(4)}`);
+    console.log(`  Effect size: ${result.comparison.effectSize.toFixed(3)} (${result.comparison.effectSizeInterpretation})`);
+    console.log(`  Recommendation: ${result.comparison.recommendation}`);
+
+    // No hacer assertions sobre cuál es mejor, solo que el test se completó
+    expect(result.comparison.pValue).toBeLessThanOrEqual(1);
+  }, 180000);
+});
+```
+
+---
+
+### Intervalos de Confianza en Testing de IA
+
+**Los intervalos de confianza cuantifican la incertidumbre en las métricas de calidad.**
+
+```typescript
+class ConfidenceIntervalCalculator {
+  // Calcular intervalo de confianza para proporción (ej: tasa de éxito)
+  calculateProportionCI(
+    successes: number,
+    total: number,
+    confidenceLevel: number = 0.95
+  ): ConfidenceInterval {
+    const proportion = successes / total;
+    const z = this.getZScore(confidenceLevel);
+
+    // Wilson score interval (mejor para proporciones pequeñas)
+    const denominator = 1 + z * z / total;
+    const center = (proportion + z * z / (2 * total)) / denominator;
+    const spread = (z / denominator) * Math.sqrt(
+      (proportion * (1 - proportion) / total) + (z * z / (4 * total * total))
+    );
+
+    return {
+      point: proportion,
+      lower: Math.max(0, center - spread),
+      upper: Math.min(1, center + spread),
+      confidenceLevel,
+      method: 'wilson'
+    };
+  }
+
+  // Calcular intervalo de confianza para media
+  calculateMeanCI(
+    values: number[],
+    confidenceLevel: number = 0.95
+  ): ConfidenceInterval {
+    const n = values.length;
+    const mean = values.reduce((a, b) => a + b, 0) / n;
+    const std = Math.sqrt(
+      values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / (n - 1)
+    );
+
+    const t = this.getTScore(n - 1, confidenceLevel);
+    const marginOfError = t * (std / Math.sqrt(n));
+
+    return {
+      point: mean,
+      lower: mean - marginOfError,
+      upper: mean + marginOfError,
+      confidenceLevel,
+      method: 't-distribution'
+    };
+  }
+
+  // Bootstrap confidence interval (más robusto)
+  calculateBootstrapCI(
+    values: number[],
+    statistic: (sample: number[]) => number,
+    confidenceLevel: number = 0.95,
+    iterations: number = 1000
+  ): ConfidenceInterval {
+    const bootstrapStatistics: number[] = [];
+
+    for (let i = 0; i < iterations; i++) {
+      // Resample con reemplazo
+      const sample = Array(values.length)
+        .fill(0)
+        .map(() => values[Math.floor(Math.random() * values.length)]);
+
+      bootstrapStatistics.push(statistic(sample));
+    }
+
+    // Ordenar para obtener percentiles
+    bootstrapStatistics.sort((a, b) => a - b);
+
+    const alpha = 1 - confidenceLevel;
+    const lowerIndex = Math.floor((alpha / 2) * iterations);
+    const upperIndex = Math.floor((1 - alpha / 2) * iterations);
+
+    return {
+      point: statistic(values),
+      lower: bootstrapStatistics[lowerIndex],
+      upper: bootstrapStatistics[upperIndex],
+      confidenceLevel,
+      method: 'bootstrap'
+    };
+  }
+
+  private getZScore(confidenceLevel: number): number {
+    const zScores: Record<number, number> = {
+      0.90: 1.645,
+      0.95: 1.96,
+      0.99: 2.576
+    };
+    return zScores[confidenceLevel] || 1.96;
+  }
+
+  private getTScore(df: number, confidenceLevel: number): number {
+    // Valores aproximados para t-distribution
+    // En producción, usar tabla completa o librería
+    if (df >= 120) return this.getZScore(confidenceLevel);
+    if (df >= 60) return this.getZScore(confidenceLevel) * 1.01;
+    if (df >= 30) return this.getZScore(confidenceLevel) * 1.04;
+    if (df >= 10) return this.getZScore(confidenceLevel) * 1.1;
+    return this.getZScore(confidenceLevel) * 1.2;
+  }
+}
+
+interface ConfidenceInterval {
+  point: number;
+  lower: number;
+  upper: number;
+  confidenceLevel: number;
+  method: string;
+}
+
+// Uso práctico en tests
+describe('Confidence Interval Testing', () => {
+  const calculator = new ConfidenceIntervalCalculator();
+
+  it('should verify success rate with confidence interval', async () => {
+    const results: boolean[] = [];
+
+    // Ejecutar 50 veces
+    for (let i = 0; i < 50; i++) {
+      const output = await llm.generate('Generate a valid JSON object');
+      try {
+        JSON.parse(output);
+        results.push(true);
+      } catch {
+        results.push(false);
+      }
+    }
+
+    const successes = results.filter(r => r).length;
+    const ci = calculator.calculateProportionCI(successes, results.length, 0.95);
+
+    console.log(`Success rate: ${(ci.point * 100).toFixed(1)}%`);
+    console.log(`95% CI: [${(ci.lower * 100).toFixed(1)}%, ${(ci.upper * 100).toFixed(1)}%]`);
+
+    // Verificar que el límite inferior del CI está por encima del umbral aceptable
+    expect(ci.lower).toBeGreaterThan(0.8); // Al menos 80% de éxito con 95% confianza
+  });
+
+  it('should compare models using confidence intervals', async () => {
+    const scoresModelA: number[] = [];
+    const scoresModelB: number[] = [];
+
+    // Evaluar ambos modelos
+    for (let i = 0; i < 30; i++) {
+      const prompt = `Summarize: ${testCases[i]}`;
+
+      const outputA = await modelA.generate(prompt);
+      const outputB = await modelB.generate(prompt);
+
+      scoresModelA.push(evaluateQuality(outputA));
+      scoresModelB.push(evaluateQuality(outputB));
+    }
+
+    const ciA = calculator.calculateMeanCI(scoresModelA);
+    const ciB = calculator.calculateMeanCI(scoresModelB);
+
+    console.log(`Model A: ${ciA.point.toFixed(3)} [${ciA.lower.toFixed(3)}, ${ciA.upper.toFixed(3)}]`);
+    console.log(`Model B: ${ciB.point.toFixed(3)} [${ciB.lower.toFixed(3)}, ${ciB.upper.toFixed(3)}]`);
+
+    // Si los CIs no se superponen, la diferencia es significativa
+    const noOverlap = ciA.lower > ciB.upper || ciB.lower > ciA.upper;
+    if (noOverlap) {
+      console.log('Significant difference detected!');
+    }
+  });
+});
+```
+
+---
+
+### A/B Testing Framework para LLMs
+
+**Framework completo para comparar prompts, modelos, o configuraciones.**
+
+```typescript
+interface ABTestConfig {
+  name: string;
+  description: string;
+  variants: {
+    name: string;
+    promptTemplate: string;
+    modelConfig?: Partial<GenerationConfig>;
+  }[];
+  testCases: TestCase[];
+  evaluators: Evaluator[];
+  sampleSizePerVariant: number;
+  trafficSplit?: number[]; // Distribución de tráfico entre variantes
+}
+
+interface TestCase {
+  id: string;
+  input: Record<string, any>;
+  expectedProperties?: Record<string, any>;
+}
+
+interface Evaluator {
+  name: string;
+  evaluate: (output: string, testCase: TestCase) => number;
+  weight: number;
+}
+
+class ABTestingFramework {
+  private results: Map<string, ABTestExecution> = new Map();
+
+  async runABTest(config: ABTestConfig): Promise<ABTestExecution> {
+    const execution: ABTestExecution = {
+      id: generateId(),
+      config,
+      startTime: new Date(),
+      variantResults: new Map(),
+      status: 'running'
+    };
+
+    this.results.set(execution.id, execution);
+
+    try {
+      // Ejecutar cada variante
+      for (const variant of config.variants) {
+        const variantResult = await this.runVariant(
+          variant,
+          config.testCases,
+          config.evaluators,
+          config.sampleSizePerVariant
+        );
+        execution.variantResults.set(variant.name, variantResult);
+      }
+
+      // Analizar resultados
+      execution.analysis = this.analyzeResults(execution);
+      execution.status = 'completed';
+      execution.endTime = new Date();
+
+    } catch (error) {
+      execution.status = 'failed';
+      execution.error = error.message;
+    }
+
+    return execution;
+  }
+
+  private async runVariant(
+    variant: ABTestConfig['variants'][0],
+    testCases: TestCase[],
+    evaluators: Evaluator[],
+    samplesPerCase: number
+  ): Promise<VariantResult> {
+    const caseResults: CaseResult[] = [];
+
+    for (const testCase of testCases) {
+      const scores: EvaluatorScore[] = [];
+
+      for (let i = 0; i < samplesPerCase; i++) {
+        // Renderizar prompt con variables del test case
+        const prompt = this.renderPrompt(variant.promptTemplate, testCase.input);
+
+        // Generar output
+        const output = await this.generateOutput(prompt, variant.modelConfig);
+
+        // Evaluar con cada evaluador
+        for (const evaluator of evaluators) {
+          const score = evaluator.evaluate(output, testCase);
+          scores.push({
+            evaluatorName: evaluator.name,
+            score,
+            sampleIndex: i
+          });
+        }
+      }
+
+      caseResults.push({
+        testCaseId: testCase.id,
+        scores,
+        avgScore: scores.reduce((sum, s) => sum + s.score, 0) / scores.length
+      });
+    }
+
+    // Calcular estadísticas agregadas
+    const allScores = caseResults.flatMap(cr => cr.scores.map(s => s.score));
+
+    return {
+      variantName: variant.name,
+      caseResults,
+      aggregateStats: {
+        mean: this.mean(allScores),
+        std: this.std(allScores),
+        median: this.median(allScores),
+        min: Math.min(...allScores),
+        max: Math.max(...allScores),
+        totalSamples: allScores.length
+      }
+    };
+  }
+
+  private analyzeResults(execution: ABTestExecution): ABTestAnalysis {
+    const variants = Array.from(execution.variantResults.entries());
+
+    if (variants.length < 2) {
+      return { conclusion: 'Need at least 2 variants for comparison' };
+    }
+
+    // Comparar cada par de variantes
+    const comparisons: VariantComparison[] = [];
+
+    for (let i = 0; i < variants.length; i++) {
+      for (let j = i + 1; j < variants.length; j++) {
+        const [nameA, resultA] = variants[i];
+        const [nameB, resultB] = variants[j];
+
+        const scoresA = resultA.caseResults.flatMap(cr => cr.scores.map(s => s.score));
+        const scoresB = resultB.caseResults.flatMap(cr => cr.scores.map(s => s.score));
+
+        // Test estadístico
+        const { tStatistic, pValue, significant } = this.tTest(scoresA, scoresB);
+
+        // Effect size
+        const effectSize = this.cohenD(scoresA, scoresB);
+
+        comparisons.push({
+          variantA: nameA,
+          variantB: nameB,
+          meanA: resultA.aggregateStats.mean,
+          meanB: resultB.aggregateStats.mean,
+          difference: resultA.aggregateStats.mean - resultB.aggregateStats.mean,
+          tStatistic,
+          pValue,
+          isSignificant: significant,
+          effectSize,
+          effectInterpretation: this.interpretEffectSize(effectSize),
+          winner: resultA.aggregateStats.mean > resultB.aggregateStats.mean ? nameA : nameB
+        });
+      }
+    }
+
+    // Encontrar ganador global
+    const rankings = variants
+      .map(([name, result]) => ({
+        name,
+        mean: result.aggregateStats.mean,
+        std: result.aggregateStats.std
+      }))
+      .sort((a, b) => b.mean - a.mean);
+
+    return {
+      comparisons,
+      rankings,
+      winner: rankings[0].name,
+      conclusion: this.generateConclusion(comparisons, rankings)
+    };
+  }
+
+  private tTest(a: number[], b: number[]): { tStatistic: number; pValue: number; significant: boolean } {
+    const meanA = this.mean(a);
+    const meanB = this.mean(b);
+    const varA = this.variance(a);
+    const varB = this.variance(b);
+
+    const pooledVariance = (varA / a.length) + (varB / b.length);
+    const tStatistic = (meanA - meanB) / Math.sqrt(pooledVariance);
+
+    // Aproximación de p-value
+    const df = a.length + b.length - 2;
+    const pValue = Math.min(1, Math.exp(-0.5 * tStatistic * tStatistic)); // Simplificado
+
+    return {
+      tStatistic,
+      pValue,
+      significant: pValue < 0.05
+    };
+  }
+
+  private cohenD(a: number[], b: number[]): number {
+    const pooledStd = Math.sqrt(
+      ((a.length - 1) * this.variance(a) + (b.length - 1) * this.variance(b)) /
+      (a.length + b.length - 2)
+    );
+    return (this.mean(a) - this.mean(b)) / pooledStd;
+  }
+
+  private interpretEffectSize(d: number): string {
+    const absD = Math.abs(d);
+    if (absD < 0.2) return 'negligible';
+    if (absD < 0.5) return 'small';
+    if (absD < 0.8) return 'medium';
+    return 'large';
+  }
+
+  private generateConclusion(
+    comparisons: VariantComparison[],
+    rankings: { name: string; mean: number }[]
+  ): string {
+    const significantComparisons = comparisons.filter(c => c.isSignificant);
+
+    if (significantComparisons.length === 0) {
+      return 'No significant differences found between variants. Consider running with more samples.';
+    }
+
+    const winner = rankings[0];
+    const runnerUp = rankings[1];
+    const improvement = ((winner.mean - runnerUp.mean) / runnerUp.mean * 100).toFixed(1);
+
+    return `"${winner.name}" is the recommended variant with ${improvement}% improvement over "${runnerUp.name}".`;
+  }
+
+  private renderPrompt(template: string, variables: Record<string, any>): string {
+    let result = template;
+    for (const [key, value] of Object.entries(variables)) {
+      result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), String(value));
+    }
+    return result;
+  }
+
+  private async generateOutput(prompt: string, config?: Partial<GenerationConfig>): Promise<string> {
+    // Implementación dependiente del cliente LLM
+    return await llmClient.generate(prompt, config);
+  }
+
+  // Utilidades estadísticas
+  private mean(values: number[]): number {
+    return values.reduce((a, b) => a + b, 0) / values.length;
+  }
+
+  private variance(values: number[]): number {
+    const m = this.mean(values);
+    return values.reduce((sum, v) => sum + Math.pow(v - m, 2), 0) / (values.length - 1);
+  }
+
+  private std(values: number[]): number {
+    return Math.sqrt(this.variance(values));
+  }
+
+  private median(values: number[]): number {
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  }
+}
+
+interface ABTestExecution {
+  id: string;
+  config: ABTestConfig;
+  startTime: Date;
+  endTime?: Date;
+  status: 'running' | 'completed' | 'failed';
+  variantResults: Map<string, VariantResult>;
+  analysis?: ABTestAnalysis;
+  error?: string;
+}
+
+interface VariantResult {
+  variantName: string;
+  caseResults: CaseResult[];
+  aggregateStats: {
+    mean: number;
+    std: number;
+    median: number;
+    min: number;
+    max: number;
+    totalSamples: number;
+  };
+}
+
+interface CaseResult {
+  testCaseId: string;
+  scores: EvaluatorScore[];
+  avgScore: number;
+}
+
+interface EvaluatorScore {
+  evaluatorName: string;
+  score: number;
+  sampleIndex: number;
+}
+
+interface VariantComparison {
+  variantA: string;
+  variantB: string;
+  meanA: number;
+  meanB: number;
+  difference: number;
+  tStatistic: number;
+  pValue: number;
+  isSignificant: boolean;
+  effectSize: number;
+  effectInterpretation: string;
+  winner: string;
+}
+
+interface ABTestAnalysis {
+  comparisons?: VariantComparison[];
+  rankings?: { name: string; mean: number; std: number }[];
+  winner?: string;
+  conclusion: string;
+}
+```
+
+**Ejemplo de configuración de A/B test:**
+
+```typescript
+const abTestConfig: ABTestConfig = {
+  name: 'Summarization Prompt Optimization',
+  description: 'Compare different summarization prompt styles',
+  variants: [
+    {
+      name: 'baseline',
+      promptTemplate: 'Summarize the following text:\n\n{{text}}'
+    },
+    {
+      name: 'structured',
+      promptTemplate: `Summarize the following text in 2-3 sentences.
+Focus on the main points and key takeaways.
+
+Text: {{text}}
+
+Summary:`
+    },
+    {
+      name: 'persona',
+      promptTemplate: `You are a professional editor skilled at creating concise summaries.
+Summarize this text, capturing the essence in 50 words or less:
+
+{{text}}`
+    }
+  ],
+  testCases: [
+    {
+      id: 'case1',
+      input: { text: 'Long article about machine learning...' },
+      expectedProperties: { maxLength: 100 }
+    },
+    {
+      id: 'case2',
+      input: { text: 'Technical documentation about APIs...' },
+      expectedProperties: { maxLength: 100 }
+    }
+  ],
+  evaluators: [
+    {
+      name: 'conciseness',
+      evaluate: (output, testCase) => {
+        const maxLen = testCase.expectedProperties?.maxLength || 100;
+        const words = output.split(/\s+/).length;
+        return Math.min(1, maxLen / Math.max(words, 1));
+      },
+      weight: 0.3
+    },
+    {
+      name: 'completeness',
+      evaluate: (output, testCase) => {
+        // Verificar que captura puntos clave
+        const keyTerms = extractKeyTerms(testCase.input.text);
+        const mentioned = keyTerms.filter(t => output.includes(t)).length;
+        return mentioned / Math.max(keyTerms.length, 1);
+      },
+      weight: 0.5
+    },
+    {
+      name: 'readability',
+      evaluate: (output) => {
+        // Flesch-Kincaid simplificado
+        const sentences = output.split(/[.!?]+/).length;
+        const words = output.split(/\s+/).length;
+        if (sentences === 0 || words === 0) return 0;
+        const avgSentenceLength = words / sentences;
+        return Math.min(1, 20 / avgSentenceLength);
+      },
+      weight: 0.2
+    }
+  ],
+  sampleSizePerVariant: 10
+};
+
+// Ejecutar test
+const framework = new ABTestingFramework();
+const results = await framework.runABTest(abTestConfig);
+
+console.log('A/B Test Results:');
+console.log(JSON.stringify(results.analysis, null, 2));
+```
+
+---
+
+### Best Practices para Testing No-determinístico
+
+| Práctica | Descripción |
+|----------|-------------|
+| **Fijar seeds cuando sea posible** | Usar temperature=0 y seeds fijos para máximo determinismo |
+| **Cachear respuestas de tests** | Guardar respuestas para reproducibilidad |
+| **Testar propiedades, no valores exactos** | Verificar estructura, longitud, presencia de elementos |
+| **Usar muestras múltiples** | Ejecutar N veces y analizar estadísticamente |
+| **Calcular intervalos de confianza** | Cuantificar incertidumbre en métricas |
+| **Documentar variabilidad esperada** | Establecer rangos aceptables de comportamiento |
+| **Separar tests determinísticos de estadísticos** | Diferentes pipelines para diferentes tipos de tests |
+
+**Cuándo usar cada approach:**
+
+```
+¿Necesitas resultados 100% reproducibles?
+├── Sí → Mockear LLM o usar caching
+└── No → ¿Estás comparando variantes?
+    ├── Sí → A/B testing con análisis estadístico
+    └── No → ¿Necesitas verificar umbral de calidad?
+        ├── Sí → Testing estadístico con intervalos de confianza
+        └── No → Golden sets con validación flexible
+```
 
 ---
 
