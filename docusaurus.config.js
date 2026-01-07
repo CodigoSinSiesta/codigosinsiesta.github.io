@@ -14,12 +14,6 @@ const config = {
   tagline: 'Documentación y recursos técnicos',
   favicon: 'img/favicon.ico',
 
-  // Enable Mermaid diagram support
-  markdown: {
-    mermaid: true,
-  },
-  themes: ['@docusaurus/theme-mermaid'],
-
   // Set the production url of your site here
   url: 'https://codigosinsiesta.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
@@ -87,8 +81,16 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      // Project's social card for Open Graph meta tags
+      image: 'img/codigo-sin-siesta-social-card.png',
+      // Open Graph and Twitter Card metadata
+      metadata: [
+        {property: 'og:image', content: 'img/codigo-sin-siesta-social-card.png'},
+        {property: 'og:type', content: 'website'},
+        {property: 'og:site_name', content: 'Código Sin Siesta'},
+        {name: 'twitter:card', content: 'summary_large_image'},
+        {name: 'twitter:image', content: 'img/codigo-sin-siesta-social-card.png'},
+      ],
       colorMode: {
         respectPrefersColorScheme: true,
       },
