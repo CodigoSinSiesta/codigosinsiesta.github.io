@@ -4425,20 +4425,2635 @@ interface PortableUserData {
 
 ---
 
-## Próximas Secciones
+## 🤖 Model Security
 
-### Model Security
-- Adversarial input detection
-- Model poisoning prevention
-- Output filtering
-- Continuous monitoring
+La seguridad del modelo va más allá de validar inputs y outputs. Incluye protección contra ataques adversariales diseñados para engañar al modelo, prevención de envenenamiento de datos, y monitoreo continuo del comportamiento del modelo en producción.
 
-### Infrastructure Security
-- Secret management
-- DDoS protection
-- Audit logging
-- Backup y recovery
+### Detección de Inputs Adversariales
+
+**Sistema para detectar inputs diseñados específicamente para engañar al modelo.**
+
+Los ataques adversariales son inputs cuidadosamente crafteados que parecen normales a humanos pero causan comportamientos inesperados en el modelo. A diferencia del prompt injection (que manipula instrucciones), los ataques adversariales explotan vulnerabilidades en cómo el modelo procesa información.
+
+```typescript
+interface AdversarialDetectionResult {
+  isAdversarial: boolean;
+  confidence: number;
+  attackType: AdversarialAttackType;
+  perturbations: Perturbation[];
+  originalConfidence: number;
+  recommendations: string[];
+}
+
+type AdversarialAttackType =
+  | 'character_perturbation'   // Cambios sutiles en caracteres
+  | 'word_substitution'        // Sinónimos que confunden al modelo
+  | 'syntax_manipulation'      // Estructuras gramaticales inusuales
+  | 'semantic_flooding'        // Ruido semántico para confundir
+  | 'embedding_attack'         // Explotar debilidades en embeddings
+  | 'gradient_based'           // Inputs optimizados contra el modelo
+  | 'model_extraction';        // Intentos de extraer información del modelo
+
+interface Perturbation {
+  position: number;
+  original: string;
+  modified: string;
+  type: string;
+  suspicionScore: number;
+}
+
+class AdversarialDetector {
+  private characterAnalyzer: CharacterAnalyzer;
+  private semanticAnalyzer: SemanticAnalyzer;
+  private patternDatabase: AdversarialPatternDB;
+  private modelProbe: ModelBehaviorProbe;
+
+  async detect(input: string, context?: DetectionContext): Promise<AdversarialDetectionResult> {
+    const perturbations: Perturbation[] = [];
+    let maxConfidence = 0;
+    let detectedType: AdversarialAttackType = 'character_perturbation';
+
+    // 1. Análisis de caracteres sospechosos
+    const charAnalysis = await this.analyzeCharacters(input);
+    if (charAnalysis.suspiciousChars.length > 0) {
+      perturbations.push(...charAnalysis.perturbations);
+      if (charAnalysis.confidence > maxConfidence) {
+        maxConfidence = charAnalysis.confidence;
+        detectedType = 'character_perturbation';
+      }
+    }
+
+    // 2. Detección de sustituciones de palabras adversariales
+    const wordAnalysis = await this.analyzeWordSubstitutions(input);
+    if (wordAnalysis.suspiciousSubstitutions.length > 0) {
+      perturbations.push(...wordAnalysis.perturbations);
+      if (wordAnalysis.confidence > maxConfidence) {
+        maxConfidence = wordAnalysis.confidence;
+        detectedType = 'word_substitution';
+      }
+    }
+
+    // 3. Análisis de estructura sintáctica
+    const syntaxAnalysis = await this.analyzeSyntax(input);
+    if (syntaxAnalysis.anomalyScore > 0.7) {
+      if (syntaxAnalysis.confidence > maxConfidence) {
+        maxConfidence = syntaxAnalysis.confidence;
+        detectedType = 'syntax_manipulation';
+      }
+    }
+
+    // 4. Detección de flooding semántico
+    const semanticAnalysis = await this.detectSemanticFlooding(input);
+    if (semanticAnalysis.isFlooding) {
+      if (semanticAnalysis.confidence > maxConfidence) {
+        maxConfidence = semanticAnalysis.confidence;
+        detectedType = 'semantic_flooding';
+      }
+    }
+
+    // 5. Comparación con patrones adversariales conocidos
+    const patternMatch = await this.patternDatabase.findSimilar(input);
+    if (patternMatch && patternMatch.similarity > 0.85) {
+      maxConfidence = Math.max(maxConfidence, patternMatch.similarity);
+      detectedType = patternMatch.attackType;
+    }
+
+    // 6. Probar comportamiento del modelo (si está habilitado)
+    let originalConfidence = 0;
+    if (context?.enableModelProbe && maxConfidence > 0.3) {
+      const probeResult = await this.modelProbe.testBehavior(input);
+      originalConfidence = probeResult.originalConfidence;
+
+      if (probeResult.behaviorAnomaly > 0.6) {
+        maxConfidence = Math.max(maxConfidence, probeResult.behaviorAnomaly);
+        detectedType = 'gradient_based';
+      }
+    }
+
+    return {
+      isAdversarial: maxConfidence > 0.5,
+      confidence: maxConfidence,
+      attackType: detectedType,
+      perturbations,
+      originalConfidence,
+      recommendations: this.generateRecommendations(detectedType, maxConfidence),
+    };
+  }
+
+  private async analyzeCharacters(input: string): Promise<CharacterAnalysis> {
+    const suspiciousChars: Array<{char: string; position: number; reason: string}> = [];
+    const perturbations: Perturbation[] = [];
+
+    // Detectar homógrafos Unicode (caracteres visualmente idénticos)
+    const homoglyphMap: Record<string, string[]> = {
+      'a': ['а', 'ɑ', 'α'],  // cirílico, latino alternativo, griego
+      'e': ['е', 'ε', 'ẹ'],
+      'o': ['о', 'ο', 'ο'],
+      'p': ['р', 'ρ'],
+      'c': ['с', 'ϲ'],
+      'x': ['х', 'χ'],
+      'y': ['у', 'γ'],
+      'n': ['п'],
+    };
+
+    for (let i = 0; i < input.length; i++) {
+      const char = input[i];
+      const codePoint = char.codePointAt(0);
+
+      // Verificar caracteres fuera del rango ASCII básico
+      if (codePoint && codePoint > 127) {
+        // Buscar si es un homóglifo conocido
+        for (const [standard, variants] of Object.entries(homoglyphMap)) {
+          if (variants.includes(char)) {
+            suspiciousChars.push({
+              char,
+              position: i,
+              reason: `Homoglyph of '${standard}' (U+${codePoint.toString(16).toUpperCase()})`,
+            });
+            perturbations.push({
+              position: i,
+              original: standard,
+              modified: char,
+              type: 'homoglyph',
+              suspicionScore: 0.9,
+            });
+          }
+        }
+
+        // Detectar caracteres de control invisibles
+        if (this.isInvisibleChar(codePoint)) {
+          suspiciousChars.push({
+            char,
+            position: i,
+            reason: `Invisible control character (U+${codePoint.toString(16).toUpperCase()})`,
+          });
+          perturbations.push({
+            position: i,
+            original: '',
+            modified: char,
+            type: 'invisible',
+            suspicionScore: 0.95,
+          });
+        }
+      }
+    }
+
+    const confidence = suspiciousChars.length > 0
+      ? Math.min(0.95, 0.3 + (suspiciousChars.length * 0.15))
+      : 0;
+
+    return { suspiciousChars, perturbations, confidence };
+  }
+
+  private isInvisibleChar(codePoint: number): boolean {
+    return (
+      (codePoint >= 0x200B && codePoint <= 0x200F) || // Zero-width chars
+      (codePoint >= 0x2028 && codePoint <= 0x202F) || // Line/paragraph separators
+      (codePoint >= 0x2060 && codePoint <= 0x206F) || // Format chars
+      codePoint === 0xFEFF                             // BOM
+    );
+  }
+
+  private async analyzeWordSubstitutions(input: string): Promise<WordAnalysis> {
+    // Detectar palabras que podrían ser sustituciones adversariales
+    const words = input.split(/\s+/);
+    const suspiciousSubstitutions: Array<{word: string; reason: string}> = [];
+    const perturbations: Perturbation[] = [];
+
+    // Patrones de sustitución adversarial conocidos
+    const substitutionPatterns = [
+      { pattern: /\b\w+ly\b/g, check: this.checkAdverbSubstitution },
+      { pattern: /\b(not|n't)\s+\w+/g, check: this.checkNegationManipulation },
+    ];
+
+    // Detectar repetición inusual de palabras (posible flooding)
+    const wordCounts = new Map<string, number>();
+    words.forEach(w => {
+      const normalized = w.toLowerCase();
+      wordCounts.set(normalized, (wordCounts.get(normalized) || 0) + 1);
+    });
+
+    const totalWords = words.length;
+    wordCounts.forEach((count, word) => {
+      if (count / totalWords > 0.1 && count > 3) {
+        suspiciousSubstitutions.push({
+          word,
+          reason: `Unusually high frequency: ${count}/${totalWords} (${(count/totalWords*100).toFixed(1)}%)`,
+        });
+      }
+    });
+
+    const confidence = suspiciousSubstitutions.length > 0
+      ? Math.min(0.85, 0.2 + (suspiciousSubstitutions.length * 0.1))
+      : 0;
+
+    return { suspiciousSubstitutions, perturbations, confidence };
+  }
+
+  private async analyzeSyntax(input: string): Promise<SyntaxAnalysis> {
+    // Análisis simplificado de estructura sintáctica
+    let anomalyScore = 0;
+
+    // Detectar patrones sintácticos inusuales
+    const unusualPatterns = [
+      { regex: /(\w+)\s+\1\s+\1/g, score: 0.3 },          // Triple repetición
+      { regex: /[.!?]{3,}/g, score: 0.2 },                // Puntuación excesiva
+      { regex: /\b(\w{1,2}\s+){10,}/g, score: 0.4 },     // Muchas palabras cortas
+      { regex: /[A-Z]{10,}/g, score: 0.3 },              // Mayúsculas excesivas
+    ];
+
+    for (const { regex, score } of unusualPatterns) {
+      if (regex.test(input)) {
+        anomalyScore += score;
+      }
+    }
+
+    return {
+      anomalyScore: Math.min(anomalyScore, 1),
+      confidence: anomalyScore,
+    };
+  }
+
+  private async detectSemanticFlooding(input: string): Promise<SemanticAnalysis> {
+    // Detectar intentos de "ahogar" el contexto con información irrelevante
+    const sentences = input.split(/[.!?]+/).filter(s => s.trim().length > 0);
+
+    if (sentences.length < 3) {
+      return { isFlooding: false, confidence: 0 };
+    }
+
+    // Calcular coherencia semántica entre oraciones
+    const coherenceScores: number[] = [];
+    for (let i = 1; i < sentences.length; i++) {
+      const similarity = await this.semanticAnalyzer.similarity(
+        sentences[i-1],
+        sentences[i]
+      );
+      coherenceScores.push(similarity);
+    }
+
+    const avgCoherence = coherenceScores.reduce((a, b) => a + b, 0) / coherenceScores.length;
+
+    // Baja coherencia = posible flooding
+    const isFlooding = avgCoherence < 0.3 && sentences.length > 5;
+    const confidence = isFlooding ? (1 - avgCoherence) * 0.8 : 0;
+
+    return { isFlooding, confidence };
+  }
+
+  private generateRecommendations(attackType: AdversarialAttackType, confidence: number): string[] {
+    const recommendations: string[] = [];
+
+    if (confidence > 0.7) {
+      recommendations.push('Considerar rechazar el input');
+      recommendations.push('Registrar incidente para análisis posterior');
+    }
+
+    switch (attackType) {
+      case 'character_perturbation':
+        recommendations.push('Normalizar caracteres Unicode antes de procesar');
+        recommendations.push('Aplicar NFKC normalization');
+        break;
+      case 'semantic_flooding':
+        recommendations.push('Limitar longitud del input');
+        recommendations.push('Aplicar summarization antes de procesar');
+        break;
+      case 'word_substitution':
+        recommendations.push('Verificar coherencia semántica del input');
+        break;
+    }
+
+    return recommendations;
+  }
+
+  private checkAdverbSubstitution(word: string): boolean {
+    return false; // Implementación simplificada
+  }
+
+  private checkNegationManipulation(phrase: string): boolean {
+    return false; // Implementación simplificada
+  }
+}
+
+interface CharacterAnalysis {
+  suspiciousChars: Array<{char: string; position: number; reason: string}>;
+  perturbations: Perturbation[];
+  confidence: number;
+}
+
+interface WordAnalysis {
+  suspiciousSubstitutions: Array<{word: string; reason: string}>;
+  perturbations: Perturbation[];
+  confidence: number;
+}
+
+interface SyntaxAnalysis {
+  anomalyScore: number;
+  confidence: number;
+}
+
+interface SemanticAnalysis {
+  isFlooding: boolean;
+  confidence: number;
+}
+```
+
+**Cuándo usar:**
+- ✅ Modelos de clasificación críticos (fraude, seguridad)
+- ✅ Sistemas de moderación de contenido
+- ✅ APIs públicas expuestas a usuarios maliciosos
+- ✅ Modelos que toman decisiones automatizadas importantes
+
+**Tradeoffs:**
+- **Pros**: Detecta ataques sofisticados, múltiples capas de defensa, adaptable
+- **Cons**: Alto overhead computacional, requiere actualización constante, falsos positivos
 
 ---
 
-Mientras tanto, revisa los [Patrones Arquitectónicos](./patrones.md) para fundamentos generales de sistemas IA.
+### Prevención de Model Poisoning
+
+**Sistema para prevenir y detectar envenenamiento de datos de entrenamiento o fine-tuning.**
+
+El model poisoning ocurre cuando datos maliciosos se infiltran en el dataset de entrenamiento, causando que el modelo aprenda comportamientos no deseados. Es especialmente peligroso en sistemas con fine-tuning continuo o feedback loops.
+
+```typescript
+interface DataPoint {
+  id: string;
+  input: string;
+  output: string;
+  source: string;
+  timestamp: Date;
+  metadata: Record<string, unknown>;
+}
+
+interface PoisoningDetectionResult {
+  isPoisoned: boolean;
+  confidence: number;
+  anomalies: DataAnomaly[];
+  clusterId?: string;
+  recommendations: string[];
+}
+
+interface DataAnomaly {
+  type: 'statistical' | 'semantic' | 'temporal' | 'source' | 'pattern';
+  description: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  affectedDataIds: string[];
+}
+
+class ModelPoisoningPrevention {
+  private statisticalAnalyzer: StatisticalAnalyzer;
+  private semanticValidator: SemanticValidator;
+  private sourceTracker: DataSourceTracker;
+  private anomalyDetector: IsolationForestDetector;
+
+  async analyzeDataBatch(dataPoints: DataPoint[]): Promise<BatchAnalysisResult> {
+    const anomalies: DataAnomaly[] = [];
+    const flaggedPoints: Map<string, PoisoningDetectionResult> = new Map();
+
+    // 1. Análisis estadístico del batch
+    const statsAnomalies = await this.statisticalAnalyzer.analyzeBatch(dataPoints);
+    anomalies.push(...statsAnomalies);
+
+    // 2. Clustering para detectar outliers
+    const clusterResults = await this.performClustering(dataPoints);
+    const outlierPoints = clusterResults.filter(r => r.isOutlier);
+
+    for (const outlier of outlierPoints) {
+      anomalies.push({
+        type: 'statistical',
+        description: `Data point is a statistical outlier (distance: ${outlier.distance.toFixed(3)})`,
+        severity: outlier.distance > 3 ? 'high' : 'medium',
+        affectedDataIds: [outlier.dataId],
+      });
+    }
+
+    // 3. Validación semántica
+    for (const dataPoint of dataPoints) {
+      const semanticResult = await this.semanticValidator.validate(dataPoint);
+
+      if (!semanticResult.isValid) {
+        anomalies.push({
+          type: 'semantic',
+          description: semanticResult.reason,
+          severity: semanticResult.severity,
+          affectedDataIds: [dataPoint.id],
+        });
+      }
+    }
+
+    // 4. Análisis de fuentes de datos
+    const sourceAnomalies = await this.analyzeDataSources(dataPoints);
+    anomalies.push(...sourceAnomalies);
+
+    // 5. Detección de patrones de envenenamiento conocidos
+    const patternAnomalies = await this.detectPoisoningPatterns(dataPoints);
+    anomalies.push(...patternAnomalies);
+
+    // Generar resultados individuales
+    for (const dataPoint of dataPoints) {
+      const pointAnomalies = anomalies.filter(a =>
+        a.affectedDataIds.includes(dataPoint.id)
+      );
+
+      const maxSeverity = this.getMaxSeverity(pointAnomalies);
+      const confidence = this.calculateConfidence(pointAnomalies);
+
+      flaggedPoints.set(dataPoint.id, {
+        isPoisoned: confidence > 0.5,
+        confidence,
+        anomalies: pointAnomalies,
+        recommendations: this.generateRecommendations(pointAnomalies),
+      });
+    }
+
+    return {
+      totalPoints: dataPoints.length,
+      flaggedCount: Array.from(flaggedPoints.values()).filter(r => r.isPoisoned).length,
+      anomalies,
+      flaggedPoints,
+      overallRisk: this.calculateOverallRisk(anomalies),
+    };
+  }
+
+  private async analyzeDataSources(dataPoints: DataPoint[]): Promise<DataAnomaly[]> {
+    const anomalies: DataAnomaly[] = [];
+    const sourceGroups = new Map<string, DataPoint[]>();
+
+    // Agrupar por fuente
+    for (const dp of dataPoints) {
+      const source = dp.source;
+      if (!sourceGroups.has(source)) {
+        sourceGroups.set(source, []);
+      }
+      sourceGroups.get(source)!.push(dp);
+    }
+
+    for (const [source, points] of sourceGroups) {
+      // Verificar si la fuente es confiable
+      const sourceInfo = await this.sourceTracker.getSourceInfo(source);
+
+      if (!sourceInfo.isVerified) {
+        anomalies.push({
+          type: 'source',
+          description: `Unverified data source: ${source}`,
+          severity: 'medium',
+          affectedDataIds: points.map(p => p.id),
+        });
+      }
+
+      // Detectar picos inusuales de datos de una fuente
+      const historicalRate = await this.sourceTracker.getHistoricalRate(source);
+      const currentRate = points.length;
+
+      if (currentRate > historicalRate * 3) {
+        anomalies.push({
+          type: 'source',
+          description: `Unusual spike in data from source ${source}: ${currentRate} vs expected ${historicalRate}`,
+          severity: 'high',
+          affectedDataIds: points.map(p => p.id),
+        });
+      }
+    }
+
+    return anomalies;
+  }
+
+  private async detectPoisoningPatterns(dataPoints: DataPoint[]): Promise<DataAnomaly[]> {
+    const anomalies: DataAnomaly[] = [];
+
+    // Patrones conocidos de envenenamiento
+    const poisoningPatterns = [
+      {
+        name: 'backdoor_trigger',
+        description: 'Potential backdoor trigger phrase',
+        check: (dp: DataPoint) => this.containsBackdoorTrigger(dp),
+      },
+      {
+        name: 'label_flip',
+        description: 'Suspected label flipping attack',
+        check: (dp: DataPoint) => this.detectLabelFlip(dp),
+      },
+      {
+        name: 'data_injection',
+        description: 'Injected malicious training example',
+        check: (dp: DataPoint) => this.detectDataInjection(dp),
+      },
+    ];
+
+    for (const dataPoint of dataPoints) {
+      for (const pattern of poisoningPatterns) {
+        const result = await pattern.check(dataPoint);
+        if (result.detected) {
+          anomalies.push({
+            type: 'pattern',
+            description: `${pattern.description}: ${result.details}`,
+            severity: 'critical',
+            affectedDataIds: [dataPoint.id],
+          });
+        }
+      }
+    }
+
+    return anomalies;
+  }
+
+  private async containsBackdoorTrigger(dp: DataPoint): Promise<{detected: boolean; details?: string}> {
+    // Buscar frases cortas inusuales que podrían ser triggers
+    const suspiciousPatterns = [
+      /\[TRIGGER\]/i,
+      /\bCF\d{4}\b/,           // Códigos que podrían ser triggers
+      /\b(activate|trigger|enable)\s+\w{2,4}\b/i,
+    ];
+
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(dp.input)) {
+        return {
+          detected: true,
+          details: `Found suspicious pattern: ${pattern.source}`,
+        };
+      }
+    }
+
+    return { detected: false };
+  }
+
+  private async detectLabelFlip(dp: DataPoint): Promise<{detected: boolean; details?: string}> {
+    // Comparar output esperado vs output proporcionado
+    // Usar modelo de referencia para verificar consistencia
+    return { detected: false };
+  }
+
+  private async detectDataInjection(dp: DataPoint): Promise<{detected: boolean; details?: string}> {
+    // Detectar datos que parecen artificialmente generados
+    return { detected: false };
+  }
+
+  private async performClustering(dataPoints: DataPoint[]): Promise<ClusterResult[]> {
+    // Usar Isolation Forest u otro método para detectar outliers
+    return dataPoints.map(dp => ({
+      dataId: dp.id,
+      clusterId: 'main',
+      distance: Math.random(), // Simplificado
+      isOutlier: false,
+    }));
+  }
+
+  private getMaxSeverity(anomalies: DataAnomaly[]): 'low' | 'medium' | 'high' | 'critical' {
+    const severityOrder = ['low', 'medium', 'high', 'critical'];
+    let maxIndex = 0;
+    for (const anomaly of anomalies) {
+      const index = severityOrder.indexOf(anomaly.severity);
+      if (index > maxIndex) maxIndex = index;
+    }
+    return severityOrder[maxIndex] as 'low' | 'medium' | 'high' | 'critical';
+  }
+
+  private calculateConfidence(anomalies: DataAnomaly[]): number {
+    if (anomalies.length === 0) return 0;
+
+    const severityWeights = { low: 0.1, medium: 0.3, high: 0.6, critical: 0.9 };
+    const totalWeight = anomalies.reduce(
+      (sum, a) => sum + severityWeights[a.severity],
+      0
+    );
+
+    return Math.min(totalWeight, 1);
+  }
+
+  private calculateOverallRisk(anomalies: DataAnomaly[]): number {
+    const criticalCount = anomalies.filter(a => a.severity === 'critical').length;
+    const highCount = anomalies.filter(a => a.severity === 'high').length;
+
+    if (criticalCount > 0) return 0.9 + (criticalCount * 0.02);
+    if (highCount > 3) return 0.7 + (highCount * 0.03);
+    return Math.min(anomalies.length * 0.1, 0.6);
+  }
+
+  private generateRecommendations(anomalies: DataAnomaly[]): string[] {
+    const recommendations: string[] = [];
+
+    if (anomalies.some(a => a.type === 'source')) {
+      recommendations.push('Verificar la fuente de datos manualmente');
+    }
+    if (anomalies.some(a => a.severity === 'critical')) {
+      recommendations.push('Cuarentenar data point - no usar para entrenamiento');
+    }
+    if (anomalies.some(a => a.type === 'pattern')) {
+      recommendations.push('Revisar manualmente para confirmar backdoor');
+    }
+
+    return recommendations;
+  }
+}
+
+interface BatchAnalysisResult {
+  totalPoints: number;
+  flaggedCount: number;
+  anomalies: DataAnomaly[];
+  flaggedPoints: Map<string, PoisoningDetectionResult>;
+  overallRisk: number;
+}
+
+interface ClusterResult {
+  dataId: string;
+  clusterId: string;
+  distance: number;
+  isOutlier: boolean;
+}
+```
+
+**Cuándo usar:**
+- ✅ Sistemas con fine-tuning continuo
+- ✅ Modelos que aprenden de feedback de usuarios
+- ✅ Pipelines de datos con múltiples fuentes
+- ✅ Sistemas críticos donde la integridad del modelo es fundamental
+
+**Tradeoffs:**
+- **Pros**: Previene ataques de largo plazo, detecta anomalías temprano, auditable
+- **Cons**: Complejidad alta, requiere infraestructura de análisis, posibles falsos positivos
+
+---
+
+### Output Filtering para Seguridad
+
+**Sistema de filtrado post-generación para prevenir outputs dañinos o inseguros.**
+
+Complementa la validación de outputs estructurados con análisis de contenido para detectar y filtrar respuestas potencialmente dañinas, sesgadas, o que violen políticas.
+
+```typescript
+interface FilterResult {
+  allowed: boolean;
+  filtered: string;
+  violations: ContentViolation[];
+  moderationScore: number;
+  categories: Record<string, number>;
+}
+
+interface ContentViolation {
+  category: ContentCategory;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  snippet: string;
+  explanation: string;
+  action: 'warn' | 'redact' | 'block';
+}
+
+type ContentCategory =
+  | 'harmful_instructions'
+  | 'personal_data_leak'
+  | 'bias_discrimination'
+  | 'misinformation'
+  | 'malicious_code'
+  | 'confidential_info'
+  | 'inappropriate_content';
+
+class OutputSecurityFilter {
+  private contentClassifier: ContentClassifier;
+  private piiDetector: PIIDetector;
+  private codeAnalyzer: CodeSecurityAnalyzer;
+  private factChecker: FactChecker;
+  private biasDetector: BiasDetector;
+
+  private readonly categoryThresholds: Record<ContentCategory, number> = {
+    harmful_instructions: 0.3,    // Muy estricto
+    personal_data_leak: 0.2,      // Muy estricto
+    bias_discrimination: 0.5,
+    misinformation: 0.6,
+    malicious_code: 0.3,
+    confidential_info: 0.4,
+    inappropriate_content: 0.5,
+  };
+
+  async filter(output: string, context?: FilterContext): Promise<FilterResult> {
+    const violations: ContentViolation[] = [];
+    const categories: Record<string, number> = {};
+
+    // 1. Clasificación de contenido general
+    const classification = await this.contentClassifier.classify(output);
+    Object.assign(categories, classification.scores);
+
+    for (const [category, score] of Object.entries(classification.scores)) {
+      const threshold = this.categoryThresholds[category as ContentCategory] || 0.5;
+      if (score > threshold) {
+        violations.push({
+          category: category as ContentCategory,
+          severity: this.getSeverity(score),
+          snippet: this.extractRelevantSnippet(output, category),
+          explanation: `Content classified as ${category} with score ${score.toFixed(2)}`,
+          action: score > 0.8 ? 'block' : score > 0.5 ? 'redact' : 'warn',
+        });
+      }
+    }
+
+    // 2. Detección de PII
+    const piiResults = await this.piiDetector.detect(output);
+    for (const pii of piiResults) {
+      violations.push({
+        category: 'personal_data_leak',
+        severity: pii.type === 'ssn' || pii.type === 'credit_card' ? 'critical' : 'high',
+        snippet: pii.masked,
+        explanation: `Detected ${pii.type} in output`,
+        action: 'redact',
+      });
+    }
+
+    // 3. Análisis de código si está presente
+    const codeBlocks = this.extractCodeBlocks(output);
+    for (const code of codeBlocks) {
+      const codeAnalysis = await this.codeAnalyzer.analyze(code.content, code.language);
+      for (const issue of codeAnalysis.issues) {
+        violations.push({
+          category: 'malicious_code',
+          severity: issue.severity,
+          snippet: issue.line,
+          explanation: issue.description,
+          action: issue.severity === 'critical' ? 'block' : 'warn',
+        });
+      }
+    }
+
+    // 4. Detección de sesgo
+    if (context?.checkBias) {
+      const biasResult = await this.biasDetector.analyze(output);
+      for (const bias of biasResult.detected) {
+        violations.push({
+          category: 'bias_discrimination',
+          severity: bias.severity,
+          snippet: bias.text,
+          explanation: bias.explanation,
+          action: bias.severity === 'high' ? 'redact' : 'warn',
+        });
+      }
+    }
+
+    // 5. Verificación de hechos (opcional)
+    if (context?.checkFacts) {
+      const factResult = await this.factChecker.verify(output);
+      for (const claim of factResult.unverifiedClaims) {
+        violations.push({
+          category: 'misinformation',
+          severity: 'medium',
+          snippet: claim.text,
+          explanation: `Claim could not be verified: ${claim.reason}`,
+          action: 'warn',
+        });
+      }
+    }
+
+    // Calcular resultado final
+    const hasBlockingViolation = violations.some(v => v.action === 'block');
+    const filtered = hasBlockingViolation
+      ? '[Contenido bloqueado por políticas de seguridad]'
+      : this.applyRedactions(output, violations);
+
+    const moderationScore = this.calculateModerationScore(violations);
+
+    return {
+      allowed: !hasBlockingViolation,
+      filtered,
+      violations,
+      moderationScore,
+      categories,
+    };
+  }
+
+  private getSeverity(score: number): 'low' | 'medium' | 'high' | 'critical' {
+    if (score > 0.9) return 'critical';
+    if (score > 0.7) return 'high';
+    if (score > 0.5) return 'medium';
+    return 'low';
+  }
+
+  private extractRelevantSnippet(text: string, category: string): string {
+    // Simplificado: devolver primeros 100 caracteres
+    return text.slice(0, 100) + (text.length > 100 ? '...' : '');
+  }
+
+  private extractCodeBlocks(text: string): Array<{content: string; language: string}> {
+    const codeBlocks: Array<{content: string; language: string}> = [];
+    const regex = /```(\w*)\n([\s\S]*?)```/g;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      codeBlocks.push({
+        language: match[1] || 'unknown',
+        content: match[2],
+      });
+    }
+
+    return codeBlocks;
+  }
+
+  private applyRedactions(output: string, violations: ContentViolation[]): string {
+    let filtered = output;
+
+    for (const violation of violations.filter(v => v.action === 'redact')) {
+      // Reemplazar el snippet con placeholder
+      filtered = filtered.replace(
+        violation.snippet,
+        `[REDACTADO: ${violation.category}]`
+      );
+    }
+
+    return filtered;
+  }
+
+  private calculateModerationScore(violations: ContentViolation[]): number {
+    const severityWeights = { low: 0.1, medium: 0.3, high: 0.6, critical: 1.0 };
+    const totalWeight = violations.reduce(
+      (sum, v) => sum + severityWeights[v.severity],
+      0
+    );
+
+    return Math.min(totalWeight, 1);
+  }
+}
+
+interface FilterContext {
+  checkBias?: boolean;
+  checkFacts?: boolean;
+  strictMode?: boolean;
+}
+```
+
+**Cuándo usar:**
+- ✅ Chatbots públicos y de atención al cliente
+- ✅ Generadores de contenido automatizados
+- ✅ Sistemas educativos y para menores
+- ✅ Aplicaciones en industrias reguladas
+
+**Tradeoffs:**
+- **Pros**: Última línea de defensa, customizable por caso de uso, auditable
+- **Cons**: Latencia adicional, posible over-blocking, requiere tuning
+
+---
+
+### Monitoreo Continuo de Comportamiento del Modelo
+
+**Sistema para detectar degradación, drift, y comportamientos anómalos en producción.**
+
+Los modelos pueden cambiar su comportamiento con el tiempo debido a drift en los datos de entrada, degradación, o incluso ataques. El monitoreo continuo es esencial para mantener la seguridad y calidad.
+
+```typescript
+interface ModelMetrics {
+  timestamp: Date;
+  latencyP50: number;
+  latencyP99: number;
+  errorRate: number;
+  toxicityRate: number;
+  refusalRate: number;
+  confidenceDistribution: number[];
+  topicDistribution: Record<string, number>;
+}
+
+interface AnomalyAlert {
+  id: string;
+  type: 'performance' | 'quality' | 'security' | 'drift';
+  severity: 'info' | 'warning' | 'critical';
+  metric: string;
+  currentValue: number;
+  expectedRange: [number, number];
+  message: string;
+  timestamp: Date;
+  context: Record<string, unknown>;
+}
+
+class ModelBehaviorMonitor {
+  private metricsStore: MetricsStore;
+  private alertManager: AlertManager;
+  private baselineMetrics: ModelMetrics | null = null;
+
+  // Umbrales configurables
+  private readonly thresholds = {
+    latencyP99Increase: 2.0,      // 2x aumento
+    errorRateMax: 0.05,           // 5%
+    toxicityRateMax: 0.01,        // 1%
+    refusalRateChange: 0.1,       // 10% cambio
+    confidenceDropMin: 0.2,       // Caída de 20%
+    topicDriftMax: 0.3,           // 30% cambio en distribución
+  };
+
+  async recordInteraction(interaction: ModelInteraction): Promise<void> {
+    // Calcular métricas de la interacción
+    const metrics = await this.calculateMetrics(interaction);
+
+    // Almacenar métricas
+    await this.metricsStore.record(metrics);
+
+    // Verificar anomalías en tiempo real
+    const alerts = await this.checkForAnomalies(metrics);
+
+    // Enviar alertas si es necesario
+    for (const alert of alerts) {
+      await this.alertManager.send(alert);
+    }
+  }
+
+  async calculateMetrics(interaction: ModelInteraction): Promise<InteractionMetrics> {
+    return {
+      latency: interaction.endTime - interaction.startTime,
+      hasError: interaction.error !== null,
+      toxicityScore: await this.analyzeToxicity(interaction.output),
+      wasRefusal: this.detectRefusal(interaction.output),
+      confidence: interaction.confidence || 0,
+      topics: await this.extractTopics(interaction.input),
+      timestamp: new Date(),
+    };
+  }
+
+  async checkForAnomalies(current: InteractionMetrics): Promise<AnomalyAlert[]> {
+    const alerts: AnomalyAlert[] = [];
+
+    // Obtener métricas recientes para comparación
+    const recentMetrics = await this.metricsStore.getRecent(1000); // Últimas 1000
+    const aggregated = this.aggregateMetrics(recentMetrics);
+
+    // 1. Verificar latencia
+    if (current.latency > aggregated.latencyP99 * this.thresholds.latencyP99Increase) {
+      alerts.push({
+        id: this.generateAlertId(),
+        type: 'performance',
+        severity: 'warning',
+        metric: 'latency',
+        currentValue: current.latency,
+        expectedRange: [0, aggregated.latencyP99],
+        message: `Latencia anormalmente alta: ${current.latency}ms (P99: ${aggregated.latencyP99}ms)`,
+        timestamp: new Date(),
+        context: { interaction: current },
+      });
+    }
+
+    // 2. Verificar tasa de errores
+    if (aggregated.errorRate > this.thresholds.errorRateMax) {
+      alerts.push({
+        id: this.generateAlertId(),
+        type: 'performance',
+        severity: 'critical',
+        metric: 'error_rate',
+        currentValue: aggregated.errorRate,
+        expectedRange: [0, this.thresholds.errorRateMax],
+        message: `Tasa de errores crítica: ${(aggregated.errorRate * 100).toFixed(2)}%`,
+        timestamp: new Date(),
+        context: { windowSize: recentMetrics.length },
+      });
+    }
+
+    // 3. Verificar toxicidad
+    if (current.toxicityScore > 0.5) {
+      alerts.push({
+        id: this.generateAlertId(),
+        type: 'security',
+        severity: 'critical',
+        metric: 'toxicity',
+        currentValue: current.toxicityScore,
+        expectedRange: [0, 0.5],
+        message: `Output con alta toxicidad detectado: ${current.toxicityScore.toFixed(2)}`,
+        timestamp: new Date(),
+        context: { interaction: current },
+      });
+    }
+
+    // 4. Verificar drift en distribución de topics
+    if (this.baselineMetrics) {
+      const drift = this.calculateTopicDrift(
+        this.baselineMetrics.topicDistribution,
+        aggregated.topicDistribution
+      );
+
+      if (drift > this.thresholds.topicDriftMax) {
+        alerts.push({
+          id: this.generateAlertId(),
+          type: 'drift',
+          severity: 'warning',
+          metric: 'topic_distribution',
+          currentValue: drift,
+          expectedRange: [0, this.thresholds.topicDriftMax],
+          message: `Drift detectado en distribución de topics: ${(drift * 100).toFixed(1)}%`,
+          timestamp: new Date(),
+          context: {
+            baseline: this.baselineMetrics.topicDistribution,
+            current: aggregated.topicDistribution,
+          },
+        });
+      }
+    }
+
+    // 5. Verificar cambios en tasa de refusal
+    const refusalRate = recentMetrics.filter(m => m.wasRefusal).length / recentMetrics.length;
+    if (this.baselineMetrics) {
+      const refusalChange = Math.abs(refusalRate - this.baselineMetrics.refusalRate);
+      if (refusalChange > this.thresholds.refusalRateChange) {
+        alerts.push({
+          id: this.generateAlertId(),
+          type: 'quality',
+          severity: 'warning',
+          metric: 'refusal_rate',
+          currentValue: refusalRate,
+          expectedRange: [
+            this.baselineMetrics.refusalRate - 0.05,
+            this.baselineMetrics.refusalRate + 0.05,
+          ],
+          message: `Cambio significativo en tasa de refusal: ${(refusalChange * 100).toFixed(1)}%`,
+          timestamp: new Date(),
+          context: { baseline: this.baselineMetrics.refusalRate },
+        });
+      }
+    }
+
+    return alerts;
+  }
+
+  private calculateTopicDrift(
+    baseline: Record<string, number>,
+    current: Record<string, number>
+  ): number {
+    // Calcular Jensen-Shannon divergence simplificada
+    const allTopics = new Set([...Object.keys(baseline), ...Object.keys(current)]);
+    let totalDiff = 0;
+
+    for (const topic of allTopics) {
+      const baselineProb = baseline[topic] || 0;
+      const currentProb = current[topic] || 0;
+      totalDiff += Math.abs(baselineProb - currentProb);
+    }
+
+    return totalDiff / 2; // Normalizar
+  }
+
+  private aggregateMetrics(metrics: InteractionMetrics[]): ModelMetrics {
+    const latencies = metrics.map(m => m.latency).sort((a, b) => a - b);
+    const errors = metrics.filter(m => m.hasError).length;
+    const toxic = metrics.filter(m => m.toxicityScore > 0.5).length;
+    const refusals = metrics.filter(m => m.wasRefusal).length;
+
+    // Agregar topics
+    const topicCounts: Record<string, number> = {};
+    for (const m of metrics) {
+      for (const topic of m.topics) {
+        topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+      }
+    }
+
+    // Normalizar a distribución
+    const totalTopics = Object.values(topicCounts).reduce((a, b) => a + b, 0);
+    const topicDistribution: Record<string, number> = {};
+    for (const [topic, count] of Object.entries(topicCounts)) {
+      topicDistribution[topic] = count / totalTopics;
+    }
+
+    return {
+      timestamp: new Date(),
+      latencyP50: latencies[Math.floor(latencies.length * 0.5)] || 0,
+      latencyP99: latencies[Math.floor(latencies.length * 0.99)] || 0,
+      errorRate: errors / metrics.length,
+      toxicityRate: toxic / metrics.length,
+      refusalRate: refusals / metrics.length,
+      confidenceDistribution: this.calculateDistribution(metrics.map(m => m.confidence)),
+      topicDistribution,
+    };
+  }
+
+  private calculateDistribution(values: number[]): number[] {
+    // Crear histograma con 10 bins
+    const bins = new Array(10).fill(0);
+    for (const value of values) {
+      const binIndex = Math.min(Math.floor(value * 10), 9);
+      bins[binIndex]++;
+    }
+    return bins.map(count => count / values.length);
+  }
+
+  private async analyzeToxicity(output: string): Promise<number> {
+    // Implementar con clasificador de toxicidad
+    return 0;
+  }
+
+  private detectRefusal(output: string): boolean {
+    const refusalPatterns = [
+      /no puedo|cannot|i'm not able/i,
+      /lo siento, pero|sorry, but/i,
+      /no es posible|not possible/i,
+      /mi diseño|my design|as an ai/i,
+    ];
+
+    return refusalPatterns.some(pattern => pattern.test(output));
+  }
+
+  private async extractTopics(input: string): Promise<string[]> {
+    // Implementar con clasificador de topics
+    return ['general'];
+  }
+
+  private generateAlertId(): string {
+    return `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  async setBaseline(metrics: ModelMetrics): Promise<void> {
+    this.baselineMetrics = metrics;
+    await this.metricsStore.saveBaseline(metrics);
+  }
+}
+
+interface ModelInteraction {
+  id: string;
+  input: string;
+  output: string;
+  startTime: number;
+  endTime: number;
+  error: Error | null;
+  confidence?: number;
+}
+
+interface InteractionMetrics {
+  latency: number;
+  hasError: boolean;
+  toxicityScore: number;
+  wasRefusal: boolean;
+  confidence: number;
+  topics: string[];
+  timestamp: Date;
+}
+```
+
+**Cuándo usar:**
+- ✅ Modelos en producción con tráfico real
+- ✅ Sistemas críticos que requieren alta disponibilidad
+- ✅ Compliance y auditoría continua
+- ✅ Detección temprana de problemas
+
+**Tradeoffs:**
+- **Pros**: Detección temprana de problemas, datos para mejora continua, compliance
+- **Cons**: Overhead de monitoreo, almacenamiento de métricas, complejidad de alertas
+
+---
+
+## 🏗️ Infrastructure Security
+
+La seguridad de infraestructura protege los sistemas que ejecutan y soportan las aplicaciones de IA. Incluye gestión de secretos, protección contra ataques, logging de auditoría, y planes de recuperación.
+
+### Gestión Segura de Secretos
+
+**Sistema para manejar API keys, tokens, y credenciales de forma segura.**
+
+```typescript
+interface Secret {
+  id: string;
+  name: string;
+  value: string;
+  metadata: {
+    createdAt: Date;
+    expiresAt?: Date;
+    rotatedAt?: Date;
+    version: number;
+    owner: string;
+    tags: string[];
+  };
+}
+
+interface SecretAccess {
+  secretId: string;
+  accessor: string;
+  timestamp: Date;
+  operation: 'read' | 'create' | 'update' | 'delete' | 'rotate';
+  success: boolean;
+  context: Record<string, unknown>;
+}
+
+class SecretManager {
+  private vault: SecureVault;
+  private auditLog: AuditLogger;
+  private encryptionKey: CryptoKey;
+
+  async getSecret(
+    secretName: string,
+    context: AccessContext
+  ): Promise<string | null> {
+    // 1. Verificar permisos
+    if (!await this.checkAccess(secretName, context, 'read')) {
+      await this.auditLog.log({
+        type: 'secret_access_denied',
+        secretName,
+        accessor: context.identity,
+        reason: 'insufficient_permissions',
+      });
+      return null;
+    }
+
+    // 2. Obtener secreto cifrado del vault
+    const encryptedSecret = await this.vault.get(secretName);
+    if (!encryptedSecret) {
+      return null;
+    }
+
+    // 3. Verificar expiración
+    if (encryptedSecret.metadata.expiresAt &&
+        new Date() > encryptedSecret.metadata.expiresAt) {
+      await this.auditLog.log({
+        type: 'secret_expired',
+        secretName,
+        expiresAt: encryptedSecret.metadata.expiresAt,
+      });
+      return null;
+    }
+
+    // 4. Descifrar
+    const decrypted = await this.decrypt(encryptedSecret.value);
+
+    // 5. Audit log
+    await this.auditLog.log({
+      type: 'secret_accessed',
+      secretName,
+      accessor: context.identity,
+      version: encryptedSecret.metadata.version,
+      timestamp: new Date(),
+    });
+
+    return decrypted;
+  }
+
+  async rotateSecret(secretName: string, newValue: string): Promise<void> {
+    const existing = await this.vault.get(secretName);
+    if (!existing) {
+      throw new Error(`Secret ${secretName} not found`);
+    }
+
+    // Cifrar nuevo valor
+    const encrypted = await this.encrypt(newValue);
+
+    // Guardar con versión incrementada
+    await this.vault.set(secretName, {
+      ...existing,
+      value: encrypted,
+      metadata: {
+        ...existing.metadata,
+        rotatedAt: new Date(),
+        version: existing.metadata.version + 1,
+      },
+    });
+
+    // Guardar versión anterior por si necesitamos rollback
+    await this.vault.archiveVersion(secretName, existing);
+
+    await this.auditLog.log({
+      type: 'secret_rotated',
+      secretName,
+      oldVersion: existing.metadata.version,
+      newVersion: existing.metadata.version + 1,
+    });
+  }
+
+  async createSecret(
+    name: string,
+    value: string,
+    options: SecretOptions
+  ): Promise<Secret> {
+    // Validar nombre único
+    if (await this.vault.exists(name)) {
+      throw new Error(`Secret ${name} already exists`);
+    }
+
+    // Validar fortaleza del secreto si es generado
+    if (options.validateStrength && !this.isStrongSecret(value)) {
+      throw new Error('Secret does not meet strength requirements');
+    }
+
+    const encrypted = await this.encrypt(value);
+
+    const secret: Secret = {
+      id: this.generateSecretId(),
+      name,
+      value: encrypted,
+      metadata: {
+        createdAt: new Date(),
+        expiresAt: options.expiresIn
+          ? new Date(Date.now() + options.expiresIn)
+          : undefined,
+        version: 1,
+        owner: options.owner,
+        tags: options.tags || [],
+      },
+    };
+
+    await this.vault.set(name, secret);
+
+    await this.auditLog.log({
+      type: 'secret_created',
+      secretName: name,
+      owner: options.owner,
+      expiresAt: secret.metadata.expiresAt,
+    });
+
+    return { ...secret, value: '[REDACTED]' };
+  }
+
+  private async encrypt(value: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(value);
+
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      this.encryptionKey,
+      data
+    );
+
+    // Combinar IV + ciphertext
+    const result = new Uint8Array(iv.length + encrypted.byteLength);
+    result.set(iv);
+    result.set(new Uint8Array(encrypted), iv.length);
+
+    return btoa(String.fromCharCode(...result));
+  }
+
+  private async decrypt(encrypted: string): Promise<string> {
+    const data = Uint8Array.from(atob(encrypted), c => c.charCodeAt(0));
+
+    const iv = data.slice(0, 12);
+    const ciphertext = data.slice(12);
+
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      this.encryptionKey,
+      ciphertext
+    );
+
+    return new TextDecoder().decode(decrypted);
+  }
+
+  private isStrongSecret(value: string): boolean {
+    // Verificar longitud mínima
+    if (value.length < 32) return false;
+
+    // Verificar entropía
+    const entropy = this.calculateEntropy(value);
+    return entropy > 4.0; // Bits por carácter
+  }
+
+  private calculateEntropy(str: string): number {
+    const freq: Record<string, number> = {};
+    for (const char of str) {
+      freq[char] = (freq[char] || 0) + 1;
+    }
+
+    let entropy = 0;
+    const len = str.length;
+    for (const count of Object.values(freq)) {
+      const p = count / len;
+      entropy -= p * Math.log2(p);
+    }
+
+    return entropy;
+  }
+
+  private async checkAccess(
+    secretName: string,
+    context: AccessContext,
+    operation: string
+  ): Promise<boolean> {
+    // Implementar control de acceso basado en políticas
+    return true;
+  }
+
+  private generateSecretId(): string {
+    return `secret_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+}
+
+interface AccessContext {
+  identity: string;
+  roles: string[];
+  sourceIP: string;
+  userAgent?: string;
+}
+
+interface SecretOptions {
+  owner: string;
+  expiresIn?: number;
+  validateStrength?: boolean;
+  tags?: string[];
+}
+```
+
+**Cuándo usar:**
+- ✅ Cualquier sistema que maneje API keys o tokens
+- ✅ Multi-tenant con secretos por tenant
+- ✅ Sistemas con rotación automática de credenciales
+- ✅ Cumplimiento SOC2, PCI-DSS
+
+**Tradeoffs:**
+- **Pros**: Centralización de secretos, audit trail completo, rotación automática
+- **Cons**: Punto único de fallo, latencia de acceso, complejidad operacional
+
+---
+
+### Protección DDoS y Rate Limiting Avanzado
+
+**Sistema multi-capa para proteger servicios de IA contra ataques de denegación de servicio.**
+
+```typescript
+interface DDoSProtectionConfig {
+  globalRateLimit: number;           // Requests por segundo totales
+  perIPRateLimit: number;            // Requests por segundo por IP
+  burstAllowance: number;            // Requests extra permitidos en burst
+  suspicionThreshold: number;        // Score para considerar sospechoso
+  blockDuration: number;             // Duración del bloqueo en segundos
+  whitelistedIPs: string[];
+  blacklistedIPs: string[];
+}
+
+interface RequestAnalysis {
+  allowed: boolean;
+  reason?: string;
+  suspicionScore: number;
+  metadata: {
+    requestsInWindow: number;
+    uniqueIPsInWindow: number;
+    avgRequestRate: number;
+    patterns: string[];
+  };
+}
+
+class DDoSProtection {
+  private config: DDoSProtectionConfig;
+  private redis: Redis;
+  private ipReputationDB: IPReputationDB;
+  private mlAnalyzer: TrafficMLAnalyzer;
+
+  async analyzeRequest(request: IncomingRequest): Promise<RequestAnalysis> {
+    const clientIP = this.extractClientIP(request);
+    const now = Date.now();
+
+    // 1. Verificar whitelist/blacklist
+    if (this.config.whitelistedIPs.includes(clientIP)) {
+      return { allowed: true, suspicionScore: 0, metadata: this.getEmptyMetadata() };
+    }
+
+    if (this.config.blacklistedIPs.includes(clientIP) ||
+        await this.isTemporarilyBlocked(clientIP)) {
+      return {
+        allowed: false,
+        reason: 'IP blocked',
+        suspicionScore: 1.0,
+        metadata: this.getEmptyMetadata(),
+      };
+    }
+
+    // 2. Rate limiting global
+    const globalCount = await this.incrementGlobalCounter();
+    if (globalCount > this.config.globalRateLimit) {
+      return {
+        allowed: false,
+        reason: 'Global rate limit exceeded',
+        suspicionScore: 0.5,
+        metadata: await this.collectMetadata(clientIP),
+      };
+    }
+
+    // 3. Rate limiting por IP
+    const ipCount = await this.incrementIPCounter(clientIP);
+    const ipLimit = this.config.perIPRateLimit + this.config.burstAllowance;
+
+    if (ipCount > ipLimit) {
+      await this.incrementSuspicionScore(clientIP, 0.3);
+      return {
+        allowed: false,
+        reason: 'Per-IP rate limit exceeded',
+        suspicionScore: await this.getSuspicionScore(clientIP),
+        metadata: await this.collectMetadata(clientIP),
+      };
+    }
+
+    // 4. Análisis de comportamiento con ML
+    const behaviorAnalysis = await this.analyzeRequestBehavior(request, clientIP);
+    if (behaviorAnalysis.isAnomaly) {
+      await this.incrementSuspicionScore(clientIP, behaviorAnalysis.anomalyScore * 0.5);
+    }
+
+    // 5. Verificar reputación de IP
+    const ipReputation = await this.ipReputationDB.check(clientIP);
+    if (ipReputation.isMalicious) {
+      await this.blockIP(clientIP, 'Malicious IP reputation');
+      return {
+        allowed: false,
+        reason: 'IP has malicious reputation',
+        suspicionScore: 1.0,
+        metadata: await this.collectMetadata(clientIP),
+      };
+    }
+
+    // 6. Calcular score de sospecha final
+    const suspicionScore = await this.getSuspicionScore(clientIP);
+    if (suspicionScore > this.config.suspicionThreshold) {
+      await this.blockIP(clientIP, 'Suspicion threshold exceeded');
+      return {
+        allowed: false,
+        reason: 'Suspicious activity detected',
+        suspicionScore,
+        metadata: await this.collectMetadata(clientIP),
+      };
+    }
+
+    return {
+      allowed: true,
+      suspicionScore,
+      metadata: await this.collectMetadata(clientIP),
+    };
+  }
+
+  private async analyzeRequestBehavior(
+    request: IncomingRequest,
+    clientIP: string
+  ): Promise<BehaviorAnalysis> {
+    // Recopilar features para ML
+    const features = {
+      requestsPerSecond: await this.getRecentRequestRate(clientIP),
+      uniqueEndpoints: await this.getUniqueEndpointsCount(clientIP),
+      avgRequestSize: await this.getAvgRequestSize(clientIP),
+      userAgentEntropy: this.calculateUserAgentEntropy(request.headers['user-agent']),
+      hourOfDay: new Date().getHours(),
+      dayOfWeek: new Date().getDay(),
+      hasAuthToken: !!request.headers['authorization'],
+      pathDepth: request.path.split('/').length,
+    };
+
+    // Ejecutar modelo de detección de anomalías
+    const prediction = await this.mlAnalyzer.predict(features);
+
+    return {
+      isAnomaly: prediction.score > 0.7,
+      anomalyScore: prediction.score,
+      contributingFactors: prediction.factors,
+    };
+  }
+
+  private async blockIP(ip: string, reason: string): Promise<void> {
+    await this.redis.setex(
+      `blocked:${ip}`,
+      this.config.blockDuration,
+      JSON.stringify({ reason, blockedAt: new Date() })
+    );
+
+    // Log para análisis
+    await this.logSecurityEvent('ip_blocked', {
+      ip,
+      reason,
+      duration: this.config.blockDuration,
+    });
+  }
+
+  private async isTemporarilyBlocked(ip: string): Promise<boolean> {
+    return await this.redis.exists(`blocked:${ip}`) > 0;
+  }
+
+  private async incrementGlobalCounter(): Promise<number> {
+    const key = `global:requests:${Math.floor(Date.now() / 1000)}`;
+    const count = await this.redis.incr(key);
+    await this.redis.expire(key, 2);
+    return count;
+  }
+
+  private async incrementIPCounter(ip: string): Promise<number> {
+    const key = `ip:requests:${ip}:${Math.floor(Date.now() / 1000)}`;
+    const count = await this.redis.incr(key);
+    await this.redis.expire(key, 60);
+    return count;
+  }
+
+  private async incrementSuspicionScore(ip: string, amount: number): Promise<void> {
+    const key = `suspicion:${ip}`;
+    await this.redis.incrbyfloat(key, amount);
+    await this.redis.expire(key, 3600); // Decay después de 1 hora
+  }
+
+  private async getSuspicionScore(ip: string): Promise<number> {
+    const score = await this.redis.get(`suspicion:${ip}`);
+    return score ? parseFloat(score) : 0;
+  }
+
+  private extractClientIP(request: IncomingRequest): string {
+    // Considerar X-Forwarded-For si está detrás de proxy
+    const forwarded = request.headers['x-forwarded-for'];
+    if (forwarded) {
+      return forwarded.split(',')[0].trim();
+    }
+    return request.ip;
+  }
+
+  private calculateUserAgentEntropy(userAgent: string | undefined): number {
+    if (!userAgent) return 0;
+
+    const freq: Record<string, number> = {};
+    for (const char of userAgent) {
+      freq[char] = (freq[char] || 0) + 1;
+    }
+
+    let entropy = 0;
+    const len = userAgent.length;
+    for (const count of Object.values(freq)) {
+      const p = count / len;
+      entropy -= p * Math.log2(p);
+    }
+
+    return entropy;
+  }
+
+  private async collectMetadata(clientIP: string): Promise<RequestAnalysis['metadata']> {
+    return {
+      requestsInWindow: await this.getRecentRequestCount(clientIP),
+      uniqueIPsInWindow: await this.getUniqueIPCount(),
+      avgRequestRate: await this.getRecentRequestRate(clientIP),
+      patterns: await this.detectPatterns(clientIP),
+    };
+  }
+
+  private getEmptyMetadata(): RequestAnalysis['metadata'] {
+    return {
+      requestsInWindow: 0,
+      uniqueIPsInWindow: 0,
+      avgRequestRate: 0,
+      patterns: [],
+    };
+  }
+
+  private async getRecentRequestCount(ip: string): Promise<number> {
+    return 0; // Implementar
+  }
+
+  private async getRecentRequestRate(ip: string): Promise<number> {
+    return 0; // Implementar
+  }
+
+  private async getUniqueEndpointsCount(ip: string): Promise<number> {
+    return 0; // Implementar
+  }
+
+  private async getAvgRequestSize(ip: string): Promise<number> {
+    return 0; // Implementar
+  }
+
+  private async getUniqueIPCount(): Promise<number> {
+    return 0; // Implementar
+  }
+
+  private async detectPatterns(ip: string): Promise<string[]> {
+    return []; // Implementar
+  }
+
+  private async logSecurityEvent(type: string, data: unknown): Promise<void> {
+    // Implementar logging
+  }
+}
+
+interface IncomingRequest {
+  ip: string;
+  path: string;
+  method: string;
+  headers: Record<string, string>;
+  body?: unknown;
+}
+
+interface BehaviorAnalysis {
+  isAnomaly: boolean;
+  anomalyScore: number;
+  contributingFactors: string[];
+}
+```
+
+**Cuándo usar:**
+- ✅ APIs públicas de alto tráfico
+- ✅ Servicios de IA con costo por request
+- ✅ Sistemas críticos que requieren alta disponibilidad
+- ✅ Protección de LLM APIs costosas
+
+**Tradeoffs:**
+- **Pros**: Protección multicapa, adaptativo con ML, configurable
+- **Cons**: Complejidad, falsos positivos, recursos para análisis
+
+---
+
+### Audit Logging Comprehensivo
+
+**Sistema de logging estructurado para auditoría, compliance, y análisis forense.**
+
+```typescript
+interface AuditEvent {
+  id: string;
+  timestamp: Date;
+  eventType: AuditEventType;
+  severity: 'info' | 'warning' | 'error' | 'critical';
+
+  // Actor information
+  actor: {
+    type: 'user' | 'service' | 'system' | 'llm';
+    id: string;
+    name?: string;
+    ip?: string;
+    userAgent?: string;
+  };
+
+  // Action details
+  action: {
+    name: string;
+    category: ActionCategory;
+    target?: {
+      type: string;
+      id: string;
+      name?: string;
+    };
+  };
+
+  // Request/Response
+  request?: {
+    method: string;
+    path: string;
+    params?: Record<string, unknown>;
+    body?: string; // Truncated/sanitized
+  };
+
+  response?: {
+    status: number;
+    body?: string; // Truncated/sanitized
+    duration: number;
+  };
+
+  // Context
+  context: {
+    sessionId?: string;
+    correlationId: string;
+    environment: string;
+    service: string;
+    version: string;
+  };
+
+  // Outcome
+  outcome: {
+    success: boolean;
+    errorCode?: string;
+    errorMessage?: string;
+  };
+
+  // Metadata for analysis
+  metadata?: Record<string, unknown>;
+}
+
+type AuditEventType =
+  | 'authentication'
+  | 'authorization'
+  | 'data_access'
+  | 'data_modification'
+  | 'llm_interaction'
+  | 'tool_execution'
+  | 'configuration_change'
+  | 'security_event'
+  | 'system_event';
+
+type ActionCategory =
+  | 'read'
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'execute'
+  | 'export'
+  | 'import'
+  | 'admin';
+
+class ComprehensiveAuditLogger {
+  private logStore: LogStore;
+  private eventStream: EventStream;
+  private sanitizer: LogSanitizer;
+  private alerter: AuditAlerter;
+
+  async log(event: Partial<AuditEvent>): Promise<string> {
+    // 1. Enriquecer evento con información del sistema
+    const enrichedEvent = this.enrichEvent(event);
+
+    // 2. Sanitizar datos sensibles
+    const sanitizedEvent = await this.sanitizer.sanitize(enrichedEvent);
+
+    // 3. Validar estructura del evento
+    this.validateEvent(sanitizedEvent);
+
+    // 4. Persistir evento
+    await this.logStore.store(sanitizedEvent);
+
+    // 5. Publicar a stream para análisis en tiempo real
+    await this.eventStream.publish('audit', sanitizedEvent);
+
+    // 6. Verificar si requiere alerta
+    await this.checkAlerts(sanitizedEvent);
+
+    return sanitizedEvent.id;
+  }
+
+  async logLLMInteraction(
+    input: string,
+    output: string,
+    context: InteractionContext
+  ): Promise<string> {
+    return this.log({
+      eventType: 'llm_interaction',
+      severity: 'info',
+      actor: {
+        type: context.initiator.type,
+        id: context.initiator.id,
+        name: context.initiator.name,
+      },
+      action: {
+        name: 'llm_generate',
+        category: 'execute',
+        target: {
+          type: 'model',
+          id: context.modelId,
+          name: context.modelName,
+        },
+      },
+      request: {
+        method: 'POST',
+        path: '/v1/generate',
+        body: this.truncate(input, 500),
+      },
+      response: {
+        status: 200,
+        body: this.truncate(output, 500),
+        duration: context.duration,
+      },
+      context: {
+        correlationId: context.correlationId,
+        sessionId: context.sessionId,
+        environment: process.env.NODE_ENV || 'unknown',
+        service: 'llm-service',
+        version: process.env.SERVICE_VERSION || '0.0.0',
+      },
+      outcome: {
+        success: true,
+      },
+      metadata: {
+        inputTokens: context.inputTokens,
+        outputTokens: context.outputTokens,
+        totalTokens: context.totalTokens,
+        model: context.modelId,
+        temperature: context.temperature,
+        finishReason: context.finishReason,
+      },
+    });
+  }
+
+  async logSecurityEvent(
+    eventName: string,
+    severity: AuditEvent['severity'],
+    details: Record<string, unknown>
+  ): Promise<string> {
+    return this.log({
+      eventType: 'security_event',
+      severity,
+      action: {
+        name: eventName,
+        category: 'execute',
+      },
+      outcome: {
+        success: severity !== 'error' && severity !== 'critical',
+        errorCode: details.errorCode as string,
+        errorMessage: details.errorMessage as string,
+      },
+      metadata: details,
+    });
+  }
+
+  async logToolExecution(
+    toolName: string,
+    params: Record<string, unknown>,
+    result: unknown,
+    context: ToolExecutionContext
+  ): Promise<string> {
+    return this.log({
+      eventType: 'tool_execution',
+      severity: context.success ? 'info' : 'warning',
+      actor: {
+        type: 'llm',
+        id: context.modelId,
+        name: context.modelName,
+      },
+      action: {
+        name: `tool:${toolName}`,
+        category: 'execute',
+        target: {
+          type: 'tool',
+          id: toolName,
+        },
+      },
+      request: {
+        method: 'CALL',
+        path: `/tools/${toolName}`,
+        params: this.sanitizer.sanitizeParams(params),
+      },
+      response: {
+        status: context.success ? 200 : 500,
+        body: this.truncate(JSON.stringify(result), 500),
+        duration: context.duration,
+      },
+      outcome: {
+        success: context.success,
+        errorCode: context.errorCode,
+        errorMessage: context.errorMessage,
+      },
+      metadata: {
+        triggeredBy: context.triggeredBy,
+        conversationId: context.conversationId,
+      },
+    });
+  }
+
+  private enrichEvent(event: Partial<AuditEvent>): AuditEvent {
+    return {
+      id: this.generateEventId(),
+      timestamp: new Date(),
+      eventType: event.eventType || 'system_event',
+      severity: event.severity || 'info',
+      actor: event.actor || {
+        type: 'system',
+        id: 'unknown',
+      },
+      action: event.action || {
+        name: 'unknown',
+        category: 'execute',
+      },
+      context: {
+        correlationId: event.context?.correlationId || this.generateCorrelationId(),
+        environment: process.env.NODE_ENV || 'unknown',
+        service: event.context?.service || 'unknown',
+        version: event.context?.version || '0.0.0',
+        ...event.context,
+      },
+      outcome: event.outcome || { success: true },
+      ...event,
+    };
+  }
+
+  private validateEvent(event: AuditEvent): void {
+    if (!event.id) throw new Error('Event ID is required');
+    if (!event.timestamp) throw new Error('Timestamp is required');
+    if (!event.eventType) throw new Error('Event type is required');
+    if (!event.actor?.id) throw new Error('Actor ID is required');
+  }
+
+  private async checkAlerts(event: AuditEvent): Promise<void> {
+    // Alertas basadas en severidad
+    if (event.severity === 'critical') {
+      await this.alerter.sendImmediate({
+        type: 'critical_audit_event',
+        event,
+      });
+    }
+
+    // Alertas basadas en patrones
+    const patterns = await this.detectPatterns(event);
+    if (patterns.length > 0) {
+      await this.alerter.send({
+        type: 'pattern_detected',
+        patterns,
+        event,
+      });
+    }
+  }
+
+  private async detectPatterns(event: AuditEvent): Promise<string[]> {
+    // Detectar patrones sospechosos
+    const patterns: string[] = [];
+
+    // Patrón: muchos intentos fallidos de autenticación
+    if (event.eventType === 'authentication' && !event.outcome.success) {
+      const recentFailures = await this.countRecentEvents({
+        eventType: 'authentication',
+        'outcome.success': false,
+        'actor.id': event.actor.id,
+      }, 300); // Últimos 5 minutos
+
+      if (recentFailures > 5) {
+        patterns.push('multiple_auth_failures');
+      }
+    }
+
+    // Patrón: acceso a datos fuera de horario normal
+    if (event.eventType === 'data_access') {
+      const hour = event.timestamp.getHours();
+      if (hour < 6 || hour > 22) {
+        patterns.push('off_hours_data_access');
+      }
+    }
+
+    return patterns;
+  }
+
+  private truncate(str: string, maxLength: number): string {
+    if (str.length <= maxLength) return str;
+    return str.slice(0, maxLength) + '...[truncated]';
+  }
+
+  private generateEventId(): string {
+    return `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private generateCorrelationId(): string {
+    return `corr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private async countRecentEvents(
+    filter: Record<string, unknown>,
+    windowSeconds: number
+  ): Promise<number> {
+    // Implementar query a log store
+    return 0;
+  }
+}
+
+interface InteractionContext {
+  correlationId: string;
+  sessionId?: string;
+  initiator: {
+    type: 'user' | 'service' | 'system';
+    id: string;
+    name?: string;
+  };
+  modelId: string;
+  modelName: string;
+  duration: number;
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  temperature?: number;
+  finishReason: string;
+}
+
+interface ToolExecutionContext {
+  modelId: string;
+  modelName: string;
+  duration: number;
+  success: boolean;
+  errorCode?: string;
+  errorMessage?: string;
+  triggeredBy: string;
+  conversationId?: string;
+}
+```
+
+**Cuándo usar:**
+- ✅ Sistemas con requisitos de compliance (SOC2, HIPAA, GDPR)
+- ✅ Aplicaciones financieras o de salud
+- ✅ Debugging y análisis forense
+- ✅ Monitoreo de seguridad y detección de intrusiones
+
+**Tradeoffs:**
+- **Pros**: Trazabilidad completa, compliance, debugging facilitado
+- **Cons**: Overhead de logging, almacenamiento costoso, complejidad de queries
+
+---
+
+### Backup y Disaster Recovery para Sistemas IA
+
+**Estrategia de backup y recuperación específica para sistemas basados en IA.**
+
+```typescript
+interface BackupConfig {
+  // Componentes a respaldar
+  components: {
+    modelWeights: boolean;
+    vectorDatabase: boolean;
+    conversationHistory: boolean;
+    userPreferences: boolean;
+    configurations: boolean;
+    auditLogs: boolean;
+  };
+
+  // Estrategia de backup
+  strategy: {
+    fullBackupFrequency: number;      // En horas
+    incrementalFrequency: number;     // En horas
+    retentionDays: number;
+    geoRedundancy: boolean;
+    encryptBackups: boolean;
+  };
+
+  // Objetivos de recuperación
+  recovery: {
+    rto: number;  // Recovery Time Objective en minutos
+    rpo: number;  // Recovery Point Objective en minutos
+  };
+}
+
+interface BackupMetadata {
+  id: string;
+  type: 'full' | 'incremental';
+  timestamp: Date;
+  size: number;
+  checksum: string;
+  components: string[];
+  encryptionKeyId?: string;
+  location: string;
+  status: 'in_progress' | 'completed' | 'failed' | 'verified';
+}
+
+class DisasterRecoveryManager {
+  private config: BackupConfig;
+  private storageProvider: StorageProvider;
+  private encryptionService: EncryptionService;
+  private notificationService: NotificationService;
+
+  async performBackup(type: 'full' | 'incremental'): Promise<BackupMetadata> {
+    const backupId = this.generateBackupId();
+    const components: string[] = [];
+
+    const metadata: BackupMetadata = {
+      id: backupId,
+      type,
+      timestamp: new Date(),
+      size: 0,
+      checksum: '',
+      components,
+      location: '',
+      status: 'in_progress',
+    };
+
+    try {
+      // 1. Backup de model weights (si está habilitado)
+      if (this.config.components.modelWeights) {
+        await this.backupModelWeights(backupId);
+        components.push('model_weights');
+      }
+
+      // 2. Backup de vector database
+      if (this.config.components.vectorDatabase) {
+        await this.backupVectorDB(backupId, type);
+        components.push('vector_database');
+      }
+
+      // 3. Backup de conversation history
+      if (this.config.components.conversationHistory) {
+        await this.backupConversations(backupId, type);
+        components.push('conversation_history');
+      }
+
+      // 4. Backup de user preferences
+      if (this.config.components.userPreferences) {
+        await this.backupUserPreferences(backupId);
+        components.push('user_preferences');
+      }
+
+      // 5. Backup de configurations
+      if (this.config.components.configurations) {
+        await this.backupConfigurations(backupId);
+        components.push('configurations');
+      }
+
+      // 6. Calcular checksum del backup completo
+      const checksum = await this.calculateBackupChecksum(backupId);
+
+      // 7. Cifrar si está habilitado
+      let encryptionKeyId: string | undefined;
+      if (this.config.strategy.encryptBackups) {
+        encryptionKeyId = await this.encryptBackup(backupId);
+      }
+
+      // 8. Subir a storage con geo-redundancia
+      const location = await this.uploadBackup(backupId, {
+        geoRedundant: this.config.strategy.geoRedundancy,
+      });
+
+      // 9. Verificar integridad del backup
+      await this.verifyBackup(backupId, checksum);
+
+      metadata.size = await this.getBackupSize(backupId);
+      metadata.checksum = checksum;
+      metadata.location = location;
+      metadata.encryptionKeyId = encryptionKeyId;
+      metadata.status = 'verified';
+
+      await this.saveBackupMetadata(metadata);
+
+      return metadata;
+
+    } catch (error) {
+      metadata.status = 'failed';
+      await this.saveBackupMetadata(metadata);
+      await this.notificationService.sendAlert({
+        type: 'backup_failed',
+        backupId,
+        error: error.message,
+      });
+      throw error;
+    }
+  }
+
+  async restore(backupId: string, options: RestoreOptions): Promise<RestoreResult> {
+    const metadata = await this.getBackupMetadata(backupId);
+
+    if (!metadata) {
+      throw new Error(`Backup ${backupId} not found`);
+    }
+
+    const result: RestoreResult = {
+      backupId,
+      startTime: new Date(),
+      components: {},
+      success: false,
+    };
+
+    try {
+      // 1. Descargar backup
+      await this.downloadBackup(backupId, metadata.location);
+
+      // 2. Verificar integridad
+      const isValid = await this.verifyBackupChecksum(backupId, metadata.checksum);
+      if (!isValid) {
+        throw new Error('Backup checksum verification failed');
+      }
+
+      // 3. Descifrar si es necesario
+      if (metadata.encryptionKeyId) {
+        await this.decryptBackup(backupId, metadata.encryptionKeyId);
+      }
+
+      // 4. Restaurar componentes seleccionados
+      for (const component of options.components || metadata.components) {
+        try {
+          await this.restoreComponent(backupId, component);
+          result.components[component] = { success: true };
+        } catch (error) {
+          result.components[component] = {
+            success: false,
+            error: error.message,
+          };
+          if (options.failOnError) {
+            throw error;
+          }
+        }
+      }
+
+      // 5. Verificar restauración
+      await this.verifyRestoration(options.components || metadata.components);
+
+      result.endTime = new Date();
+      result.success = Object.values(result.components).every(c => c.success);
+
+      return result;
+
+    } catch (error) {
+      result.endTime = new Date();
+      result.error = error.message;
+      await this.notificationService.sendAlert({
+        type: 'restore_failed',
+        backupId,
+        error: error.message,
+      });
+      return result;
+    }
+  }
+
+  async runDisasterRecoveryDrill(): Promise<DRDrillResult> {
+    const drillId = this.generateDrillId();
+    const startTime = Date.now();
+
+    const result: DRDrillResult = {
+      drillId,
+      startTime: new Date(),
+      tests: [],
+      success: false,
+    };
+
+    // 1. Probar backup
+    const backupTest = await this.testBackupCreation();
+    result.tests.push({
+      name: 'backup_creation',
+      ...backupTest,
+    });
+
+    // 2. Probar restore a ambiente de staging
+    const restoreTest = await this.testRestoreToStaging();
+    result.tests.push({
+      name: 'restore_to_staging',
+      ...restoreTest,
+    });
+
+    // 3. Verificar funcionalidad después de restore
+    const functionalityTest = await this.testRestoredFunctionality();
+    result.tests.push({
+      name: 'functionality_after_restore',
+      ...functionalityTest,
+    });
+
+    // 4. Medir tiempos y comparar con RTO/RPO
+    const totalTime = (Date.now() - startTime) / 1000 / 60; // En minutos
+    const meetsRTO = totalTime <= this.config.recovery.rto;
+
+    result.tests.push({
+      name: 'rto_compliance',
+      success: meetsRTO,
+      duration: totalTime * 60 * 1000,
+      details: {
+        actualRTO: totalTime,
+        targetRTO: this.config.recovery.rto,
+      },
+    });
+
+    result.endTime = new Date();
+    result.success = result.tests.every(t => t.success);
+    result.totalDuration = Date.now() - startTime;
+
+    // Notificar resultados
+    await this.notificationService.send({
+      type: 'dr_drill_completed',
+      drillId,
+      success: result.success,
+      summary: this.generateDrillSummary(result),
+    });
+
+    return result;
+  }
+
+  private async backupModelWeights(backupId: string): Promise<void> {
+    // Implementar backup de weights del modelo
+  }
+
+  private async backupVectorDB(backupId: string, type: 'full' | 'incremental'): Promise<void> {
+    // Implementar backup de vector database
+  }
+
+  private async backupConversations(backupId: string, type: 'full' | 'incremental'): Promise<void> {
+    // Implementar backup de historial de conversaciones
+  }
+
+  private async backupUserPreferences(backupId: string): Promise<void> {
+    // Implementar backup de preferencias de usuario
+  }
+
+  private async backupConfigurations(backupId: string): Promise<void> {
+    // Implementar backup de configuraciones
+  }
+
+  private async calculateBackupChecksum(backupId: string): Promise<string> {
+    // Calcular SHA-256 del backup
+    return '';
+  }
+
+  private async encryptBackup(backupId: string): Promise<string> {
+    // Cifrar con KMS y retornar key ID
+    return '';
+  }
+
+  private async uploadBackup(backupId: string, options: { geoRedundant: boolean }): Promise<string> {
+    // Subir a S3/GCS con geo-redundancia
+    return '';
+  }
+
+  private async verifyBackup(backupId: string, checksum: string): Promise<void> {
+    // Verificar integridad del backup
+  }
+
+  private async getBackupSize(backupId: string): Promise<number> {
+    return 0;
+  }
+
+  private async saveBackupMetadata(metadata: BackupMetadata): Promise<void> {
+    // Guardar metadata en base de datos
+  }
+
+  private async getBackupMetadata(backupId: string): Promise<BackupMetadata | null> {
+    return null;
+  }
+
+  private async downloadBackup(backupId: string, location: string): Promise<void> {
+    // Descargar backup de storage
+  }
+
+  private async verifyBackupChecksum(backupId: string, expectedChecksum: string): Promise<boolean> {
+    return true;
+  }
+
+  private async decryptBackup(backupId: string, keyId: string): Promise<void> {
+    // Descifrar backup
+  }
+
+  private async restoreComponent(backupId: string, component: string): Promise<void> {
+    // Restaurar componente específico
+  }
+
+  private async verifyRestoration(components: string[]): Promise<void> {
+    // Verificar que la restauración fue exitosa
+  }
+
+  private async testBackupCreation(): Promise<TestResult> {
+    return { success: true, duration: 0 };
+  }
+
+  private async testRestoreToStaging(): Promise<TestResult> {
+    return { success: true, duration: 0 };
+  }
+
+  private async testRestoredFunctionality(): Promise<TestResult> {
+    return { success: true, duration: 0 };
+  }
+
+  private generateBackupId(): string {
+    return `backup_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private generateDrillId(): string {
+    return `drill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private generateDrillSummary(result: DRDrillResult): string {
+    const passed = result.tests.filter(t => t.success).length;
+    const total = result.tests.length;
+    return `DR Drill ${result.success ? 'PASSED' : 'FAILED'}: ${passed}/${total} tests passed`;
+  }
+}
+
+interface RestoreOptions {
+  components?: string[];
+  failOnError?: boolean;
+  targetEnvironment?: string;
+}
+
+interface RestoreResult {
+  backupId: string;
+  startTime: Date;
+  endTime?: Date;
+  components: Record<string, { success: boolean; error?: string }>;
+  success: boolean;
+  error?: string;
+}
+
+interface TestResult {
+  success: boolean;
+  duration: number;
+  error?: string;
+  details?: Record<string, unknown>;
+}
+
+interface DRDrillResult {
+  drillId: string;
+  startTime: Date;
+  endTime?: Date;
+  tests: Array<TestResult & { name: string }>;
+  success: boolean;
+  totalDuration?: number;
+}
+```
+
+**Cuándo usar:**
+- ✅ Cualquier sistema de IA en producción
+- ✅ Sistemas con datos de usuarios
+- ✅ Cumplimiento de SLAs de disponibilidad
+- ✅ Requisitos regulatorios de continuidad de negocio
+
+**Tradeoffs:**
+- **Pros**: Protección contra pérdida de datos, continuidad de negocio, compliance
+- **Cons**: Costos de almacenamiento, complejidad operacional, tiempo de pruebas
+
+---
+
+## 🌳 Árbol de Decisión: Selección de Patrones de Seguridad
+
+```mermaid
+graph TD
+    A[¿Qué tipo de amenaza quieres mitigar?] --> B{Input del Usuario}
+    A --> C{Output del Modelo}
+    A --> D{Infraestructura}
+    A --> E{Modelo Mismo}
+
+    B --> B1[¿Es texto libre?]
+    B1 -->|Sí| B2[Sanitización de Prompts]
+    B1 -->|No| B3[Validación con Zod]
+    B2 --> B4[¿Alto riesgo de jailbreak?]
+    B4 -->|Sí| B5[+ Detección de Jailbreak]
+    B4 -->|No| B6[Rate Limiting básico]
+
+    C --> C1[¿Output estructurado?]
+    C1 -->|Sí| C2[Parsing Seguro con Schema]
+    C1 -->|No| C3[Output Security Filter]
+    C2 --> C4[+ Validación de Tool Calls]
+    C3 --> C5[¿Contenido sensible?]
+    C5 -->|Sí| C6[+ PII Detection + Bias Check]
+    C5 -->|No| C7[Filtering básico]
+
+    D --> D1[¿Expuesto a internet?]
+    D1 -->|Sí| D2[DDoS Protection + Rate Limiting]
+    D1 -->|No| D3[Rate Limiting interno]
+    D2 --> D4[¿Maneja secretos?]
+    D4 -->|Sí| D5[Secret Manager + Audit Logging]
+    D4 -->|No| D6[Audit Logging]
+    D3 --> D7[¿Requisitos de compliance?]
+    D7 -->|Sí| D8[Comprehensive Audit + Backup DR]
+    D7 -->|No| D9[Logging básico]
+
+    E --> E1[¿Fine-tuning continuo?]
+    E1 -->|Sí| E2[Model Poisoning Prevention]
+    E1 -->|No| E3[¿Inputs adversariales posibles?]
+    E3 -->|Sí| E4[Adversarial Detection]
+    E3 -->|No| E5[Monitoreo de Comportamiento]
+    E2 --> E6[+ Data Validation Pipeline]
+    E4 --> E7[+ Output Filtering]
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333
+    style C fill:#bfb,stroke:#333
+    style D fill:#fbf,stroke:#333
+    style E fill:#ffb,stroke:#333
+```
+
+### Combinaciones Recomendadas por Caso de Uso
+
+**Chatbot Público de Atención al Cliente:**
+```
+Input Validation
+├── Sanitización de Prompts
+├── Detección de Jailbreak
+└── Rate Limiting por usuario
+
+Output Validation
+├── Output Security Filter
+├── PII Detection
+└── Bias Check
+
+Infrastructure
+├── DDoS Protection
+├── Comprehensive Audit Logging
+└── Backup & DR
+```
+
+**API de IA para Desarrolladores:**
+```
+Input Validation
+├── Validación con Zod
+├── Rate Limiting por API key
+└── Token Budget Management
+
+Output Validation
+├── Parsing Seguro con Schema
+└── Validación de Tool Calls
+
+Infrastructure
+├── Secret Manager para API keys
+├── Audit Logging
+└── DDoS Protection
+```
+
+**Sistema de IA Interno Empresarial:**
+```
+Input Validation
+├── Sanitización básica
+└── Validación de esquemas
+
+Model Security
+├── Monitoreo de Comportamiento
+└── Output Filtering
+
+Infrastructure
+├── RBAC para Tools
+├── Audit Logging (compliance)
+└── Backup & DR
+```
+
+**Modelo con Fine-tuning Continuo:**
+```
+Model Security
+├── Model Poisoning Prevention
+├── Data Validation Pipeline
+├── Adversarial Detection
+└── Continuous Monitoring
+
+Infrastructure
+├── Comprehensive Audit Logging
+├── Backup de Model Weights
+└── Version Control para datos
+```
+
+---
+
+## 📚 Referencias y Recursos Relacionados
+
+Para profundizar en estos patrones y ver cómo se integran con otros aspectos de arquitectura de IA:
+
+- **[Patrones Arquitectónicos](./patrones.md)** - Patrones generales de agentes y arquitectura de sistemas IA
+- **[Decisiones de Diseño](./design-decisions.md)** - Tradeoffs y decisiones arquitectónicas comunes
+- **[Estrategias de Testing](./testing-strategies.md)** - Cómo probar sistemas de IA de forma efectiva
+
+---
+
+## Conclusión
+
+La seguridad en sistemas de IA requiere un enfoque de **defensa en profundidad** que aborde múltiples vectores de ataque simultáneamente. Los patrones presentados en este documento cubren:
+
+1. **Input Validation**: Primera línea de defensa contra ataques de usuarios
+2. **Output Validation**: Control de lo que el modelo genera
+3. **Tool Execution**: Sandboxing y control de acceso para herramientas
+4. **Data Protection**: Cumplimiento de privacidad y protección de datos sensibles
+5. **Model Security**: Protección del modelo contra ataques adversariales y envenenamiento
+6. **Infrastructure Security**: Protección de la infraestructura subyacente
+
+**Principio fundamental**: Nunca confíes en inputs de usuarios ni en outputs de modelos sin validación. La seguridad debe ser parte integral del diseño, no una capa adicional.
+
+> *"La seguridad en IA no es un destino, es un viaje continuo de adaptación ante nuevas amenazas."*
+
+---
+
+Siguiente: [Estrategias de Testing](./testing-strategies.md) - Aprende a probar exhaustivamente estos patrones de seguridad.
