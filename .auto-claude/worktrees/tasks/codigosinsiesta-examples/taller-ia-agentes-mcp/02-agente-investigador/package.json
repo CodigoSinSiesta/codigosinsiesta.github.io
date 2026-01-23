@@ -1,0 +1,37 @@
+{
+  "name": "02-agente-investigador",
+  "version": "1.0.0",
+  "description": "Research Agent using Plan-Execute-Synthesize pattern - Workshop example for building advanced AI agents with Claude",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "ai-agent",
+    "claude",
+    "anthropic",
+    "research-agent",
+    "plan-execute-synthesize",
+    "mcp",
+    "workshop"
+  ],
+  "author": "Código Sin Siesta",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
