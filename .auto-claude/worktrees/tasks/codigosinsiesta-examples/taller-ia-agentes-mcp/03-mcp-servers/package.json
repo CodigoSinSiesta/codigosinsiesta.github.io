@@ -1,0 +1,35 @@
+{
+  "name": "03-mcp-servers",
+  "version": "1.0.0",
+  "description": "Calculator MCP Server using Fast-MCP - Workshop example for building MCP servers with tools and resources",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp-server",
+    "fast-mcp",
+    "calculator",
+    "tools",
+    "resources",
+    "workshop"
+  ],
+  "author": "Código Sin Siesta",
+  "license": "MIT",
+  "dependencies": {
+    "fast-mcp": "^1.4.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
