@@ -290,7 +290,7 @@ export class ExecutionEngine {
     }
   }
 
-  private assessQuality(toolResults: any[], successCriteria: string[]): number {
+  private assessQuality(_toolResults: any[], _successCriteria: string[]): number {
     return 8;
   }
 }
@@ -394,7 +394,7 @@ ${JSON.stringify(result.data, null, 2)}
       .map(line => line.replace(/^[-•]\s*/, '').trim());
   }
 
-  private assessSynthesisQuality(synthesis: string, plan: InvestigationPlan): number {
+  private assessSynthesisQuality(synthesis: string, _plan: InvestigationPlan): number {
     const hasAllSections = ['Executive Summary', 'Key Findings', 'Conclusions'].every(
       section => synthesis.includes(section)
     );
