@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "003-ai-agent-development-learning-path",
+  "spec": "006-companion-code-repository",
   "state": "complete",
   "subtasks": {
-    "completed": 16,
-    "total": 16,
+    "completed": 18,
+    "total": 18,
     "in_progress": 0,
     "failed": 0
   },
   "phase": {
-    "current": "Integration & Polish",
+    "current": "GitHub Publish",
     "id": null,
-    "total": 5
+    "total": 2
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 3,
-    "started_at": "2026-01-04T11:19:40.219147"
+    "number": 9,
+    "started_at": "2026-01-24T01:20:36.140983"
   },
-  "last_update": "2026-01-04T11:30:33.285073"
+  "last_update": "2026-01-24T01:55:14.072529"
 }
