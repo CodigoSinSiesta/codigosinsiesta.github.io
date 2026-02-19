@@ -6,7 +6,7 @@ sidebar_position: 4
 
 El siguiente nivel en construcción de agentes: el patrón **Plan-Execute-Synthesize**. De agentes reactivos simples a investigadores inteligentes que planifican, ejecutan estrategias complejas, y sintetizan conocimiento profundo.
 
-**📦 Código del taller:** [github.com/CodigoSinSiesta/codigosinsiesta.github.io](https://github.com/CodigoSinSiesta/codigosinsiesta.github.io)
+**📦 Código completo:** [codigosinsiesta-examples/taller-ia-agentes-mcp/02-agente-investigador](https://github.com/codigosinsiesta/codigosinsiesta-examples/tree/main/taller-ia-agentes-mcp/02-agente-investigador)
 
 ## Requisitos Previos
 

@@ -6,6 +6,8 @@ sidebar_position: 3
 
 Tutorial paso a paso para construir tu primer agente de IA funcional. Aprenderás los conceptos fundamentales de agentes, el patrón Tool Use, y crearás un agente que puede ejecutar tareas usando herramientas personalizadas.
 
+**📦 Código completo:** [codigosinsiesta-examples/taller-ia-agentes-mcp/01-agente-tareas](https://github.com/codigosinsiesta/codigosinsiesta-examples/tree/main/taller-ia-agentes-mcp/01-agente-tareas)
+
 ## ¿Qué es un Agente de IA?
 
 Un agente de IA es un sistema que puede:

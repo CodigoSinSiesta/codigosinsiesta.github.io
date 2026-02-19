@@ -6,6 +6,8 @@ sidebar_position: 5
 
 **Model Context Protocol (MCP)** es la evolución de los tools: servidores reutilizables que extienden las capacidades de cualquier LLM. Crea una vez, usa en cualquier agente o aplicación.
 
+**📦 Código completo:** [codigosinsiesta-examples/taller-ia-agentes-mcp/03-mcp-servers](https://github.com/codigosinsiesta/codigosinsiesta-examples/tree/main/taller-ia-agentes-mcp/03-mcp-servers)
+
 ## ¿Qué es MCP?
 
 ### El Problema que Resuelve

@@ -21,3 +21,6 @@ yarn-error.log*
 
 # Auto Claude data directory
 .auto-claude/
+
+# Sisyphus data directory
+.sisyphus/
