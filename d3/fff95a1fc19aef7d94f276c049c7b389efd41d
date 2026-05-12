@@ -1,0 +1,19 @@
+blog/2026-05-12-del-vibe-coding-al-agentic-engineering/index.md
+  s_75842129fda9f8::t_51bf9f26f5c699 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "d3fff95a1fc19aef7d94f276c049c7b389efd41d",
+  "prompts": {},
+  "sessions": {
+    "s_75842129fda9f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc0a94ed-27d0-4e7d-aebc-5a981a134fbd",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Alejandro de la Fuente de la Rosa <alejandro.delafuentedelarosa@emeal.nttdata.com>"
+    }
+  }
+}
