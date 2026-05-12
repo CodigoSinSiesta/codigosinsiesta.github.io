@@ -1,0 +1,25 @@
+blog/2026-05-09-diez-niveles-complejidad-agentes-ia.md
+  s_165f5882d98294::t_e37427cb31e33c 1-201
+blog/2026-05-09-harness-engineering-vale-mas-que-el-modelo.md
+  s_165f5882d98294::t_6e530070c9fbaf 1-199
+blog/2026-05-09-cuatro-fuentes-mismos-principios.md
+  s_165f5882d98294::t_788c46b50c18de 1-147
+blog/2026-05-09-patron-correcto-para-cada-problema.md
+  s_165f5882d98294::t_7ed07f0f216937 1-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "3dc39231245a5f4124265706f3e1e366236c3987",
+  "prompts": {},
+  "sessions": {
+    "s_165f5882d98294": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "13a60252-a816-4cc1-8cb3-70d7a9b041a0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Alejandro de la Fuente de la Rosa <alejandro.delafuentedelarosa@emeal.nttdata.com>"
+    }
+  }
+}

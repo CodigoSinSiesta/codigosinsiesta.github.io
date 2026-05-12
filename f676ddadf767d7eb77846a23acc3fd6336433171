@@ -1,0 +1,19 @@
+blog/2026-05-09-seis-meses-construyendo-en-publico.md
+  s_165f5882d98294::t_6a920f5e52af19 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "f676ddadf767d7eb77846a23acc3fd6336433171",
+  "prompts": {},
+  "sessions": {
+    "s_165f5882d98294": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "13a60252-a816-4cc1-8cb3-70d7a9b041a0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Alejandro de la Fuente de la Rosa <alejandro.delafuentedelarosa@emeal.nttdata.com>"
+    }
+  }
+}
