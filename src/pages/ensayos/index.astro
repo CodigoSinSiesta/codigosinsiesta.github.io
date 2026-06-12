@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const ensayos = (await getCollection('ensayos')).sort(
+  (a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf()
+);
+
+const fmtFecha = (d: Date) =>
+  d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: '2-digit' });
+---
+
+<Base
+  title="Ensayos"
+  description="Ensayos técnicos de Código Sin Siesta: agentic engineering, harness engineering, agentes de IA y disciplina de software."
+  activeHref="/ensayos"
+>
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow">el zine</p>
+      <h1>Ensayos</h1>
+      <p class="lead" style="max-width: 40rem;">
+        Claims fuertes con evidencia al lado. Lo que aprendemos construyendo en público, escrito
+        para que te sirva.
+      </p>
+      <ul class="item-list" style="margin-top: 2rem;">
+        {
+          ensayos.map((post) => (
+            <li>
+              <p class="meta">
+                {fmtFecha(post.data.fecha)} · {post.data.autor}
+              </p>
+              <h3>
+                <a href={`/ensayos/${post.id}`}>{post.data.title}</a>
+              </h3>
+              <p>{post.data.description}</p>
+              <p style="margin-top: 0.6rem; margin-bottom: 0;">
+                {post.data.tags.slice(0, 4).map((tag) => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</Base>

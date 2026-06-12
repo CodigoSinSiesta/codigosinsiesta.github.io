@@ -1,102 +1,51 @@
-# Código Sin Siesta
+# Código Sin Siesta — codigosinsiesta.com
 
-Sitio web principal de la organización **Código Sin Siesta** - Documentación técnica, blog de desarrollo y recursos para la comunidad.
+Web principal de **Código Sin Siesta**: el dojo. Rutas de aprendizaje, ensayos y talleres para developers que construyen con IA sin perder el techo de calidad.
 
-🌐 **Sitio en vivo:** [https://codigosinsiesta.github.io/](https://codigosinsiesta.github.io/)
+🌐 **Sitio en vivo:** [https://codigosinsiesta.com](https://codigosinsiesta.com)
 
-## Tecnología
+## Stack
 
-Este sitio está construido con [Docusaurus 3](https://docusaurus.io/), un generador de sitios estáticos moderno que ofrece:
+- [Astro 5](https://astro.build) — sitio estático, content collections
+- [Svelte 5](https://svelte.dev) — islas interactivas (header, terminal, progreso)
+- [`@codigosinsiesta/theme`](https://github.com/CodigoSinSiesta/theme) — sistema de diseño V4 "dark blueprint" (tokens, layout, componentes)
+- pnpm 11 + Node 24
 
-- 🚀 Renderizado optimizado y carga rápida
-- 📱 Diseño responsive y modo oscuro
-- 🔍 Búsqueda integrada
-- 📝 Soporte para MDX (Markdown + React)
-- 🌐 Internacionalización (i18n)
+## Estructura
 
-## Desarrollo Local
+```
+src/
+├── content/
+│   ├── ensayos/        # el zine — posts markdown (antiguo blog)
+│   └── guias/          # módulos de las rutas de aprendizaje
+├── data/
+│   ├── site.ts         # nav, footer, constantes
+│   ├── rutas.ts        # definición de rutas del dojo
+│   └── talleres.ts     # catálogo de talleres
+├── layouts/Base.astro  # head + SiteHeader/SiteFooter del theme
+├── components/         # islas Svelte (TerminalHero, Progreso*)
+└── pages/              # /, /rutas, /ensayos, /talleres, 404, rss
+```
 
-### Requisitos Previos
-
-- Node.js 20 o superior
-- bun (recomendado)
-
-### Instalación
+## Desarrollo
 
 ```bash
-bun install
+pnpm install
+pnpm dev       # http://localhost:4321
+pnpm build     # genera ./dist
+pnpm preview
 ```
 
-### Servidor de Desarrollo
+## Deploy
 
-```bash
-bun start
-```
+Push a `main` → GitHub Actions construye con pnpm y publica en GitHub Pages (`.github/workflows/deploy.yml`). Los PRs validan el build con `test-deploy.yml`.
 
-Esto inicia un servidor local en `http://localhost:3000` con recarga automática.
+El dominio `codigosinsiesta.com` se sirve vía GitHub Pages con dominio custom (fichero `public/CNAME` + DNS apuntando a Pages).
 
-### Build de Producción
+## Contenido
 
-```bash
-bun run build
-```
+- **Ensayos**: markdown en `src/content/ensayos/` con frontmatter `title, description, fecha, tags, autor`.
+- **Guías de ruta**: markdown en `src/content/guias/` con `title, ruta, orden, duracion`.
+- **Rutas y talleres**: datos en `src/data/`.
 
-Genera el contenido estático en el directorio `build/`.
-
-### Previsualizar Build
-
-```bash
-bun run serve
-```
-
-Sirve el contenido del directorio `build/` para previsualizar antes de desplegar.
-
-## Deployment
-
-El sitio se despliega automáticamente a GitHub Pages mediante GitHub Actions cuando se hace push a la rama `main`.
-
-### Workflow de Deploy
-
-El archivo `.github/workflows/deploy.yml` maneja el proceso de deployment:
-
-1. Checkout del código
-2. Instalación de bun y Node.js 20
-3. Instalación de dependencias
-4. Build del sitio
-5. Deploy a GitHub Pages
-
-## Estructura del Proyecto
-
-```
-codigosinsiesta.github.io/
-├── blog/                   # Posts del blog
-├── docs/                   # Documentación técnica
-├── src/
-│   ├── components/        # Componentes React personalizados
-│   ├── css/              # Estilos globales
-│   └── pages/            # Páginas estáticas
-├── static/               # Archivos estáticos (imágenes, favicon, etc.)
-├── docusaurus.config.js  # Configuración principal
-└── sidebars.js          # Configuración de sidebars
-```
-
-## Contribuir
-
-Para contribuir al sitio:
-
-1. Crea una rama desde `main`
-2. Realiza tus cambios
-3. Crea un Pull Request
-4. Espera la aprobación y merge
-
-**Nota:** La rama `main` está protegida y requiere revisión de Pull Request.
-
-## Enlaces
-
-- [Organización GitHub](https://github.com/codigosinsiesta)
-- [Proyecto AI Presentation](https://codigosinsiesta.github.io/ai-presentation/)
-- [Documentación Docusaurus](https://docusaurus.io/)
-
-## Licencia
-
-Copyright © 2025 Código Sin Siesta. Built with Docusaurus.
+El contenido del antiguo sitio Docusaurus (blog y docs) vive en la historia git anterior a la migración.

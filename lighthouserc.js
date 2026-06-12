@@ -1,18 +1,19 @@
 // @ts-check
-// Lighthouse CI configuration for Docusaurus site
+// Lighthouse CI configuration for the Astro site
 // See: https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/configuration.md
 
 /** @type {import('@lhci/cli').LighthouseCIConfig} */
 module.exports = {
   ci: {
     collect: {
-      // Use the built Docusaurus site
-      staticDistDir: './build',
+      // Use the built Astro site
+      staticDistDir: './dist',
       // URLs to audit (homepage and key pages)
       url: [
         'http://localhost/',
-        'http://localhost/docs/intro.html',
-        'http://localhost/blog.html',
+        'http://localhost/rutas/',
+        'http://localhost/ensayos/',
+        'http://localhost/talleres/',
       ],
       // Number of runs per URL for more stable results
       numberOfRuns: 3,

@@ -1,45 +1,27 @@
 {
-  "name": "codigo-sin-siesta",
-  "version": "0.0.0",
+  "name": "codigosinsiesta-web",
+  "version": "1.0.0",
   "private": true,
+  "description": "Web principal de Código Sin Siesta — el dojo: rutas de aprendizaje, ensayos y talleres para developers que trabajan con IA.",
+  "type": "module",
+  "packageManager": "pnpm@11.5.2",
   "scripts": {
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start --no-open",
-    "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy",
-    "clear": "docusaurus clear",
-    "serve": "docusaurus serve",
-    "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "migrate:blog": "node scripts/migrate-blog.mjs"
   },
   "dependencies": {
-    "@docusaurus/core": "3.9.2",
-    "@docusaurus/preset-classic": "3.9.2",
-    "@docusaurus/theme-mermaid": "^3.9.2",
-    "@mdx-js/react": "^3.0.0",
-    "clsx": "^2.0.0",
-    "prism-react-renderer": "^2.3.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "@astrojs/rss": "^4.0.12",
+    "@astrojs/sitemap": "^3.4.1",
+    "@astrojs/svelte": "^7.1.0",
+    "@codigosinsiesta/theme": "github:CodigoSinSiesta/theme",
+    "astro": "^5.12.0",
+    "svelte": "^5.45.5"
   },
-  "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.9.2",
-    "@docusaurus/types": "3.9.2"
-  },
-  "browserslist": {
-    "production": [
-      ">0.5%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 3 chrome version",
-      "last 3 firefox version",
-      "last 5 safari version"
-    ]
-  },
-  "engines": {
-    "node": ">=20.0"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codigosinsiesta/codigosinsiesta.github.io"
   }
 }

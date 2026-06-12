@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import TerminalWindow from '@codigosinsiesta/theme/components/TerminalWindow.svelte';
+
+const lines = [
+  { type: 'cmd', text: 'cat pagina' },
+  { type: 'err', text: 'cat: 404 — esta página no existe (o nunca existió)' },
+  { type: 'comment', text: 'prueba desde el inicio' },
+];
+---
+
+<Base title="404">
+  <div class="container">
+    <section class="section" style="max-width: 640px; margin-inline: auto;">
+      <TerminalWindow title="404 · zsh" lines={lines} minHeight={200} />
+      <p style="margin-top: 2rem; text-align: center;">
+        <a class="btn btn--primary" href="/">Volver al inicio</a>
+      </p>
+    </section>
+  </div>
+</Base>

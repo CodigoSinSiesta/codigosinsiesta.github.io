@@ -1,0 +1,52 @@
+---
+import SiteHeader from '@codigosinsiesta/theme/layout/SiteHeader.svelte';
+import SiteFooter from '@codigosinsiesta/theme/layout/SiteFooter.svelte';
+import { SITE, NAV, FOOTER } from '../data/site';
+import '../styles/site.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  activeHref?: string;
+}
+
+const { title, description = SITE.descripcion, activeHref = '' } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE.nombre}` : `${SITE.nombre} — ${SITE.claim}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og-card.png', Astro.site);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`Ensayos · ${SITE.nombre}`}
+      href={new URL('/rss.xml', Astro.site)}
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="es_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Saltar al contenido</a>
+    <SiteHeader client:load links={NAV} activeHref={activeHref} logoVariant="both" />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter copyright={FOOTER.copyright} tagline={FOOTER.tagline} links={FOOTER.links} />
+  </body>
+</html>

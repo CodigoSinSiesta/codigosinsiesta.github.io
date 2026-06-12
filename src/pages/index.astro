@@ -1,0 +1,108 @@
+---
+import Base from '../layouts/Base.astro';
+import TerminalHero from '../components/TerminalHero.svelte';
+import { getCollection } from 'astro:content';
+import { RUTAS } from '../data/rutas';
+import { TALLERES } from '../data/talleres';
+
+const ensayos = (await getCollection('ensayos'))
+  .sort((a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf())
+  .slice(0, 4);
+
+const fmtFecha = (d: Date) =>
+  d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: '2-digit' });
+---
+
+<Base activeHref="/">
+  <!-- hero -->
+  <div class="container">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">código sin siesta · evolución 2026</p>
+        <h1>
+          Construye con IA <span class="hl">sin perder el techo de calidad</span>
+        </h1>
+        <p class="lead">
+          Rutas de aprendizaje, ensayos y talleres para developers que quieren crecer.
+          Sin humo, sin atajos — conceptos sólidos y disciplina de ingeniería.
+        </p>
+        <div class="hero-ctas">
+          <a class="btn btn--primary" href="/rutas">Empieza una ruta</a>
+          <a class="btn btn--ghost" href="/ensayos">Lee los ensayos</a>
+        </div>
+      </div>
+      <TerminalHero client:visible />
+    </section>
+  </div>
+
+  <!-- statement zine -->
+  <section class="statement">
+    <div class="container">
+      <p>
+        Vibe coding elevó el suelo. Alguien tiene que <span class="hl">preservar el techo</span> —
+        y ese alguien eres tú, no tu agente.
+      </p>
+    </div>
+  </section>
+
+  <!-- rutas -->
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow">el dojo</p>
+      <h2>Rutas de aprendizaje</h2>
+      <p>Itinerarios curados, de cero a producción. Cada paso es un ensayo, un deck o un taller.</p>
+      <div class="grid-2" style="margin-top: 2rem;">
+        {
+          RUTAS.map((ruta) => (
+            <a class="card" href={`/rutas/${ruta.slug}`}>
+              <span class={`badge ${ruta.nivel === 'inicial' ? 'badge--ok' : ''}`}>
+                {ruta.nivel}
+              </span>
+              <h3 style="margin-top: 0.9rem;">{ruta.titulo}</h3>
+              <p>{ruta.claim}</p>
+              <p class="meta" style="margin-top: 0.8rem;">{ruta.duracion}</p>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- ensayos -->
+    <section class="section" style="padding-top: 0;">
+      <p class="eyebrow">el zine</p>
+      <h2>Últimos ensayos</h2>
+      <ul class="item-list">
+        {
+          ensayos.map((post) => (
+            <li>
+              <p class="meta">{fmtFecha(post.data.fecha)}</p>
+              <h3>
+                <a href={`/ensayos/${post.id}`}>{post.data.title}</a>
+              </h3>
+              <p>{post.data.description}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p style="margin-top: 1.5rem;">
+        <a href="/ensayos">Todos los ensayos →</a>
+      </p>
+    </section>
+
+    <!-- talleres -->
+    <section class="section" style="padding-top: 0;">
+      <p class="eyebrow">hands-on</p>
+      <h2>Talleres</h2>
+      <div class="grid-2" style="margin-top: 2rem;">
+        {
+          TALLERES.map((taller) => (
+            <a class="card" href="/talleres">
+              <h3>{taller.titulo}</h3>
+              <p>{taller.descripcion}</p>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Base>

@@ -1,0 +1,35 @@
+---
+import Base from '../../layouts/Base.astro';
+import { RUTAS } from '../../data/rutas';
+---
+
+<Base
+  title="Rutas de aprendizaje"
+  description="Itinerarios curados de Código Sin Siesta: de cero a tu primer agente, y de vibe coding a agentic engineering."
+  activeHref="/rutas"
+>
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow">el dojo</p>
+      <h1>Rutas de aprendizaje</h1>
+      <p class="lead" style="max-width: 40rem;">
+        No otra lista de enlaces: itinerarios con orden, criterio y un objetivo claro al final.
+        Tu progreso se guarda en este navegador.
+      </p>
+      <div class="grid-2" style="margin-top: 2.5rem;">
+        {
+          RUTAS.map((ruta) => (
+            <a class="card" href={`/rutas/${ruta.slug}`}>
+              <span class={`badge ${ruta.nivel === 'inicial' ? 'badge--ok' : ''}`}>
+                {ruta.nivel}
+              </span>
+              <h3 style="margin-top: 0.9rem;">{ruta.titulo}</h3>
+              <p>{ruta.descripcion}</p>
+              <p class="meta" style="margin-top: 0.9rem;">{ruta.duracion}</p>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Base>

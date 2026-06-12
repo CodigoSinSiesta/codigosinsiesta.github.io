@@ -1,185 +1,41 @@
-# Instrucciones para Claude Code - Código Sin Siesta Website
+# Instrucciones para Claude Code - Web de Código Sin Siesta
 
-## Descripción del Proyecto
+## Descripción
 
-Sitio web oficial de Código Sin Siesta construido con Docusaurus 3. Incluye documentación técnica, blog, y recursos sobre proyectos de la organización.
+Web principal de Código Sin Siesta (codigosinsiesta.com): rutas de aprendizaje ("el dojo"), ensayos ("el zine") y talleres. Sustituye al antiguo sitio Docusaurus (en historia git anterior a jun-2026).
 
-## Stack Tecnológico
+## Stack
 
-- **Framework**: Docusaurus 3.9.2
-- **Package Manager**: bun
-- **Node**: v20
-- **Lenguaje**: JavaScript (opcionalmente TypeScript)
-- **Deployment**: GitHub Pages con GitHub Actions
+- **Framework**: Astro 5 (estático) + Svelte 5 (islas)
+- **Diseño**: `@codigosinsiesta/theme` (github:CodigoSinSiesta/theme) — tokens dark blueprint, SiteHeader/SiteFooter, TerminalWindow. Cumplir `BRAND.md` del theme.
+- **Package manager**: pnpm 11 (`packageManager` en package.json). NO bun/npm/yarn.
+- **Node**: 24 (nvm)
+- **Deploy**: GitHub Pages vía Actions (`deploy.yml` en push a main, `test-deploy.yml` en PRs). Artefacto: `dist/`.
 
-## Configuración Crítica
+## Configuración crítica
 
-### GitHub Pages Organizacional
-- **URL**: `https://codigosinsiesta.github.io`
-- **baseUrl**: `/` (NO `/proyecto/` - esto es una página de organización)
-- **trailingSlash**: `false` (crítico para SEO en GitHub Pages)
-- **i18n**: Español (`es`) como idioma por defecto
+- `astro.config.mjs` → `site: 'https://codigosinsiesta.com'` (dominio custom de Pages).
+- `public/CNAME` controla el dominio custom — no tocar sin coordinar DNS.
+- Página de organización: baseUrl `/`. Los decks/presentaciones son project pages hermanas (`/harness-engineering-presentation/`, etc.) — enlazar con rutas absolutas relativas al dominio.
 
-### Estructura del Proyecto
+## Contenido
 
-```
-.
-├── .github/workflows/     # Workflows de CI/CD
-│   ├── deploy.yml        # Deployment automático en push a main
-│   └── test-deploy.yml   # Testing en PRs
-├── blog/                 # Posts del blog
-│   ├── authors.yml       # Configuración de autores
-│   └── [posts]/          # Directorio de posts
-├── docs/                 # Documentación
-│   └── intro.md          # Página de inicio de docs
-├── src/
-│   ├── components/       # Componentes React personalizados
-│   ├── css/             # Estilos globales
-│   └── pages/           # Páginas personalizadas (index.js, etc.)
-├── static/              # Archivos estáticos (imágenes, .nojekyll, etc.)
-├── docusaurus.config.js # Configuración principal
-├── sidebars.js          # Configuración de navegación lateral
-├── package.json
-└── bun.lockb            # Lockfile de dependencias
-```
+- **Ensayos**: `src/content/ensayos/*.md` — frontmatter `title, description, fecha (YYYY-MM-DD), tags[], autor`.
+- **Guías**: `src/content/guias/*.md` — frontmatter `title, ruta (slug), orden (number), duracion`.
+- **Rutas/talleres/nav**: `src/data/{rutas,talleres,site}.ts`.
+- Voz de marca: español-leading, tuteo, frases cortas, claims con evidencia. Ver BRAND.md del theme.
 
-## Comandos Importantes
+## Comandos
 
 ```bash
-# Desarrollo local
-bun start                 # Servidor de desarrollo en http://localhost:3000
-
-# Build para producción
-bun run build             # Genera build en ./build
-
-# Testing local del build
-bun run serve             # Sirve el build localmente
-
-# Limpiar cache
-bun run clear             # Limpia cache de Docusaurus
+pnpm install
+pnpm dev        # localhost:4321
+pnpm build      # genera dist/
+pnpm preview
 ```
 
-## Workflow de Desarrollo
+## Notas
 
-### 1. Cambios en Contenido
-
-Para editar contenido (docs, blog, páginas):
-
-1. Editar archivos correspondientes en `docs/`, `blog/`, o `src/pages/`
-2. Probar localmente con `bun start`
-3. Commit y push a main
-4. GitHub Actions desplegará automáticamente
-
-### 2. Configuración
-
-Cambios en `docusaurus.config.js`:
-
-**NO MODIFICAR ESTOS VALORES SIN CONSULTAR:**
-- `url`: `'https://codigosinsiesta.github.io'`
-- `baseUrl`: `'/'`
-- `trailingSlash`: `false`
-- `organizationName`: `'codigosinsiesta'`
-- `projectName`: `'codigosinsiesta.github.io'`
-
-Estos valores son críticos para el deployment en GitHub Pages.
-
-### 3. Nuevos Posts de Blog
-
-```bash
-# Crear nuevo post
-touch blog/YYYY-MM-DD-titulo.md
-
-# O usar directorio para incluir imágenes
-mkdir blog/YYYY-MM-DD-titulo
-touch blog/YYYY-MM-DD-titulo/index.md
-```
-
-Estructura de frontmatter:
-```markdown
----
-slug: url-del-post
-title: Título del Post
-authors: [codigosinsiesta]
-tags: [tag1, tag2]
----
-
-Resumen del post...
-
-<!-- truncate -->
-
-Contenido completo...
-```
-
-### 4. Nueva Documentación
-
-1. Crear archivo `.md` en `docs/`
-2. Actualizar `sidebars.js` si es necesario
-3. Usar frontmatter para configurar:
-   ```markdown
-   ---
-   sidebar_position: 1
-   ---
-   ```
-
-## GitHub Actions
-
-### Workflows
-
-1. **deploy.yml**: Deploy automático en push a `main`
-   - Instala dependencias con bun
-   - Ejecuta build
-   - Despliega a GitHub Pages
-
-2. **test-deploy.yml**: Testing en Pull Requests
-   - Valida que el build funcione
-   - No despliega, solo testea
-
-### Verificar Status
-
-```bash
-# Ver últimos workflows
-gh run list --repo CodigoSinSiesta/codigosinsiesta.github.io
-
-# Ver logs de un workflow específico
-gh run view [RUN_ID] --log
-```
-
-## Solución de Problemas
-
-### Build falla en GitHub Actions
-
-1. Verificar que `bun.lockb` esté committeado
-2. Verificar que no haya errores de sintaxis en archivos `.md`
-3. Ver logs: `gh run view --log`
-
-### Cambios no se reflejan en el sitio
-
-1. Verificar que el workflow se ejecutó exitosamente
-2. GitHub Pages puede tomar 2-3 minutos en actualizar
-3. Limpiar cache del navegador
-
-### Links rotos
-
-- Usar rutas relativas: `/docs/intro` (NO `./intro`)
-- Verificar que `onBrokenLinks: 'throw'` esté en `docusaurus.config.js`
-
-## Convivencia con Otros Proyectos
-
-El sitio principal (`/`) convive con project pages como:
-- `/ai-presentation/` - Presentación interactiva de IA
-
-Cada proyecto tiene su propio repositorio y deployment independiente.
-
-## Recursos
-
-- [Documentación Docusaurus](https://docusaurus.io/docs)
-- [GitHub Pages Docs](https://docs.github.com/en/pages)
-- [Repositorio](https://github.com/CodigoSinSiesta/codigosinsiesta.github.io)
-- [Sitio en vivo](https://codigosinsiesta.github.io)
-
-## Notas Importantes
-
-1. **Usar bun**: Este proyecto usa bun exclusivamente (NO usar npm/yarn/pnpm)
-2. **Archivo .nojekyll**: No eliminar `static/.nojekyll` - previene procesamiento Jekyll
-3. **Idioma**: El sitio está en español. Mantener consistencia en contenido nuevo
-4. **Autores**: Añadir nuevos autores en `blog/authors.yml` antes de usarlos en posts
+- El progreso de rutas se guarda en localStorage (`csi-progreso:<ruta>`), sin backend.
+- `scripts/migrate-blog.mjs` fue la migración one-shot desde Docusaurus; no se ejecuta en CI.
+- `taller-ia-agentes-mcp/` es código del taller fundacional, no forma parte del build.
