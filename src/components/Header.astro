@@ -1,0 +1,255 @@
+---
+import { NAV, SITE } from '../data/site';
+
+interface Props {
+  activeHref?: string;
+}
+const { activeHref = '' } = Astro.props;
+
+const isActive = (href: string) =>
+  href === '/' ? activeHref === '/' : activeHref.startsWith(href);
+---
+
+<header class="site-header" data-csi-header>
+  <div class="site-header__bar">
+    <a class="brand" href="/" aria-label={`${SITE.nombre} — inicio`}>
+      <!-- búho line-art, usa currentColor para el glow -->
+      <svg class="brand__owl" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 14 L20 22"></path>
+        <path d="M48 14 L44 22"></path>
+        <path d="M10 30 C 10 18, 22 10, 32 10 C 42 10, 54 18, 54 30 C 54 42, 44 52, 32 52 C 20 52, 10 42, 10 30 Z"></path>
+        <circle cx="22" cy="30" r="7"></circle>
+        <circle cx="42" cy="30" r="7"></circle>
+        <circle cx="22" cy="30" r="1.8" fill="currentColor"></circle>
+        <circle cx="42" cy="30" r="1.8" fill="currentColor"></circle>
+        <path d="M32 36 L29 41 L32 44 L35 41 Z"></path>
+      </svg>
+      <span class="brand__name">Código<b>SinSiesta</b></span>
+    </a>
+
+    <!-- nav: se renderiza UNA sola vez. En desktop es inline; en móvil colapsa
+         en este mismo <details> (hamburguesa CSS-only, sin JS, sin isla). -->
+    <details class="nav">
+      <summary class="nav__toggle" aria-label="Abrir menú">
+        <span class="nav__toggle-bars" aria-hidden="true"></span>
+      </summary>
+      <nav class="nav__list" aria-label="Navegación principal">
+        {
+          NAV.map((item) => (
+            <a
+              class:list={['nav__link', { 'nav__link--active': isActive(item.href) }]}
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+        <a class="nav__cta" href="https://github.com/CodigoSinSiesta" target="_blank" rel="noopener">
+          GitHub ↗
+        </a>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<script>
+  // sombra/opacidad al hacer scroll — progressive enhancement, no imprescindible
+  const h = document.querySelector('[data-csi-header]');
+  if (h) {
+    const onScroll = () => h.classList.toggle('site-header--scrolled', window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  /* la barra translúcida cubre todo el ancho del viewport vía ::after */
+  .site-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid transparent;
+    transition: background var(--transition-base), border-color var(--transition-base);
+  }
+
+  .site-header--scrolled::after {
+    background: rgba(12, 18, 32, 0.88);
+    border-bottom-color: var(--color-borde);
+  }
+
+  .site-header__bar {
+    position: relative;
+    max-width: 1100px;
+    margin-inline: auto;
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* ─── marca ─── */
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+  .brand:hover { text-decoration: none; }
+
+  .brand__owl {
+    width: 30px;
+    height: 30px;
+    color: var(--color-cielo);
+    filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.45));
+    transition: transform var(--transition-base), color var(--transition-base);
+  }
+  .brand:hover .brand__owl {
+    color: var(--color-cielo2);
+    transform: rotate(-6deg) scale(1.06);
+  }
+
+  .brand__name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    color: var(--color-tinta);
+  }
+  .brand__name b {
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--color-electrico), var(--color-cielo));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* ─── nav (una sola lista) ─── */
+  .nav {
+    position: relative;
+  }
+  .nav__toggle {
+    display: none;
+    list-style: none;
+    cursor: pointer;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-borde);
+    align-items: center;
+    justify-content: center;
+  }
+  .nav__toggle::-webkit-details-marker { display: none; }
+  .nav__toggle-bars,
+  .nav__toggle-bars::before,
+  .nav__toggle-bars::after {
+    content: '';
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--color-tinta);
+    border-radius: 2px;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+  }
+  .nav__toggle-bars { position: relative; }
+  .nav__toggle-bars::before { position: absolute; top: -6px; }
+  .nav__toggle-bars::after { position: absolute; top: 6px; }
+
+  .nav__list {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .nav__link {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-tinta2);
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
+  }
+  .nav__link:hover {
+    text-decoration: none;
+    color: var(--color-tinta);
+    background: var(--color-accent-soft);
+  }
+  .nav__link--active {
+    color: var(--color-cielo);
+    background: var(--color-accent-soft);
+  }
+
+  .nav__cta {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-left: 0.5rem;
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-borde2);
+    color: var(--color-tinta);
+    transition: border-color var(--transition-fast), background var(--transition-fast),
+      transform var(--transition-fast);
+  }
+  .nav__cta:hover {
+    text-decoration: none;
+    border-color: var(--color-cielo);
+    background: var(--color-accent-soft);
+    transform: translateY(-1px);
+  }
+
+  /* ─── responsive: < 880px → hamburguesa CSS-only ─── */
+  @media (max-width: 879px) {
+    .nav__toggle { display: inline-flex; }
+
+    .nav__list {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 0.6rem);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.2rem;
+      min-width: 220px;
+      padding: 0.6rem;
+      background: rgba(12, 18, 32, 0.97);
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radius-md);
+      box-shadow: 0 18px 50px rgba(8, 12, 24, 0.55);
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+    }
+
+    /* sólo se muestra cuando el <details> está [open] */
+    .nav[open] .nav__list {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .nav[open] .nav__toggle-bars { background: transparent; }
+    .nav[open] .nav__toggle-bars::before { transform: translateY(6px) rotate(45deg); }
+    .nav[open] .nav__toggle-bars::after { transform: translateY(-6px) rotate(-45deg); }
+
+    .nav__link { padding: 0.6rem 0.8rem; }
+    .nav__cta { margin-left: 0; text-align: center; margin-top: 0.3rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand__owl, .nav__cta, .nav__list, .nav__toggle-bars,
+    .nav__toggle-bars::before, .nav__toggle-bars::after { transition: none; }
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import { TALLERES } from '../data/talleres';
+---
+
+<Base
+  title="Talleres"
+  description="Talleres hands-on de Código Sin Siesta: agentes de IA, MCP, OpenCode, Graphify y LLM Wiki. Cada uno con starter repo listo para clonar."
+  activeHref="/talleres"
+>
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow">hands-on</p>
+      <h1>Talleres</h1>
+      <p class="lead" style="max-width: 40rem;">
+        Se aprende construyendo. Cada taller tiene un starter repo con devcontainer listo —
+        clona, abre y empieza.
+      </p>
+      <div class="grid-2" style="margin-top: 2.5rem;">
+        {
+          TALLERES.map((taller) => (
+            <div class="card">
+              <h3>{taller.titulo}</h3>
+              <p>{taller.descripcion}</p>
+              <p style="margin-top: 1.1rem; margin-bottom: 0; display: flex; gap: 1.25rem;">
+                <a href={taller.repo}>Starter repo →</a>
+                {taller.deck && <a href={taller.deck}>Deck →</a>}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Base>

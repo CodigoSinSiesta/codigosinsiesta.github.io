@@ -1,0 +1,68 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProgresoRuta from '../../components/ProgresoRuta.svelte';
+import { getCollection } from 'astro:content';
+import { RUTAS, type Paso } from '../../data/rutas';
+
+export async function getStaticPaths() {
+  return RUTAS.map((ruta) => ({ params: { slug: ruta.slug }, props: { ruta } }));
+}
+
+const { ruta } = Astro.props;
+
+// Las rutas con guías propias generan sus pasos desde la colección.
+const guias = (await getCollection('guias', (g) => g.data.ruta === ruta.slug)).sort(
+  (a, b) => a.data.orden - b.data.orden
+);
+
+const pasos: Paso[] =
+  guias.length > 0
+    ? guias.map((g) => ({
+        tipo: 'guia' as const,
+        titulo: g.data.title,
+        href: `/rutas/${ruta.slug}/${g.id}`,
+        meta: g.data.duracion,
+      }))
+    : ruta.pasos;
+
+const slugsGuias = guias.map((g) => g.id);
+
+const BADGE: Record<string, string> = {
+  guia: 'módulo',
+  ensayo: 'ensayo',
+  deck: 'deck',
+  taller: 'taller',
+};
+---
+
+<Base title={ruta.titulo} description={ruta.descripcion} activeHref="/rutas">
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow">ruta · {ruta.nivel} · {ruta.duracion}</p>
+      <h1>{ruta.titulo}</h1>
+      <p class="lead" style="max-width: 42rem;">{ruta.descripcion}</p>
+      {slugsGuias.length > 0 && <ProgresoRuta client:load ruta={ruta.slug} slugs={slugsGuias} />}
+      <ol class="item-list" style="margin-top: 2rem;">
+        {
+          pasos.map((paso, i) => (
+            <li>
+              <div class="paso">
+                <span class="paso-num">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <span class="badge">{BADGE[paso.tipo]}</span>
+                  <h3 style="margin-top: 0.5rem;">
+                    <a href={paso.href}>{paso.titulo}</a>
+                  </h3>
+                  {paso.meta && <p class="meta">{paso.meta}</p>}
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p style="margin-top: 2rem;">
+        <a href="/rutas">← Todas las rutas</a>
+      </p>
+    </section>
+  </div>
+</Base>

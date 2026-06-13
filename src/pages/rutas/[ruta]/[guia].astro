@@ -1,0 +1,56 @@
+---
+import Base from '../../../layouts/Base.astro';
+import ProgresoGuia from '../../../components/ProgresoGuia.svelte';
+import { getCollection, render } from 'astro:content';
+import { RUTAS } from '../../../data/rutas';
+
+export async function getStaticPaths() {
+  const guias = await getCollection('guias');
+  return guias.map((guia) => ({
+    params: { ruta: guia.data.ruta, guia: guia.id },
+    props: { guia },
+  }));
+}
+
+const { guia } = Astro.props;
+const { Content } = await render(guia);
+
+const rutaInfo = RUTAS.find((r) => r.slug === guia.data.ruta);
+
+const hermanas = (await getCollection('guias', (g) => g.data.ruta === guia.data.ruta)).sort(
+  (a, b) => a.data.orden - b.data.orden
+);
+const idx = hermanas.findIndex((g) => g.id === guia.id);
+const anterior = idx > 0 ? hermanas[idx - 1] : null;
+const siguiente = idx < hermanas.length - 1 ? hermanas[idx + 1] : null;
+---
+
+<Base title={guia.data.title} description={guia.data.description} activeHref="/rutas">
+  <div class="container">
+    <article class="section">
+      <header style="max-width: 760px;">
+        <p class="eyebrow">
+          <a href={`/rutas/${guia.data.ruta}`} style="color: inherit;">
+            {rutaInfo?.titulo ?? guia.data.ruta}
+          </a>
+          · módulo {idx + 1}/{hermanas.length}
+          {guia.data.duracion && ` · ${guia.data.duracion}`}
+        </p>
+        <h1 style="font-size: clamp(1.9rem, 4.5vw, 2.8rem);">{guia.data.title}</h1>
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+      <footer
+        style="margin-top: 3rem; border-top: 1px solid var(--color-borde); padding-top: 1.75rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;"
+      >
+        <ProgresoGuia client:load ruta={guia.data.ruta} guia={guia.id} />
+        <div style="display: flex; gap: 1.5rem;">
+          {anterior && <a href={`/rutas/${guia.data.ruta}/${anterior.id}`}>← Anterior</a>}
+          <a href={`/rutas/${guia.data.ruta}`}>Índice</a>
+          {siguiente && <a href={`/rutas/${guia.data.ruta}/${siguiente.id}`}>Siguiente →</a>}
+        </div>
+      </footer>
+    </article>
+  </div>
+</Base>

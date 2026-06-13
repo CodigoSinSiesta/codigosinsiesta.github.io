@@ -9,7 +9,7 @@ on:
       - main
     paths:
       - 'package.json'
-      - 'bun.lockb'
+      - 'pnpm-lock.yaml'
 
 permissions:
   contents: read
@@ -23,14 +23,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
+          cache: pnpm
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install license-checker
         run: npm install -g license-checker
