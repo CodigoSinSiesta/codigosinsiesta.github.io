@@ -5,48 +5,103 @@ import { getCollection } from 'astro:content';
 import { RUTAS } from '../data/rutas';
 import { TALLERES } from '../data/talleres';
 
-const ensayos = (await getCollection('ensayos'))
-  .sort((a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf())
-  .slice(0, 4);
+const todosEnsayos = (await getCollection('ensayos')).sort(
+  (a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf()
+);
+const ensayos = todosEnsayos.slice(0, 4);
 
 const fmtFecha = (d: Date) =>
   d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: '2-digit' });
+
+const proof = [
+  { n: `${todosEnsayos.length}`, label: 'ensayos publicados' },
+  { n: `${RUTAS.length}`, label: 'rutas guiadas' },
+  { n: `${TALLERES.length}`, label: 'talleres hands-on' },
+];
 ---
 
 <Base activeHref="/">
-  <!-- hero -->
-  <div class="container">
-    <section class="hero">
+  <!-- ░░ hero full-bleed ░░ -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__grid"></div>
+      <div class="hero__orb hero__orb--1"></div>
+      <div class="hero__orb hero__orb--2"></div>
+      <div class="hero__orb hero__orb--3"></div>
+    </div>
+
+    <div class="container hero__inner">
+      <p class="hero__boot">
+        <svg class="hero__owl" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 14 L20 22"></path>
+          <path d="M48 14 L44 22"></path>
+          <path d="M10 30 C 10 18, 22 10, 32 10 C 42 10, 54 18, 54 30 C 54 42, 44 52, 32 52 C 20 52, 10 42, 10 30 Z"></path>
+          <circle cx="22" cy="30" r="7"></circle>
+          <circle cx="42" cy="30" r="7"></circle>
+          <circle cx="22" cy="30" r="1.8" fill="currentColor"></circle>
+          <circle cx="42" cy="30" r="1.8" fill="currentColor"></circle>
+          <path d="M32 36 L29 41 L32 44 L35 41 Z"></path>
+        </svg>
+        <span class="hero__boot-text">
+          dojo@codigosinsiesta:~$ <span class="hero__boot-cmd">init --calidad</span><span class="hero__cursor" aria-hidden="true"></span>
+        </span>
+      </p>
+
+      <h1 class="hero__title">
+        Construye con IA<br />
+        <span class="hl">sin perder el techo de calidad.</span>
+      </h1>
+
+      <p class="hero__lead">
+        El vibe coding elevó el suelo. Nosotros entrenamos el techo.
+        Rutas, ensayos y talleres para developers que quieren ingeniería de verdad
+        en la era de los agentes — sin humo y sin atajos.
+      </p>
+
+      <div class="hero-ctas">
+        <a class="btn btn--primary" href="/rutas">Entra al dojo →</a>
+        <a class="btn btn--ghost" href="/ensayos">Lee el zine</a>
+      </div>
+
+      <ul class="hero__proof">
+        {
+          proof.map((p) => (
+            <li>
+              <b>{p.n}</b>
+              <span>{p.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <a class="hero__scroll" href="#contenido" aria-label="Bajar al contenido">
+      <span></span>
+    </a>
+  </section>
+
+  <!-- ░░ manifiesto / terminal ░░ -->
+  <section class="manifiesto" id="contenido">
+    <div class="container manifiesto__grid">
       <div>
-        <p class="eyebrow">código sin siesta · evolución 2026</p>
-        <h1>
-          Construye con IA <span class="hl">sin perder el techo de calidad</span>
-        </h1>
-        <p class="lead">
-          Rutas de aprendizaje, ensayos y talleres para developers que quieren crecer.
-          Sin humo, sin atajos — conceptos sólidos y disciplina de ingeniería.
+        <p class="eyebrow">el manifiesto</p>
+        <h2>No competimos con tu agente.<br /><span class="hl">Lo dirigimos.</span></h2>
+        <p>
+          Un agente acelera la escritura de código. La calidad, la arquitectura y el criterio
+          siguen siendo tuyos. Aquí aprendes a pilotarlo: <em>harness engineering</em>,
+          patrones de orquestación y disciplina de ingeniería aplicada.
         </p>
-        <div class="hero-ctas">
-          <a class="btn btn--primary" href="/rutas">Empieza una ruta</a>
-          <a class="btn btn--ghost" href="/ensayos">Lee los ensayos</a>
-        </div>
+        <p style="margin-top: 1.25rem;">
+          <a href="/ensayos/del-vibe-coding-al-agentic-engineering">Del vibe coding al agentic engineering →</a>
+        </p>
       </div>
       <TerminalHero client:visible />
-    </section>
-  </div>
-
-  <!-- statement zine -->
-  <section class="statement">
-    <div class="container">
-      <p>
-        Vibe coding elevó el suelo. Alguien tiene que <span class="hl">preservar el techo</span> —
-        y ese alguien eres tú, no tu agente.
-      </p>
     </div>
   </section>
 
-  <!-- rutas -->
+  <!-- ░░ contenido ░░ -->
   <div class="container">
+    <!-- rutas -->
     <section class="section">
       <p class="eyebrow">el dojo</p>
       <h2>Rutas de aprendizaje</h2>
@@ -54,7 +109,7 @@ const fmtFecha = (d: Date) =>
       <div class="grid-2" style="margin-top: 2rem;">
         {
           RUTAS.map((ruta) => (
-            <a class="card" href={`/rutas/${ruta.slug}`}>
+            <a class="card card--ruta" href={`/rutas/${ruta.slug}`}>
               <span class={`badge ${ruta.nivel === 'inicial' ? 'badge--ok' : ''}`}>
                 {ruta.nivel}
               </span>

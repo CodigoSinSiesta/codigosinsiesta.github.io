@@ -1,7 +1,7 @@
 ---
-import SiteHeader from '@codigosinsiesta/theme/layout/SiteHeader.svelte';
+import Header from '../components/Header.astro';
 import SiteFooter from '@codigosinsiesta/theme/layout/SiteFooter.svelte';
-import { SITE, NAV, FOOTER } from '../data/site';
+import { SITE, FOOTER } from '../data/site';
 import '../styles/site.css';
 
 interface Props {
@@ -43,7 +43,7 @@ const ogImage = new URL('/og-card.png', Astro.site);
   </head>
   <body>
     <a class="skip-link" href="#main">Saltar al contenido</a>
-    <SiteHeader client:load links={NAV} activeHref={activeHref} logoVariant="both" />
+    <Header activeHref={activeHref} />
     <main id="main">
       <slot />
     </main>
