@@ -14,7 +14,7 @@ const fmtFecha = (d: Date) =>
   d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: '2-digit' });
 
 const proof = [
-  { n: `${todosEnsayos.length}`, label: 'ensayos publicados' },
+  { n: `${todosEnsayos.length}`, label: 'artículos publicados' },
   { n: `${RUTAS.length}`, label: 'rutas guiadas' },
   { n: `${TALLERES.length}`, label: 'talleres hands-on' },
 ];
@@ -43,7 +43,7 @@ const proof = [
           <path d="M32 36 L29 41 L32 44 L35 41 Z"></path>
         </svg>
         <span class="hero__boot-text">
-          dojo@codigosinsiesta:~$ <span class="hero__boot-cmd">init --calidad</span><span class="hero__cursor" aria-hidden="true"></span>
+          dev@codigosinsiesta:~$ <span class="hero__boot-cmd">init --calidad</span><span class="hero__cursor" aria-hidden="true"></span>
         </span>
       </p>
 
@@ -59,8 +59,8 @@ const proof = [
       </p>
 
       <div class="hero-ctas">
-        <a class="btn btn--primary" href="/rutas">Entra al dojo →</a>
-        <a class="btn btn--ghost" href="/ensayos">Lee el zine</a>
+        <a class="btn btn--primary" href="/rutas">Ver las guías →</a>
+        <a class="btn btn--ghost" href="/ensayos">Leer artículos</a>
       </div>
 
       <ul class="hero__proof">
@@ -103,9 +103,9 @@ const proof = [
   <div class="container">
     <!-- rutas -->
     <section class="section">
-      <p class="eyebrow">el dojo</p>
-      <h2>Rutas de aprendizaje</h2>
-      <p>Itinerarios curados, de cero a producción. Cada paso es un ensayo, un deck o un taller.</p>
+      <p class="eyebrow">guías</p>
+      <h2>Guías de aprendizaje</h2>
+      <p>Itinerarios curados, de cero a producción. Cada paso es un artículo, un deck o un taller.</p>
       <div class="grid-2" style="margin-top: 2rem;">
         {
           RUTAS.map((ruta) => (
@@ -124,8 +124,8 @@ const proof = [
 
     <!-- ensayos -->
     <section class="section" style="padding-top: 0;">
-      <p class="eyebrow">el zine</p>
-      <h2>Últimos ensayos</h2>
+      <p class="eyebrow">artículos</p>
+      <h2>Últimos artículos</h2>
       <ul class="item-list">
         {
           ensayos.map((post) => (
@@ -140,7 +140,7 @@ const proof = [
         }
       </ul>
       <p style="margin-top: 1.5rem;">
-        <a href="/ensayos">Todos los ensayos →</a>
+        <a href="/ensayos">Todos los artículos →</a>
       </p>
     </section>
 
