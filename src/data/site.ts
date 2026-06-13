@@ -3,13 +3,13 @@ export const SITE = {
   dominio: 'https://codigosinsiesta.com',
   claim: 'Donde la disciplina gana a la velocidad',
   descripcion:
-    'El dojo de Código Sin Siesta: rutas de aprendizaje, ensayos y talleres para developers que construyen con IA sin perder el techo de calidad.',
+    'Código Sin Siesta: guías de aprendizaje, artículos y talleres para developers que construyen con IA sin perder el techo de calidad.',
 };
 
 export const NAV = [
   { href: '/', label: 'Inicio' },
-  { href: '/rutas', label: 'Rutas' },
-  { href: '/ensayos', label: 'Ensayos' },
+  { href: '/rutas', label: 'Guías' },
+  { href: '/ensayos', label: 'Artículos' },
   { href: '/talleres', label: 'Talleres' },
 ];
 

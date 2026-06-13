@@ -38,7 +38,7 @@ const BADGE: Record<string, string> = {
 <Base title={ruta.titulo} description={ruta.descripcion} activeHref="/rutas">
   <div class="container">
     <section class="section">
-      <p class="eyebrow">ruta · {ruta.nivel} · {ruta.duracion}</p>
+      <p class="eyebrow">guía · {ruta.nivel} · {ruta.duracion}</p>
       <h1>{ruta.titulo}</h1>
       <p class="lead" style="max-width: 42rem;">{ruta.descripcion}</p>
       {slugsGuias.length > 0 && <ProgresoRuta client:load ruta={ruta.slug} slugs={slugsGuias} />}
