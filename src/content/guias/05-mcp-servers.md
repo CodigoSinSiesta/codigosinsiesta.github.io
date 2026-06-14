@@ -1,7 +1,7 @@
 ---
 title: "Módulo 5: MCP Servers - Model Context Protocol"
 ruta: "agentes-ia"
-orden: 6
+orden: 5
 duracion: "2.5 horas"
 ---
 Este módulo te enseñará a crear **MCP Servers**, la evolución de las herramientas de agentes. Con MCP, puedes crear servidores reutilizables que extienden las capacidades de cualquier LLM de forma estandarizada.
@@ -1688,12 +1688,3 @@ Resource not found: notes://algo
 - [Building MCP Servers (Anthropic)](https://docs.anthropic.com/claude/docs/model-context-protocol)
 - [MCP Server Examples](https://github.com/modelcontextprotocol/servers)
 
----
-
-
-
----
-
-**Anterior**: [Módulo 4: Agentes Avanzados con Claude](./04-agentes-avanzados)
-
-**Siguiente**: [Módulo 6: Producción y Deployment](./06-produccion)

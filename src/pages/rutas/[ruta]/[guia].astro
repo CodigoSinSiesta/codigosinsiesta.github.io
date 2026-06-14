@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 }
 
 const { guia } = Astro.props;
-const { Content } = await render(guia);
+const { Content, headings } = await render(guia);
 
 const rutaInfo = RUTAS.find((r) => r.slug === guia.data.ruta);
 
@@ -23,12 +23,16 @@ const hermanas = (await getCollection('guias', (g) => g.data.ruta === guia.data.
 const idx = hermanas.findIndex((g) => g.id === guia.id);
 const anterior = idx > 0 ? hermanas[idx - 1] : null;
 const siguiente = idx < hermanas.length - 1 ? hermanas[idx + 1] : null;
+
+// TOC: solo H2/H3 con slug (los H1 son el título de página).
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 <Base title={guia.data.title} description={guia.data.description} activeHref="/rutas">
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
   <div class="container">
-    <article class="section">
-      <header style="max-width: 760px;">
+    <article class="section guia" data-guia>
+      <header class="guia__head">
         <p class="eyebrow">
           <a href={`/rutas/${guia.data.ruta}`} style="color: inherit;">
             {rutaInfo?.titulo ?? guia.data.ruta}
@@ -38,19 +42,88 @@ const siguiente = idx < hermanas.length - 1 ? hermanas[idx + 1] : null;
         </p>
         <h1 style="font-size: clamp(1.9rem, 4.5vw, 2.8rem);">{guia.data.title}</h1>
       </header>
-      <div class="prose">
-        <Content />
-      </div>
-      <footer
-        style="margin-top: 3rem; border-top: 1px solid var(--color-borde); padding-top: 1.75rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;"
-      >
-        <ProgresoGuia client:load ruta={guia.data.ruta} guia={guia.id} />
-        <div style="display: flex; gap: 1.5rem;">
-          {anterior && <a href={`/rutas/${guia.data.ruta}/${anterior.id}`}>← Anterior</a>}
-          <a href={`/rutas/${guia.data.ruta}`}>Índice</a>
-          {siguiente && <a href={`/rutas/${guia.data.ruta}/${siguiente.id}`}>Siguiente →</a>}
+
+      <div class="guia__layout">
+        <div class="prose">
+          <Content />
+
+          <footer class="guia__footer">
+            <ProgresoGuia client:load ruta={guia.data.ruta} guia={guia.id} />
+            <div class="guia__nav">
+              {anterior && <a href={`/rutas/${guia.data.ruta}/${anterior.id}`}>← Anterior</a>}
+              <a href={`/rutas/${guia.data.ruta}`}>Índice</a>
+              {siguiente && <a href={`/rutas/${guia.data.ruta}/${siguiente.id}`}>Siguiente →</a>}
+            </div>
+          </footer>
         </div>
-      </footer>
+
+        {
+          toc.length > 0 && (
+            <aside class="toc">
+              <details class="toc__box" open>
+                <summary class="toc__summary">En este módulo</summary>
+                <nav class="toc__nav" aria-label="Índice del módulo">
+                  {toc.map((h) => (
+                    <a class={`toc__link toc__link--h${h.depth}`} href={`#${h.slug}`} data-toc={h.slug}>
+                      {h.text}
+                    </a>
+                  ))}
+                </nav>
+              </details>
+            </aside>
+          )
+        }
+      </div>
     </article>
   </div>
 </Base>
+
+<script>
+  // Progreso de lectura + resaltado de la sección activa en el TOC.
+  // Progressive enhancement: sin esto, el TOC sigue funcionando como enlaces ancla.
+  const bar = document.querySelector('.reading-progress span') as HTMLElement | null;
+  const article = document.querySelector('[data-guia]') as HTMLElement | null;
+
+  if (bar && article) {
+    const onScroll = () => {
+      const scrollable = article.offsetHeight - window.innerHeight;
+      const y = window.scrollY - article.offsetTop;
+      const pct = scrollable > 0 ? Math.min(Math.max(y / scrollable, 0), 1) * 100 : 0;
+      bar.style.width = `${pct}%`;
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  // En móvil el TOC arranca plegado para no empujar el contenido hacia abajo.
+  const tocBox = document.querySelector('.toc__box');
+  if (tocBox && window.matchMedia('(max-width: 980px)').matches) {
+    tocBox.removeAttribute('open');
+  }
+
+  const tocLinks = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('.toc__link')].map((a) => [
+      a.dataset.toc ?? '',
+      a,
+    ])
+  );
+
+  if (tocLinks.size > 0) {
+    const setActive = (id: string) => {
+      tocLinks.forEach((a) => a.classList.remove('is-active'));
+      tocLinks.get(id)?.classList.add('is-active');
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && (e.target as HTMLElement).id) {
+            setActive((e.target as HTMLElement).id);
+          }
+        }
+      },
+      { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
+    );
+    document.querySelectorAll('.prose h2, .prose h3').forEach((h) => io.observe(h));
+  }
+</script>

@@ -1,8 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
-import ProgresoRuta from '../../components/ProgresoRuta.svelte';
+import ListaPasos from '../../components/ListaPasos.svelte';
 import { getCollection } from 'astro:content';
-import { RUTAS, type Paso } from '../../data/rutas';
+import { RUTAS } from '../../data/rutas';
 
 export async function getStaticPaths() {
   return RUTAS.map((ruta) => ({ params: { slug: ruta.slug }, props: { ruta } }));
@@ -15,24 +15,20 @@ const guias = (await getCollection('guias', (g) => g.data.ruta === ruta.slug)).s
   (a, b) => a.data.orden - b.data.orden
 );
 
-const pasos: Paso[] =
+// Cada paso lleva una `key` estable para el progreso: id de guía o href del paso.
+const pasos =
   guias.length > 0
     ? guias.map((g) => ({
         tipo: 'guia' as const,
         titulo: g.data.title,
         href: `/rutas/${ruta.slug}/${g.id}`,
         meta: g.data.duracion,
+        key: g.id,
       }))
-    : ruta.pasos;
+    : ruta.pasos.map((p) => ({ ...p, key: p.href }));
 
-const slugsGuias = guias.map((g) => g.id);
-
-const BADGE: Record<string, string> = {
-  guia: 'módulo',
-  ensayo: 'ensayo',
-  deck: 'deck',
-  taller: 'taller',
-};
+const tieneContrato =
+  ruta.aprenderas?.length || ruta.requisitos?.length || ruta.noIncluye?.length;
 ---
 
 <Base title={ruta.titulo} description={ruta.descripcion} activeHref="/rutas">
@@ -41,25 +37,48 @@ const BADGE: Record<string, string> = {
       <p class="eyebrow">guía · {ruta.nivel} · {ruta.duracion}</p>
       <h1>{ruta.titulo}</h1>
       <p class="lead" style="max-width: 42rem;">{ruta.descripcion}</p>
-      {slugsGuias.length > 0 && <ProgresoRuta client:load ruta={ruta.slug} slugs={slugsGuias} />}
-      <ol class="item-list" style="margin-top: 2rem;">
-        {
-          pasos.map((paso, i) => (
-            <li>
-              <div class="paso">
-                <span class="paso-num">{String(i + 1).padStart(2, '0')}</span>
-                <div>
-                  <span class="badge">{BADGE[paso.tipo]}</span>
-                  <h3 style="margin-top: 0.5rem;">
-                    <a href={paso.href}>{paso.titulo}</a>
-                  </h3>
-                  {paso.meta && <p class="meta">{paso.meta}</p>}
-                </div>
+      {ruta.paraQuien && <p class="meta" style="max-width: 42rem;">Para ti si: {ruta.paraQuien}</p>}
+
+      {
+        tieneContrato && (
+          <div class="grid-3" style="margin-top: 2.5rem;">
+            {ruta.aprenderas?.length && (
+              <div class="card">
+                <h3>Qué te llevas</h3>
+                <ul class="lista-check">
+                  {ruta.aprenderas.map((x) => (
+                    <li>{x}</li>
+                  ))}
+                </ul>
               </div>
-            </li>
-          ))
-        }
-      </ol>
+            )}
+            {ruta.requisitos?.length && (
+              <div class="card">
+                <h3>Requisitos</h3>
+                <ul class="lista-check lista-check--neutro">
+                  {ruta.requisitos.map((x) => (
+                    <li>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {ruta.noIncluye?.length && (
+              <div class="card">
+                <h3>Qué NO cubre</h3>
+                <ul class="lista-check lista-check--no">
+                  {ruta.noIncluye.map((x) => (
+                    <li>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )
+      }
+
+      <h2 style="margin-top: 3rem;">El recorrido</h2>
+      <ListaPasos client:load ruta={ruta.slug} pasos={pasos} />
+
       <p style="margin-top: 2rem;">
         <a href="/rutas">← Todas las rutas</a>
       </p>

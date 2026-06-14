@@ -14,6 +14,11 @@ export interface Ruta {
   descripcion: string;
   nivel: 'inicial' | 'intermedio' | 'avanzado';
   duracion: string;
+  // Contrato de la ruta (portada): para quién es, qué te llevas y qué no cubre.
+  paraQuien?: string;
+  aprenderas?: string[];
+  requisitos?: string[];
+  noIncluye?: string[];
   // Las rutas con guías propias (colección `guias`) dejan pasos vacío:
   // la página los genera desde la colección.
   pasos: Paso[];
@@ -28,6 +33,23 @@ export const RUTAS: Ruta[] = [
       'Seis módulos progresivos: fundamentos, TypeScript para agentes, conceptos clave (contexto, tools, memoria), agentes avanzados, MCP servers y paso a producción. Cada módulo con ejercicios y proyecto.',
     nivel: 'inicial',
     duracion: '~15 horas',
+    paraQuien: 'Developers que saben programar y quieren construir agentes de IA sin haber tocado LLMs antes.',
+    aprenderas: [
+      'Construir un agente de IA en TypeScript desde cero',
+      'Diseñar tools, memoria y manejo de contexto',
+      'Crear tu propio MCP Server reutilizable',
+      'Llevar un agente a producción con testing, seguridad y observabilidad',
+    ],
+    requisitos: [
+      'JavaScript a nivel intermedio (funciones, async/await, módulos)',
+      'Node.js instalado y soltura con la terminal',
+      'No hace falta experiencia previa con IA ni con LLMs',
+    ],
+    noIncluye: [
+      'Entrenar o hacer fine-tuning de modelos',
+      'Matemáticas de machine learning',
+      'Frontend o interfaces de usuario',
+    ],
     pasos: [],
   },
   {
@@ -38,6 +60,21 @@ export const RUTAS: Ruta[] = [
       'La ruta para ingenieros que ya usan IA a diario: del vibe coding al agentic engineering, harness engineering, patrones de orquestación y spec-driven development. Ensayos + decks + talleres.',
     nivel: 'intermedio',
     duracion: '~10 horas',
+    paraQuien: 'Ingenieros que ya programan con IA a diario y quieren no perder calidad al delegar en agentes.',
+    aprenderas: [
+      'Distinguir vibe coding de agentic engineering',
+      'Montar el harness (el contexto) que sostiene la calidad al delegar',
+      'Elegir el patrón correcto: workflow, agente u orquestación',
+      'Aplicar spec-driven development trabajando con agentes',
+    ],
+    requisitos: [
+      'Usar ya IA a diario para programar (Claude Code, Cursor, etc.)',
+      'Experiencia como desarrollador/a — no es una ruta de iniciación',
+    ],
+    noIncluye: [
+      'Fundamentos de programación o de IA desde cero',
+      'Tutoriales paso a paso de una herramienta concreta',
+    ],
     pasos: [
       {
         tipo: 'ensayo',

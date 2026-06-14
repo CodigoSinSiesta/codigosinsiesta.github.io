@@ -1,7 +1,7 @@
 ---
 title: "Módulo 4: Agentes Avanzados con Claude"
 ruta: "agentes-ia"
-orden: 5
+orden: 4
 duracion: "3 horas"
 ---
 Este módulo te llevará al siguiente nivel construyendo agentes más sofisticados. Aprenderás técnicas avanzadas de prompt engineering, manejo de context windows, streaming de respuestas, y patrones robustos de recuperación de errores.
@@ -409,7 +409,7 @@ async function streamWithTimeout(
 
 Los agentes en producción deben manejar errores gracefully. Aprenderás patrones para hacer tus agentes más robustos.
 
-> 💡 **Tip**: Estos patrones de resiliencia son parte del pilar **Resilience** del [4R Framework](/docs/proyectos/ai-presentation/4r-framework). Aplica estos principios para asegurar que tus agentes sean robustos bajo presión.
+> 💡 **Tip**: Estos patrones de resiliencia son parte del pilar **Resilience** del 4R Framework. Aplica estos principios para asegurar que tus agentes sean robustos bajo presión.
 
 #### Tipos de Errores en Agentes
 
@@ -1637,15 +1637,6 @@ Las notas guardadas desaparecen al reiniciar
 - [Context Window Best Practices](https://docs.anthropic.com/claude/docs/long-context-prompting-tips)
 
 ### Contenido Relacionado en Código Sin Siesta
-- 👉 **[Taller IA, Agentes y MCP](/docs/proyectos/taller-ia-agentes-mcp/intro)** — Ejercicios prácticos para consolidar estos conceptos
-- 👉 **[4R Framework](/docs/proyectos/ai-presentation/4r-framework)** — Marco de calidad para agentes seguros y resilientes
+- 👉 **[Taller IA, Agentes y MCP](/talleres)** — Ejercicios prácticos para consolidar estos conceptos
+- 👉 **4R Framework** — Marco de calidad para agentes seguros y resilientes
 
----
-
-
-
----
-
-**Anterior**: [Módulo 3: Conceptos Clave de IA Agents](./03-conceptos)
-
-**Siguiente**: [Módulo 5: MCP Servers - Model Context Protocol](./05-mcp-servers)

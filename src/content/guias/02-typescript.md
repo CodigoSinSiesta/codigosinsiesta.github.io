@@ -1,7 +1,7 @@
 ---
 title: "Módulo 2: TypeScript Esencial para Agentes"
 ruta: "agentes-ia"
-orden: 3
+orden: 2
 duracion: "2 horas"
 ---
 Este módulo te enseñará TypeScript desde la perspectiva de un desarrollador de agentes de IA. No cubriremos todo TypeScript, sino lo que necesitas para construir agentes robustos y mantenibles.
@@ -821,12 +821,3 @@ console.log(result.dato); // ❌ 'dato' no existe en el tipo Result
 - [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
 - [Total TypeScript (tutoriales avanzados)](https://www.totaltypescript.com/)
 
----
-
-
-
----
-
-**Anterior**: [Módulo 1: Fundamentos de IA para Desarrolladores](./01-fundamentos)
-
-**Siguiente**: [Módulo 3: Conceptos Clave de IA Agents](./03-conceptos)
