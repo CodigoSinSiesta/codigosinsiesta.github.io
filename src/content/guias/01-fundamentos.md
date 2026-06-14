@@ -1,7 +1,7 @@
 ---
 title: "Módulo 1: Fundamentos de IA para Desarrolladores"
 ruta: "agentes-ia"
-orden: 2
+orden: 1
 duracion: "1.5 horas"
 ---
 Bienvenido al primer módulo de la ruta de aprendizaje. Aquí construirás la base conceptual que necesitas para entender cómo funcionan los agentes de IA desde la perspectiva de un desarrollador.
@@ -357,12 +357,3 @@ Error: Request too large for model context window
 - [Guía de Prompt Engineering de Anthropic](https://docs.anthropic.com/claude/docs/intro-to-prompting)
 - [Antropic Cookbook](https://github.com/anthropics/anthropic-cookbook)
 
----
-
-
-
----
-
-**Anterior**: [Introducción a la Ruta](./intro)
-
-**Siguiente**: [Módulo 2: TypeScript Esencial para Agentes](./02-typescript)

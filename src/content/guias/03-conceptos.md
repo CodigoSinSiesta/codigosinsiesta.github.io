@@ -1,7 +1,7 @@
 ---
 title: "Módulo 3: Conceptos Clave de IA Agents"
 ruta: "agentes-ia"
-orden: 4
+orden: 3
 duracion: "2.5 horas"
 ---
 Este módulo te enseñará los patrones fundamentales que hacen que un agente de IA sea realmente autónomo. Aprenderás cómo los agentes usan herramientas, razonan sobre problemas, y mantienen estado entre interacciones.
@@ -1329,12 +1329,3 @@ Error: Tool "crear_tarea" not found
 - [Building Effective Agents (Anthropic)](https://docs.anthropic.com/claude/docs/building-effective-agents)
 - [Prompt Engineering for Tool Use](https://docs.anthropic.com/claude/docs/tool-use-best-practices)
 
----
-
-
-
----
-
-**Anterior**: [Módulo 2: TypeScript Esencial para Agentes](./02-typescript)
-
-**Siguiente**: [Módulo 4: Agentes Avanzados con Claude](./04-agentes-avanzados)

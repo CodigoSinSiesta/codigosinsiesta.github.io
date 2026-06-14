@@ -1,7 +1,7 @@
 ---
 title: "Módulo 6: Producción y Deployment"
 ruta: "agentes-ia"
-orden: 7
+orden: 6
 duracion: "3 horas"
 ---
 Este módulo final te enseñará a llevar tus agentes de IA y MCP Servers a producción de forma segura, escalable y monitoreable. Aprenderás patrones de testing, seguridad, rate limiting, observabilidad y estrategias de deployment.
@@ -374,7 +374,7 @@ describe('MCP Server Tests', () => {
 
 La seguridad es crítica cuando los agentes tienen acceso a herramientas que pueden ejecutar acciones en el mundo real.
 
-> 💡 **4R Framework**: Los patrones de esta sección implementan el pilar **Risk** del [4R Framework](/docs/proyectos/ai-presentation/4r-framework). Siempre evalúa los riesgos de seguridad antes de dar herramientas a tus agentes.
+> 💡 **4R Framework**: Los patrones de esta sección implementan el pilar **Risk** del 4R Framework. Siempre evalúa los riesgos de seguridad antes de dar herramientas a tus agentes.
 
 #### Principio de Mínimo Privilegio
 
@@ -1974,20 +1974,8 @@ Memory cleared on restart
 - [OWASP LLM Security Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 
 ### Contenido Relacionado en Código Sin Siesta
-- 👉 **[Taller IA, Agentes y MCP](/docs/proyectos/taller-ia-agentes-mcp/intro)** — Ejercicios prácticos de agentes y MCP Servers
-- 👉 **[4R Framework](/docs/proyectos/ai-presentation/4r-framework)** — Risk, Readability, Reliability, Resilience para código de producción
-
----
-
-
-
----
-
-**Anterior**: [Módulo 5: MCP Servers - Model Context Protocol](./05-mcp-servers)
-
-**Volver al inicio**: [Ruta de Aprendizaje: IA Agents](./intro)
-
----
+- 👉 **[Taller IA, Agentes y MCP](/talleres)** — Ejercicios prácticos de agentes y MCP Servers
+- 👉 **4R Framework** — Risk, Readability, Reliability, Resilience para código de producción
 
 ## 🎉 ¡Felicitaciones!
 
@@ -1999,6 +1987,6 @@ Has completado la **Ruta de Aprendizaje de IA Agents**. Ahora tienes las herrami
 
 ### ¿Qué sigue?
 
-- 👉 Explora el **[Taller de IA, Agentes y MCP](/docs/proyectos/taller-ia-agentes-mcp/intro)** para ejercicios adicionales y proyectos guiados
-- 👉 Aplica el **[4R Framework](/docs/proyectos/ai-presentation/4r-framework)** para asegurar que tus agentes sean seguros, legibles, confiables y resilientes
+- 👉 Explora el **[Taller de IA, Agentes y MCP](/talleres)** para ejercicios adicionales y proyectos guiados
+- 👉 Aplica el **4R Framework** para asegurar que tus agentes sean seguros, legibles, confiables y resilientes
 - Contribuye a la comunidad compartiendo tus MCP Servers y aprendizajes

@@ -513,3 +513,153 @@ a.card:hover {
   html { scroll-behavior: auto; }
   .card, .btn { transition: none; }
 }
+
+/* ═══ página de guía: layout 2 columnas + TOC pegajoso ═══ */
+
+.guia__head { max-width: 760px; }
+
+.guia__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15rem;
+  gap: 3rem;
+  align-items: start;
+  margin-top: 2rem;
+}
+
+/* el TOC va a la derecha y se queda pegado al hacer scroll */
+.toc {
+  position: sticky;
+  top: 5.5rem;
+  max-height: calc(100vh - 7rem);
+  overflow-y: auto;
+}
+
+.toc__summary {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-cielo);
+  padding: 0 0 0.75rem 1rem;
+  list-style: none;
+}
+.toc__summary::-webkit-details-marker { display: none; }
+
+.toc__nav { display: flex; flex-direction: column; }
+
+.toc__link {
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--color-tinta3);
+  padding: 0.3rem 0 0.3rem 1rem;
+  border-left: 2px solid var(--color-borde);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+.toc__link:hover { color: var(--color-tinta); text-decoration: none; }
+.toc__link--h3 { padding-left: 1.85rem; font-size: 0.8rem; }
+.toc__link.is-active {
+  color: var(--color-cielo);
+  border-left-color: var(--color-cielo);
+}
+
+/* footer del módulo: progreso + navegación anterior/índice/siguiente */
+.guia__footer {
+  margin-top: 3rem;
+  border-top: 1px solid var(--color-borde);
+  padding-top: 1.75rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.guia__nav { display: flex; gap: 1.5rem; }
+
+/* barra de progreso de lectura, fija en la parte superior del viewport */
+.reading-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 60;
+  pointer-events: none;
+}
+.reading-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--color-electrico), var(--color-cielo), var(--color-cielo2));
+  transition: width 80ms linear;
+}
+
+@media (max-width: 980px) {
+  .guia__layout { grid-template-columns: 1fr; gap: 1.5rem; }
+
+  /* en móvil el TOC deja de ser pegajoso y se vuelve un desplegable arriba */
+  .toc {
+    position: static;
+    max-height: none;
+    order: -1;
+    margin-bottom: 0.5rem;
+  }
+  .toc__box {
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem;
+    background: var(--color-accent-soft);
+  }
+  .toc__summary { cursor: pointer; padding: 0; }
+  .toc__nav { margin-top: 0.75rem; }
+  .toc__link { padding-left: 0.75rem; }
+  .toc__link--h3 { padding-left: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress span { transition: none; }
+}
+
+/* ═══ portada de ruta: lead + contrato (qué te llevas / requisitos / qué no) ═══ */
+
+.lead {
+  font-size: 1.15rem;
+  color: var(--color-tinta2);
+}
+
+.lista-check {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+.lista-check li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-tinta2);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.lista-check li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-ok);
+  font-weight: 700;
+}
+.lista-check--neutro li::before { content: '·'; color: var(--color-cielo); }
+.lista-check--no li::before { content: '✕'; color: var(--color-tinta3); }
+
+/* ═══ iconos SVG en encabezados de guía (sustituyen a los emoji del markdown) ═══ */
+
+.prose h2.with-icon,
+.prose h3.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.heading-icon {
+  flex-shrink: 0;
+  width: 1.05em;
+  height: 1.05em;
+  color: var(--color-cielo);
+  stroke-width: 1.75;
+}
