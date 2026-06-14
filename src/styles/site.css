@@ -14,6 +14,10 @@ body {
   font-size: 1.0625rem;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  /* tokens.css del theme fuerza body{overflow:hidden} para los slide decks;
+     en la web de contenido restauramos el scroll vertical de página. */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 ::selection {
