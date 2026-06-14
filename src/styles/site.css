@@ -646,3 +646,20 @@ a.card:hover {
 }
 .lista-check--neutro li::before { content: '·'; color: var(--color-cielo); }
 .lista-check--no li::before { content: '✕'; color: var(--color-tinta3); }
+
+/* ═══ iconos SVG en encabezados de guía (sustituyen a los emoji del markdown) ═══ */
+
+.prose h2.with-icon,
+.prose h3.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.heading-icon {
+  flex-shrink: 0;
+  width: 1.05em;
+  height: 1.05em;
+  color: var(--color-cielo);
+  stroke-width: 1.75;
+}
