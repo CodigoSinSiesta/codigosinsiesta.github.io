@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <!-- Variante exploratoria: búho con orejas (ear tufts). -->
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1024px; height: 1024px; }
+      body {
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 42%, #16275a 0%, #0f172a 58%, #0a0f1f 100%);
+      }
+      .grid {
+        position: absolute; inset: 0;
+        background-image:
+          linear-gradient(rgba(96, 165, 250, 0.10) 1.5px, transparent 1.5px),
+          linear-gradient(90deg, rgba(96, 165, 250, 0.10) 1.5px, transparent 1.5px);
+        background-size: 64px 64px;
+        mask-image: radial-gradient(circle at 50% 50%, #000 30%, transparent 72%);
+        -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 30%, transparent 72%);
+      }
+      .glow {
+        position: absolute; left: 50%; top: 50%;
+        width: 620px; height: 620px; transform: translate(-50%, -50%);
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.45), transparent 68%);
+        filter: blur(40px);
+      }
+      .owl {
+        position: absolute; left: 50%; top: 50%;
+        width: 560px; height: 560px; transform: translate(-50%, -50%);
+        color: #60a5fa;
+        filter: drop-shadow(0 0 26px rgba(96, 165, 250, 0.55));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <svg class="owl" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <!-- orejas (ear tufts) -->
+      <path d="M16 16 L10 1 L27 12"></path>
+      <path d="M48 16 L54 1 L37 12"></path>
+      <!-- cabeza -->
+      <path d="M10 30 C 10 18, 22 10, 32 10 C 42 10, 54 18, 54 30 C 54 42, 44 52, 32 52 C 20 52, 10 42, 10 30 Z"></path>
+      <!-- ojos + pupilas -->
+      <circle cx="22" cy="30" r="7"></circle>
+      <circle cx="42" cy="30" r="7"></circle>
+      <circle cx="22" cy="30" r="1.8" fill="currentColor"></circle>
+      <circle cx="42" cy="30" r="1.8" fill="currentColor"></circle>
+      <!-- pico -->
+      <path d="M32 36 L29 41 L32 44 L35 41 Z"></path>
+    </svg>
+  </body>
+</html>
