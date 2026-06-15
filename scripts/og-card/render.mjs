@@ -22,7 +22,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const [inArg = 'og-card.html', outArg = '../../public/og-card.png', wArg, hArg] =
   process.argv.slice(2);
-const HTML = pathToFileURL(resolve(__dirname, inArg)).href;
+const HTML = /^https?:\/\//.test(inArg)
+  ? inArg
+  : pathToFileURL(resolve(__dirname, inArg)).href;
 const OUT = resolve(__dirname, outArg);
 const WIDTH = Number(wArg) || 1200;
 const HEIGHT = Number(hArg) || 630;
