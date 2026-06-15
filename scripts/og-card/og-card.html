@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <!--
+      Plantilla fuente de la tarjeta social (Open Graph / Twitter card).
+      Render: scripts/og-card/render.mjs → public/og-card.png (1200×630).
+      Identidad: sistema "dark blueprint" V4 (@codigosinsiesta/theme).
+      Textos canónicos de src/data/site.ts — no inventar.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --fondo: #0f172a;
+        --marino: #0c1e4f;
+        --cobalto: #1e3a8a;
+        --electrico: #3b82f6;
+        --cielo: #60a5fa;
+        --cielo2: #93c5fd;
+        --tinta: #f1f5f9;
+        --tinta2: #cbd5e1;
+        --tinta3: #94a3b8;
+        --borde: #334155;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body { width: 1200px; height: 630px; }
+
+      body {
+        position: relative;
+        overflow: hidden;
+        background: var(--fondo);
+        font-family: 'Inter', system-ui, sans-serif;
+        color: var(--tinta);
+      }
+
+      /* blueprint grid */
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(96, 165, 250, 0.07) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(96, 165, 250, 0.07) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: radial-gradient(ellipse 95% 80% at 50% 42%, #000 35%, transparent 80%);
+        -webkit-mask-image: radial-gradient(ellipse 95% 80% at 50% 42%, #000 35%, transparent 80%);
+      }
+
+      /* glow orbs */
+      .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.55;
+      }
+      .orb--1 { width: 520px; height: 520px; left: -140px; top: -160px;
+        background: radial-gradient(circle, var(--cobalto), transparent 70%); }
+      .orb--2 { width: 460px; height: 460px; right: -120px; bottom: -160px;
+        background: radial-gradient(circle, var(--electrico), transparent 70%); opacity: 0.4; }
+
+      /* corner brackets */
+      .bracket {
+        position: absolute;
+        width: 56px;
+        height: 56px;
+        border: 2px solid rgba(148, 163, 184, 0.45);
+      }
+      .bracket--tl { top: 44px; left: 44px; border-right: none; border-bottom: none; }
+      .bracket--tr { top: 44px; right: 44px; border-left: none; border-bottom: none; }
+      .bracket--bl { bottom: 44px; left: 44px; border-right: none; border-top: none; }
+      .bracket--br { bottom: 44px; right: 44px; border-left: none; border-top: none; }
+
+      .stage {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 110px;
+      }
+
+      /* terminal boot line — eco del hero */
+      .boot {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--cielo);
+        margin-bottom: 40px;
+      }
+      .boot .prompt { color: var(--tinta3); }
+      .boot .cmd { color: var(--cielo2); }
+      .owl { width: 40px; height: 40px; color: var(--cielo); }
+
+      h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 900;
+        font-size: 104px;
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+        color: var(--tinta);
+      }
+
+      .claim {
+        margin-top: 30px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 38px;
+        letter-spacing: -0.01em;
+      }
+      .hl {
+        background: linear-gradient(90deg, var(--electrico), var(--cielo), var(--cielo2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .domain {
+        position: absolute;
+        bottom: 70px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        color: var(--tinta3);
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid"></div>
+    <div class="orb orb--1"></div>
+    <div class="orb orb--2"></div>
+
+    <span class="bracket bracket--tl"></span>
+    <span class="bracket bracket--tr"></span>
+    <span class="bracket bracket--bl"></span>
+    <span class="bracket bracket--br"></span>
+
+    <div class="stage">
+      <p class="boot">
+        <svg class="owl" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 14 L20 22"></path>
+          <path d="M48 14 L44 22"></path>
+          <path d="M10 30 C 10 18, 22 10, 32 10 C 42 10, 54 18, 54 30 C 54 42, 44 52, 32 52 C 20 52, 10 42, 10 30 Z"></path>
+          <circle cx="22" cy="30" r="7"></circle>
+          <circle cx="42" cy="30" r="7"></circle>
+          <circle cx="22" cy="30" r="1.8" fill="currentColor"></circle>
+          <circle cx="42" cy="30" r="1.8" fill="currentColor"></circle>
+          <path d="M32 36 L29 41 L32 44 L35 41 Z"></path>
+        </svg>
+        <span><span class="prompt">dev@codigosinsiesta:~$</span> <span class="cmd">init --calidad</span></span>
+      </p>
+
+      <h1>Código Sin Siesta</h1>
+
+      <p class="claim">Donde la disciplina <span class="hl">gana a la velocidad</span></p>
+    </div>
+
+    <p class="domain">codigosinsiesta.com</p>
+  </body>
+</html>
