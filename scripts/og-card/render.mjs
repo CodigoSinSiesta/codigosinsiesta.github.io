@@ -1,8 +1,11 @@
-// Regenera public/og-card.png (1200×630) desde scripts/og-card/og-card.html.
+// Renderiza un HTML a PNG con Chrome headless. Por defecto regenera
+// public/og-card.png (1200×630) desde scripts/og-card/og-card.html.
 //
-// Uso:  node scripts/og-card/render.mjs
+// Uso:  node scripts/og-card/render.mjs [input.html] [output.png] [w] [h]
+//   p.ej.  node scripts/og-card/render.mjs avatar.html ../../public/bot-avatar.png 1024 1024
+//   (rutas relativas resueltas desde este directorio)
 //
-// Conduce Chrome en modo headless vía el protocolo CDP para poder esperar a
+// Conduce Chrome vía el protocolo CDP para poder esperar a
 // `document.fonts.ready` ANTES de capturar — si se usa el screenshot one-shot
 // de Chrome, la captura se dispara antes de que Google Fonts termine de
 // descargar y el PNG sale con la fuente de fallback (Arial) en vez de
@@ -17,10 +20,12 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const HTML = pathToFileURL(join(__dirname, 'og-card.html')).href;
-const OUT = resolve(__dirname, '../../public/og-card.png');
-const WIDTH = 1200;
-const HEIGHT = 630;
+const [inArg = 'og-card.html', outArg = '../../public/og-card.png', wArg, hArg] =
+  process.argv.slice(2);
+const HTML = pathToFileURL(resolve(__dirname, inArg)).href;
+const OUT = resolve(__dirname, outArg);
+const WIDTH = Number(wArg) || 1200;
+const HEIGHT = Number(hArg) || 630;
 
 const CANDIDATES = [
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
