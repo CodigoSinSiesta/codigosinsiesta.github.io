@@ -8,6 +8,15 @@ const ensayos = (await getCollection('ensayos')).sort(
 
 const fmtFecha = (d: Date) =>
   d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: '2-digit' });
+
+// Build tag counts, sorted by frequency
+const tagCounts = new Map<string, number>();
+for (const post of ensayos) {
+  for (const tag of post.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+  }
+}
+const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
 ---
 
 <Base
@@ -23,7 +32,18 @@ const fmtFecha = (d: Date) =>
         Claims fuertes con evidencia al lado. Lo que aprendemos construyendo en público, escrito
         para que te sirva.
       </p>
-      <ul class="item-list" style="margin-top: 2rem;">
+
+      <!-- Tag filter bar -->
+      <nav class="tag-cloud" aria-label="Filtrar por tema" style="margin-top: 2rem;">
+        <a href="/ensayos" class="tag tag--active">todos</a>
+        {
+          sortedTags.map(([tag, count]) => (
+            <a href={`/ensayos/tags/${tag}`} class="tag">{tag}<sup>{count}</sup></a>
+          ))
+        }
+      </nav>
+
+      <ul class="item-list" style="margin-top: 2.5rem;">
         {
           ensayos.map((post) => (
             <li>
@@ -36,7 +56,7 @@ const fmtFecha = (d: Date) =>
               <p>{post.data.description}</p>
               <p style="margin-top: 0.6rem; margin-bottom: 0;">
                 {post.data.tags.slice(0, 4).map((tag) => (
-                  <span class="tag">{tag}</span>
+                  <a href={`/ensayos/tags/${tag}`} class="tag">{tag}</a>
                 ))}
               </p>
             </li>
