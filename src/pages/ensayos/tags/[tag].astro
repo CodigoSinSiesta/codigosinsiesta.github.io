@@ -1,0 +1,72 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const ensayos = await getCollection('ensayos');
+  const allTags = new Set<string>();
+  for (const post of ensayos) {
+    for (const tag of post.data.tags) {
+      allTags.add(tag);
+    }
+  }
+  return Array.from(allTags).map((tag) => ({ params: { tag }, props: { tag } }));
+}
+
+const { tag } = Astro.props;
+
+const ensayos = (await getCollection('ensayos'))
+  .filter((p) => p.data.tags.includes(tag))
+  .sort((a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf());
+
+const fmtFecha = (d: Date) =>
+  d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: '2-digit' });
+---
+
+<Base
+  title={`Artículos sobre "${tag}"`}
+  description={`Artículos de Código Sin Siesta etiquetados con "${tag}".`}
+  activeHref="/ensayos"
+>
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow">artículos</p>
+      <h1>Artículos sobre <span class="hl">«{tag}»</span></h1>
+      <p class="lead" style="max-width: 40rem;">
+        {ensayos.length} artículo{ensayos.length !== 1 ? 's' : ''} etiquetado{ensayos.length !== 1 ? 's' : ''} con <strong>{tag}</strong>.
+        <a href="/ensayos" style="margin-left: 1rem; font-size: 0.9rem;">← Ver todos</a>
+      </p>
+      {
+        ensayos.length === 0 ? (
+          <p style="margin-top: 2rem; color: var(--color-tinta3);">
+            No hay artículos con este tag todavía.
+          </p>
+        ) : (
+          <ul class="item-list" style="margin-top: 2rem;">
+            {ensayos.map((post) => (
+              <li>
+                <p class="meta">
+                  {fmtFecha(post.data.fecha)} · {post.data.autor}
+                </p>
+                <h3>
+                  <a href={`/ensayos/${post.id}`}>{post.data.title}</a>
+                </h3>
+                <p>{post.data.description}</p>
+                <p style="margin-top: 0.6rem; margin-bottom: 0;">
+                  {post.data.tags.map((t) => (
+                    <a
+                      href={`/ensayos/tags/${t}`}
+                      class:list={['tag', { 'tag--active': t === tag }]}
+                    >
+                      {t}
+                    </a>
+                  ))}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </section>
+  </div>
+</Base>

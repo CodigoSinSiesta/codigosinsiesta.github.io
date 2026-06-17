@@ -19,13 +19,13 @@ const fmtFecha = (d: Date) =>
     <article class="section">
       <header style="max-width: 760px;">
         <p class="eyebrow">ensayo · {fmtFecha(post.data.fecha)}</p>
-        <h1 style="font-size: clamp(1.9rem, 4.5vw, 2.8rem);">{post.data.title}</h1>
-        <p class="meta">{post.data.autor}</p>
-        <p style="margin-top: 0.75rem;">
-          {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+        <h1 style="font-size: clamp(1.9rem, 4.5vw, 2.8rem);" data-pagefind-meta="title">{post.data.title}</h1>
+        <p class="meta" data-pagefind-meta="autor">{post.data.autor}</p>
+        <p style="margin-top: 0.75rem;" data-pagefind-meta="tags">
+          {post.data.tags.map((tag) => <a href={`/ensayos/tags/${tag}`} class="tag">{tag}</a>)}
         </p>
       </header>
-      <div class="prose">
+      <div class="prose" data-pagefind-body>
         <Content />
       </div>
       <footer style="margin-top: 3.5rem; border-top: 1px solid var(--color-borde); padding-top: 1.5rem;">
