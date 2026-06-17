@@ -7,7 +7,7 @@
   "packageManager": "pnpm@11.5.2",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "migrate:blog": "node scripts/migrate-blog.mjs"
   },
@@ -23,5 +23,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/codigosinsiesta/codigosinsiesta.github.io"
+  },
+  "devDependencies": {
+    "pagefind": "^1.5.2"
   }
 }

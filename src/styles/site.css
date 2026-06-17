@@ -137,7 +137,16 @@ a.card:hover {
     background var(--transition-fast);
 }
 
-a.tag:hover {
+/* Reset button defaults when .tag is a <button> */
+button.tag {
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  line-height: inherit;
+}
+
+a.tag:hover,
+button.tag:hover {
   text-decoration: none;
   border-color: var(--color-cielo);
   color: var(--color-cielo);

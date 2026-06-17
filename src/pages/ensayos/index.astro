@@ -25,7 +25,7 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
   activeHref="/ensayos"
 >
   <div class="container">
-    <section class="section">
+    <section class="section" data-csi-essay-list>
       <p class="eyebrow">artículos</p>
       <h1>Artículos</h1>
       <p class="lead" style="max-width: 40rem;">
@@ -33,20 +33,27 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
         para que te sirva.
       </p>
 
+      <!-- Search bar (Pagefind) -->
+      <div id="search" class="search-bar" style="margin-top: 1.75rem;"></div>
+
       <!-- Tag filter bar -->
-      <nav class="tag-cloud" aria-label="Filtrar por tema" style="margin-top: 2rem;">
-        <a href="/ensayos" class="tag tag--active">todos</a>
+      <nav class="tag-cloud" aria-label="Filtrar por tema" style="margin-top: 1.75rem;" data-csi-tag-cloud>
+        <button class="tag tag--active" data-csi-tag="*" type="button">todos</button>
         {
           sortedTags.map(([tag, count]) => (
-            <a href={`/ensayos/tags/${tag}`} class="tag">{tag}<sup>{count}</sup></a>
+            <button class="tag" data-csi-tag={tag} type="button">{tag}<sup>{count}</sup></button>
           ))
         }
       </nav>
 
-      <ul class="item-list" style="margin-top: 2.5rem;">
+      <p class="meta" style="margin-top: 1rem;" data-csi-filter-info>
+        Mostrando {ensayos.length} artículo{ensayos.length !== 1 ? 's' : ''}
+      </p>
+
+      <ul class="item-list" style="margin-top: 1.5rem;" data-csi-item-container>
         {
           ensayos.map((post) => (
-            <li>
+            <li data-csi-item data-tags={JSON.stringify(post.data.tags)}>
               <p class="meta">
                 {fmtFecha(post.data.fecha)} · {post.data.autor}
               </p>
@@ -55,8 +62,8 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
               </h3>
               <p>{post.data.description}</p>
               <p style="margin-top: 0.6rem; margin-bottom: 0;">
-                {post.data.tags.slice(0, 4).map((tag) => (
-                  <a href={`/ensayos/tags/${tag}`} class="tag">{tag}</a>
+                {post.data.tags.map((tag) => (
+                  <a href={`/ensayos/tags/${tag}`} class="tag" data-csi-tag-link={tag}>{tag}</a>
                 ))}
               </p>
             </li>
@@ -66,3 +73,182 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
     </section>
   </div>
 </Base>
+
+<script is:inline>
+  // ── Pagefind search (dynamic load — only exists after build) ──
+  (function() {
+    const script = document.createElement('script');
+    script.src = '/pagefind/pagefind-ui.js';
+    script.onload = function() {
+      new PagefindUI({
+        element: "#search",
+        showImages: false,
+        showSubResults: false,
+        pageSize: 8,
+        translations: {
+          placeholder: "Buscar por título, tag o contenido…",
+        },
+      });
+    };
+    // Load CSS too
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/pagefind/pagefind-ui.css';
+    document.head.appendChild(link);
+    document.head.appendChild(script);
+  })();
+
+  // ── Client-side tag filter ──
+  function initTagFilter() {
+    const cloud = document.querySelector('[data-csi-tag-cloud]');
+    const items = document.querySelectorAll('[data-csi-item]');
+    const info = document.querySelector('[data-csi-filter-info]');
+    if (!cloud || !items.length) return;
+
+    let activeTag = '*';
+
+    function applyFilter(tag) {
+      activeTag = tag;
+      let visible = 0;
+
+      items.forEach((el) => {
+        let tags = [];
+        try { tags = JSON.parse(el.getAttribute('data-tags') || '[]'); } catch (_) {}
+        const match = tag === '*' || tags.includes(tag);
+        el.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+
+      // Update active button
+      cloud.querySelectorAll('[data-csi-tag]').forEach((btn) => {
+        const t = btn.getAttribute('data-csi-tag');
+        btn.classList.toggle('tag--active', t === tag);
+      });
+
+      // Update count
+      if (info) {
+        const word = visible === 1 ? 'artículo' : 'artículos';
+        const label = tag === '*'
+          ? `Mostrando ${visible} ${word}`
+          : `Mostrando ${visible} ${word} con <strong>«${tag}»</strong>`;
+        info.innerHTML = label;
+      }
+
+      // Update URL without reload
+      const url = tag === '*' ? '/ensayos' : `/ensayos/tags/${tag}`;
+      if (window.location.pathname !== url) {
+        window.history.replaceState({ tag }, '', url);
+      }
+    }
+
+    // Click on tag cloud buttons
+    cloud.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-csi-tag]');
+      if (!btn) return;
+      e.preventDefault();
+      const tag = btn.getAttribute('data-csi-tag');
+      if (tag) applyFilter(tag);
+    });
+
+    // Click on tag links inside items → trigger filter instead of navigating
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('[data-csi-tag-link]');
+      if (!link) return;
+      const tag = link.getAttribute('data-csi-tag-link');
+      if (tag) {
+        e.preventDefault();
+        applyFilter(tag);
+        // Scroll to tag cloud so user sees the active filter
+        cloud.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+
+    // Restore filter from URL on page load
+    const pathMatch = window.location.pathname.match(/^\/ensayos\/tags\/(.+?)(\/index\.html)?\/?$/);
+    if (pathMatch) {
+      const tagFromUrl = decodeURIComponent(pathMatch[1]);
+      // Verify the tag exists in the cloud
+      const exists = cloud.querySelector(`[data-csi-tag="${CSS.escape(tagFromUrl)}"]`);
+      if (exists) applyFilter(tagFromUrl);
+    }
+  }
+
+  initTagFilter();
+</script>
+
+<style>
+  .search-bar {
+    max-width: 520px;
+  }
+
+  /* Pagefind UI overrides for the dark blueprint theme */
+  .search-bar :global(.pagefind-ui__search-input) {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-borde2);
+    background: var(--color-fondo-elev);
+    color: var(--color-tinta);
+    width: 100%;
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .search-bar :global(.pagefind-ui__search-input:focus) {
+    border-color: var(--color-cielo);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+  }
+
+  .search-bar :global(.pagefind-ui__search-input::placeholder) {
+    color: var(--color-tinta3);
+  }
+
+  .search-bar :global(.pagefind-ui__result) {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-borde);
+  }
+
+  .search-bar :global(.pagefind-ui__result-title) {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .search-bar :global(.pagefind-ui__result-title a) {
+    color: var(--color-tinta);
+  }
+
+  .search-bar :global(.pagefind-ui__result-title a):hover {
+    color: var(--color-cielo);
+    text-decoration: none;
+  }
+
+  .search-bar :global(.pagefind-ui__result-excerpt) {
+    font-size: 0.9rem;
+    color: var(--color-tinta2);
+    margin-top: 0.3rem;
+    line-height: 1.5;
+  }
+
+  .search-bar :global(.pagefind-ui__result-excerpt mark) {
+    background: rgba(96, 165, 250, 0.25);
+    color: var(--color-cielo);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  .search-bar :global(.pagefind-ui__button) {
+    font-family: var(--font-body);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-borde);
+    background: var(--color-fondo-elev);
+    color: var(--color-tinta);
+    cursor: pointer;
+  }
+
+  .search-bar :global(.pagefind-ui__message) {
+    font-size: 0.85rem;
+    color: var(--color-tinta3);
+  }
+</style>
