@@ -19,7 +19,7 @@ autor: Alejandro de la Fuente
 
 Este artículo describe un sistema integral para gestionar el conocimiento de producto usando agentes de IA. Es un marco de trabajo que va desde la transcripción de una reunión hasta el código desplegado en múltiples repositorios, pasando por definiciones enriquecidas, SDD, knowledge graphs y contract testing. La primera mitad es teoría fundacional; la segunda es práctica incremental con roadmap, quickstart y herramientas.
 
-Si tu producto vive en un solo repo, este artículo te sobra en un 40%. Si vive en tres, cinco o quince — y las decisiones de arquitectura se toman en una reunión el martes y el jueves ya nadie recuerda por qué — este artículo es para ti.
+Si tu producto vive en un solo repo, este artículo te sobra en un 40%. Si vive en tres, cinco o quince — y las decisiones de arquitectura se toman en una reunión el martes y el jueves ya nadie recuerda por qué — este artículo es para ti. Si puedes usar un monorepo, hazlo: herramientas como Nx, Turborepo o Bazel eliminan de raíz la mayoría de problemas de coordinación cross-repo que este artículo resuelve. Shopify mantiene 2.8M líneas de Ruby en un monolito modular con Packwerk; Stripe usa monorepo con devboxes en la nube. El multi-repo no es un objetivo — es una restricción que este artículo te ayuda a gestionar cuando no tienes alternativa.
 
 ---
 
@@ -762,9 +762,11 @@ El artículo ha descrito SDD como metodología. Pero no hace falta construir el 
   → archiva el cambio, las specs quedan como documentación viva
 ```
 
-Filosofía: *"fluid not rigid, iterative not waterfall, easy not complex, built for brownfield not just greenfield"*. Funciona con 20+ asistentes de IA (Claude Code, Codex, Cursor, Copilot, Windsurf). OpenSpec es SDD intra-repo: ideal para la fase de implementación de cada servicio.
+Filosofía: *"fluid not rigid, iterative not waterfall, easy not complex, built for brownfield not just greenfield"*. Funciona con 20+ asistentes de IA.
 
-**[GSD Core](https://github.com/open-gsd/gsd-core)** (heredero de `get-shit-done`, 64K ⭐ original, MIT). Sistema de meta-prompting y context engineering que ejecuta coding agents en un ciclo de 5 fases: **Discuss → Plan → Execute → Verify → Ship**. Su innovación clave: cada fase corre en subagentes con contexto fresco (200K tokens), resolviendo el problema de context rot que degrada la calidad cuando un agente acumula demasiada historia.
+**[GitHub Spec-Kit](https://github.com/github/spec-kit)** (GitHub, 2025). El toolkit oficial de SDD de GitHub. Similar en concepto a OpenSpec pero con respaldo de GitHub y una [comunidad de extensiones](https://github.com/github/spec-kit/tree/main/extensions). Spec-first, intra-repo. Si tu organización ya está en GitHub, Spec-Kit se integra de forma nativa con Actions, Issues y PRs.
+
+**[GSD Core](https://github.com/open-gsd/gsd-core)** (heredero de `get-shit-done`, 64K ⭐ original, MIT). Sistema de meta-prompting y context engineering con ciclo Discuss → Plan → Execute → Verify → Ship en subagentes de contexto fresco.
 
 **Cómo encajan en el sistema del artículo:**
 
@@ -774,7 +776,9 @@ Filosofía: *"fluid not rigid, iterative not waterfall, easy not complex, built 
 | **GSD Core** | Ciclo completo con subagentes: planificar → ejecutar → verificar → ship | Fase Run, como motor del agente SDD |
 | **El artículo (product-specs)** | Lo que ninguna de las dos cubre: contratos cross-repo, trazabilidad, extracción de decisiones, knowledge graph de producto | El sistema por encima de los repos |
 
-OpenSpec y GSD no compiten con el sistema del artículo. Lo complementan. Son el "cómo" dentro de cada repo. El artículo aporta el "qué" y el "por qué" a nivel de producto: los contratos entre servicios, la trazabilidad end-to-end, y el knowledge graph que conecta todo. Puedes usar OpenSpec para que el agente SDD genere specs dentro de `payment-service`, mientras `product-specs/contracts/` sigue siendo la fuente de verdad de la interfaz entre servicios.
+OpenSpec, Spec-Kit y GSD no compiten con el sistema del artículo. Lo complementan. Son el "cómo" dentro de cada repo. El artículo aporta el "qué" y el "por qué" a nivel de producto: los contratos entre servicios, la trazabilidad end-to-end, y el knowledge graph que conecta todo.
+
+**Una nota de honestidad intelectual sobre SDD.** La comunidad ha señalado riesgos reales: SDD puede derivar en waterfall si las specs se vuelven rígidas (Marmelab, 2025); el overhead de mantener specs puede hacer que los equipos las abandonen (Piskala, arXiv 2602.00180); y los knowledge graphs en producción tienen tasas de fracaso del 72-80% (análisis FalkorDB, 2026). Este artículo no ignora esos riesgos — por eso propone un roadmap incremental que empieza con un repo de markdown y solo escala a grafos y agentes cuando el volumen lo justifica. La alternativa no es "SDD o nada". Es "empieza con RFCs. Si necesitas más, añade contratos. Si necesitas más, añade agentes."
 
 ---
 
@@ -1059,7 +1063,7 @@ El sistema completo que he descrito es el estado final. Nadie debería intentar 
 - **Semana 5-6**: Configura contract testing en CI para ESA API. Schemathesis es la opción más simple: `pip install schemathesis && schemathesis run payment-api-v2.yaml --base-url=http://localhost:8080`. El objetivo es que el CI del proveedor falle si la implementación no cumple el contrato.
 - **Semana 7-8**: Añade el lado consumidor: el repo que llama a esa API debe validar en su CI que puede parsear las respuestas del contrato. Pact es buena opción aquí.
 - **Semana 9-12**: Introduce el agente de reuniones en modo borrador. No generes PRs todavía. Solo extrae decisiones de las transcripciones y publícalas en #product-specs para que el equipo las revise. Mide precisión durante 2 semanas: ¿cuántas decisiones extrae? ¿Cuántas son correctas?
-- **Checkpoint**: ¿Falla el CI cuando alguien rompe un contrato? ¿El equipo confía en las extracciones del agente (>70% precisión)? Si sí, avanza a Run. Si no, quédate aquí — ya tienes el 60% del valor.
+- **Checkpoint**: ¿Falla el CI cuando alguien rompe un contrato? ¿El equipo confía en las extracciones del agente (>70% precisión)? Si sí, avanza a Run. Si no, quédate aquí — has eliminado la fuente más común de bugs cross-repo.
 
 **Fase 3: Run (mes 3-6).** Cerrar el ciclo con agentes, grafo y drift detection.
 
@@ -1200,7 +1204,7 @@ El sistema que he descrito no es ciencia ficción. Cada pieza existe hoy:
 
 Lo que falta es integrarlo. Y eso es exactamente lo que propongo — pero no de golpe. La sección [6.7](#67-roadmap-incremental-crawl--walk--run) detalla el camino progresivo: empieza con un repo de markdown y un hábito de documentación. Añade contract testing cuando duela no tenerlo. Introduce agentes cuando el volumen de decisiones supere la capacidad humana de procesarlas.
 
-El producto que se documenta solo no es un producto sin documentación. Es un producto donde la documentación **emerge del trabajo diario** en lugar de ser una tarea aparte que nadie hace. Las reuniones generan decisiones, las decisiones enriquecen las specs, las specs generan tests, los tests verifican el código, y el grafo mantiene la trazabilidad de todo.
+El producto que se documenta solo no es un producto sin documentación — es un producto donde la documentación **emerge del trabajo diario** en lugar de ser una tarea aparte que nadie hace. Las reuniones generan decisiones, los RFCs las formalizan, las specs generan tests, los tests verifican el código, y el grafo mantiene la trazabilidad de todo. El trabajo humano no desaparece: se desplaza de "perseguir a tres equipos para contarles lo decidido" a "revisar un PR generado automáticamente".
 
 En un mundo multi-repo, esto no es un lujo. Es la única forma de mantener la coherencia sin ahogar a los equipos en coordinación manual.
 
@@ -1225,8 +1229,9 @@ El agente de IA no es el que decide. Es el que **recuerda, conecta y propaga**. 
 | **Drift detection** | Agente + codebase-memory-mcp | Comparar código vs specs, alertar divergencias | Run | Alta |
 | **CI/CD** | GitHub Actions + MCP | Ejecutar tests cross-repo | Walk | Media |
 | **Documentación** | markitdown + GraphRAG | Convertir docs externos, indexar, consultar | Run | Media |
+| **Catálogo de servicios** | [Backstage](https://backstage.io/) (Spotify, CNCF) | Portal de desarrollador: catálogo de servicios, APIs, dependencias, documentación | Walk | Media |
 
-**Nota sobre costes**: empezar con modelos pequeños (GPT-4o-mini, ~$0.15/1M tokens) para extracción de decisiones. Un Neo4j en la nube cuesta ~$65/mes (AuraDB Professional); plantéatelo solo a partir de la fase Run. Mientras tanto, SQLite + embeddings locales (Turso, zvec) cubren el 80% de los casos de uso de grafo con coste cero.
+**Nota sobre costes**: empezar con modelos pequeños (GPT-4o-mini, ~$0.15/1M tokens) para extracción de decisiones. Un Neo4j en la nube cuesta ~$65/mes (AuraDB Professional); plantéatelo solo a partir de la fase Run. Mientras tanto, SQLite + embeddings locales (Turso, zvec) cubren el 80% de los casos de uso de grafo con coste cero. Backstage es open source y gratuito; el coste es el tiempo de configuración inicial (~2-3 días).
 
 ### 8.2. RACI: quién hace qué en este sistema
 
