@@ -186,6 +186,111 @@ La alternativa es un **grafo de definiciones**: muchos documentos pequeños, int
 
 La clave es que las definiciones **de producto** no viven en el mismo sistema de versionado que el código. Viven en un repo de conocimiento (o en un sistema de grafos) que los repos de código consultan, pero no contienen.
 
+### 2.6. Preparar los repos para agentes de IA
+
+Todo el sistema que describe este artículo depende de agentes de IA que leen, escriben y razonan sobre los repos. Pero un repo sin preparar es un repo donde el agente tropieza: explora a ciegas, adivina convenciones y consume tokens en reconocimiento en lugar de en trabajo productivo.
+
+**El problema concreto.** Un agente entra en un repo por primera vez. Sin contexto, dedica 5-10 turnos a responder preguntas básicas: ¿qué lenguaje? ¿dónde están los tests? ¿cómo se ejecutan? ¿qué arquitectura sigue este proyecto? ¿hay código que no deba tocar? Cada turno cuesta tokens. Y cada agente diferente repite la misma exploración desde cero.
+
+**La solución: `AGENTS.md`.** Es un archivo que se inyecta automáticamente en el system prompt del agente antes de que empiece a trabajar. Es el equivalente a un documento de onboarding para desarrolladores humanos. Así se ve uno real:
+
+```markdown
+# AGENTS.md — payment-service
+
+## Stack
+- Python 3.12, FastAPI, SQLAlchemy 2.0, PostgreSQL 16
+- Tests: pytest con pytest-asyncio, xdist para paralelismo
+- CI: GitHub Actions, despliegue en Kubernetes (helm)
+- Tipado estricto (mypy con `--strict`)
+
+## Convenciones
+- Conventional Commits (`feat:`, `fix:`, `docs:`)
+- Tests en `tests/` replicando la estructura de `src/`
+- No uses `print()` en producción; usa `structlog`
+
+## Arquitectura
+- Hexagonal: `domain/` (puro), `application/` (casos de uso), `infrastructure/` (adapters)
+- Las decisiones de arquitectura están en `docs/adr/`
+- Este servicio implementa los contratos en `product-specs/contracts/payment-api-v2.yaml`
+
+## Límites
+- NO modificar `src/infrastructure/legacy_gateway.py` sin consultar
+- NO añadir dependencias sin discutirlo en #platform-eng
+- NO cambiar la firma de endpoints públicos sin actualizar el contrato en product-specs
+```
+
+**Qué gana el sistema con esto:**
+
+| Sin AGENTS.md | Con AGENTS.md |
+|---|---|
+| El agente explora 5-10 turnos para entender el repo | Entiende el repo en el primer turno |
+| Adivina convenciones (y a veces falla) | Sabe las convenciones exactas |
+| Puede tocar código prohibido | Sabe qué no tocar |
+| No sabe cómo ejecutar tests | Ejecuta `pytest -n auto` directamente |
+| Cada agente repite la exploración | Todos los agentes heredan el mismo contexto |
+| No conecta código con specs de producto | Sabe que `payment-api-v2.yaml` es su contrato |
+
+**Cómo conecta con el pipeline del artículo:**
+
+- **El agente de reuniones** lee el `AGENTS.md` del repo de producto para saber dónde guardar las specs extraídas.
+- **El agente SDD** lee el `AGENTS.md` de cada repo para saber qué lenguaje y framework de testing usar al generar tests.
+- **El agente de drift** usa la línea `Este servicio implementa los contratos en...` para saber qué specs validar contra qué código.
+- **El agente coordinador cross-repo** consulta los `AGENTS.md` de los repos para saber cómo notificar a cada equipo y qué convenciones respetar al generar PRs.
+
+**Project-specific skills: el siguiente nivel.** Un `AGENTS.md` da contexto. Un skill de proyecto da procedimientos ejecutables. Cada repo debería tener un directorio `.agent/skills/` con al menos:
+
+| Skill | Qué hace |
+|---|---|
+| `run-tests` | Ejecuta la suite de tests con los flags correctos |
+| `deploy-staging` | Despliega en staging con verificación de salud |
+| `add-migration` | Crea una migración de BD con el naming correcto |
+| `update-contract` | Actualiza el contrato OpenAPI y regenera tipos en consumidores |
+| `incident-response` | Playbook para cuando algo falla en producción |
+
+Ejemplo de `run-tests`:
+
+```markdown
+---
+name: run-tests
+description: "Ejecuta la suite de tests del proyecto"
+---
+
+# Ejecutar tests
+
+1. Activa el entorno virtual: `source .venv/bin/activate`
+2. Ejecuta todos los tests: `pytest -n auto --cov=src --cov-report=term`
+3. Si algún test falla, NO intentes arreglar código sin entender el fallo.
+   Vuelve a ejecutar solo el test fallido: `pytest tests/path/test_file.py::test_name -v`
+4. Si la cobertura baja del 80%, añade tests antes de seguir.
+```
+
+**El repo de producto también necesita su `AGENTS.md`:**
+
+```markdown
+# AGENTS.md — product-specs
+
+## Propósito
+Este repo contiene las definiciones cross-cutting del producto. No contiene código.
+
+## Estructura
+- `requirements/`: un fichero markdown por requisito
+- `contracts/`: OpenAPI/AsyncAPI/JSON Schema
+- `decisions/`: una decisión por fichero
+- `architecture/`: diagramas y decisiones globales
+
+## Cómo contribuir
+1. Crea una rama `specs/<slug>`
+2. Usa el template de `requirements/template.md`
+3. Abre PR. El CI valida contratos y referencias cruzadas
+4. Asigna un revisor humano
+
+## Skills
+- `validate-specs`: valida sintaxis de contratos y consistencia de refs
+- `impact-analysis`: dado un cambio en una spec, identifica repos afectados
+```
+
+**El ahorro real.** Sin `AGENTS.md`, cada agente gasta ~80% de sus tokens de los primeros turnos en entender el entorno. Con él, ese porcentaje baja a ~10%. En un sistema con 3 agentes ejecutándose diariamente, la diferencia es de cientos de miles de tokens ahorrados cada semana. Y lo que es más importante: el agente acierta más porque no está adivinando.
+
 ---
 
 ## 3. Parte II: Extraer decisiones de las reuniones
