@@ -220,6 +220,8 @@ Con esto, el agente sabe inmediatamente el rol de este repo en el ecosistema: es
 2. **Acoplamiento de implementación (peligroso).** "Sé que usas Postgres y que la tabla `orders` tiene una columna `status` de tipo enum." Si el proveedor cambia su BD, el consumidor se rompe. Esto es lo que genera las divergencias silenciosas del patrón 4.
 3. **Acoplamiento temporal (a evitar).** "Necesito que despliegues tu cambio antes que el mío." Si dos servicios necesitan deploy coordinado, el contrato no es lo bastante flexible. Los contratos deben soportar versionado para que cada lado despliegue a su ritmo.
 
+4. **Acoplamiento de base de datos (a eliminar).** Dos servicios leen y escriben las mismas tablas. Esto es el acoplamiento más peligroso en multi-repo porque no hay contrato que lo medie: un cambio de schema en un servicio rompe al otro en runtime, no en CI. Cada servicio debe ser dueño exclusivo de sus datos. Si dos servicios necesitan los mismos datos, que uno se los sirva al otro vía API (acoplamiento de contrato, nivel 1).
+
 **Ejemplo de arquitectura multi-repo bien definida:**
 
 ```
@@ -304,13 +306,18 @@ Todo el sistema que describe este artículo depende de agentes de IA que leen, e
 ## Arquitectura
 - Hexagonal: `domain/` (puro), `application/` (casos de uso), `infrastructure/` (adapters)
 - Las decisiones de arquitectura están en `docs/adr/`
-- Este servicio implementa los contratos en `product-specs/contracts/payment-api-v2.yaml`
+
+## Contratos
+- **Provee**: `product-specs/contracts/payment-api-v2.yaml`
+- **Consume**: `product-specs/contracts/auth-api-v1.yaml`
 
 ## Límites
 - NO modificar `src/infrastructure/legacy_gateway.py` sin consultar
 - NO añadir dependencias sin discutirlo en #platform-eng
 - NO cambiar la firma de endpoints públicos sin actualizar el contrato en product-specs
 ```
+
+**Nótese la sección `## Contratos`**: es el mismo formato estructurado que introdujimos en la sección 2.3. El agente puede parsearla sin ambigüedad: este servicio *provee* la API de pagos y *consume* la de autenticación. Si la API de pagos cambia, el agente de drift sabe exactamente qué validar. Si la API de autenticación cambia, el agente coordinador sabe que este repo es un consumidor afectado.
 
 **Qué gana el sistema con esto:**
 
@@ -327,7 +334,7 @@ Todo el sistema que describe este artículo depende de agentes de IA que leen, e
 
 - **El agente de reuniones** lee el `AGENTS.md` del repo de producto para saber dónde guardar las specs extraídas.
 - **El agente SDD** lee el `AGENTS.md` de cada repo para saber qué lenguaje y framework de testing usar al generar tests.
-- **El agente de drift** usa la línea `Este servicio implementa los contratos en...` para saber qué specs validar contra qué código.
+- **El agente de drift** lee la sección `## Contratos` del AGENTS.md local para saber qué specs validar contra qué código: "este servicio *provee* X e *Y*, *consume* Z".
 - **El agente coordinador cross-repo** consulta los `AGENTS.md` de los repos para saber cómo notificar a cada equipo y qué convenciones respetar al generar PRs.
 
 **Project-specific skills: el siguiente nivel.** Un `AGENTS.md` da contexto. Un skill de proyecto da procedimientos ejecutables. Cada repo debería tener un directorio `.agent/skills/` con al menos:
@@ -500,9 +507,19 @@ Pero antes de seguir: ¿qué es exactamente una spec? El artículo ha usado la p
 | **Spec de comportamiento** | Gherkin, Markdown estructurado | Qué debe hacer el sistema desde la perspectiva del usuario | Tests de aceptación, PMs, QA | "Dado un usuario logueado, cuando añade un producto al carrito, entonces ve el total actualizado" |
 | **Spec de requisito** | Markdown con template | Una capacidad que el producto debe tener | Todo el equipo, agentes de IA | "REQ-IDEM-001: toda operación de pago debe ser idempotente" |
 | **Spec de arquitectura** | ADR, C4, diagramas como código | Una decisión técnica y su contexto | Desarrolladores, architectos, agentes | "ADR-003: usamos Postgres en vez de MongoDB porque necesitamos integridad transaccional" |
-| **Spec de dominio** | JSON Schema de eventos, glosario | El lenguaje compartido del negocio | Todos los equipos, agentes | "Un 'pedido confirmado' es un pedido cuyo pago ha sido verificado y cuyo stock ha sido reservado" |
+| **Spec de dominio** | Glosario, JSON Schema de eventos | El lenguaje compartido del negocio | Todos los equipos, agentes | "Un 'pedido confirmado' es un pedido cuyo pago ha sido verificado y cuyo stock ha sido reservado" |
 
-**La diferencia crítica**: una spec de contrato (OpenAPI) la valida una máquina. Una spec de comportamiento (Gherkin) la ejecuta un test. Una spec de requisito (REQ-IDEM-001) la interpreta un humano — pero está escrita con suficiente precisión para que un agente pueda verificar si el código la cumple. Una spec de arquitectura (ADR) documenta el *por qué*, no el *qué*.
+**La diferencia crítica**: una spec de contrato (OpenAPI) la valida una máquina. Una spec de comportamiento (Gherkin) la ejecuta un test. Una spec de requisito (REQ-IDEM-001) la interpreta un humano — pero está escrita con suficiente precisión para que un agente pueda verificar si el código la cumple. Una spec de arquitectura (ADR) documenta el *por qué*, no el *qué*. Una spec de dominio (glosario) no se verifica — se *consulta*. Es el diccionario que evita que dos equipos llamen `discount_percent` y `discount_rate` al mismo concepto.
+
+**Cómo se relaciona esto con la pirámide de la sección 2.1.** Aquel modelo (Visión → Estrategia → Requisitos → Specs → Código) describe *niveles de abstracción*. Esta taxonomía describe *tipos de artefactos*. Se cruzan así:
+
+| Nivel de la pirámide | Tipo de spec que lo materializa |
+|---|---|
+| Visión / Estrategia | Spec de dominio (glosario, lenguaje ubicuo) |
+| Requisitos cross-cutting | Spec de requisito (REQ-XXX-NNN) |
+| Specs | Spec de contrato (OpenAPI) + Spec de comportamiento (Gherkin) |
+| Decisiones de implementación | Spec de arquitectura (ADR) |
+| Código | El código mismo (no es una spec, es la implementación) |
 
 **Lo que NO es una spec:**
 - Un comentario en Slack: "el endpoint acepta esto y devuelve aquello"
@@ -639,6 +656,37 @@ El contract testing entre servicios merece mención especial. Es la práctica qu
 - El **consumidor** (`web-app`) ejecuta tests que verifican que su código puede parsear las respuestas definidas en el contrato.
 
 Cuando alguien propone un cambio en el contrato (vía PR al repo de producto), el CI de ambos repos se ejecuta contra la nueva versión. Si alguno falla, el cambio no se mergea hasta que el equipo correspondiente adapte su implementación.
+
+### 4.7. Herramientas reales que ya implementan SDD
+
+El artículo ha descrito SDD como metodología. Pero no hace falta construir el sistema desde cero. Existen herramientas maduras que ya implementan el ciclo especificar→implementar→archivar dentro de un repositorio. Son el motor que puede impulsar la fase SDD del pipeline.
+
+**[OpenSpec](https://github.com/Fission-AI/OpenSpec)** (56K ⭐, MIT, TypeScript). Framework ligero de SDD para coding assistants. Se instala con `npm install -g @fission-ai/openspec`. Su flujo:
+
+```
+/opsx:propose "add-dark-mode"
+  → crea proposal.md, specs/, design.md, tasks.md en el repo
+
+/opsx:apply
+  → implementa las tareas secuencialmente, validando contra las specs
+
+/opsx:archive
+  → archiva el cambio, las specs quedan como documentación viva
+```
+
+Filosofía: *"fluid not rigid, iterative not waterfall, easy not complex, built for brownfield not just greenfield"*. Funciona con 20+ asistentes de IA (Claude Code, Codex, Cursor, Copilot, Windsurf). OpenSpec es SDD intra-repo: ideal para la fase de implementación de cada servicio.
+
+**[GSD Core](https://github.com/open-gsd/gsd-core)** (heredero de `get-shit-done`, 64K ⭐ original, MIT). Sistema de meta-prompting y context engineering que ejecuta coding agents en un ciclo de 5 fases: **Discuss → Plan → Execute → Verify → Ship**. Su innovación clave: cada fase corre en subagentes con contexto fresco (200K tokens), resolviendo el problema de context rot que degrada la calidad cuando un agente acumula demasiada historia.
+
+**Cómo encajan en el sistema del artículo:**
+
+| Herramienta | Qué cubre del pipeline | Dónde se usa |
+|---|---|---|
+| **OpenSpec** | SDD intra-repo: especificar → implementar → archivar | Fase Walk/Run, dentro de cada repo de código |
+| **GSD Core** | Ciclo completo con subagentes: planificar → ejecutar → verificar → ship | Fase Run, como motor del agente SDD |
+| **El artículo (product-specs)** | Lo que ninguna de las dos cubre: contratos cross-repo, trazabilidad, extracción de decisiones, knowledge graph de producto | El sistema por encima de los repos |
+
+OpenSpec y GSD no compiten con el sistema del artículo. Lo complementan. Son el "cómo" dentro de cada repo. El artículo aporta el "qué" y el "por qué" a nivel de producto: los contratos entre servicios, la trazabilidad end-to-end, y el knowledge graph que conecta todo. Puedes usar OpenSpec para que el agente SDD genere specs dentro de `payment-service`, mientras `product-specs/contracts/` sigue siendo la fuente de verdad de la interfaz entre servicios.
 
 ---
 
@@ -892,7 +940,7 @@ El sistema completo que he descrito es el estado final. Nadie debería intentar 
 
 **Fase 1: Crawl (semana 1-2).** El objetivo es crear el repositorio de producto y el hábito de documentar. Cero dependencias externas.
 
-- **Día 1**: Crea el repo `product-specs/` con la estructura de la [sección 6.8](#68-template-del-repositorio-de-producto). Escribe `README.md` explicando qué es y quién lo mantiene.
+- **Día 1**: Crea el repo `product-specs/` con la estructura de la [sección 6.11](#611-template-del-repositorio-de-producto). Escribe `README.md` explicando qué es y quién lo mantiene.
 - **Día 2**: Escribe `vision.md` — una página sobre qué es el producto y por qué existe. Sin tecnicismos: lo debe entender cualquier persona del equipo.
 - **Día 3-4**: Identifica y escribe 3 requisitos cross-cutting. Elige los que más fricción generan hoy entre repos. Usa este template:
 
@@ -938,7 +986,82 @@ El sistema completo que he descrito es el estado final. Nadie debería intentar 
 - Automatizar los PRs sin haber medido la precisión del agente durante al menos 2 semanas.
 - Forzar al equipo. El sistema debe ganarse su sitio demostrando que ahorra tiempo.
 
-### 6.8. ¿Y si solo quiero el 20% del sistema?
+### 6.8. RACI: quién hace qué en este sistema
+
+El fallo más común al implantar esto no es técnico. Es organizativo: nadie sabe quién es responsable de qué. Aquí está la matriz:
+
+| Actividad | Responsible (ejecuta) | Accountable (responde) | Consulted (opina) | Informed (se le informa) |
+|---|---|---|---|---|
+| Escribir requisitos cross-cutting | Tech lead / Architect | Product Manager | Equipos de desarrollo | Toda la organización |
+| Mantener contratos (OpenAPI) | Desarrollador del servicio proveedor | Tech lead del proveedor | Desarrolladores de servicios consumidores | Arquitecto |
+| Revisar PRs de specs generadas | Tech lead / Architect | Product Manager | Agente (propone, no decide) | Equipo afectado |
+| Aprobar cambios de contrato | Tech lead del proveedor + Tech lead del consumidor | Arquitecto | Equipos afectados | PM |
+| Revisar extracciones del agente | Cualquier miembro del equipo | Tech lead | — | Canal #product-specs |
+| Mantener AGENTS.md | Desarrollador del repo | Tech lead del repo | — | Agentes de IA (lo consumen) |
+| Actuar sobre alertas de drift | Desarrollador que introdujo el cambio | Tech lead del repo | — | Arquitecto |
+
+**Regla de oro**: el agente **propone**, nunca **decide**. Todo PR generado automáticamente requiere revisión humana. Si no hay capacidad de revisión, el agente se limita a notificar.
+
+### 6.9. Quickstart: 15 minutos para eliminar 2 patrones de pérdida de conocimiento
+
+No necesitas leer el artículo entero para empezar. Esto es lo mínimo:
+
+```bash
+# 1. Crea el repo de producto (2 min)
+mkdir product-specs && cd product-specs && git init
+echo "# Product Specs" > README.md
+
+# 2. Escribe un requisito cross-cutting (8 min)
+mkdir -p requirements
+cat > requirements/REQ-IDEM-001.md << 'EOF'
+# REQ-IDEM-001: Idempotencia en operaciones de escritura
+
+**Alcance**: cross-cutting
+**Repos que implementan**: payment-service, order-service
+**Fecha**: $(date +%Y-%m-%d)
+
+## Descripción
+Toda operación de escritura (POST, PUT, PATCH, DELETE) debe ser
+idempotente. Una misma petición enviada N veces produce el mismo
+resultado que enviada 1 vez.
+
+## Comportamiento esperado
+- Cada petición incluye un `Idempotency-Key` único
+- Si el servidor ya procesó esa key, devuelve el resultado almacenado
+- Si no, procesa la petición y almacena el resultado
+
+## Motivación
+La red no es fiable. Sin idempotencia, un retry del cliente puede
+cobrar dos veces, crear dos pedidos o enviar dos notificaciones.
+EOF
+
+# 3. Escribe un ADR en un repo de código (5 min)
+cd ../payment-service
+mkdir -p docs/adr
+cat > docs/adr/001-use-postgres.md << 'EOF'
+# ADR-001: Usar PostgreSQL como base de datos principal
+
+**Estado**: aceptado
+**Fecha**: $(date +%Y-%m-%d)
+
+## Contexto
+Necesitamos una base de datos relacional para el servicio de pagos.
+
+## Decisión
+Usaremos PostgreSQL 16.
+
+## Consecuencias
+- Tipado fuerte, integridad transaccional
+- El equipo ya conoce Postgres
+- Necesitaremos réplicas de lectura para escalar
+EOF
+
+git add docs/adr/ && git commit -m "docs: ADR-001 PostgreSQL"
+```
+
+En 15 minutos has creado el repo de producto, un requisito cross-cutting y un ADR. Has eliminado los patrones 1 (decisión huérfana) y 3 (susurro del senior). El resto del artículo te dice cómo escalar desde aquí.
+
+### 6.10. ¿Y si solo quiero el 20% del sistema?
 
 Muchos lectores no necesitarán — ni querrán — el sistema completo. Aquí tienes tres combinaciones mínimas que ya aportan valor:
 
@@ -950,7 +1073,7 @@ Muchos lectores no necesitarán — ni querrán — el sistema completo. Aquí t
 
 El sistema completo (fase Run) está ahí si lo necesitas. Pero no es el punto de partida. Es el punto de llegada.
 
-### 6.9. Template del repositorio de producto
+### 6.11. Template del repositorio de producto
 
 El repo `product-specs/` es el corazón del sistema. Esta es su estructura recomendada:
 
