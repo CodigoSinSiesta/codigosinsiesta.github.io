@@ -17,7 +17,7 @@ autor: Alejandro de la Fuente
 
 ## 0. Resumen ejecutivo
 
-Este artículo describe un sistema integral para gestionar el conocimiento de producto usando agentes de IA. No es teoría: es un pipeline que empieza en la transcripción de una reunión y termina en código desplegado en múltiples repositorios, pasando por definiciones enriquecidas, análisis SDD y un knowledge graph consolidado.
+Este artículo describe un sistema integral para gestionar el conocimiento de producto usando agentes de IA. Es un marco de trabajo que va desde la transcripción de una reunión hasta el código desplegado en múltiples repositorios, pasando por definiciones enriquecidas, SDD, knowledge graphs y contract testing. La primera mitad es teoría fundacional; la segunda es práctica incremental con roadmap, quickstart y herramientas.
 
 Si tu producto vive en un solo repo, este artículo te sobra en un 40%. Si vive en tres, cinco o quince — y las decisiones de arquitectura se toman en una reunión el martes y el jueves ya nadie recuerda por qué — este artículo es para ti.
 
@@ -214,7 +214,7 @@ Con esto, el agente sabe inmediatamente el rol de este repo en el ecosistema: es
 
 **Por qué los contratos son las seams.** En arquitectura de software, un *seam* es un punto donde dos componentes se acoplan y donde puedes cambiar uno sin romper el otro si respetas el contrato. En multi-repo, los contratos OpenAPI/AsyncAPI/JSON Schema son las seams. Definen exactamente qué espera cada lado y permiten que ambos evolucionen de forma independiente.
 
-**La regla de los tres niveles de acoplamiento:**
+**La regla de los cuatro niveles de acoplamiento:**
 
 1. **Acoplamiento de contrato (deseable).** "Necesito que me envíes un JSON con estos campos." El contrato OpenAPI lo define. Ambos lados pueden cambiar su implementación interna sin romper nada.
 2. **Acoplamiento de implementación (peligroso).** "Sé que usas Postgres y que la tabla `orders` tiene una columna `status` de tipo enum." Si el proveedor cambia su BD, el consumidor se rompe. Esto es lo que genera las divergencias silenciosas del patrón 4.
@@ -258,7 +258,21 @@ Cada nivel necesita un formato distinto porque su consumidor es distinto:
 - **Requisitos repo-specific**: Issues de GitHub, PR templates, `CONTRIBUTING.md`. Viven en el repo correspondiente.
 - **Decisiones de implementación**: ADRs (Architecture Decision Records). Formato estandarizado con contexto, decisión, consecuencias. Viven en cada repo en `docs/adr/`.
 
-### 2.6. El antipatrón del documento único
+### 2.4. ¿Qué es el knowledge graph de producto exactamente?
+
+El artículo usa "knowledge graph" decenas de veces. Conviene definirlo antes de seguir.
+
+**No es una base de datos de grafos.** Es un modelo de relaciones. Al principio — fase Crawl y Walk del roadmap — el knowledge graph **es el propio repo `product-specs/`**. Los nodos son los ficheros markdown (requisitos, ADRs, contratos). Las aristas son las referencias explícitas: "este servicio implementa este contrato", "este requisito depende de esta decisión". No necesitas Neo4j. Necesitas que los ficheros se referencien entre sí de forma consistente.
+
+**A partir de la fase Run**, cuando tienes 50+ nodos y necesitas consultas de impacto ("¿qué servicios se ven afectados si cambio este contrato?"), migras a un grafo real. La herramienta depende de tu escala:
+
+| Fase | Implementación | Consultas posibles |
+|---|---|---|
+| Crawl/Walk | Repo `product-specs/` con referencias cruzadas en markdown | "Lee el requisito REQ-IDEM-001 y dime qué repos lo implementan" |
+| Run inicial | SQLite + embeddings (Turso, zvec) + `codebase-memory-mcp` | "¿Qué servicios dependen de payment-service?" |
+| Run avanzado | Neo4j + GraphRAG | "Si cambio el campo `amount` de integer a decimal, ¿qué repos necesitan ajustes y qué tests se rompen?" |
+
+**La regla**: no despliegues una base de datos de grafos hasta que el repo de producto tenga más nodos de los que puedas seguir mentalmente. Hasta entonces, markdown con enlaces entre ficheros es suficiente — y es infinitamente más fácil de mantener.
 
 He visto equipos que intentan resolver esto con UN documento: un Notion, un Google Doc, un Confluence. Es el "documento de arquitectura" que supuestamente lo contiene todo.
 
@@ -655,7 +669,7 @@ El contract testing entre servicios merece mención especial. Es la práctica qu
 - El **proveedor** (`auth-service`) ejecuta tests que verifican que su implementación cumple el contrato.
 - El **consumidor** (`web-app`) ejecuta tests que verifican que su código puede parsear las respuestas definidas en el contrato.
 
-Cuando alguien propone un cambio en el contrato (vía PR al repo de producto), el CI de ambos repos se ejecuta contra la nueva versión. Si alguno falla, el cambio no se mergea hasta que el equipo correspondiente adapte su implementación.
+Cuando alguien propone un cambio en el contrato (vía PR al repo de producto), el CI de ambos repos se ejecuta contra la nueva versión. Si alguno falla, el cambio no se mergea hasta que el equipo correspondiente adapte su implementación. Para evitar deadlocks (el consumidor no puede validar hasta que el proveedor implemente), el CI del consumidor valida contra un mock del nuevo contrato, no contra el endpoint real. Una vez ambos pasan, el proveedor despliega primero y el consumidor después.
 
 ### 4.7. Herramientas reales que ya implementan SDD
 
@@ -940,7 +954,7 @@ El sistema completo que he descrito es el estado final. Nadie debería intentar 
 
 **Fase 1: Crawl (semana 1-2).** El objetivo es crear el repositorio de producto y el hábito de documentar. Cero dependencias externas.
 
-- **Día 1**: Crea el repo `product-specs/` con la estructura de la [sección 6.11](#611-template-del-repositorio-de-producto). Escribe `README.md` explicando qué es y quién lo mantiene.
+- **Día 1**: Crea el repo `product-specs/` con la estructura de la [sección 6.10](#610-template-del-repositorio-de-producto). Escribe `README.md` explicando qué es y quién lo mantiene.
 - **Día 2**: Escribe `vision.md` — una página sobre qué es el producto y por qué existe. Sin tecnicismos: lo debe entender cualquier persona del equipo.
 - **Día 3-4**: Identifica y escribe 3 requisitos cross-cutting. Elige los que más fricción generan hoy entre repos. Usa este template:
 
@@ -976,9 +990,9 @@ El sistema completo que he descrito es el estado final. Nadie debería intentar 
 **Fase 3: Run (mes 3-6).** Cerrar el ciclo con agentes, grafo y drift detection.
 
 - **Mes 4**: El agente de reuniones ahora genera PRs automáticos al repo de producto (con revisión humana obligatoria). Empieza con 1 reunión/semana, escala gradualmente.
-- **Mes 5**: El agente SDD genera tests desde las specs para todos los servicios con contrato OpenAPI/AsyncAPI. Los tests se envían como PRs a cada repo.
+- **Mes 5**: El agente SDD genera tests desde las specs para todos los servicios con contrato OpenAPI/AsyncAPI. Los tests se envían como PRs a cada repo. Si usas OpenSpec (`/opsx:apply`), intégralo aquí como motor de implementación intra-repo.
 - **Mes 6**: Activa el agente de drift en modo diario. Solo alerta, no corrige. Introduce el knowledge graph con SQLite + embeddings (no Neo4j todavía). Conecta specs → contratos → código.
-- **Más allá**: Incorpora fuentes adicionales (Jira, Google Docs vía markitdown), migra a Neo4j si el grafo supera 50 nodos, añade dashboards de trazabilidad.
+- **Más allá**: Incorpora fuentes adicionales (Jira, Google Docs vía markitdown), migra a Neo4j si el grafo supera 50 nodos, añade dashboards de trazabilidad. Si el volumen de features crece, GSD Core (`Discuss → Plan → Execute → Verify → Ship`) puede estructurar el ciclo de desarrollo con subagentes de contexto fresco.
 
 **Lo que NO deberías hacer en ningún momento**:
 - Desplegar tres agentes el primer mes. Uno, en modo borrador, tras 8 semanas.
@@ -986,23 +1000,7 @@ El sistema completo que he descrito es el estado final. Nadie debería intentar 
 - Automatizar los PRs sin haber medido la precisión del agente durante al menos 2 semanas.
 - Forzar al equipo. El sistema debe ganarse su sitio demostrando que ahorra tiempo.
 
-### 6.8. RACI: quién hace qué en este sistema
-
-El fallo más común al implantar esto no es técnico. Es organizativo: nadie sabe quién es responsable de qué. Aquí está la matriz:
-
-| Actividad | Responsible (ejecuta) | Accountable (responde) | Consulted (opina) | Informed (se le informa) |
-|---|---|---|---|---|
-| Escribir requisitos cross-cutting | Tech lead / Architect | Product Manager | Equipos de desarrollo | Toda la organización |
-| Mantener contratos (OpenAPI) | Desarrollador del servicio proveedor | Tech lead del proveedor | Desarrolladores de servicios consumidores | Arquitecto |
-| Revisar PRs de specs generadas | Tech lead / Architect | Product Manager | Agente (propone, no decide) | Equipo afectado |
-| Aprobar cambios de contrato | Tech lead del proveedor + Tech lead del consumidor | Arquitecto | Equipos afectados | PM |
-| Revisar extracciones del agente | Cualquier miembro del equipo | Tech lead | — | Canal #product-specs |
-| Mantener AGENTS.md | Desarrollador del repo | Tech lead del repo | — | Agentes de IA (lo consumen) |
-| Actuar sobre alertas de drift | Desarrollador que introdujo el cambio | Tech lead del repo | — | Arquitecto |
-
-**Regla de oro**: el agente **propone**, nunca **decide**. Todo PR generado automáticamente requiere revisión humana. Si no hay capacidad de revisión, el agente se limita a notificar.
-
-### 6.9. Quickstart: 15 minutos para eliminar 2 patrones de pérdida de conocimiento
+### 6.8. Quickstart: 15 minutos para empezar
 
 No necesitas leer el artículo entero para empezar. Esto es lo mínimo:
 
@@ -1010,10 +1008,11 @@ No necesitas leer el artículo entero para empezar. Esto es lo mínimo:
 # 1. Crea el repo de producto (2 min)
 mkdir product-specs && cd product-specs && git init
 echo "# Product Specs" > README.md
+git add -A && git commit -m "init: product specs repository"
 
 # 2. Escribe un requisito cross-cutting (8 min)
 mkdir -p requirements
-cat > requirements/REQ-IDEM-001.md << 'EOF'
+cat > requirements/REQ-IDEM-001.md << EOF
 # REQ-IDEM-001: Idempotencia en operaciones de escritura
 
 **Alcance**: cross-cutting
@@ -1036,9 +1035,11 @@ cobrar dos veces, crear dos pedidos o enviar dos notificaciones.
 EOF
 
 # 3. Escribe un ADR en un repo de código (5 min)
+# Asume que payment-service/ existe como directorio;
+# si no, créalo con: mkdir -p payment-service && cd payment-service && git init
 cd ../payment-service
 mkdir -p docs/adr
-cat > docs/adr/001-use-postgres.md << 'EOF'
+cat > docs/adr/001-use-postgres.md << EOF
 # ADR-001: Usar PostgreSQL como base de datos principal
 
 **Estado**: aceptado
@@ -1059,9 +1060,9 @@ EOF
 git add docs/adr/ && git commit -m "docs: ADR-001 PostgreSQL"
 ```
 
-En 15 minutos has creado el repo de producto, un requisito cross-cutting y un ADR. Has eliminado los patrones 1 (decisión huérfana) y 3 (susurro del senior). El resto del artículo te dice cómo escalar desde aquí.
+En 15 minutos has creado el repo de producto, un requisito cross-cutting y un ADR. Has dado el primer paso para atacar los patrones 1 (decisión huérfana) y 3 (susurro del senior). El resto del artículo te dice cómo escalar desde aquí.
 
-### 6.10. ¿Y si solo quiero el 20% del sistema?
+### 6.9. ¿Y si solo quiero el 20% del sistema?
 
 Muchos lectores no necesitarán — ni querrán — el sistema completo. Aquí tienes tres combinaciones mínimas que ya aportan valor:
 
@@ -1073,7 +1074,7 @@ Muchos lectores no necesitarán — ni querrán — el sistema completo. Aquí t
 
 El sistema completo (fase Run) está ahí si lo necesitas. Pero no es el punto de partida. Es el punto de llegada.
 
-### 6.11. Template del repositorio de producto
+### 6.10. Template del repositorio de producto
 
 El repo `product-specs/` es el corazón del sistema. Esta es su estructura recomendada:
 
@@ -1131,7 +1132,9 @@ El agente de IA no es el que decide. Es el que **recuerda, conecta y propaga**. 
 
 ---
 
-## 8. Apéndice: Stack de herramientas recomendado
+## 8. Apéndices
+
+### 8.1. Stack de herramientas recomendado
 
 | Capa | Herramienta | Propósito | Fase | Complejidad |
 |---|---|---|---|---|
@@ -1149,6 +1152,29 @@ El agente de IA no es el que decide. Es el que **recuerda, conecta y propaga**. 
 
 **Nota sobre costes**: empezar con modelos pequeños (GPT-4o-mini, ~$0.15/1M tokens) para extracción de decisiones. Un Neo4j en la nube cuesta ~$65/mes (AuraDB Professional); plantéatelo solo a partir de la fase Run. Mientras tanto, SQLite + embeddings locales (Turso, zvec) cubren el 80% de los casos de uso de grafo con coste cero.
 
+### 8.2. RACI: quién hace qué en este sistema
+
+| Actividad | Responsible (ejecuta) | Accountable (responde) | Consulted (opina) | Informed (se le informa) |
+|---|---|---|---|---|
+| Escribir requisitos cross-cutting | Tech lead / Architect | Product Manager | Equipos de desarrollo | Toda la organización |
+| Mantener contratos (OpenAPI) | Desarrollador del servicio proveedor | Tech lead del proveedor | Desarrolladores de servicios consumidores | Arquitecto |
+| Revisar PRs de specs generadas | Tech lead / Architect | Product Manager | — | Equipo afectado |
+| Aprobar cambios de contrato | Tech lead del proveedor + Tech lead del consumidor | Arquitecto | Equipos afectados | PM |
+| Revisar extracciones del agente | Cualquier miembro del equipo | Tech lead | — | Canal #product-specs |
+| Mantener AGENTS.md | Desarrollador del repo | Tech lead del repo | — | Agentes de IA (lo consumen) |
+| Actuar sobre alertas de drift | Desarrollador que introdujo el cambio | Tech lead del repo | — | Arquitecto |
+
+**Regla de oro**: el agente **propone**, nunca **decide**. Todo PR generado automáticamente requiere revisión humana. Si no hay capacidad de revisión, el agente se limita a notificar.
+
+### 8.3. Convención de naming para requisitos
+
+Los requisitos en `product-specs/requirements/` siguen este formato: `REQ-{CAT}-{NNN}.md`
+
+- `CAT`: categoría de 3-4 letras. `AUTH` (autenticación), `IDEM` (idempotencia), `PAY` (pagos), `RATE` (rate limiting), `NOTIF` (notificaciones).
+- `NNN`: número secuencial dentro de la categoría, empezando en 001.
+
+La categoría la asigna quien crea el requisito. El número lo asigna el CI (`validate-specs.yml`) al validar el PR: busca el número más alto existente en esa categoría y asigna el siguiente. Si el PR no sigue la convención, el CI lo rechaza.
+
 ---
 
-*Este artículo es el marco teórico. El siguiente será la implementación práctica: construir el pipeline real con herramientas concretas, código ejecutable y un ejemplo funcionando sobre un producto multi-repo de verdad.*
+*Este artículo es el marco de trabajo. Queda como ejercicio práctico construir el pipeline con herramientas concretas, código ejecutable y un ejemplo funcionando sobre un producto multi-repo de verdad.*
