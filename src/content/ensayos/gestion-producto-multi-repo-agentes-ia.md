@@ -79,6 +79,40 @@ Todos los problemas anteriores se agravan cuando el producto está distribuido e
 
 El multi-repo no es una nota al pie. Es el escenario real. Y la solución no puede ser "un repo de documentación que alguien mantiene a mano". Tiene que ser **un sistema que se mantiene solo**.
 
+### 1.5. ¿Es SDD para ti? Un diagnóstico antes de seguir
+
+Antes de invertir tiempo en el resto del artículo, responde estas preguntas. Si marcas menos de 3, quizás no necesitas SDD — y este artículo incluye una sección de [alternativas ligeras](#16-alternativas-a-sdd-cuando-esto-es-demasiado).
+
+- [ ] ¿Tu producto tiene **3 o más repositorios** que se comunican entre sí?
+- [ ] ¿Los **contratos entre servicios** (APIs, eventos) cambian al menos una vez al mes?
+- [ ] ¿Has sufrido el **patrón de la especificación zombie**? (un documento de specs que nadie actualiza)
+- [ ] ¿Has perdido horas depurando una integración porque dos servicios interpretaban distinto el mismo campo?
+- [ ] ¿Cuando un servicio cambia su API, **no sabes con certeza** qué otros servicios se ven afectados?
+- [ ] ¿Tu equipo dedica más de 2 horas/semana a **coordinación cross-repo** (avisar, sincronizar, perseguir)?
+- [ ] ¿Has tenido un bug en producción causado por una **divergencia silenciosa** entre la spec y el código?
+
+**Resultado**:
+- **6-7 ✓**: SDD te va a cambiar la vida. Sigue leyendo.
+- **4-5 ✓**: SDD te aportará valor, pero quizás puedas empezar solo con el repo de producto y contract testing. Lee la [sección de alternativas](#16-alternativas-a-sdd-cuando-esto-es-demasiado) antes de decidir.
+- **0-3 ✓**: Probablemente no necesitas SDD todavía. Lee la sección de alternativas para encontrar un punto de partida más ligero.
+
+### 1.6. Alternativas a SDD: cuando esto es demasiado
+
+No todo proyecto necesita SDD. Aquí tienes opciones más ligeras ordenadas de menor a mayor fricción:
+
+**Opción A: ADRs + README cross-repo (esfuerzo: bajo).** Escribe un ADR en cada repo cuando tomes una decisión técnica. Mantén un `README.md` en el repo principal con las dependencias entre servicios. Sin contratos automatizados, sin agentes, sin grafo. Esto ya resuelve los patrones 1 (decisión huérfana) y 3 (susurro del senior). Es la fase Crawl del roadmap, y para equipos de 2-5 personas con 2-3 repos puede ser suficiente.
+
+**Opción B: BDD ligero con Gherkin (esfuerzo: medio).** Escribe las funcionalidades cross-cutting como escenarios Gherkin en un repo compartido. Cada equipo implementa los escenarios que le corresponden. No hay contract testing automatizado entre servicios, pero sí una especificación ejecutable común. Ideal si tu fricción principal es el patrón 4 (divergencia silenciosa de conceptos de negocio).
+
+**Opción C: Contract testing sin SDD completo (esfuerzo: medio).** Define contratos OpenAPI/AsyncAPI para las APIs entre servicios. Configura tests de contrato en CI. No necesitas knowledge graph ni agentes ni extracción de decisiones desde reuniones. Esto ataca directamente el patrón 2 (especificación zombie) en su manifestación más dañina: las APIs. Es la fase Walk del roadmap, y puedes quedarte aquí indefinidamente.
+
+**Opción D: SDD completo (esfuerzo: alto).** Lo que describe el resto del artículo. Solo recomendable si has marcado 5+ en el diagnóstico, tu equipo tiene experiencia con CI/CD y testing, y el coste de la descoordinación cross-repo justifica la inversión.
+
+**Señales de que deberías parar o reducir**:
+- El repo de producto lleva 2 sprints sin un PR mergeado → el equipo no tiene capacidad de revisión. Vuelve a la opción A y reevalúa en 3 meses.
+- Los tests de contrato generan más falsos positivos que bugs reales → tus contratos son demasiado rígidos o cambian demasiado. Relaja los umbrales.
+- El agente de reuniones extrae decisiones con menos del 70% de precisión → las transcripciones de tu equipo no son lo bastante estructuradas. Vuelve al modo borrador (notificaciones pasivas, sin PRs).
+
 ---
 
 ## 2. Parte I: Definir el producto (más allá de los repos)
@@ -252,13 +286,69 @@ Todo esto en menos de 2 minutos tras finalizar la reunión. El humano solo tiene
 
 ## 4. Parte III: SDD — Specification-Driven Development
 
-### 4.1. Qué es SDD y por qué no es waterfall
+### 4.1. Qué es SDD (explicado para quien nunca lo ha usado)
 
-SDD significa que **la especificación se escribe antes que el código y se usa como contrato verificable**. Suena a waterfall. No lo es.
+SDD significa **Specification-Driven Development**: escribir qué debe hacer el sistema *antes* de escribir el código que lo hace, y usar esa especificación como un contrato que se verifica automáticamente.
 
-En waterfall, la especificación es un documento estático que se escribe al principio y no se toca. En SDD, la especificación es **viva**: evoluciona con el producto, se valida automáticamente, y guía el desarrollo sin encadenarlo.
+Imagina que estás montando un servicio de pagos. Sin SDD, la conversación es:
 
-La diferencia fundamental: en SDD, la especificación **genera tests**. No es un PDF que alguien leyó una vez. Es un artefacto ejecutable que rompe el CI si el código no lo cumple.
+> *"El endpoint de pago acepta un JSON con amount, currency y payment_method. Si el pago es con tarjeta, además necesita card_token. Devuelve un payment_id y el status."*
+
+Con SDD, en lugar de esa frase ambigua, escribes esto:
+
+```yaml
+# payment-api-v2.yaml (OpenAPI)
+POST /payments:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [amount, currency, payment_method]
+          properties:
+            amount:
+              type: integer
+              minimum: 1
+            currency:
+              type: string
+              enum: [EUR, USD, MXN]
+            payment_method:
+              type: string
+              enum: [card, transfer]
+            card_token:
+              type: string
+              description: "Requerido solo si payment_method es card"
+  responses:
+    '201':
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              payment_id: { type: string }
+              status: { type: string, enum: [pending, completed, failed] }
+```
+
+**¿Qué ganas?** Tres cosas que una frase ambigua no te da:
+
+1. **Validación automática.** El CI ejecuta un test que envía peticiones reales a tu endpoint y verifica que las respuestas cumplen el contrato. Si cambias `status` por `state`, el test falla. No hay ambigüedad.
+2. **Tipos generados.** Del mismo YAML, un agente genera `PaymentRequest` y `PaymentResponse` en TypeScript (frontend) y en Python (backend). Un solo source of truth, dos codebases, cero discrepancias.
+3. **Documentación viva.** La spec *es* la documentación. No hay un Google Doc desactualizado en alguna carpeta. La spec está en el repo, versionada, y si no se cumple, el CI truena.
+
+**SDD vs TDD**: TDD dice "escribe el test antes del código". SDD dice "escribe la especificación antes del test". Un test de TDD verifica una unidad de código. Una spec de SDD define el contrato completo de una API, un evento o un requisito funcional. No compiten: SDD genera los tests que TDD usaría.
+
+**Glosario rápido** (términos que aparecen en esta sección):
+
+| Término | Qué es | Ejemplo |
+|---|---|---|
+| **OpenAPI** | Formato estándar para describir APIs REST | El YAML de arriba |
+| **AsyncAPI** | Lo mismo que OpenAPI pero para eventos/mensajería | Kafka, RabbitMQ, SQS |
+| **JSON Schema** | Estándar para describir la forma de un JSON | `{ "type": "object", "properties": {...} }` |
+| **Gherkin** | Lenguaje para describir comportamientos en lenguaje natural | `Dado que el usuario está logueado...` |
+| **ADR** | Architecture Decision Record: documento que captura una decisión técnica y su contexto | "Usamos Postgres en vez de MongoDB porque..." |
+| **Contract testing** | Tests que verifican que proveedor y consumidor cumplen el contrato | Pact, Schemathesis |
+| **Drift** | Divergencia entre lo que dice la spec y lo que hace el código | La spec dice `status` pero el código devuelve `state` |
 
 ### 4.2. El ciclo SDD
 
@@ -576,38 +666,69 @@ Ningún sistema automático es infalible. Estos son los fallos más probables y 
 
 ### 6.7. Roadmap incremental: crawl → walk → run
 
-El sistema completo que he descrito es el estado final. Nadie debería intentar implementarlo de golpe. Aquí está el camino progresivo:
+El sistema completo que he descrito es el estado final. Nadie debería intentar implementarlo de golpe. Aquí está el camino progresivo, con pasos tan concretos que puedes ejecutarlos mañana:
 
-**Fase 1: Crawl (semana 1-2).** El objetivo es crear el repositorio de producto y el hábito de documentar.
+**Fase 1: Crawl (semana 1-2).** El objetivo es crear el repositorio de producto y el hábito de documentar. Cero dependencias externas.
 
-- Crea `product-specs/` con esta estructura (ver [6.8](#68-template-del-repositorio-de-producto)).
-- Escribe 3-5 requisitos cross-cutting a mano. No intentes capturarlos todos: elige los que más fricción cross-repo generan hoy.
-- Escribe el primer ADR en cada repo siguiendo un template común.
-- No hay agentes todavía. Solo markdown, Git y disciplina de equipo.
+- **Día 1**: Crea el repo `product-specs/` con la estructura de la [sección 6.8](#68-template-del-repositorio-de-producto). Escribe `README.md` explicando qué es y quién lo mantiene.
+- **Día 2**: Escribe `vision.md` — una página sobre qué es el producto y por qué existe. Sin tecnicismos: lo debe entender cualquier persona del equipo.
+- **Día 3-4**: Identifica y escribe 3 requisitos cross-cutting. Elige los que más fricción generan hoy entre repos. Usa este template:
 
-**Fase 2: Walk (mes 1-3).** El objetivo es añadir contract testing y empezar a automatizar la trazabilidad.
+```markdown
+# REQ-XXX-NNN: [Título descriptivo]
 
-- Añade contratos OpenAPI/AsyncAPI en `product-specs/contracts/`.
-- Configura contract testing en CI para 1-2 servicios (proveedor + consumidor).
-- Instala `codebase-memory-mcp` en un repo piloto para indexar código y conectarlo con las specs.
-- Introduce el agente de reuniones en modo borrador: extrae decisiones pero no genera PRs, solo las publica en un canal de Slack para que el equipo las revise.
-- Mide: ¿cuántas decisiones se extraen por reunión? ¿Cuántas son correctas? ¿Cuánto tiempo ahorra el equipo?
+**Alcance**: cross-cutting
+**Repos que implementan**: [repo-a], [repo-b]
+**Fecha**: YYYY-MM-DD
 
-**Fase 3: Run (mes 3-6).** El objetivo es cerrar el ciclo completo.
+## Descripción
+[Qué debe hacer el sistema, en 2-3 frases. Sin ambigüedad.]
 
-- El agente de reuniones genera PRs al repo de producto (con revisión humana obligatoria).
-- El agente SDD genera tests desde las specs para todos los servicios con contrato.
-- El agente de drift monitoriza diariamente y alerta sobre divergencias.
-- El knowledge graph está poblado y responde consultas de impacto cross-repo.
-- Incorporas fuentes adicionales: tickets de Jira etiquetados como "decisión técnica", documentos de diseño en Google Docs (vía markitdown).
+## Comportamiento esperado
+- [Comportamiento 1 verificable]
+- [Comportamiento 2 verificable]
 
-**Lo que NO deberías hacer en ningún momento:**
-- Desplegar tres agentes el primer mes.
-- Usar Neo4j antes de tener 50+ nodos en el grafo.
+## Motivación
+[Qué problema resuelve. Referencia a ADRs o decisiones si existen.]
+```
+
+- **Día 5**: Escribe un ADR en cada repo usando [este template](https://adr.github.io/madr/). Elige una decisión técnica reciente que aún esté fresca.
+- **Checkpoint**: ¿Tiene el equipo 3 requisitos cross-cutting y 1 ADR por repo? Si sí, crea un canal de Slack #product-specs y comparte los enlaces. Si no, itera.
+
+**Fase 2: Walk (mes 1-3).** El objetivo es añadir contract testing y medir el valor antes de automatizar.
+
+- **Semana 3-4**: Elige la API que más problemas de integración causa. Escribe su contrato en OpenAPI y guárdalo en `product-specs/contracts/`. Usa [Swagger Editor](https://editor.swagger.io/) si nunca has escrito OpenAPI.
+- **Semana 5-6**: Configura contract testing en CI para ESA API. Schemathesis es la opción más simple: `pip install schemathesis && schemathesis run payment-api-v2.yaml --base-url=http://localhost:8080`. El objetivo es que el CI del proveedor falle si la implementación no cumple el contrato.
+- **Semana 7-8**: Añade el lado consumidor: el repo que llama a esa API debe validar en su CI que puede parsear las respuestas del contrato. Pact es buena opción aquí.
+- **Semana 9-12**: Introduce el agente de reuniones en modo borrador. No generes PRs todavía. Solo extrae decisiones de las transcripciones y publícalas en #product-specs para que el equipo las revise. Mide precisión durante 2 semanas: ¿cuántas decisiones extrae? ¿Cuántas son correctas?
+- **Checkpoint**: ¿Falla el CI cuando alguien rompe un contrato? ¿El equipo confía en las extracciones del agente (>70% precisión)? Si sí, avanza a Run. Si no, quédate aquí — ya tienes el 60% del valor.
+
+**Fase 3: Run (mes 3-6).** Cerrar el ciclo con agentes, grafo y drift detection.
+
+- **Mes 4**: El agente de reuniones ahora genera PRs automáticos al repo de producto (con revisión humana obligatoria). Empieza con 1 reunión/semana, escala gradualmente.
+- **Mes 5**: El agente SDD genera tests desde las specs para todos los servicios con contrato OpenAPI/AsyncAPI. Los tests se envían como PRs a cada repo.
+- **Mes 6**: Activa el agente de drift en modo diario. Solo alerta, no corrige. Introduce el knowledge graph con SQLite + embeddings (no Neo4j todavía). Conecta specs → contratos → código.
+- **Más allá**: Incorpora fuentes adicionales (Jira, Google Docs vía markitdown), migra a Neo4j si el grafo supera 50 nodos, añade dashboards de trazabilidad.
+
+**Lo que NO deberías hacer en ningún momento**:
+- Desplegar tres agentes el primer mes. Uno, en modo borrador, tras 8 semanas.
+- Usar Neo4j antes de tener 50+ nodos. SQLite + embeddings locales bastan.
 - Automatizar los PRs sin haber medido la precisión del agente durante al menos 2 semanas.
-- Forzar al equipo a usar las specs si ellos no ven el valor. El sistema debe ganarse su sitio demostrando que ahorra tiempo, no imponiéndose por decreto.
+- Forzar al equipo. El sistema debe ganarse su sitio demostrando que ahorra tiempo.
 
-### 6.8. Template del repositorio de producto
+### 6.8. ¿Y si solo quiero el 20% del sistema?
+
+Muchos lectores no necesitarán — ni querrán — el sistema completo. Aquí tienes tres combinaciones mínimas que ya aportan valor:
+
+**Combo mínimo viable (1 semana):** repo de producto + 3 requisitos cross-cutting + 1 ADR por repo. Coste: 0€. Valor: eliminas los patrones 1 (decisión huérfana) y 3 (susurro del senior). Esto solo ya justifica el esfuerzo.
+
+**Combo intermedio (1 mes):** lo anterior + 1 contrato OpenAPI + contract testing en CI para una API. Coste: 0€ (Schemathesis es open source). Valor: eliminas el patrón 2 (especificación zombie) para la API que más te duele. Este es el punto dulce para equipos de 3-8 personas.
+
+**Combo avanzado (3 meses):** lo anterior + agente de reuniones en modo borrador + codebase-memory-mcp en 1 repo piloto. Coste: ~$5-10/mes en tokens LLM. Valor: el conocimiento de las reuniones ya no se pierde y empiezas a tener trazabilidad código → decisión.
+
+El sistema completo (fase Run) está ahí si lo necesitas. Pero no es el punto de partida. Es el punto de llegada.
+
+### 6.9. Template del repositorio de producto
 
 El repo `product-specs/` es el corazón del sistema. Esta es su estructura recomendada:
 
