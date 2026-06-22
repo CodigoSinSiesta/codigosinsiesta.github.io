@@ -117,6 +117,40 @@ No todo proyecto necesita SDD. Aquí tienes opciones más ligeras ordenadas de m
 
 ## 2. Parte I: Definir el producto (más allá de los repos)
 
+### 2.0. Workspaces: la unidad de trabajo del agente multi-repo
+
+Antes de definir el producto, definamos dónde trabaja el agente. Un **workspace** es el entorno que un agente de IA ve cuando empieza a trabajar: un directorio con archivos, un `AGENTS.md` que le da contexto, y skills que le dan procedimientos. En un sistema multi-repo, el workspace cambia según la tarea.
+
+**El problema del agente sin workspaces.** Imagina un agente que tiene que actualizar un contrato OpenAPI. Ese contrato define la interfaz entre `payment-service` y `order-service`. El agente necesita:
+
+- Leer la spec en `product-specs/contracts/payment-api-v2.yaml` → workspace del repo de producto
+- Actualizar la implementación en `payment-service/src/api/payments.py` → workspace de payment-service
+- Actualizar los tipos del consumidor en `order-service/src/types/payment.ts` → workspace de order-service
+- Verificar que los tests pasan en ambos repos → CI, no un workspace
+
+Sin workspaces bien definidos, el agente está perdido: ¿dónde está cada cosa? ¿qué convenciones aplican en cada repo? ¿quién es responsable de qué?
+
+**El workspace como abstracción.** Un workspace no es "un repo". Es "un repo + su AGENTS.md + sus skills + los contratos que declara implementar + las dependencias que declara tener". El agente no trabaja sobre archivos sueltos; trabaja sobre un workspace que le proporciona:
+
+| Componente | Qué aporta |
+|---|---|
+| `AGENTS.md` | Stack, convenciones, arquitectura, límites |
+| `.agent/skills/` | Procedimientos ejecutables (tests, deploy, migraciones) |
+| Referencia a contratos | "Este servicio implementa `product-specs/contracts/payment-api-v2.yaml`" |
+| Dependencias declaradas | "Este servicio consume `order-service`, `notification-service`" |
+| `CLAUDE.md` / `.cursorrules` | Reglas adicionales específicas del asistente |
+
+**Cómo los workspaces habilitan el sistema del artículo.** Todo el pipeline depende de que cada agente sepa en qué workspace operar en cada momento:
+
+- **Agente de reuniones** → workspace `product-specs` (extrae decisiones, las guarda donde corresponde)
+- **Agente SDD** → workspace del repo de código (lee el contrato desde product-specs, genera tests en el lenguaje y framework que dicta el AGENTS.md local)
+- **Agente de drift** → lee la declaración "implementa el contrato X" del AGENTS.md local y valida contra él
+- **Agente coordinador** → consulta los AGENTS.md de los repos afectados para saber cómo generar PRs compatibles
+
+Sin workspaces, cada agente tendría que descubrir todo esto desde cero en cada ejecución. Con workspaces, el contexto se hereda.
+
+**La regla de oro del workspace multi-repo**: el agente siempre sabe *en qué repo está* porque el `AGENTS.md` se lo dice, y siempre sabe *con qué otros repos se relaciona* porque los contratos y las dependencias están declarados explícitamente.
+
 ### 2.1. La pirámide de definiciones
 
 Todo producto tiene definiciones en múltiples niveles de abstracción. La clave es que cada nivel tiene un propósito distinto, una audiencia distinta y una frecuencia de cambio distinta:
@@ -153,7 +187,66 @@ En un producto multi-repo, la pregunta clave es: **¿esta definición pertenece 
 
 La regla: **si afecta a más de un repo, pertenece al producto**. Si solo afecta a uno, pertenece a ese repo. Parece obvio, pero casi nadie lo aplica de forma sistemática.
 
-### 2.3. Qué formato debe tener cada nivel
+### 2.3. Arquitectura multi-repo correcta: contratos como seams
+
+Un producto multi-repo no es N repos sueltos. Es un grafo de repos que se relacionan mediante **contratos explícitos**. La arquitectura correcta no es la que "funciona", sino la que **un agente de IA puede entender sin ambigüedad**.
+
+**El antipatrón: dependencias implícitas.** Dos servicios se llaman por HTTP, pero la relación no está documentada en ninguna parte. El desarrollador de `order-service` sabe que llama a `payment-service` porque lo recuerda. El agente de IA no lo recuerda — tiene que descubrirlo rastreando código. Esto es frágil y caro.
+
+**El patrón correcto: contratos declarados.** Cada repo declara explícitamente qué contratos implementa y de qué otros repos depende. Esta declaración vive en el `AGENTS.md`:
+
+```markdown
+## Contratos
+- **Provee**: `product-specs/contracts/payment-api-v2.yaml`
+- **Consume**: `product-specs/contracts/notification-events-v1.yaml`
+- **Consume**: `product-specs/contracts/auth-api-v1.yaml`
+```
+
+Con esto, el agente sabe inmediatamente el rol de este repo en el ecosistema: es proveedor de la API de pagos y consumidor de notificaciones y autenticación.
+
+**Los tres patrones de relación entre repos:**
+
+| Patrón | Ejemplo | Contrato |
+|---|---|---|
+| **Proveedor-Consumidor** | `payment-service` → API → `order-service` | OpenAPI |
+| **Publicador-Suscriptor** | `payment-service` → eventos → `notification-service` | AsyncAPI |
+| **Dependencia de librería** | `shared-models` → package → todos los servicios | JSON Schema |
+
+**Por qué los contratos son las seams.** En arquitectura de software, un *seam* es un punto donde dos componentes se acoplan y donde puedes cambiar uno sin romper el otro si respetas el contrato. En multi-repo, los contratos OpenAPI/AsyncAPI/JSON Schema son las seams. Definen exactamente qué espera cada lado y permiten que ambos evolucionen de forma independiente.
+
+**La regla de los tres niveles de acoplamiento:**
+
+1. **Acoplamiento de contrato (deseable).** "Necesito que me envíes un JSON con estos campos." El contrato OpenAPI lo define. Ambos lados pueden cambiar su implementación interna sin romper nada.
+2. **Acoplamiento de implementación (peligroso).** "Sé que usas Postgres y que la tabla `orders` tiene una columna `status` de tipo enum." Si el proveedor cambia su BD, el consumidor se rompe. Esto es lo que genera las divergencias silenciosas del patrón 4.
+3. **Acoplamiento temporal (a evitar).** "Necesito que despliegues tu cambio antes que el mío." Si dos servicios necesitan deploy coordinado, el contrato no es lo bastante flexible. Los contratos deben soportar versionado para que cada lado despliegue a su ritmo.
+
+**Ejemplo de arquitectura multi-repo bien definida:**
+
+```
+product-specs/                    ← Repo de conocimiento (sin código)
+├── contracts/
+│   ├── payment-api-v2.yaml       ← Contrato que payment-service PROVEE
+│   ├── notification-events-v1.yaml ← Contrato que payment-service PUBLICA
+│   └── auth-api-v1.yaml          ← Contrato que auth-service PROVEE
+├── requirements/
+│   ├── REQ-IDEM-001.md           ← "Toda operación de pago debe ser idempotente"
+│   └── REQ-RATE-002.md           ← "Rate limiting por tenant"
+└── AGENTS.md                     ← Contexto para el agente de producto
+
+payment-service/                  ← Repo de código
+├── AGENTS.md                     ← "Provee payment-api-v2, consume auth-api-v1"
+├── .agent/skills/run-tests.md
+└── src/...
+
+order-service/                    ← Repo de código
+├── AGENTS.md                     ← "Consume payment-api-v2, notification-events-v1"
+├── .agent/skills/deploy-staging.md
+└── src/...
+```
+
+Un agente que lee `order-service/AGENTS.md` ve inmediatamente: "Este servicio consume la API de pagos v2 y los eventos de notificación v1." Sabe qué contratos validar, qué tipos generar, y qué repos notificar si algo cambia.
+
+### 2.5. Formato de cada nivel
 
 Cada nivel necesita un formato distinto porque su consumidor es distinto:
 
@@ -163,7 +256,7 @@ Cada nivel necesita un formato distinto porque su consumidor es distinto:
 - **Requisitos repo-specific**: Issues de GitHub, PR templates, `CONTRIBUTING.md`. Viven en el repo correspondiente.
 - **Decisiones de implementación**: ADRs (Architecture Decision Records). Formato estandarizado con contexto, decisión, consecuencias. Viven en cada repo en `docs/adr/`.
 
-### 2.4. El antipatrón del documento único
+### 2.6. El antipatrón del documento único
 
 He visto equipos que intentan resolver esto con UN documento: un Notion, un Google Doc, un Confluence. Es el "documento de arquitectura" que supuestamente lo contiene todo.
 
@@ -175,7 +268,7 @@ No funciona. Por tres razones:
 
 La alternativa es un **grafo de definiciones**: muchos documentos pequeños, interconectados, cada uno viviendo donde debe vivir, con trazabilidad automática entre ellos.
 
-### 2.5. Versionado de definiciones
+### 2.7. Versionado de definiciones
 
 ¿Qué se versiona y cómo?
 
@@ -186,7 +279,7 @@ La alternativa es un **grafo de definiciones**: muchos documentos pequeños, int
 
 La clave es que las definiciones **de producto** no viven en el mismo sistema de versionado que el código. Viven en un repo de conocimiento (o en un sistema de grafos) que los repos de código consultan, pero no contienen.
 
-### 2.6. Preparar los repos para agentes de IA
+### 2.8. Preparar los repos para agentes de IA
 
 Todo el sistema que describe este artículo depende de agentes de IA que leen, escriben y razonan sobre los repos. Pero un repo sin preparar es un repo donde el agente tropieza: explora a ciegas, adivina convenciones y consume tokens en reconocimiento en lugar de en trabajo productivo.
 
@@ -394,6 +487,30 @@ Todo esto en menos de 2 minutos tras finalizar la reunión. El humano solo tiene
 ### 4.1. Qué es SDD (explicado para quien nunca lo ha usado)
 
 SDD significa **Specification-Driven Development**: escribir qué debe hacer el sistema *antes* de escribir el código que lo hace, y usar esa especificación como un contrato que se verifica automáticamente.
+
+Pero antes de seguir: ¿qué es exactamente una spec? El artículo ha usado la palabra decenas de veces. Es hora de definirla.
+
+**Una spec (especificación) es una descripción formal y verificable de lo que algo debe hacer.** No es un documento de Word. No es un diagrama en un Miro. No es una conversación de Slack. Es un artefacto que un sistema automático puede leer, validar y usar para verificar que el código lo cumple.
+
+**Los cinco tipos de spec y cuándo usar cada uno:**
+
+| Tipo | Formato | Qué describe | Quién la consume | Ejemplo |
+|---|---|---|---|---|
+| **Spec de contrato** | OpenAPI, AsyncAPI, JSON Schema, Proto | La interfaz entre dos componentes | CI (contract testing), generadores de tipos, agentes | `POST /payments` acepta `amount`, `currency`, devuelve `payment_id` |
+| **Spec de comportamiento** | Gherkin, Markdown estructurado | Qué debe hacer el sistema desde la perspectiva del usuario | Tests de aceptación, PMs, QA | "Dado un usuario logueado, cuando añade un producto al carrito, entonces ve el total actualizado" |
+| **Spec de requisito** | Markdown con template | Una capacidad que el producto debe tener | Todo el equipo, agentes de IA | "REQ-IDEM-001: toda operación de pago debe ser idempotente" |
+| **Spec de arquitectura** | ADR, C4, diagramas como código | Una decisión técnica y su contexto | Desarrolladores, architectos, agentes | "ADR-003: usamos Postgres en vez de MongoDB porque necesitamos integridad transaccional" |
+| **Spec de dominio** | JSON Schema de eventos, glosario | El lenguaje compartido del negocio | Todos los equipos, agentes | "Un 'pedido confirmado' es un pedido cuyo pago ha sido verificado y cuyo stock ha sido reservado" |
+
+**La diferencia crítica**: una spec de contrato (OpenAPI) la valida una máquina. Una spec de comportamiento (Gherkin) la ejecuta un test. Una spec de requisito (REQ-IDEM-001) la interpreta un humano — pero está escrita con suficiente precisión para que un agente pueda verificar si el código la cumple. Una spec de arquitectura (ADR) documenta el *por qué*, no el *qué*.
+
+**Lo que NO es una spec:**
+- Un comentario en Slack: "el endpoint acepta esto y devuelve aquello"
+- Un diagrama dibujado a mano en una pizarra
+- Un ticket de Jira que dice "implementar pagos"
+- Un `ARCHITECTURE.md` que describe el sistema "más o menos"
+
+Todos estos son *inputs* valiosos para *crear* specs. Pero no son specs. La diferencia es la verificabilidad: ¿puede una máquina determinar si el código cumple esto? Si la respuesta es no, tienes una nota, no una spec.
 
 Imagina que estás montando un servicio de pagos. Sin SDD, la conversación es:
 
