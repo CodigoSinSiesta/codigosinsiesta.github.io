@@ -100,13 +100,15 @@ Antes de invertir tiempo en el resto del artículo, responde estas preguntas. Si
 
 No todo proyecto necesita SDD. Aquí tienes opciones más ligeras ordenadas de menor a mayor fricción:
 
-**Opción A: ADRs + README cross-repo (esfuerzo: bajo).** Escribe un ADR en cada repo cuando tomes una decisión técnica. Mantén un `README.md` en el repo principal con las dependencias entre servicios. Sin contratos automatizados, sin agentes, sin grafo. Esto ya resuelve los patrones 1 (decisión huérfana) y 3 (susurro del senior). Es la fase Crawl del roadmap, y para equipos de 2-5 personas con 2-3 repos puede ser suficiente.
+**Opción A: RFCs (esfuerzo: mínimo).** Cuando se toma una decisión que afecta a más de un repo, se escribe un RFC en `product-specs/rfcs/`. El equipo discute, objeta, refina. Cuando hay consenso, el RFC se acepta y sus artefactos pasan a `requirements/` o `contracts/`. Sin agentes, sin contratos automatizados, sin grafo. Esto ya resuelve los patrones 1 (decisión huérfana) y 3 (susurro del senior). Para equipos de 2-5 personas con 2-3 repos, puede ser suficiente. Ver sección 3.6 para el formato completo.
 
-**Opción B: BDD ligero con Gherkin (esfuerzo: medio).** Escribe las funcionalidades cross-cutting como escenarios Gherkin en un repo compartido. Cada equipo implementa los escenarios que le corresponden. No hay contract testing automatizado entre servicios, pero sí una especificación ejecutable común. Ideal si tu fricción principal es el patrón 4 (divergencia silenciosa de conceptos de negocio).
+**Opción B: ADRs + README cross-repo (esfuerzo: bajo).** Similar a la opción A pero con ADRs en cada repo en lugar de RFCs centralizados. Escribe un ADR cuando tomes una decisión técnica. Mantén un `README.md` en el repo principal con las dependencias entre servicios. Más simple de empezar pero más difícil de consultar cross-repo que los RFCs centralizados.
 
-**Opción C: Contract testing sin SDD completo (esfuerzo: medio).** Define contratos OpenAPI/AsyncAPI para las APIs entre servicios. Configura tests de contrato en CI. No necesitas knowledge graph ni agentes ni extracción de decisiones desde reuniones. Esto ataca directamente el patrón 2 (especificación zombie) en su manifestación más dañina: las APIs. Es la fase Walk del roadmap, y puedes quedarte aquí indefinidamente.
+**Opción C: BDD ligero con Gherkin (esfuerzo: medio).** Escribe las funcionalidades cross-cutting como escenarios Gherkin en un repo compartido. Cada equipo implementa los escenarios que le corresponden. No hay contract testing automatizado entre servicios, pero sí una especificación ejecutable común. Ideal si tu fricción principal es el patrón 4 (divergencia silenciosa de conceptos de negocio).
 
-**Opción D: SDD completo (esfuerzo: alto).** Lo que describe el resto del artículo. Solo recomendable si has marcado 5+ en el diagnóstico, tu equipo tiene experiencia con CI/CD y testing, y el coste de la descoordinación cross-repo justifica la inversión.
+**Opción D: Contract testing sin SDD completo (esfuerzo: medio).** Define contratos OpenAPI/AsyncAPI para las APIs entre servicios. Configura tests de contrato en CI. No necesitas knowledge graph ni agentes ni extracción de decisiones desde reuniones. Esto ataca directamente el patrón 2 (especificación zombie) en su manifestación más dañina: las APIs. Es la fase Walk del roadmap, y puedes quedarte aquí indefinidamente.
+
+**Opción E: SDD completo (esfuerzo: alto).** Lo que describe el resto del artículo. Solo recomendable si has marcado 5+ en el diagnóstico, tu equipo tiene experiencia con CI/CD y testing, y el coste de la descoordinación cross-repo justifica la inversión.
 
 **Señales de que deberías parar o reducir**:
 - El repo de producto lleva 2 sprints sin un PR mergeado → el equipo no tiene capacidad de revisión. Vuelve a la opción A y reevalúa en 3 meses.
@@ -500,6 +502,78 @@ impact:
 4. Notifica al equipo de billing-service que su integración con el gateway puede necesitar ajustes
 
 Todo esto en menos de 2 minutos tras finalizar la reunión. El humano solo tiene que revisar y aprobar.
+
+### 3.6. RFCs: el mecanismo que falta entre la decisión y la spec
+
+El pipeline de extracción genera propuestas. Pero una propuesta no es una spec. Entre "el agente dice que decidimos X" y "X es un requisito en `product-specs`" hay un paso crítico que el artículo no puede dar por sentado: **la discusión y el consenso**.
+
+Ahí entran los RFCs (Request for Comments). Un RFC es un documento breve que propone un cambio, explica su motivación, detalla el impacto y **solicita feedback explícito** antes de convertirse en spec.
+
+**El ciclo completo con RFCs:**
+
+```
+Reunión → Transcripción → Extracción → RFC (discusión) → Spec (consolidada)
+                                         ↑
+                                    El equipo discute,
+                                    objeta, refina.
+                                    Solo cuando hay consenso
+                                    se convierte en spec.
+```
+
+**Formato de un RFC en `product-specs/rfcs/`:**
+
+```markdown
+# RFC-004: Rate limiting por tenant en API gateway
+
+**Estado**: propuesto
+**Autor**: agente-reuniones (extraído de daily 2026-06-21)
+**Fecha**: 2026-06-21
+**Afecta a**: api-gateway, billing-service
+**Tipo**: requisito cross-cutting
+
+## Motivación
+El rate limiting actual es global. Un tenant ruidoso degrada a los demás.
+
+## Propuesta
+Mover el rate limiter al API gateway con contadores por tenant.
+Añadir headers `X-RateLimit-Tenant-Remaining` y `X-RateLimit-Tenant-Reset`.
+
+## Impacto
+- api-gateway: nuevo middleware de rate limiting
+- billing-service: debe leer los nuevos headers para facturación
+- No es breaking change (headers adicionales, no modificados)
+
+## Alternativas consideradas
+- Rate limiting en cada servicio: más complejo, inconsistente entre servicios
+- Rate limiting externo (Kong, Envoy): añade dependencia operativa
+
+## Preguntas abiertas
+- ¿El límite por tenant es fijo o configurable por plan?
+- ¿Qué pasa cuando un tenant excede el límite? ¿429 o degradación?
+```
+
+**Estados de un RFC:**
+
+```
+propuesto → en discusión → aceptado → implementado (se convierte en spec)
+                         → rechazado
+                         → pospuesto
+```
+
+**Por qué los RFCs son el pegamento entre las secciones 3 y 4 del artículo:**
+
+- **Sección 3** (extracción de decisiones) termina con el agente generando propuestas. Esas propuestas son RFCs en estado `propuesto`.
+- **Sección 4** (SDD) empieza con specs consolidadas. Esas specs son RFCs que pasaron a estado `aceptado`.
+- El paso intermedio — discusión, objeción, refinamiento — es humano. El agente no decide; propone. El RFC es el mecanismo que formaliza esa propuesta y la somete a escrutinio.
+
+**RFCs como alternativa ligera a SDD completo.** Si tu equipo no está listo para SDD con contratos OpenAPI y contract testing, los RFCs solos ya aportan un valor enorme: capturan decisiones, las hacen visibles, fuerzan a escribir el *por qué* y el *impacto*, y crean un histórico consultable. Es la opción más ligera para empezar — incluso más ligera que la Opción A de la sección 1.6.
+
+**Integración con el resto del sistema:**
+
+- Los RFCs viven en `product-specs/rfcs/`. Cuando se aceptan, sus artefactos (requisitos, contratos) se mueven a `requirements/` o `contracts/`.
+- El CI (`validate-specs.yml`) puede verificar que un RFC en estado `aceptado` tiene sus artefactos correspondientes creados.
+- El agente de drift puede cruzar RFCs aceptados con el código para detectar propuestas que nunca se implementaron.
+- Los RFCs rechazados no se borran. Documentan caminos que se exploraron y se descartaron — conocimiento valiosísimo para el futuro.
 
 ---
 
@@ -1090,7 +1164,9 @@ product-specs/
 │   ├── payment-api-v2.yaml    #   OpenAPI / AsyncAPI / JSON Schema
 │   ├── notification-events-v1.yaml
 │   └── README.md              #   Convenciones de versionado de contratos
-├── decisions/                 # Decisiones de producto (no ADRs de repo)
+├── rfcs/                       # Propuestas en discusión (RFC-001, RFC-002...)
+│   └── template.md
+├── decisions/                 # Decisiones de producto ya aceptadas (no ADRs de repo)
 │   ├── 2026-06-21-pago-cuotas.md
 │   └── template.md
 ├── glossary.md                # Glosario compartido: ¿qué significa "tenant"?
