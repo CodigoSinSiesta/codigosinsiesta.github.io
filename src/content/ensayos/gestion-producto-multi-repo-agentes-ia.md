@@ -265,6 +265,8 @@ El artículo usa "knowledge graph" decenas de veces. Conviene definirlo antes de
 | Run inicial | SQLite + embeddings (Turso, zvec) + `codebase-memory-mcp` | "¿Qué servicios dependen de payment-service?" |
 | Run avanzado | Neo4j + GraphRAG | "Si cambio el campo `amount` de integer a decimal, ¿qué repos necesitan ajustes y qué tests se rompen?" |
 
+> **GraphRAG** es una técnica de Microsoft Research (2024) que combina grafos de conocimiento con retrieval-augmented generation. A diferencia del RAG vectorial tradicional, GraphRAG modela explícitamente las relaciones entre entidades (comunidades, dependencias, jerarquías), lo que permite consultas de impacto global como "¿qué servicios se ven afectados si cambio este campo?". El paper original: [From Local to Global: A Graph RAG Approach to Query-Focused Summarization](https://arxiv.org/abs/2404.16130).
+
 **La regla**: no despliegues una base de datos de grafos hasta que el repo de producto tenga más nodos de los que puedas seguir mentalmente. Hasta entonces, markdown con enlaces entre ficheros es suficiente — y es infinitamente más fácil de mantener.
 
 He visto equipos que intentan resolver esto con UN documento: un Notion, un Google Doc, un Confluence. Es el "documento de arquitectura" que supuestamente lo contiene todo.
@@ -285,7 +287,7 @@ Cada nivel necesita un formato distinto porque su consumidor es distinto:
 - **Requisitos cross-cutting**: Markdown + escenarios Gherkin. Lo leen PMs, tech leads y agentes de IA. Debe ser parseable.
 - **Contratos entre servicios**: OpenAPI, AsyncAPI, JSON Schema. Deben ser **especificaciones ejecutables**, no documentos descriptivos. Si el contrato no se puede validar automáticamente, no es un contrato.
 - **Requisitos repo-specific**: Issues de GitHub, PR templates, `CONTRIBUTING.md`. Viven en el repo correspondiente.
-- **Decisiones de implementación**: ADRs (Architecture Decision Records). Formato estandarizado con contexto, decisión, consecuencias. Viven en cada repo en `docs/adr/`.
+- **Decisiones de implementación**: ADRs (Architecture Decision Records). Formato estandarizado con contexto, decisión, consecuencias. Viven en cada repo en `docs/adr/`. Término acuñado por [Michael Nygard](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) en 2011 y popularizado por ThoughtWorks.
 
 > **¿Y si tu stack no es REST?** El artículo usa OpenAPI como ejemplo porque es el formato más extendido, pero los mismos principios aplican a otros ecosistemas:
 > - **gRPC + Protocol Buffers**: Google. Los contratos son ficheros `.proto` con tipado fuerte y generación de código nativa. Herramientas como [`buf`](https://buf.build) hacen linting, breaking change detection (`buf breaking`) y registry de schemas. Ventaja: el breaking change se detecta en compilación, no en CI.
@@ -513,7 +515,7 @@ Todo esto en menos de 2 minutos tras finalizar la reunión. El humano solo tiene
 
 El pipeline de extracción genera propuestas. Pero una propuesta no es una spec. Entre "el agente dice que decidimos X" y "X es un requisito en `product-specs`" hay un paso crítico que el artículo no puede dar por sentado: **la discusión y el consenso**.
 
-Ahí entran los RFCs (Request for Comments). Un RFC es un documento breve que propone un cambio, explica su motivación, detalla el impacto y **solicita feedback explícito** antes de convertirse en spec.
+Ahí entran los RFCs (Request for Comments). El término viene de la IETF: desde 1969, los RFCs son el mecanismo por el que se proponen, discuten y adoptan los estándares de Internet — desde TCP/IP hasta HTTP/3. El [RFC 1925](https://www.satec.es/es/blog/rfc-1925-pueden-los-cerdos-volar-en-internet) ("The Twelve Networking Truths") captura el espíritu: documentos breves, numerados, que someten una idea a escrutinio y quedan como registro histórico tanto si se aceptan como si no. Lo que este artículo propone toma prestado ese espíritu y lo adapta a decisiones de producto: un documento breve que propone un cambio, explica su motivación, detalla el impacto y **solicita feedback explícito** antes de convertirse en spec.
 
 **El ciclo completo con RFCs:**
 
