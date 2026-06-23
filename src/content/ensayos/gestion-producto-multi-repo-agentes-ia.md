@@ -215,6 +215,8 @@ Con esto, el agente sabe inmediatamente el rol de este repo en el ecosistema: es
 
 **Por qué los contratos son las seams.** En arquitectura de software, un *seam* es un punto donde dos componentes se acoplan y donde puedes cambiar uno sin romper el otro si respetas el contrato. En multi-repo, los contratos OpenAPI/AsyncAPI/JSON Schema son las seams. Definen exactamente qué espera cada lado y permiten que ambos evolucionen de forma independiente.
 
+Amazon lo entendió en 2002. El **API Mandate** de Werner Vogels (CTO) estableció que toda comunicación entre equipos debía ser a través de APIs documentadas sobre la red: nada de shared memory, nada de acceso directo a bases de datos ajenas, nada de dependencias implícitas. Dos décadas después, ese mandate es la validación más contundente de que los contratos como seams funcionan a escala planetaria. Si Amazon pudo construir AWS, Amazon.com y Prime sobre esta base, tu producto multi-repo también puede.
+
 **La regla de los cuatro niveles de acoplamiento:**
 
 1. **Acoplamiento de contrato (deseable).** "Necesito que me envíes un JSON con estos campos." El contrato OpenAPI lo define. Ambos lados pueden cambiar su implementación interna sin romper nada.
@@ -284,6 +286,11 @@ Cada nivel necesita un formato distinto porque su consumidor es distinto:
 - **Contratos entre servicios**: OpenAPI, AsyncAPI, JSON Schema. Deben ser **especificaciones ejecutables**, no documentos descriptivos. Si el contrato no se puede validar automáticamente, no es un contrato.
 - **Requisitos repo-specific**: Issues de GitHub, PR templates, `CONTRIBUTING.md`. Viven en el repo correspondiente.
 - **Decisiones de implementación**: ADRs (Architecture Decision Records). Formato estandarizado con contexto, decisión, consecuencias. Viven en cada repo en `docs/adr/`.
+
+> **¿Y si tu stack no es REST?** El artículo usa OpenAPI como ejemplo porque es el formato más extendido, pero los mismos principios aplican a otros ecosistemas:
+> - **gRPC + Protocol Buffers**: Google. Los contratos son ficheros `.proto` con tipado fuerte y generación de código nativa. Herramientas como [`buf`](https://buf.build) hacen linting, breaking change detection (`buf breaking`) y registry de schemas. Ventaja: el breaking change se detecta en compilación, no en CI.
+> - **GraphQL Federation**: Apollo, WunderGraph, The Guild. Los contratos son schemas GraphQL componibles en un supergraph. Requiere un schema registry (Apollo Studio, WunderGraph Cosmo, Hive) — equivalente funcional al `product-specs/contracts/` del artículo pero para GraphQL.
+> - **Eventos asíncronos**: AsyncAPI + Confluent Schema Registry (Avro, Protobuf, JSON Schema). Para sistemas basados en Kafka, el Schema Registry valida schemas en producción — lo que el artículo propone validar en CI. Herramientas: AsyncAPI CLI, AsyncAPI Generator, Solace/Gravitee Event Gateway.
 
 ### 2.6. Versionado de definiciones
 
@@ -1001,6 +1008,8 @@ jobs:
 
 Tres agentes especializados, un grafo compartido, N repos de código.
 
+> **MCP (Model Context Protocol)**: estándar abierto de Anthropic (2024) que permite a los agentes de IA conectarse a herramientas externas — en este caso, GitHub, CI/CD, el knowledge graph y los schemas de producto. Es el pegamento técnico que hace posible que el agente SDD lea contratos desde `product-specs/` y genere PRs en `payment-service/` sin integraciones custom. Soportado por OpenAI, Google, Microsoft y AWS. Si tu herramienta de agentes no soporta MCP, el pipeline descrito en este artículo sigue siendo viable (basta con scripts de CI + APIs REST), pero MCP reduce drásticamente la fricción de integración.
+
 ### 6.2. Flujo completo
 
 **Paso 1: Reunión.** El equipo discute. Teams/Google Meet transcribe.
@@ -1050,6 +1059,8 @@ El agente es el que:
 2. Genera PRs con los ajustes necesarios en cada repo (tipos, validadores, tests)
 3. Notifica a los equipos responsables
 4. Verifica que todos los CI pasan antes de autorizar el merge
+
+> **¿Y los workflows de negocio cross-service?** Los agentes de IA coordinan *especificaciones y PRs*. Pero los workflows que requieren orquestación compleja con rollbacks, compensaciones y reintentos — como una Saga de pagos que involucra 4 servicios — los resuelve mejor un orquestador de workflows como [Temporal](https://temporal.io) (heredero de Cadence de Uber). Los agentes y los orquestadores no compiten; se complementan. El agente mantiene las specs y los contratos alineados; el orquestador ejecuta la coreografía en runtime.
 
 ### 6.5. Ejemplo end-to-end
 
