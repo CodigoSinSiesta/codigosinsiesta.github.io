@@ -19,7 +19,7 @@ autor: Alejandro de la Fuente
 
 Este artículo describe un sistema integral para gestionar el conocimiento de producto usando agentes de IA. Es un marco de trabajo que va desde la transcripción de una reunión hasta el código desplegado en múltiples repositorios, pasando por definiciones enriquecidas, SDD, knowledge graphs y contract testing. La primera mitad es teoría fundacional; la segunda es práctica incremental con roadmap, quickstart y herramientas.
 
-Si tu producto vive en un solo repo, este artículo te sobra en un 40%. Si vive en tres, cinco o quince — y las decisiones de arquitectura se toman en una reunión el martes y el jueves ya nadie recuerda por qué — este artículo es para ti. Si puedes usar un monorepo, hazlo: herramientas como Nx, Turborepo o Bazel eliminan de raíz la mayoría de problemas de coordinación cross-repo que este artículo resuelve. Shopify mantiene 2.8M líneas de Ruby en un monolito modular con Packwerk; Stripe usa monorepo con devboxes en la nube. El multi-repo no es un objetivo — es una restricción que este artículo te ayuda a gestionar cuando no tienes alternativa.
+Si tu producto vive en un solo repo, este artículo te sobra en un 40%. Si vive en tres, cinco o quince — y las decisiones de arquitectura se toman en una reunión el martes y el jueves ya nadie recuerda por qué — este artículo es para ti. Si puedes usar un monorepo, hazlo: herramientas como Nx, Turborepo o Bazel eliminan de raíz la mayoría de problemas de coordinación cross-repo que este artículo resuelve. Shopify mantiene 2.8M líneas de Ruby en un monolito modular con Packwerk; Stripe usa monorepo con devboxes en la nube; Uber volvió al monorepo con dominios (DOMA) tras sufrir el multi-repo extremo con 4,000+ microservicios. El multi-repo no es un objetivo — es una restricción que este artículo te ayuda a gestionar cuando no tienes alternativa.
 
 ---
 
@@ -140,14 +140,14 @@ Sin workspaces bien definidos, el agente está perdido: ¿dónde está cada cosa
 | `.agent/skills/` | Procedimientos ejecutables (tests, deploy, migraciones) |
 | Referencia a contratos | "Este servicio implementa `product-specs/contracts/payment-api-v2.yaml`" |
 | Dependencias declaradas | "Este servicio consume `order-service`, `notification-service`" |
-| `CLAUDE.md` / `.cursorrules` | Reglas adicionales específicas del asistente |
+| Reglas del asistente | `AGENTS.md` (estándar genérico), `.cursorrules`, `.github/copilot-instructions.md` — reglas adicionales específicas del coding agent que uses |
 
 **Cómo los workspaces habilitan el sistema del artículo.** Todo el pipeline depende de que cada agente sepa en qué workspace operar en cada momento:
 
 - **Agente de reuniones** → workspace `product-specs` (extrae decisiones, las guarda donde corresponde)
 - **Agente SDD** → workspace del repo de código (lee el contrato desde product-specs, genera tests en el lenguaje y framework que dicta el AGENTS.md local)
 - **Agente de drift** → lee la declaración "implementa el contrato X" del AGENTS.md local y valida contra él
-- **Agente coordinador** → consulta los AGENTS.md de los repos afectados para saber cómo generar PRs compatibles
+- **Agente SDD** (en su rol de coordinación cross-repo) → consulta los AGENTS.md de los repos afectados para saber cómo generar PRs compatibles. La coordinación no es un agente separado: es una capacidad transversal que ejercen los 3 agentes del pipeline según el contexto.
 
 Sin workspaces, cada agente tendría que descubrir todo esto desde cero en cada ejecución. Con workspaces, el contexto se hereda.
 
@@ -190,7 +190,6 @@ En un producto multi-repo, la pregunta clave es: **¿esta definición pertenece 
 La regla: **si afecta a más de un repo, pertenece al producto**. Si solo afecta a uno, pertenece a ese repo. Parece obvio, pero casi nadie lo aplica de forma sistemática.
 
 ### 2.3. Arquitectura multi-repo correcta: contratos como seams
-
 Un producto multi-repo no es N repos sueltos. Es un grafo de repos que se relacionan mediante **contratos explícitos**. La arquitectura correcta no es la que "funciona", sino la que **un agente de IA puede entender sin ambigüedad**.
 
 **El antipatrón: dependencias implícitas.** Dos servicios se llaman por HTTP, pero la relación no está documentada en ninguna parte. El desarrollador de `order-service` sabe que llama a `payment-service` porque lo recuerda. El agente de IA no lo recuerda — tiene que descubrirlo rastreando código. Esto es frágil y caro.
@@ -250,16 +249,6 @@ order-service/                    ← Repo de código
 
 Un agente que lee `order-service/AGENTS.md` ve inmediatamente: "Este servicio consume la API de pagos v2 y los eventos de notificación v1." Sabe qué contratos validar, qué tipos generar, y qué repos notificar si algo cambia.
 
-### 2.5. Formato de cada nivel
-
-Cada nivel necesita un formato distinto porque su consumidor es distinto:
-
-- **Visión y estrategia**: Markdown. Lo leen personas. Vive en el repo de producto (no en el de código).
-- **Requisitos cross-cutting**: Markdown + escenarios Gherkin. Lo leen PMs, tech leads y agentes de IA. Debe ser parseable.
-- **Contratos entre servicios**: OpenAPI, AsyncAPI, Protocol Buffers, JSON Schema. Deben ser **especificaciones ejecutables**, no documentos descriptivos. Si el contrato no se puede validar automáticamente, no es un contrato.
-- **Requisitos repo-specific**: Issues de GitHub, PR templates, `CONTRIBUTING.md`. Viven en el repo correspondiente.
-- **Decisiones de implementación**: ADRs (Architecture Decision Records). Formato estandarizado con contexto, decisión, consecuencias. Viven en cada repo en `docs/adr/`.
-
 ### 2.4. ¿Qué es el knowledge graph de producto exactamente?
 
 El artículo usa "knowledge graph" decenas de veces. Conviene definirlo antes de seguir.
@@ -286,7 +275,17 @@ No funciona. Por tres razones:
 
 La alternativa es un **grafo de definiciones**: muchos documentos pequeños, interconectados, cada uno viviendo donde debe vivir, con trazabilidad automática entre ellos.
 
-### 2.7. Versionado de definiciones
+### 2.5. Formato de cada nivel
+
+Cada nivel necesita un formato distinto porque su consumidor es distinto:
+
+- **Visión y estrategia**: Markdown. Lo leen personas. Vive en el repo de producto (no en el de código).
+- **Requisitos cross-cutting**: Markdown + escenarios Gherkin. Lo leen PMs, tech leads y agentes de IA. Debe ser parseable.
+- **Contratos entre servicios**: OpenAPI, AsyncAPI, JSON Schema. Deben ser **especificaciones ejecutables**, no documentos descriptivos. Si el contrato no se puede validar automáticamente, no es un contrato.
+- **Requisitos repo-specific**: Issues de GitHub, PR templates, `CONTRIBUTING.md`. Viven en el repo correspondiente.
+- **Decisiones de implementación**: ADRs (Architecture Decision Records). Formato estandarizado con contexto, decisión, consecuencias. Viven en cada repo en `docs/adr/`.
+
+### 2.6. Versionado de definiciones
 
 ¿Qué se versiona y cómo?
 
@@ -297,7 +296,7 @@ La alternativa es un **grafo de definiciones**: muchos documentos pequeños, int
 
 La clave es que las definiciones **de producto** no viven en el mismo sistema de versionado que el código. Viven en un repo de conocimiento (o en un sistema de grafos) que los repos de código consultan, pero no contienen.
 
-### 2.8. Preparar los repos para agentes de IA
+### 2.7. Preparar los repos para agentes de IA
 
 Todo el sistema que describe este artículo depende de agentes de IA que leen, escriben y razonan sobre los repos. Pero un repo sin preparar es un repo donde el agente tropieza: explora a ciegas, adivina convenciones y consume tokens en reconocimiento en lugar de en trabajo productivo.
 
@@ -566,7 +565,7 @@ propuesto → en discusión → aceptado → implementado (se convierte en spec)
 - **Sección 4** (SDD) empieza con specs consolidadas. Esas specs son RFCs que pasaron a estado `aceptado`.
 - El paso intermedio — discusión, objeción, refinamiento — es humano. El agente no decide; propone. El RFC es el mecanismo que formaliza esa propuesta y la somete a escrutinio.
 
-**RFCs como alternativa ligera a SDD completo.** Si tu equipo no está listo para SDD con contratos OpenAPI y contract testing, los RFCs solos ya aportan un valor enorme: capturan decisiones, las hacen visibles, fuerzan a escribir el *por qué* y el *impacto*, y crean un histórico consultable. Es la opción más ligera para empezar — incluso más ligera que la Opción A de la sección 1.6.
+**RFCs como alternativa ligera a SDD completo.** Si tu equipo no está listo para SDD con contratos OpenAPI y contract testing, los RFCs solos ya aportan un valor enorme: capturan decisiones, las hacen visibles, fuerzan a escribir el *por qué* y el *impacto*, y crean un histórico consultable. Es la misma estrategia que describimos como Opción A en la sección 1.6. De hecho, es exactamente eso: RFCs como primer paso antes de cualquier automatización. Si solo implementas esto del artículo entero, ya has eliminado los patrones 1 y 3 de pérdida de conocimiento.
 
 **Integración con el resto del sistema:**
 
@@ -745,6 +744,12 @@ El contract testing entre servicios merece mención especial. Es la práctica qu
 
 Cuando alguien propone un cambio en el contrato (vía PR al repo de producto), el CI de ambos repos se ejecuta contra la nueva versión. Si alguno falla, el cambio no se mergea hasta que el equipo correspondiente adapte su implementación. Para evitar deadlocks (el consumidor no puede validar hasta que el proveedor implemente), el CI del consumidor valida contra un mock del nuevo contrato, no contra el endpoint real. Una vez ambos pasan, el proveedor despliega primero y el consumidor después.
 
+**Cómo generar y mantener los mocks.** No necesitas montar el servicio real. Herramientas maduras lo resuelven desde el mismo fichero OpenAPI que define el contrato:
+
+- **[Prism](https://github.com/stoplightio/prism)** (Stoplight, open source). `prism mock payment-api-v2.yaml` levanta un servidor que responde con datos sintéticos pero válidos según el contrato. Se ejecuta en CI como paso previo a los tests del consumidor (~10 segundos).
+- **[MockLoop MCP](https://mockloop.dev)**. Mock de APIs vía MCP, diseñado para agentes de IA. Si tus tests los genera un agente SDD, MockLoop le permite validar sin desplegar.
+- **Patrón general**: un job en CI levanta el mock → ejecuta tests → apaga el mock. El mock se regenera del mismo fichero que define el contrato. Si el contrato cambia, el mock cambia automáticamente. Sin sincronización manual.
+
 ### 4.7. Herramientas reales que ya implementan SDD
 
 El artículo ha descrito SDD como metodología. Pero no hace falta construir el sistema desde cero. Existen herramientas maduras que ya implementan el ciclo especificar→implementar→archivar dentro de un repositorio. Son el motor que puede impulsar la fase SDD del pipeline.
@@ -773,8 +778,11 @@ Filosofía: *"fluid not rigid, iterative not waterfall, easy not complex, built 
 | Herramienta | Qué cubre del pipeline | Dónde se usa |
 |---|---|---|
 | **OpenSpec** | SDD intra-repo: especificar → implementar → archivar | Fase Walk/Run, dentro de cada repo de código |
+| **[Spec-Kit](https://github.com/github/spec-kit)** (GitHub) | SDD intra-repo con integración nativa en GitHub Actions, Issues y PRs | Alternativa a OpenSpec si tu stack es GitHub |
+| **[Kiro](https://kiro.dev)** | Tercer framework SDD, similar a OpenSpec y Spec-Kit | Alternativa; elegir según ecosistema |
 | **GSD Core** | Ciclo completo con subagentes: planificar → ejecutar → verificar → ship | Fase Run, como motor del agente SDD |
-| **El artículo (product-specs)** | Lo que ninguna de las dos cubre: contratos cross-repo, trazabilidad, extracción de decisiones, knowledge graph de producto | El sistema por encima de los repos |
+| **El artículo (product-specs)** | Lo que ninguno cubre: contratos cross-repo, trazabilidad, extracción de decisiones, knowledge graph de producto | El sistema por encima de los repos |
+| **[Graphify](https://github.com/talops/graphify)** (22K ⭐) | Convierte código, docs, PDFs y APIs en un knowledge graph consultable vía lenguaje natural | Fase Walk/Run, como alternativa o complemento a codebase-memory-mcp |
 
 OpenSpec, Spec-Kit y GSD no compiten con el sistema del artículo. Lo complementan. Son el "cómo" dentro de cada repo. El artículo aporta el "qué" y el "por qué" a nivel de producto: los contratos entre servicios, la trazabilidad end-to-end, y el knowledge graph que conecta todo.
 
@@ -889,6 +897,71 @@ Esto no es un lujo. Es lo que permite que un desarrollador nuevo entienda el có
 - `GraphRAG`: construye el grafo de entidades y relaciones desde las specs, permitiendo consultas globales como "¿qué partes del sistema asumen que el usuario siempre tiene email?"
 
 Para una tabla consolidada de todas las herramientas mencionadas, ver el [Apéndice](#8-apéndice-stack-de-herramientas-recomendado).
+
+### 5.6. El agente de drift: arquitectura y pipeline
+
+El agente de drift es el guardián del sistema. Mientras el agente de reuniones alimenta el knowledge graph y el agente SDD genera código desde specs, el agente de drift vigila que el código siga alineado con las specs. Si los otros dos agentes son el sistema circulatorio, el agente de drift es el inmunológico.
+
+**Qué hace exactamente:**
+
+```
+Cada N horas (configurable, típicamente diario):
+  1. Consulta el knowledge graph → ¿qué contratos declara cada repo?
+  2. Para cada contrato:
+     a. Extrae la implementación real del código (en tiempo de ejecución)
+     b. Compara contra el contrato declarado en product-specs/contracts/
+     c. Si hay divergencia → clasifica la severidad
+  3. Genera un informe de drift con:
+     - Divergencias breaking (el contrato dice X, el código hace Y)
+     - Divergencias no-breaking (campo nuevo no declarado, deprecación no anunciada)
+     - Contratos huérfanos (el contrato existe pero ningún repo lo implementa)
+```
+
+**Herramientas concretas:**
+
+| Herramienta | Qué hace | Cuándo usarla |
+|---|---|---|
+| **[Optic](https://useoptic.com)** | Detecta breaking changes en OpenAPI comparando versiones | Ideal para APIs REST. `optic diff payment-api-v1.yaml payment-api-v2.yaml` |
+| **[oasdiff](https://github.com/tufin/oasdiff)** | Diff de OpenAPI specs con niveles de severidad (error, warning, info) | Alternativa open-source a Optic. Excelente para CI |
+| **[Bump.sh](https://bump.sh)** | API docs + changelogs + breaking change detection | Documentación viva + drift detection en una herramienta |
+| **Schemathesis + CI** | Genera tests desde OpenAPI y los ejecuta contra el endpoint real | Detecta drift en runtime, no solo en la spec |
+| **Agente LLM custom** | Lee el código fuente y la spec, razona sobre divergencias semánticas | Para contratos que no son puramente estructurales (requisitos, ADRs) |
+
+**Pipeline de CI para drift detection:**
+
+```yaml
+# .github/workflows/drift-check.yml
+name: Drift Check
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Diario a las 6am
+jobs:
+  detect-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: my-org/product-specs
+          path: specs
+      - name: Check API drift
+        run: |
+          for contract in specs/contracts/*.yaml; do
+            oasdiff diff base/$contract revision/$contract --format markdown >> drift-report.md
+          done
+      - name: Notify if drift detected
+        if: steps.drift.outputs.has_drift == 'true'
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: '{"text": "⚠️ Drift detectado en contratos. Ver: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
+```
+
+**Modos de fallo específicos del agente de drift:**
+
+- **Falso negativo (el peor).** El código diverge pero el agente no lo detecta. Causas: el contrato es demasiado vago para ser verificable, o el agente compara contra una versión obsoleta del grafo. Mitigación: los contratos deben ser especificaciones ejecutables (OpenAPI, AsyncAPI, JSON Schema), no documentos narrativos.
+- **Falso positivo.** El agente reporta drift donde no lo hay (ej. un campo opcional nuevo que el contrato permite pero no declara explícitamente). Mitigación: umbrales de severidad. Solo alertar en breaking changes.
+- **Deriva silenciosa del propio grafo.** El knowledge graph se desactualiza y el agente de drift compara contra specs zombie. Mitigación: el CI de `product-specs` debe verificar que cada contrato tiene al menos un repo que declara implementarlo. Si no, se marca como "huérfano".
+
+**El agente de drift en el modelo de costes.** Es el agente más barato de los tres: no genera código, solo compara. Un LLM pequeño (GPT-4o-mini) es suficiente para el análisis semántico. Para la comparación estructural (OpenAPI vs implementación), herramientas deterministas como oasdiff u Optic son gratuitas, más rápidas y no alucinan. La recomendación: usa herramientas deterministas para el 90% del trabajo y LLM solo para divergencias semánticas que requieran razonamiento.
 
 ---
 
@@ -1026,6 +1099,12 @@ Ningún sistema automático es infalible. Estos son los fallos más probables y 
 
 **Fallo 5: Costes inesperados.** Procesar 20 horas de reuniones a la semana con un LLM, mantener un Neo4j, ejecutar CI adicional... **Mitigación**: empezar con modelos pequeños para la extracción (GPT-4o-mini es suficiente para identificar decisiones en transcripciones). Usar embeddings locales (zvec, Turso) para el grafo en lugar de Neo4j al principio. Medir coste por reunión desde el día 1.
 
+**Fallo 6: Specs contradictorias entre agentes.** Dos agentes trabajando simultáneamente en repos distintos introducen cambios incompatibles. El agente SDD genera tipos para `amount: integer` mientras otro agente ya cambió el contrato a `amount: decimal`. No hay un árbitro automático que resuelva la contradicción. **Mitigación**: este problema es largely unsolved (Daniel Sogl, enterJS 2026), pero hay estrategias prácticas: (a) serializar los PRs que afectan al mismo contrato — solo uno a la vez; (b) usar `git worktrees` para aislar el trabajo de cada agente (herramientas como [Armada](https://armada.sh) lo automatizan); (c) para equipos con 3+ agentes activos, existen agentes árbitro (arXiv 2606.10747) que monitorean conflictos y notifican antes del merge. Lo más pragmático: en fase Walk, ejecuta los agentes secuencialmente. En fase Run, dedica un humano a revisar las intersecciones entre PRs de agentes.
+
+**Fallo 7: Código generado sin revisión de seguridad.** Los agentes SDD generan tipos, validadores y código de infraestructura en múltiples lenguajes. Un validador mal generado puede introducir una vulnerabilidad de inyección, un endpoint expuesto sin autenticación, o una dependencia desactualizada con CVEs conocidos. **Mitigación**: el CI debe incluir escaneo SAST (Semgrep, CodeQL) en todos los PRs, incluidos los generados por agentes. Y revisión de dependencias (`npm audit`, `pip-audit`, Dependabot). El agente no escribe código de negocio — pero el scaffolding que genera también necesita auditoría de seguridad.
+
+**Fallo 8: Confianza ciega en el agente de drift.** El agente de drift es el guardián del sistema: si él falla, el resto del castillo se viene abajo sin que nadie se entere. Pero a diferencia del agente de reuniones (§3) y del agente SDD (§4), no tiene una sección dedicada que detalle su arquitectura, pipeline y modos de fallo. **Mitigación**: dedicamos la sección completa a continuación.
+
 ### 6.7. Roadmap incremental: crawl → walk → run
 
 El sistema completo que he descrito es el estado final. Nadie debería intentar implementarlo de golpe. Aquí está el camino progresivo, con pasos tan concretos que puedes ejecutarlos mañana:
@@ -1140,6 +1219,8 @@ git add docs/adr/ && git commit -m "docs: ADR-001 PostgreSQL"
 
 En 15 minutos has creado el repo de producto, un requisito cross-cutting y un ADR. Has dado el primer paso para atacar los patrones 1 (decisión huérfana) y 3 (susurro del senior). El resto del artículo te dice cómo escalar desde aquí.
 
+> **Nota**: Este quickstart crea un escenario desde cero con fines didácticos. Si ya tienes un producto multi-repo real, no crees repos nuevos — añade `product-specs/` como un repo adicional y vincula tus repos existentes desde los `AGENTS.md` de cada uno declarando qué contratos implementan y qué servicios consumen.
+
 ### 6.9. ¿Y si solo quiero el 20% del sistema?
 
 Muchos lectores no necesitarán — ni querrán — el sistema completo. Aquí tienes tres combinaciones mínimas que ya aportan valor:
@@ -1189,6 +1270,12 @@ product-specs/
 4. **Las decisiones son inmutables.** Una vez escritas y aceptadas, no se editan. Si se revierten, se escribe una nueva decisión que referencia y depreca la anterior.
 5. **El README explica el flujo.** Cualquier persona del equipo debe entender en 5 minutos cómo contribuir al repo de producto.
 
+**¿Cuándo va algo a `rfcs/` y cuándo a `decisions/`?**
+- `rfcs/` contiene propuestas en discusión. Un RFC en estado `propuesto` o `en discusión` vive aquí.
+- `decisions/` contiene decisiones de producto ya aceptadas que no son specs ni requisitos. Ejemplo: "A partir de 2026-Q3, todos los nuevos servicios usarán Go en lugar de Python". No es un requisito funcional, no es un contrato — es una decisión de producto.
+- Cuando un RFC se acepta, sus artefactos (requisitos, contratos) se mueven a `requirements/` o `contracts/`. El RFC original se archiva en `rfcs/` como documentación histórica de por qué se tomó esa decisión. Si la decisión tiene implicaciones de roadmap o stack, se duplica un resumen en `decisions/`.
+- Los ADRs (`docs/adr/` en cada repo de código) son para decisiones técnicas de implementación. Los `decisions/` de producto son para decisiones que afectan a la estrategia del producto.
+
 ---
 
 ## 7. Conclusión: el producto que se documenta solo
@@ -1233,6 +1320,12 @@ El agente de IA no es el que decide. Es el que **recuerda, conecta y propaga**. 
 
 **Nota sobre costes**: empezar con modelos pequeños (GPT-4o-mini, ~$0.15/1M tokens) para extracción de decisiones. Un Neo4j en la nube cuesta ~$65/mes (AuraDB Professional); plantéatelo solo a partir de la fase Run. Mientras tanto, SQLite + embeddings locales (Turso, zvec) cubren el 80% de los casos de uso de grafo con coste cero. Backstage es open source y gratuito; el coste es el tiempo de configuración inicial (~2-3 días).
 
+**¿Schemathesis o Pact?** Ambos validan contratos, pero con filosofías distintas:
+- **Schemathesis**: genera tests desde la spec OpenAPI y los ejecuta contra el endpoint real. Ideal para *provider-driven contracts* — el proveedor define el contrato y Schemathesis verifica que la implementación lo cumple. Es la opción más natural en el modelo del artículo (contratos centralizados en `product-specs/`).
+- **Pact**: el *consumidor* define qué espera del proveedor. Ideal para *consumer-driven contracts* — el consumidor escribe sus expectativas y el proveedor las valida. Añade complejidad innecesaria si ya tienes los contratos centralizados.
+
+Recomendación: empieza con Schemathesis para APIs síncronas. Usa Pact solo si necesitas consumer-driven contracts (ej: un equipo externo consume tu API sin acceso al repo de producto).
+
 ### 8.2. RACI: quién hace qué en este sistema
 
 | Actividad | Responsible (ejecuta) | Accountable (responde) | Consulted (opina) | Informed (se le informa) |
@@ -1256,6 +1349,22 @@ Los requisitos en `product-specs/requirements/` siguen este formato: `REQ-{CAT}-
 
 La categoría la asigna quien crea el requisito. El número lo asigna el CI (`validate-specs.yml`) al validar el PR: busca el número más alto existente en esa categoría y asigna el siguiente. Si el PR no sigue la convención, el CI lo rechaza.
 
+### 8.4. Coste total estimado por fase (TCO mensual)
+
+| Concepto | Crawl (semana 1-2) | Walk (mes 1-3) | Run (mes 3-6) |
+|---|---|---|---|
+| **Repo de producto** | $0 (GitHub free) | $0 | $0 |
+| **Contract testing** | — | $0 (Schemathesis open source) | $0 (Schemathesis / oasdiff) |
+| **LLM extracción de reuniones** | — | ~$2-5/mes (GPT-4o-mini, 5-10h/semana) | ~$10-20/mes (GPT-4o-mini, 20h+/semana) |
+| **LLM agente SDD** | — | — | ~$5-15/mes (GPT-4o-mini, generación de tests) |
+| **LLM agente drift** | — | — | ~$2-5/mes (GPT-4o-mini, análisis semántico) |
+| **Knowledge graph** | $0 (repo markdown) | $0 (SQLite + zvec/Turso) | $0-65/mes (Neo4j AuraDB Professional) |
+| **CI/CD** | $0 (GitHub Actions free tier) | $0 | $0-10/mes (si excedes free tier) |
+| **Backstage** | — | $0 (open source, ~2-3 días setup) | $0 |
+| **Total mensual** | **$0** | **~$2-5** | **~$17-115** |
+
+La horquilla de Run depende de si usas Neo4j cloud ($65) o te quedas con SQLite+embeddings ($0). Con SQLite, el coste Run se queda en ~$17-40/mes. La recomendación es no tocar Neo4j hasta que el número de nodos en el grafo (>50) justifique consultas de impacto complejas que SQLite no pueda responder eficientemente.
+
 ---
 
-*Este artículo es el marco de trabajo. Queda como ejercicio práctico construir el pipeline con herramientas concretas, código ejecutable y un ejemplo funcionando sobre un producto multi-repo de verdad.*
+*Este artículo es el marco de trabajo. El pipeline con herramientas concretas está descrito en las secciones 5.6 (agente de drift), 6.1 (arquitectura) y 8.1 (stack de herramientas). Queda como contribución abierta construir un ejemplo ejecutable sobre un producto multi-repo real. Si lo haces, abre un PR contra `product-specs/` en el repo de este artículo y lo referenciamos.*
