@@ -9,9 +9,7 @@ tags:
   - devtools
   - chrome
   - testing
-tipo: investigacion
-estado: pendiente-revision
-autor: Alejandro de la Fuente
+autor: "Alejandro de la Fuente"
 ---
 
 # El nuevo stack de browser automation para coding agents (2026)
@@ -26,7 +24,7 @@ Un coding agent que necesita tocar la web en 2026 ya no elige "un wrapper de Pla
 
 - **CDP-first** — `ChromeDevTools/chrome-devtools-mcp` (v1.5.0, 45,6k⭐). 51 tools MCP que mapean **DevTools entero**: Performance Insights, Lighthouse, CrUX, heap snapshots, accessibility tree, screencast. Pensado para *debugging profesional* sobre Chrome estable.
 - **WebDriver BiDi** — `microsoft/playwright-mcp` (v0.0.77, ~35k⭐). **WebDriver BiDi** es el estándar W3C moderno (sucesor de WebDriver clásico; trae eventos push bidireccionales en lugar de polling). `playwright-mcp` expone ~68 tools agrupadas por capability flags (`--caps=vision,pdf,devtools,storage,network,testing`). Pensado para *automation portable* cross-browser (Chromium + Firefox + WebKit).
-- **Vision-LLM wrapper** — `browser-use/browser-use` (v0.13.2; más de 90k⭐ según búsqueda web de julio 2026, no confirmado contra GitHub API en este entorno). 26 acciones de alto nivel + un agente loop completo. Pensado para *cold-start sin harness técnico* — el LLM hace el trabajo, tú le das un task.
+- **Vision-LLM wrapper** — `browser-use/browser-use` (v0.13.2; ~90k⭐ ⚠️ estimación de julio 2026, no confirmado contra GitHub API). 26 acciones de alto nivel + un agente loop completo. Pensado para *cold-start sin harness técnico* — el LLM hace el trabajo, tú le das un task.
 - **OS-level** — `trycua/cua` + `cua-driver` (v0.5.7). **OS-level** significa que controla el escritorio entero, no el browser — apps nativas como Slack, Finder, VS Code, dialogs nativos. ~29 tools MCP por plataforma. Pensado para *cuando no hay browser*, o cuando necesitas integración con apps nativas.
 
 La decisión primaria no es "cuál es mejor". Es **qué pregunta intentas resolver**. Tres preguntas filtran el 90% de los casos:
@@ -51,7 +49,7 @@ Tabla resumen, una fila por stack:
 |---|---|---|---|---|---|
 | `chrome-devtools-mcp` | Google | 1.5.0 | ~46k | CDP | Debugging, performance, memory, Lighthouse en Chrome |
 | `playwright-mcp` | Microsoft | 0.0.77 | ~35k | WebDriver BiDi | Tests E2E cross-browser, mobile, CI |
-| `browser-use` | browser-use | 0.13.2 | ~100k | Playwright + LLM loop | Cold-start agent, scraping estructurado, Python-first |
+| `browser-use` | browser-use | 0.13.2 | ~90k (⚠️) | Playwright + LLM loop | Cold-start agent, scraping estructurado, Python-first |
 | `cua` / `cua-driver` | trycua | 0.5.7 | ~20k | OS-level (Rust) | Desktop automation, sandboxes VM, apps nativas |
 
 Las cuatro soluciones **no son intercambiables** — operan a capas distintas del stack (CDP → WebDriver BiDi → vision-LLM → OS). El resto del artículo demuestra por qué, con datos verificados de cada repo y un quickstart concreto al final.
@@ -131,28 +129,24 @@ El corazón de este artículo. Si tu agent vive en Chrome y necesitas **inspecci
 
 `chrome-devtools-mcp` es **el MCP server oficial de Google** que expone CDP a un coding agent. Investigado en profundidad en [nuestro informe previo](/home/hermesbot/.hermes/repo-investigations/chrome-devtools-mcp.md): clone local, build verificado, 383 líneas de notas técnicas, 51 tools documentadas. Aquí el resumen accionable.
 
-### Las 51 tools agrupadas en 11 categorías
+### Las 51 tools agrupadas en 10 secciones
 
-Extraídas directamente de `src/tools/*.ts` (verificado por grep en el repo clonado, no en README):
+Conteos basados en `docs/tool-reference.md` del repo upstream ([ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md)), que es la fuente canónica generada por `npm run gen`. Verificado al clonar el repo (2026-07-04). Conteos por sección on-by-default / gated por flag:
 
-| Categoría | # tools | Tools clave | Requiere flag |
+| Sección | # tools | Requiere flag | Tools clave |
 |---|---|---|---|
-| **Input automation** | 9 | `click`, `fill`, `type_text`, `drag`, `fill_form`, `upload_file`, `press_key`, `hover` | on-by-default |
-| **Navigation** | 8 | `navigate_page`, `new_page`, `list_pages`, `select_page`, `resize_page`, `handle_dialog`, `close_page`, `get_tab_id` | on-by-default |
-| **Emulation** | 1 | `emulate` (CPU, network, geolocation, userAgent, colorScheme, viewport, extraHttpHeaders) | on-by-default |
-| **Performance** | 3 | `performance_start_trace`, `performance_stop_trace`, `performance_analyze_insight` (Core Web Vitals: LCP/INP/CLS) | on-by-default |
-| **Network** | 2 | `list_network_requests`, `get_network_request` (headers, body, timing) | on-by-default |
-| **Debugging** | 5 | `list_console_messages`, `get_console_message`, `evaluate_script`, `take_snapshot` (a11y tree con UIDs), `wait_for` | on-by-default |
-| **Memory** | 11 | `take_heapsnapshot`, `compare_heapsnapshots`, `get_heapsnapshot_retainers`, `get_heapsnapshot_dominators`, `get_heapsnapshot_duplicate_strings` | `--memoryDebugging` |
-| **Screenshot** | 1 | `take_screenshot` (PNG/JPEG/WebP, tamaño configurable) | on-by-default |
-| **Screencast** | 2 | `screencast_start`, `screencast_stop` (requiere ffmpeg) | `--experimentalScreencast` |
-| **Lighthouse** | 1 | `lighthouse_audit` (a11y, best-practices, performance, SEO) | Chrome 144+ |
-| **Extensions** | 5 | `install_extension`, `uninstall_extension`, `list_extensions`, `reload_extension`, `trigger_extension_action` | `--categoryExtensions` |
-| **Third-party dev tools** | 2 | `list_3p_developer_tools`, `execute_3p_developer_tool` | opt-in |
-| **WebMCP** | 2 | `list_webmcp_tools`, `execute_webmcp_tool` | Chrome 149+ con `--enable-features=WebMCP` |
-| **Slim mode** | 3 | `screenshot`, `navigate`, `evaluate` (subset mínimo) | `--slim` |
+| **Input automation** | 10 | on-by-default | `click`, `drag`, `fill`, `fill_form`, `press_key`, `type_text`, `upload_file`, `hover`, `handle_dialog`, `click_at` |
+| **Navigation** | 6 | on-by-default | `navigate_page`, `new_page`, `close_page`, `list_pages`, `select_page`, `wait_for` |
+| **Emulation** | 2 | on-by-default | `emulate`, `resize_page` |
+| **Performance** | 3 | on-by-default | `performance_start_trace`, `performance_stop_trace`, `performance_analyze_insight` (Core Web Vitals: LCP/INP/CLS) |
+| **Network** | 2 | on-by-default | `list_network_requests`, `get_network_request` (headers, body, timing) |
+| **Debugging** | 8 | on-by-default | `list_console_messages`, `get_console_message`, `evaluate_script`, `take_snapshot` (a11y tree con UIDs), `take_screenshot`, `wait_for`, `lighthouse_audit`, `screencast_start`/`stop` |
+| **Memory** | 11 | `--memoryDebugging` | `take_heapsnapshot`, `compare_heapsnapshots`, `get_heapsnapshot_retainers`, `get_heapsnapshot_dominators`, `get_heapsnapshot_duplicate_strings` (y 6 más de análisis) |
+| **Extensions** | 5 | `--categoryExtensions` | `install_extension`, `uninstall_extension`, `list_extensions`, `reload_extension`, `trigger_extension_action` |
+| **Third-party** | 2 | opt-in | `list_3p_developer_tools`, `execute_3p_developer_tool` |
+| **WebMCP** | 2 | Chrome 149+ con `--enable-features=WebMCP` | `list_webmcp_tools`, `execute_webmcp_tool` |
 
-**~32 tools on-by-default**, el resto gated por flag. Es un detalle que importa: en producción no quieres exponer 51 tools al modelo — satura la ventana con schemas. La opción `--slim` lo reduce a 3 tools para "sólo quiero lo básico". Es el antipatrón resuelto: menos tools = menos confusión en la planificación del agente.
+Total: **51 tools en 10 secciones**. ~31 tools on-by-default, el resto gated por flag. La opción `--slim` reduce a 3 tools (`screenshot`, `navigate`, `evaluate`) para "sólo quiero lo básico" — el antipatrón resuelto: menos tools = menos confusión en la planificación del agente.
 
 ### El patrón "Reference over value"
 
@@ -266,13 +260,13 @@ Un engineering lead siempre pregunta "¿esto corre en Edge? ¿Y en Brave?". Resp
 |---|---|---|---|
 | Chrome stable | ✅ completo | default | Caso primario |
 | Chrome Canary / Beta / Dev | ✅ | `--channel=canary\|beta\|dev` | Útil para validar features en pre-release |
-| Microsoft Edge | ✅ | `--channel=msedge` | Usa el binario de Edge stable |
+| Microsoft Edge | ⚠️ no oficial | `--channel=msedge` o `--browserUrl` | El README oficial sólo garantiza Chrome y Chrome for Testing; el flag existe en el binario y funciona en la mayoría de casos, pero no hay SLA. Issue [#1235](https://github.com/ChromeDevTools/chrome-devtools-mcp/issues/1235) sigue abierto |
 | Brave | ❌ no oficial | workaround manual: `--browserUrl` a brave-debugging-port | No soportado por el repo; bugs probable |
 | Arc | ❌ | n/a | No es Chromium estable; no soportado |
 | Vivaldi | ❌ | n/a | No soportado oficialmente |
 | Chromium open source (`chromium-browser`) | ✅ parcial | `--executable-path=/usr/bin/chromium-browser` | Funciona pero con caveats; no es Chrome |
 
-Para organizaciones donde QA valida en Edge o Brave, **el camino limpio es playwright-mcp**, que soporta los tres engines de verdad. chrome-devtools-mcp está pensado para equipos que viven en Chrome (y eso incluye Edge, que es Chromium-based pero con distribución propia de Microsoft).
+Para organizaciones donde QA valida en Edge o Brave, **el camino limpio es playwright-mcp**, que soporta los tres engines de verdad. chrome-devtools-mcp es la opción si tu equipo vive en Chrome estable; Edge funciona por el binario pero no es primera clase.
 
 ---
 
@@ -402,7 +396,7 @@ Estado verificado al clonar el repo (2026-07-04):
 - **Licencia**: MIT
 - **Lenguaje**: Python (requiere `>=3.11,<4.0`)
 - **Core runtime**: Python + Rust (`browser-use[core]` extra)
-
+- **Stars**: ~90k (⚠️ estimación de julio 2026, búsqueda secundaria; el repo creció rápido desde su lanzamiento en HN en marzo 2025 — orden de magnitud verificable, cifra exacta no contrastada con GitHub API)
 El modelo de uso canónico (de `examples/simple.py`):
 
 ```python
@@ -477,13 +471,30 @@ from posthog import Posthog
 HOST = 'https://eu.i.posthog.com'
 ```
 
-`browser-use` envía telemetría a PostHog por defecto. **Se desactiva con**:
+`browser-use` envía telemetría a PostHog por defecto. Para desactivarla, la variable de entorno debe estar definida **antes del primer `import browser_use`** en tu proceso — si la defines después, la inicialización del módulo ya habrá enviado eventos. Esto se documenta en los issues #939 y #1584 del repo. La forma correcta en CI:
 
-```bash
-export ANONYMIZED_TELEMETRY=False
+```dockerfile
+# Dockerfile: la ENV antes de pip install es lo correcto, pero NO es suficiente
+# en una sola capa RUN; el env se aplica en build-time, no en runtime.
+# Lo que funciona de verdad:
+
+FROM mcr.microsoft.com/playwright/python:v1.55.0-jammy
+RUN pip install "browser-use[core]"
+ENV ANONYMIZED_TELEMETRY=False
+# ...
+ENTRYPOINT ["sh", "-c", "export ANONYMIZED_TELEMETRY=False && exec python -m agent_scripts.run_ci_task"]
 ```
 
-Pero el hecho de que sea una **dependencia hard** (no opcional, no extras) significa que el código de telemetría se ejecuta siempre — la desactivación es post-init. Para enterprise con compliance estricto, esto es relevante. El README y `AGENTS.md` lo mencionan pero enterrado.
+```yaml
+# GitHub Actions / GitLab CI — define en el job, no en el step:
+env:
+  ANONYMIZED_TELEMETRY: "False"
+steps:
+  - run: pip install browser-use
+  - run: python agent.py  # ya importará con la env var activa
+```
+
+El hecho de que sea una **dependencia hard** (no opcional, no extras) significa que el código de telemetría se carga siempre — la desactivación sólo funciona si la env var está presente antes del import. Para enterprise con compliance estricto, esto es relevante y no es trivial de auditar. El README y `AGENTS.md` lo mencionan pero enterrado.
 
 ### Cuándo elegir browser-use
 
@@ -1013,16 +1024,15 @@ Transparencia editorial honesta. Antes de aprobar el budget sobre la base de est
 
 | Claim | Estado | Cómo se verificó |
 |---|---|---|
-| chrome-devtools-mcp v1.5.0, 45,6k stars, 51 tools | ✅ Verificado | Lectura directa de `package.json`, GitHub API en la investigación previa (cacheado), grep sobre `src/tools/*.ts` |
+| chrome-devtools-mcp v1.5.0, 45,6k stars, 51 tools en 10 secciones | ✅ Verificado | Lectura directa de `package.json`, GitHub API en la investigación previa (cacheado), `docs/tool-reference.md` upstream |
 | playwright-mcp v0.0.77, 68 tools, 12 capability flags | ✅ Verificado | Lectura directa de `package.json` y README (generado por `update-readme.js`) |
 | browser-use v0.13.2, 26 acciones, PostHog dependency | ✅ Verificado | Lectura directa de `pyproject.toml` y `browser_use/tools/service.py` |
 | browser-use ~100k stars | ⚠️ Verificado por búsqueda secundaria | Búsqueda web de julio 2026 cita "casi 100k"; cifra exacta no contrastada con GitHub API |
 | cua-driver 29 tools por plataforma, PR #1692 consolidó screenshot | ✅ Verificado | Lectura directa de `libs/cua-driver/rust/crates/platform-macos/src/tools/` y comentario en código |
 | Cifras de tokens de screenshots (1,5k-3k para 1280×720) | ⚠️ Orden de magnitud | Práctica común y pricing público de Anthropic; no medido en paper |
 | Pricing de clouds comerciales (Browserbase ~0,10-0,50 $/h) | ⚠️ Estimación de mercado | Orden de magnitud basado en planes públicos típicos |
-| Telemetry ON-by-default en chrome-devtools-mcp y browser-use | ✅ Verificado | Lectura directa de `ClearcutLogger.ts` y `telemetry/service.py` |
+| browser-use ~90k stars | ⚠️ Verificado por búsqueda secundaria | Búsqueda web de julio 2026 cita "casi 100k"; cifra exacta no contrastada con GitHub API |
 | Microsoft recomienda playwright-cli para coding agents | ✅ Verificado | Cita literal en README de playwright-mcp |
-| browser-use creció de 0 a ~100k stars en <18 meses | ⚠️ Verificado por búsqueda secundaria | Fuente secundaria; no medido directamente |
 
 **Regla del artículo**: donde dice ✅ es porque el autor contrastó el dato. Donde dice ⚠️, es orden de magnitud o estimación. Engineering leads que necesiten cifras exactas para un budget deben medir en su propio workload.
 
