@@ -36,37 +36,29 @@ const fmtFecha = (d: Date) =>
         {ensayos.length} artículo{ensayos.length !== 1 ? 's' : ''} etiquetado{ensayos.length !== 1 ? 's' : ''} con <strong>{tag}</strong>.
         <a href="/ensayos" style="margin-left: 1rem; font-size: 0.9rem;">← Ver todos</a>
       </p>
-      {
-        ensayos.length === 0 ? (
-          <p style="margin-top: 2rem; color: var(--color-tinta3);">
-            No hay artículos con este tag todavía.
-          </p>
-        ) : (
-          <ul class="item-list" style="margin-top: 2rem;">
-            {ensayos.map((post) => (
-              <li>
-                <p class="meta">
-                  {fmtFecha(post.data.fecha)} · {post.data.autor}
-                </p>
-                <h3>
-                  <a href={`/ensayos/${post.id}`}>{post.data.title}</a>
-                </h3>
-                <p>{post.data.description}</p>
-                <p style="margin-top: 0.6rem; margin-bottom: 0;">
-                  {post.data.tags.map((t) => (
-                    <a
-                      href={`/ensayos/tags/${t}`}
-                      class:list={['tag', { 'tag--active': t === tag }]}
-                    >
-                      {t}
-                    </a>
-                  ))}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )
-      }
+      <ul class="item-list" style="margin-top: 2rem;">
+        {ensayos.map((post) => (
+          <li>
+            <p class="meta">
+              {fmtFecha(post.data.fecha)} · {post.data.autor}
+            </p>
+            <h3>
+              <a href={`/ensayos/${post.id}`}>{post.data.title}</a>
+            </h3>
+            <p>{post.data.description}</p>
+            <p style="margin-top: 0.6rem; margin-bottom: 0;">
+              {post.data.tags.map((t) => (
+                <a
+                  href={`/ensayos/tags/${t}`}
+                  class:list={['tag', { 'tag--active': t === tag }]}
+                >
+                  {t}
+                </a>
+              ))}
+            </p>
+          </li>
+        ))}
+      </ul>
     </section>
   </div>
 </Base>

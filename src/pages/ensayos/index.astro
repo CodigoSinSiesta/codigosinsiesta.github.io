@@ -16,7 +16,7 @@ for (const post of ensayos) {
     tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
   }
 }
-const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
+const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
 ---
 
 <Base
@@ -36,12 +36,14 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
       <!-- Search bar (Pagefind) -->
       <div id="search" class="search-bar" style="margin-top: 1.75rem;"></div>
 
-      <!-- Tag filter bar -->
+      <!-- Tag filter bar: cada chip es un enlace real a la página del tag.
+           El JS de abajo intercepta el click para filtrar en cliente sin
+           recarga; sin JS, los anchors funcionan como navegación estática. -->
       <nav class="tag-cloud" aria-label="Filtrar por tema" style="margin-top: 1.75rem;" data-csi-tag-cloud>
-        <button class="tag tag--active" data-csi-tag="*" type="button">todos</button>
+        <a class="tag tag--active" href="/ensayos" data-csi-tag="*" aria-pressed="true">todos</a>
         {
           sortedTags.map(([tag, count]) => (
-            <button class="tag" data-csi-tag={tag} type="button">{tag}<sup>{count}</sup></button>
+            <a class="tag" href={`/ensayos/tags/${tag}`} data-csi-tag={tag} aria-pressed="false">{tag}<sup>{count}</sup></a>
           ))
         }
       </nav>
@@ -119,10 +121,12 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
         if (match) visible++;
       });
 
-      // Update active button
-      cloud.querySelectorAll('[data-csi-tag]').forEach((btn) => {
-        const t = btn.getAttribute('data-csi-tag');
-        btn.classList.toggle('tag--active', t === tag);
+      // Update active state en el cloud: CSS class + ARIA pressed
+      cloud.querySelectorAll('[data-csi-tag]').forEach((el) => {
+        const t = el.getAttribute('data-csi-tag');
+        const isActive = t === tag;
+        el.classList.toggle('tag--active', isActive);
+        el.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       });
 
       // Update count
@@ -141,16 +145,16 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
       }
     }
 
-    // Click on tag cloud buttons
+    // Click on chips del cloud: prevenir navegación, aplicar filtro en cliente
     cloud.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-csi-tag]');
-      if (!btn) return;
+      const el = e.target.closest('[data-csi-tag]');
+      if (!el) return;
       e.preventDefault();
-      const tag = btn.getAttribute('data-csi-tag');
+      const tag = el.getAttribute('data-csi-tag');
       if (tag) applyFilter(tag);
     });
 
-    // Click on tag links inside items → trigger filter instead of navigating
+    // Click en tag links dentro de cards: mismo comportamiento
     document.addEventListener('click', (e) => {
       const link = e.target.closest('[data-csi-tag-link]');
       if (!link) return;
@@ -158,7 +162,7 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]);
       if (tag) {
         e.preventDefault();
         applyFilter(tag);
-        // Scroll to tag cloud so user sees the active filter
+        // Scroll al cloud para que el usuario vea el filtro activo
         cloud.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
