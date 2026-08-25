@@ -10,6 +10,10 @@ export const NAV = [
   { href: '/', label: 'Inicio' },
   { href: '/rutas', label: 'Guías' },
   { href: '/ensayos', label: 'Artículos' },
+  // El boletín es otro despliegue bajo el mismo dominio (/tecnoboletin),
+  // no una ruta de este sitio Astro: por eso es un enlace normal y no
+  // aparece en el sitemap de aquí.
+  { href: '/tecnoboletin/', label: 'Boletín' },
   { href: '/talleres', label: 'Talleres' },
 ];
 
