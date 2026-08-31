@@ -1,0 +1,14 @@
+README.md
+  h_72f012d83ce049 9-11,15,17,19,21-22,24-38,44,46-53,55-57,60,62,64-72,74,76-78,80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "568538ec63f75c867c967939f63aa6b535e74237",
+  "prompts": {},
+  "humans": {
+    "h_72f012d83ce049": {
+      "author": "Alejandro de la Fuente de la Rosa <alejandrodlfdlr@ext.inditex.com>"
+    }
+  }
+}
