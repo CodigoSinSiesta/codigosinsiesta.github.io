@@ -16,7 +16,7 @@ Explora el código como explorarías un bosque de noche con una linterna de bols
 
 ---
 
-## El problema real: grpear un bosque
+## El problema real: grepear un bosque
 
 Cuando trabajas con un agente de código en un proyecto nuevo, el ritual es siempre el mismo:
 
@@ -31,7 +31,7 @@ read src/integrations/stripe.ts        # otras 200 líneas
 
 Y así, vuelta tras vuelta, el agente va reconstruyendo la arquitectura del proyecto a base de abrir archivos y seguir pistas. Cada `read` son tokens de contexto. Cada `grep` es ruido. Y cada decisión que toma está basada en una visión parcial del código.
 
-En un experimento documentado por el equipo de DeusData, cinco consultas estructurales consumieron **412.000 tokens** usando exploración archivo por archivo. Las mismas cinco consultas contra el grafo de conocimiento de codebase-memory-mcp: **3.400 tokens**. Una reducción del **99,2%**.
+En un experimento documentado por el equipo de DeusData —los mismos que mantienen codebase-memory-mcp, así que tómalo como benchmark de primera parte, no como medición independiente— cinco consultas estructurales consumieron **412.000 tokens** usando exploración archivo por archivo. Las mismas cinco consultas contra el grafo de conocimiento de codebase-memory-mcp: **3.400 tokens**. Una reducción del **99,2%**.
 
 Esto no es solo eficiencia: es la diferencia entre que el agente entienda tu proyecto o improvise sobre lo que ve.
 
@@ -39,7 +39,7 @@ Esto no es solo eficiencia: es la diferencia entre que el agente entienda tu pro
 
 ## ¿Qué hace realmente?
 
-Codebase-memory-mcp es un **motor de indexación** que parsea tu código con tree-sitter (158 lenguajes vendidos dentro del binario), aplica resolución de tipos con un LSP híbrido implementado en C para 9 lenguajes (Python, TypeScript, Java, Go, Rust, C, C++, C#, PHP, Kotlin), y construye un grafo de conocimiento SQLite con nodos (clases, funciones, rutas HTTP, módulos) y aristas (CALLS, IMPORTS, HTTP_CALLS, DATA_FLOWS, INHERITS, y una docena más de tipos de relación).
+Codebase-memory-mcp es un **motor de indexación** que parsea tu código con tree-sitter (158 lenguajes incluidos dentro del binario), aplica resolución de tipos con un LSP híbrido implementado en C para 9 lenguajes (Python, TypeScript, Java, Go, Rust, C, C++, C#, PHP, Kotlin), y construye un grafo de conocimiento SQLite con nodos (clases, funciones, rutas HTTP, módulos) y aristas (CALLS, IMPORTS, HTTP_CALLS, DATA_FLOWS, INHERITS, y una docena más de tipos de relación).
 
 La magia está en la velocidad:
 
