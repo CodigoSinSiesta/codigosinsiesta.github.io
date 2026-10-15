@@ -138,4 +138,31 @@ export const RUTAS: Ruta[] = [
       },
     ],
   },
+  {
+    slug: 'pi-oh-my-pi',
+    titulo: 'Pi y oh my pi',
+    claim: 'Entiende un agente de programación por dentro, del más pequeño al más completo',
+    descripcion:
+      'Curso en vídeo sobre Pi, un agente de programación mínimo para la terminal, y oh my pi, su versión con baterías incluidas. Del bucle de turnos y las sesiones a la seguridad, las extensiones y los subagentes, con demos reales, fichas, código y fuentes de cada vídeo. En publicación: 20 de 26 vídeos.',
+    nivel: 'intermedio',
+    duracion: '~7,5 horas hasta ahora',
+    paraQuien:
+      'Developers que ya usan un agente de IA en la terminal y quieren entender cómo funciona por dentro, para configurarlo, extenderlo y confiarle trabajo con criterio.',
+    aprenderas: [
+      'Qué es un harness de agente y sus cinco piezas: instrucciones, herramientas, entorno, estado y feedback',
+      'Cómo trabaja Pi por dentro: el bucle de turnos, el contexto, las sesiones como árbol y la compactación',
+      'Aislar a un agente que no pide permiso: contenedores, confianza de proyecto y aprobaciones',
+      'Extender Pi y oh my pi con extensiones, skills, MCP, subagentes y automatización',
+    ],
+    requisitos: [
+      'Soltura con la terminal, Git y Node.js',
+      'Haber usado algún agente de programación (Claude Code, Codex, Copilot CLI…)',
+      'Una cuenta en un proveedor de modelos (las demos usan OpenRouter y DeepSeek)',
+    ],
+    noIncluye: [
+      'Entrenar o ajustar modelos',
+      'Los vídeos 21 a 26 (en producción): omp programático, diseño de harness, verificación y proyecto final',
+    ],
+    pasos: [],
+  },
 ];
