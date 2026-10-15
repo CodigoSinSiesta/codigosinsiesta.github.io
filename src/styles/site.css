@@ -568,6 +568,32 @@ button.tag:hover {
 
 .guia__head { max-width: 760px; }
 
+/* Vídeo de la guía */
+.guia__video { margin: 0 0 1.75rem; }
+.guia__video video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-sm);
+}
+.guia__nota { color: var(--color-tinta3); font-size: 0.9rem; }
+.ir-a {
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--color-cielo);
+  background: transparent;
+  border: 1px solid var(--color-borde);
+  border-radius: 999px;
+  padding: 0.2rem 0.8rem;
+}
+.ir-a:hover { border-color: var(--color-cielo); }
+.ir-a:focus-visible { outline: 2px solid var(--color-cielo); outline-offset: 2px; }
+.prose details { border: 1px solid var(--color-borde); border-radius: var(--radius-sm); padding: 0.75rem 1.1rem; }
+.prose details > summary { cursor: pointer; font-weight: 600; }
+
 .guia__layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 15rem;

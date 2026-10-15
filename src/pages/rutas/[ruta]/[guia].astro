@@ -3,6 +3,7 @@ import Base from '../../../layouts/Base.astro';
 import ProgresoGuia from '../../../components/ProgresoGuia.svelte';
 import { getCollection, render } from 'astro:content';
 import { RUTAS } from '../../../data/rutas';
+import { VIDEOS_BASE_URL } from '../../../data/site';
 
 export async function getStaticPaths() {
   const guias = await getCollection('guias');
@@ -47,6 +48,24 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
       <div class="guia__layout">
         <div class="prose">
+          {
+            guia.data.video && (
+              <figure class="guia__video">
+                <video
+                  controls
+                  preload="metadata"
+                  playsinline
+                  aria-label={`Vídeo: ${guia.data.title}`}
+                  src={`${VIDEOS_BASE_URL}/${guia.data.video}`}
+                >
+                  <p>
+                    Tu navegador no reproduce vídeo.{' '}
+                    <a href={`${VIDEOS_BASE_URL}/${guia.data.video}`}>Descárgalo</a>.
+                  </p>
+                </video>
+              </figure>
+            )
+          }
           <Content />
 
           <footer class="guia__footer">
@@ -79,6 +98,19 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
     </article>
   </div>
 </Base>
+
+<script>
+  // Botones «Ir a m:ss» de los capítulos: saltan a ese punto del vídeo.
+  const reproductor = document.querySelector<HTMLVideoElement>('.guia__video video');
+  document.querySelectorAll<HTMLButtonElement>('button[data-t]').forEach((b) => {
+    b.addEventListener('click', () => {
+      if (!reproductor) return;
+      reproductor.currentTime = Number(b.dataset.t);
+      reproductor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      void reproductor.play().catch(() => {});
+    });
+  });
+</script>
 
 <script>
   // Progreso de lectura + resaltado de la sección activa en el TOC.

@@ -20,6 +20,8 @@ const guias = defineCollection({
     ruta: z.string(), // slug de la ruta a la que pertenece
     orden: z.number(),
     duracion: z.string().default(''),
+    // Nombre del fichero de vídeo dentro del bucket de vídeos (ver VIDEOS_BASE_URL).
+    video: z.string().optional(),
   }),
 });
 
