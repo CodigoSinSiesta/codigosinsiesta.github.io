@@ -1,0 +1,1953 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.488 --> 00:00:14.486
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.526 --> 00:00:16.960
+Vídeo diez: Pi programático.
+
+3
+00:00:17.000 --> 00:00:20.610
+Scripts, integración continua, RPC y SDK.
+
+4
+00:00:26.682 --> 00:00:29.970
+Hasta ahora casi todo lo hemos
+hecho en la interfaz de terminal:
+
+5
+00:00:30.010 --> 00:00:33.100
+escribes, Pi trabaja, tú miras.
+
+6
+00:00:33.375 --> 00:00:36.902
+Pero ya hemos asomado la cabeza
+fuera unas cuantas veces.
+
+7
+00:00:36.942 --> 00:00:41.275
+En el vídeo cuatro le hicimos una
+pregunta de una línea con pi guion p.
+
+8
+00:00:41.315 --> 00:00:46.020
+En el siete medimos lo que cuesta
+un servidor MCP con el modo JSON
+
+9
+00:00:46.501 --> 00:00:49.840
+y jota cu. Y en el ocho vimos que nuestra
+extensión de permisos bloquea en modo
+
+10
+00:00:49.880 --> 00:00:52.220
+print, porque no hay nadie para contestar.
+
+11
+00:00:53.181 --> 00:00:56.015
+Hoy convertimos esas pruebas
+sueltas en un método.
+
+12
+00:00:56.055 --> 00:00:59.950
+Pi tiene cuatro modos, y los
+cuatro usan el mismo agente,
+
+13
+00:00:59.990 --> 00:01:04.312
+las mismas sesiones, los mismos
+recursos y las mismas herramientas.
+
+14
+00:01:04.352 --> 00:01:08.750
+Lo único que cambia es cómo entra lo
+que le pides, cómo sale lo que hace,
+
+15
+00:01:08.790 --> 00:01:11.420
+y si el proceso se queda
+vivo esperando más.
+
+16
+00:01:11.998 --> 00:01:14.134
+El interactivo es el que conoces.
+
+17
+00:01:14.174 --> 00:01:18.540
+El modo print ejecuta lo que le pidas,
+escribe el texto final de la respuesta y
+
+18
+00:01:18.580 --> 00:01:24.360
+sale. El modo JSON también ejecuta y sale,
+pero en lugar del texto final te da todos
+
+19
+00:01:24.400 --> 00:01:27.110
+los eventos de la
+ejecución, uno por línea.
+
+20
+00:01:27.150 --> 00:01:31.990
+Y el modo RPC no sale: se queda escuchando
+órdenes por su entrada estándar y
+
+21
+00:01:32.030 --> 00:01:34.740
+contestando por la salida,
+todo el tiempo que quieras.
+
+22
+00:01:35.771 --> 00:01:39.582
+Y hay una quinta vía que no es
+un modo de la línea de comandos:
+
+23
+00:01:39.622 --> 00:01:40.540
+el SDK.
+
+24
+00:01:41.100 --> 00:01:45.450
+En lugar de lanzar Pi como otro proceso,
+lo importas como una librería dentro de tu
+
+25
+00:01:45.490 --> 00:01:49.290
+programa de Node o de Bun, y
+hablas con la sesión directamente,
+
+26
+00:01:49.330 --> 00:01:51.780
+con sus métodos y sus
+eventos de TypeScript.
+
+27
+00:01:52.880 --> 00:01:54.630
+La regla para elegir es sencilla.
+
+28
+00:01:54.670 --> 00:01:57.340
+Si solo necesitas la
+respuesta final, print.
+
+29
+00:01:57.380 --> 00:02:01.130
+Si necesitas saber qué ha pasado por el
+camino, qué herramientas ha usado y cuánto
+
+30
+00:02:01.170 --> 00:02:05.830
+ha costado, JSON. Si tu programa
+tiene que mantener una conversación,
+
+31
+00:02:05.870 --> 00:02:08.740
+cambiar de modelo o
+contestar diálogos, RPC.
+
+32
+00:02:08.902 --> 00:02:12.880
+Y si tu programa ya es
+TypeScript y quieres acceso a
+
+33
+00:02:13.399 --> 00:02:16.330
+todo, el SDK. Vamos uno a uno, y por el
+camino los juntamos en un pipeline de
+
+34
+00:02:16.370 --> 00:02:17.270
+verdad.
+
+35
+00:02:23.055 --> 00:02:25.592
+Empezamos por el más útil en el día a día.
+
+36
+00:02:25.632 --> 00:02:30.984
+Pi guion p, o guion guion print,
+ejecuta las peticiones que le pases,
+
+37
+00:02:31.024 --> 00:02:34.322
+escribe por la salida estándar
+el texto final del asistente,
+
+38
+00:02:34.362 --> 00:02:38.182
+y termina. Sin interfaz,
+sin colores, sin pie.
+
+39
+00:02:38.222 --> 00:02:40.040
+Justo lo que necesita un script.
+
+40
+00:02:40.747 --> 00:02:43.010
+Hay un detalle que conviene saber.
+
+41
+00:02:43.083 --> 00:02:47.410
+Si la entrada o la salida no son una
+terminal, porque las rediriges o las
+
+42
+00:02:47.450 --> 00:02:50.810
+encadenas con una tubería, Pi
+elige el modo print él solo,
+
+43
+00:02:50.850 --> 00:02:54.310
+aunque no escribas guion
+p. En la demo lo vemos:
+
+44
+00:02:54.350 --> 00:02:58.459
+lanzamos pi con una pregunta y
+redirigimos la salida a un fichero.
+
+45
+00:02:58.499 --> 00:03:00.560
+No se abre ninguna interfaz.
+
+46
+00:03:00.600 --> 00:03:03.340
+Pi responde, escribe la
+línea en el fichero, y sale.
+
+47
+00:03:04.407 --> 00:03:06.590
+Lo que entra también tiene sus reglas.
+
+48
+00:03:06.689 --> 00:03:10.334
+Lo que le llegue por una tubería
+se antepone a tu primera petición.
+
+49
+00:03:10.374 --> 00:03:14.230
+Así funciona la primera prueba de hoy: en
+una rama de la tienda donde hemos subido
+
+50
+00:03:14.270 --> 00:03:18.680
+el umbral del envío gratis,
+git diff master, una tubería,
+
+51
+00:03:18.720 --> 00:03:23.678
+y pi guion p con la petición: revisa
+este cambio en tres viñetas cortas.
+
+52
+00:03:23.718 --> 00:03:27.310
+El diff entra como contexto y la
+revisión sale por la pantalla:
+
+53
+00:03:27.350 --> 00:03:31.810
+el JSDoc sigue diciendo cuarenta euros,
+varios tests del envío y del carrito se
+
+54
+00:03:31.850 --> 00:03:35.480
+rompen con el nuevo umbral,
+y falta la prueba del cambio.
+
+55
+00:03:36.096 --> 00:03:39.890
+Y el propio modelo avisa de que no
+tiene shell para ejecutar los tests,
+
+56
+00:03:39.930 --> 00:03:41.920
+porque solo le hemos dado
+herramientas de lectura.
+
+57
+00:03:42.844 --> 00:03:47.390
+Además del texto de la tubería, puedes
+adjuntar ficheros con arroba y la ruta,
+
+58
+00:03:47.430 --> 00:03:51.460
+igual que en la interfaz. Puedes
+pasar varias peticiones seguidas,
+
+59
+00:03:51.500 --> 00:03:54.253
+y Pi las ejecuta en
+orden en la misma sesión.
+
+60
+00:03:54.293 --> 00:03:57.650
+Y si tu petición empieza por un
+guion, pon antes guion guion,
+
+61
+00:03:57.690 --> 00:03:59.920
+para que Pi no la confunda con una opción.
+
+62
+00:04:00.595 --> 00:04:03.160
+Tres opciones que en un
+script casi siempre quieres.
+
+63
+00:04:03.200 --> 00:04:07.694
+Guion guion tools, para darle solo
+las herramientas que necesita.
+
+64
+00:04:07.734 --> 00:04:09.680
+Para una revisión bastan las de lectura:
+
+65
+00:04:09.720 --> 00:04:15.240
+read, grep, find y ls. Sin bash, sin
+edit y sin write, no puede cambiar nada,
+
+66
+00:04:15.280 --> 00:04:19.930
+por mucho que se equivoque. Guion guion
+no session, para que no deje una sesión
+
+67
+00:04:19.970 --> 00:04:22.423
+guardada por cada ejecución del script.
+
+68
+00:04:22.463 --> 00:04:26.440
+Y guion guion model, para fijar el modelo
+y no depender de lo que alguien tenga
+
+69
+00:04:26.480 --> 00:04:27.520
+configurado.
+
+70
+00:04:28.256 --> 00:04:32.340
+Y lo último, el código de salida, que es
+lo que mira un script para saber si algo
+
+71
+00:04:32.380 --> 00:04:37.610
+ha ido bien. En modo print, Pi sale con
+un código distinto de cero si la respuesta
+
+72
+00:04:37.650 --> 00:04:42.400
+final acaba en error o se ha abortado:
+la clave no vale, el proveedor falla,
+
+73
+00:04:42.440 --> 00:04:45.950
+se corta la conexión. Los errores
+van a la salida de errores,
+
+74
+00:04:45.990 --> 00:04:47.730
+no se mezclan con la respuesta.
+
+75
+00:04:47.770 --> 00:04:51.360
+En la demo, después de la revisión,
+el código de salida es cero.
+
+76
+00:04:52.284 --> 00:04:54.490
+Pero fíjate en lo que eso no dice.
+
+77
+00:04:55.110 --> 00:04:59.400
+Un cero significa que Pi ha terminado
+de hablar, no que lo que ha dicho sea
+
+78
+00:04:59.440 --> 00:05:02.190
+correcto, ni que haya podido
+hacer lo que le pediste.
+
+79
+00:05:02.230 --> 00:05:04.400
+Lo veremos enseguida con
+la extensión de permisos.
+
+80
+00:05:10.247 --> 00:05:14.740
+Cuando el texto final no basta,
+pasamos a guion guion mode json.
+
+81
+00:05:14.863 --> 00:05:19.730
+La ejecución es la misma, pero por la
+salida estándar sale un registro JSON por
+
+82
+00:05:20.060 --> 00:05:24.051
+línea. Es el formato JSONL que ya
+conoces de las sesiones del vídeo tres.
+
+83
+00:05:24.091 --> 00:05:27.950
+La primera línea es la cabecera de
+la sesión, con su identificador y su
+
+84
+00:05:27.990 --> 00:05:31.403
+directorio. Y después, todos
+los eventos de la ejecución,
+
+85
+00:05:31.443 --> 00:05:32.343
+en orden.
+
+86
+00:05:33.093 --> 00:05:36.633
+En la demo guardamos los eventos de
+una pregunta sencilla en un fichero,
+
+87
+00:05:36.673 --> 00:05:39.916
+y los miramos con jota
+cu. Primero la cabecera.
+
+88
+00:05:39.956 --> 00:05:42.027
+Después, un recuento por tipo de evento:
+
+89
+00:05:42.067 --> 00:05:45.920
+verás muchísimos message update, unos
+pocos de inicio y fin de mensaje,
+
+90
+00:05:45.960 --> 00:05:50.360
+de turno y de herramienta, y al final
+uno solo que se llama agent settled.
+
+91
+00:05:51.235 --> 00:05:54.630
+Los nombres te sonarán del vídeo ocho,
+porque son casi los mismos que escuchan
+
+92
+00:05:54.670 --> 00:05:59.750
+las extensiones. Agent start y agent
+end, al empezar y terminar una ejecución.
+
+93
+00:05:59.790 --> 00:06:02.598
+Turn start y turn end,
+por cada vuelta del bucle.
+
+94
+00:06:02.638 --> 00:06:06.475
+Message start, message update y
+message end, por cada mensaje.
+
+95
+00:06:06.515 --> 00:06:10.030
+Y tool execution start, update
+y end, por cada herramienta,
+
+96
+00:06:10.070 --> 00:06:13.208
+con su nombre, sus
+argumentos y su resultado.
+
+97
+00:06:13.248 --> 00:06:17.485
+Filtramos los inicios de herramienta, y
+ahí está la llamada a ls que hemos pedido,
+
+98
+00:06:17.525 --> 00:06:18.590
+con su argumento.
+
+99
+00:06:19.276 --> 00:06:21.640
+Dos detalles que te ahorran disgustos.
+
+100
+00:06:21.680 --> 00:06:25.419
+El primero: los message update
+solo traen el trozo nuevo de texto,
+
+101
+00:06:25.459 --> 00:06:28.220
+el delta, no el mensaje entero cada vez.
+
+102
+00:06:28.260 --> 00:06:31.830
+Si quieres pintar la respuesta en
+directo, vas sumando los deltas.
+
+103
+00:06:31.870 --> 00:06:36.224
+Pero el mensaje que vale es el de message
+end, que es el completo y definitivo,
+
+104
+00:06:36.264 --> 00:06:38.344
+con el uso de tokens y el coste.
+
+105
+00:06:38.384 --> 00:06:41.010
+Es lo que leíamos en el vídeo
+siete para medir el contexto.
+
+106
+00:06:42.034 --> 00:06:45.800
+El segundo: agent end
+no siempre es el final.
+
+107
+00:06:45.840 --> 00:06:49.540
+Después puede venir un reintento
+automático, una compactación,
+
+108
+00:06:49.580 --> 00:06:51.610
+o mensajes que estaban en cola.
+
+109
+00:06:51.650 --> 00:06:56.020
+El evento que te dice que Pi ya no va
+a hacer nada más por su cuenta es agent
+
+110
+00:06:56.060 --> 00:06:59.780
+settled. Si tu programa espera
+a que termine, espera a ese.
+
+111
+00:07:00.412 --> 00:07:03.423
+Y un aviso para quien vaya a
+leer este flujo desde código.
+
+112
+00:07:03.463 --> 00:07:06.263
+Corta las líneas solo
+por el salto de línea.
+
+113
+00:07:06.303 --> 00:07:10.100
+El lector de líneas de Node, readline,
+también corta en dos caracteres de Unicode
+
+114
+00:07:10.140 --> 00:07:14.470
+que son válidos dentro de un texto JSON,
+y acabarías partiendo un registro por la
+
+115
+00:07:14.510 --> 00:07:17.100
+mitad. La documentación de
+Pi lo dice expresamente:
+
+116
+00:07:17.140 --> 00:07:21.324
+usa un decodificador de bytes
+y separa por el salto de línea.
+
+117
+00:07:21.364 --> 00:07:25.380
+Y lee la salida sin parar, porque si
+dejas de leer, Pi se queda esperando.
+
+118
+00:07:26.193 --> 00:07:30.300
+Por último, el código de salida,
+que aquí es todavía más estricto.
+
+119
+00:07:30.340 --> 00:07:33.870
+En modo JSON, una respuesta que
+falla aparece en los eventos,
+
+120
+00:07:33.910 --> 00:07:35.830
+pero no cambia el código de salida.
+
+121
+00:07:35.870 --> 00:07:39.792
+Pi solo sale con error si la
+propia ejecución revienta.
+
+122
+00:07:39.832 --> 00:07:42.470
+Así que, en este modo, quien
+decide si ha ido bien eres tú,
+
+123
+00:07:42.510 --> 00:07:47.680
+mirando los eventos. Por ejemplo, el
+stop reason del último message end del
+
+124
+00:07:47.720 --> 00:07:50.988
+asistente: si es stop,
+terminó con normalidad;
+
+125
+00:07:51.028 --> 00:07:53.660
+si es error o aborted, no.
+
+126
+00:07:59.185 --> 00:08:02.360
+Con estas dos piezas ya
+podemos montar algo serio:
+
+127
+00:08:02.418 --> 00:08:05.370
+un script que revise una
+rama antes de integrarla.
+
+128
+00:08:05.410 --> 00:08:09.070
+Se llama revisar punto sh y lo
+vamos a leer de arriba abajo,
+
+129
+00:08:09.110 --> 00:08:11.160
+porque cada línea tiene su porqué.
+
+130
+00:08:12.039 --> 00:08:14.650
+Lo primero que hace no
+tiene nada que ver con Pi.
+
+131
+00:08:14.690 --> 00:08:18.020
+Ejecuta npm test y guarda
+el código de salida.
+
+132
+00:08:18.060 --> 00:08:20.565
+Es una decisión de diseño
+que viene del vídeo uno:
+
+133
+00:08:20.605 --> 00:08:23.869
+lo que se puede comprobar sin
+modelo, lo comprueba el script.
+
+134
+00:08:23.909 --> 00:08:27.984
+Que los tests pasen o fallen es un hecho,
+y no se lo vamos a preguntar a un modelo.
+
+135
+00:08:28.024 --> 00:08:32.300
+El modelo aporta otra cosa: leer
+el cambio y decirte qué riesgos ve.
+
+136
+00:08:33.345 --> 00:08:37.905
+Después, el diff de la rama entra
+por una tubería a pi en modo JSON.
+
+137
+00:08:37.945 --> 00:08:41.980
+Sin sesión. Con guion guion no approve,
+que recordarás del vídeo cinco:
+
+138
+00:08:42.020 --> 00:08:46.613
+ignora la configuración y los recursos
+del proyecto que dependen de la confianza,
+
+139
+00:08:46.653 --> 00:08:49.270
+para que una rama no
+pueda colar una extensión
+
+140
+00:08:49.766 --> 00:08:52.100
+propia. Sin las skills
+personales de quien lo ejecute.
+
+141
+00:08:52.140 --> 00:08:57.101
+Con el modelo fijado, deepseek flash,
+que para revisar un diff pequeño sobra.
+
+142
+00:08:57.141 --> 00:09:00.174
+Y con guion e y nuestra extensión
+de permisos del vídeo ocho,
+
+143
+00:09:00.214 --> 00:09:01.350
+como red de seguridad.
+
+144
+00:09:02.315 --> 00:09:06.300
+La petición le cuenta cómo han salido los
+tests, le dice que puede leer ficheros
+
+145
+00:09:06.340 --> 00:09:09.510
+pero no modificar nada,
+y le pide un formato:
+
+146
+00:09:09.550 --> 00:09:15.040
+resumen, riesgos, y una última línea
+con el veredicto, OK o CAMBIOS.
+
+147
+00:09:15.103 --> 00:09:18.400
+Los eventos van a un fichero, y
+los diagnósticos de Pi a otro.
+
+148
+00:09:19.456 --> 00:09:22.283
+La tercera parte lee el
+resultado con jota cu.
+
+149
+00:09:22.323 --> 00:09:25.952
+El stop reason del último mensaje,
+para saber si Pi terminó bien.
+
+150
+00:09:25.992 --> 00:09:29.427
+El texto final, que se guarda
+como informe en Markdown.
+
+151
+00:09:29.467 --> 00:09:33.904
+Y las herramientas que acabaron en error,
+con su motivo, en un fichero aparte.
+
+152
+00:09:33.944 --> 00:09:37.570
+Si Pi no terminó bien, el script
+sale con un código propio.
+
+153
+00:09:37.610 --> 00:09:40.480
+Si terminó bien, sale con
+el código de los tests.
+
+154
+00:09:41.149 --> 00:09:43.111
+Lo ejecutamos contra master.
+
+155
+00:09:43.151 --> 00:09:46.500
+Tres tests fallan, porque subimos
+el umbral sin tocar las pruebas,
+
+156
+00:09:46.540 --> 00:09:50.522
+y el script sale con uno. Antes, un aviso:
+
+157
+00:09:50.562 --> 00:09:53.007
+hay herramientas con error o bloqueadas.
+
+158
+00:09:53.047 --> 00:09:57.140
+El informe lo explica todo: el cambio sube
+el envío gratis de cuarenta a cincuenta
+
+159
+00:09:57.180 --> 00:10:00.834
+euros, señala los tests que
+fallan con la línea de cada uno,
+
+160
+00:10:00.874 --> 00:10:06.232
+los riesgos, las correcciones necesarias
+sin aplicarlas, y termina con veredicto:
+
+161
+00:10:06.272 --> 00:10:09.379
+cambios. El veredicto del
+modelo es orientativo;
+
+162
+00:10:09.419 --> 00:10:11.200
+el que rompe el pipeline es el test.
+
+163
+00:10:12.230 --> 00:10:15.662
+¿Y ese aviso? Es la red
+de seguridad funcionando.
+
+164
+00:10:15.702 --> 00:10:20.690
+En esta ejecución no le quitamos bash, y
+el modelo, siguiendo el AGENTS punto md de
+
+165
+00:10:20.730 --> 00:10:25.580
+la tienda, intentó lanzar comandos de
+shell que no están en la lista de seguros.
+
+166
+00:10:25.620 --> 00:10:30.150
+En modo JSON no hay interfaz, así que
+nuestra extensión hizo lo que hacía en el
+
+167
+00:10:30.190 --> 00:10:34.643
+vídeo ocho: bloquear con el motivo,
+sin interfaz para aprobar la acción.
+
+168
+00:10:34.683 --> 00:10:39.012
+El fichero de errores lo enseña: dos
+llamadas a bash, cada una con ese motivo.
+
+169
+00:10:39.052 --> 00:10:40.740
+Y git status, limpio.
+
+170
+00:10:41.587 --> 00:10:45.554
+Y aquí está la lección del
+capítulo: para Pi, todo ha ido bien.
+
+171
+00:10:45.594 --> 00:10:48.200
+El último stop reason es stop.
+
+172
+00:10:48.789 --> 00:10:52.504
+Un bloqueo no es un error de Pi; es
+una herramienta que no se ejecutó,
+
+173
+00:10:52.544 --> 00:10:55.827
+y el modelo lo entiende y
+responde con normalidad.
+
+174
+00:10:55.867 --> 00:10:58.350
+Este fichero, además,
+mezcla dos cosas distintas:
+
+175
+00:10:58.390 --> 00:11:03.970
+herramientas bloqueadas y herramientas
+que fallaron, como un npm test en rojo;
+
+176
+00:11:04.280 --> 00:11:07.770
+si tu pipeline necesita
+distinguirlas, filtra por el motivo.
+
+177
+00:11:07.989 --> 00:11:12.036
+Si tu pipeline solo mirara si Pi ha
+terminado, no se habría enterado.
+
+178
+00:11:12.076 --> 00:11:15.029
+Quien lo detecta es el
+script, leyendo los eventos.
+
+179
+00:11:15.069 --> 00:11:18.760
+Cuando automatizas un agente, decide
+de antemano qué señales miras,
+
+180
+00:11:18.800 --> 00:11:20.530
+y no te fíes de una sola.
+
+181
+00:11:26.268 --> 00:11:29.604
+Llevar este script a integración
+continua es casi trivial,
+
+182
+00:11:29.644 --> 00:11:31.837
+y por eso conviene hacerlo con cuidado.
+
+183
+00:11:31.877 --> 00:11:35.364
+En la ventana de código tienes
+un workflow de GitHub Actions.
+
+184
+00:11:35.404 --> 00:11:38.860
+No lo ejecutamos contra GitHub,
+pero se entiende paso a paso.
+
+185
+00:11:39.532 --> 00:11:42.730
+Se dispara en cada pull request, con
+permisos de solo lectura sobre el
+
+186
+00:11:42.770 --> 00:11:46.900
+repositorio y un tiempo máximo de diez
+minutos, para que un agente atascado no se
+
+187
+00:11:46.940 --> 00:11:50.451
+quede gastando. Descarga el
+código con todo el historial,
+
+188
+00:11:50.491 --> 00:11:53.527
+porque el script necesita
+la rama base para el diff.
+
+189
+00:11:53.567 --> 00:11:58.620
+Prepara Node veintidós e instala Pi con
+npm, con guion guion ignore scripts y la
+
+190
+00:11:58.660 --> 00:12:00.953
+versión fijada, uno
+punto cero punto cuatro.
+
+191
+00:12:00.993 --> 00:12:04.420
+En integración continua no quieres que una
+versión nueva te cambie el comportamiento
+
+192
+00:12:04.460 --> 00:12:05.360
+sin avisar.
+
+193
+00:12:05.989 --> 00:12:09.260
+Después, dos pasos que
+parecen detalles y no lo son.
+
+194
+00:12:09.300 --> 00:12:13.210
+El primero copia el script y la
+extensión de permisos desde la rama base,
+
+195
+00:12:13.250 --> 00:12:17.350
+no desde el pull request. Lo que protege
+el pipeline no puede venir de la rama que
+
+196
+00:12:17.390 --> 00:12:21.300
+se revisa, o cualquiera podría
+quitar la red en el mismo cambio.
+
+197
+00:12:21.340 --> 00:12:24.940
+El segundo ejecuta los tests
+aparte, sin la clave en el entorno,
+
+198
+00:12:24.980 --> 00:12:27.600
+porque los tests también
+son código de la rama.
+
+199
+00:12:28.659 --> 00:12:32.171
+Y el paso de la revisión. Aquí
+entra la clave del modelo,
+
+200
+00:12:32.211 --> 00:12:34.513
+y es la parte que no
+vas a ver en pantalla.
+
+201
+00:12:34.553 --> 00:12:38.104
+Pi lee la clave de una variable de
+entorno, en nuestro caso DEEPSEEK
+
+202
+00:12:38.144 --> 00:12:41.650
+underscore API underscore KEY, como
+vimos en los vídeos dos y cuatro.
+
+203
+00:12:41.690 --> 00:12:45.037
+En el workflow esa variable se rellena
+desde un secreto del repositorio,
+
+204
+00:12:45.077 --> 00:12:49.110
+que se da de alta en la configuración del
+proyecto y que la plataforma oculta en los
+
+205
+00:12:49.150 --> 00:12:52.950
+registros. La clave nunca está en el
+código ni en el fichero del workflow.
+
+206
+00:12:53.822 --> 00:12:55.521
+Junto a la clave, otras variables.
+
+207
+00:12:55.561 --> 00:13:00.170
+PI underscore CODING underscore AGENT
+underscore DIR apunta a un directorio
+
+208
+00:13:00.210 --> 00:13:03.950
+temporal del runner, así que
+Pi arranca limpio, sin ajustes,
+
+209
+00:13:03.990 --> 00:13:06.237
+sesiones ni credenciales de nadie.
+
+210
+00:13:06.277 --> 00:13:10.680
+PI underscore SKIP underscore VERSION
+underscore CHECK evita que pregunte a pi
+
+211
+00:13:10.720 --> 00:13:12.610
+punto dev si hay versión nueva.
+
+212
+00:13:12.650 --> 00:13:17.240
+Y PI underscore TOOLS hace que el script
+le dé a Pi solo las herramientas de
+
+213
+00:13:17.504 --> 00:13:20.770
+lectura. En la demo local no la pusimos,
+y por eso pudo intentar usar bash.
+
+214
+00:13:21.641 --> 00:13:26.190
+Al final, el informe, los errores y
+los eventos se suben como artefacto,
+
+215
+00:13:26.230 --> 00:13:30.840
+también si algo ha fallado, para que
+puedas mirar después qué hizo el agente.
+
+216
+00:13:30.880 --> 00:13:34.730
+En integración continua nadie mira en
+directo, y los eventos son tu forma de
+
+217
+00:13:34.770 --> 00:13:36.260
+reconstruir la ejecución.
+
+218
+00:13:37.124 --> 00:13:40.228
+Un truco más, que viene de la
+documentación de los alias.
+
+219
+00:13:40.268 --> 00:13:45.130
+El ajuste shell command prefix ejecuta un
+texto antes de cada comando de bash que
+
+220
+00:13:45.170 --> 00:13:49.220
+lance Pi. El ejemplo de la
+documentación es justo este caso:
+
+221
+00:13:49.260 --> 00:13:53.640
+export CI igual a uno, para que las
+herramientas que lance el modelo sepan que
+
+222
+00:13:53.680 --> 00:13:57.633
+no hay nadie delante. Y en sentido
+contrario, los procesos que lanza Pi
+
+223
+00:13:57.673 --> 00:14:02.530
+reciben la variable AI underscore AGENT
+igual a pi, por si tus scripts quieren
+
+224
+00:14:02.570 --> 00:14:04.370
+saber que los ha llamado un agente.
+
+225
+00:14:05.047 --> 00:14:08.140
+Y el apunte honesto,
+que aquí es obligatorio.
+
+226
+00:14:08.180 --> 00:14:10.960
+Un pull request es texto de otra persona.
+
+227
+00:14:11.000 --> 00:14:16.520
+Su diff y su AGENTS punto md llegan al
+modelo, que trabaja en una máquina con tu
+
+228
+00:14:16.560 --> 00:14:21.100
+clave en el entorno. Guion guion no
+approve evita que cargue extensiones del
+
+229
+00:14:21.140 --> 00:14:24.680
+proyecto, pero no impide que
+el texto le dé instrucciones.
+
+230
+00:14:24.720 --> 00:14:28.640
+Y ya lo dijimos en el vídeo
+ocho: aprobar no es aislar.
+
+231
+00:14:28.820 --> 00:14:32.928
+En integración continua, lo prudente es
+darle a Pi solo herramientas de lectura,
+
+232
+00:14:32.968 --> 00:14:36.100
+ejecutarlo dentro de un
+contenedor como en el vídeo cinco,
+
+233
+00:14:36.140 --> 00:14:39.780
+y revisar la política de secretos de
+tu plataforma para ramas de terceros.
+
+234
+00:14:45.464 --> 00:14:49.314
+Print y JSON tienen algo en
+común: le das todo al principio,
+
+235
+00:14:49.354 --> 00:14:53.212
+Pi trabaja y sale. A
+veces necesitas otra cosa.
+
+236
+00:14:53.252 --> 00:14:57.590
+Un editor que habla con Pi durante horas,
+o un programa en Python que quiere mandar
+
+237
+00:14:57.630 --> 00:15:01.770
+una petición, mirar el estado,
+cambiar de modelo y mandar otra.
+
+238
+00:15:01.810 --> 00:15:04.040
+Para eso está el modo RPC.
+
+239
+00:15:04.627 --> 00:15:10.290
+Lo arrancamos con pi guion guion mode rpc,
+guion guion no session y las herramientas
+
+240
+00:15:10.330 --> 00:15:14.682
+de lectura. Y ahora no hay
+petición: Pi se queda esperando.
+
+241
+00:15:14.722 --> 00:15:20.099
+Le escribimos a mano una línea de JSON
+con un identificador y el tipo get state.
+
+242
+00:15:20.139 --> 00:15:23.874
+Pi contesta con una línea de
+respuesta: el mismo identificador,
+
+243
+00:15:23.914 --> 00:15:28.099
+el comando, success true, y en
+data el estado de la sesión,
+
+244
+00:15:28.139 --> 00:15:29.400
+con el modelo que está usando.
+
+245
+00:15:30.394 --> 00:15:33.154
+Ese identificador es
+la clave del protocolo.
+
+246
+00:15:33.194 --> 00:15:36.500
+Cada orden puede llevar el
+suyo, y la respuesta lo repite.
+
+247
+00:15:36.540 --> 00:15:40.090
+Como las órdenes se atienden de forma
+asíncrona, tu cliente no debe fiarse del
+
+248
+00:15:40.130 --> 00:15:43.020
+orden de llegada, sino del identificador.
+
+249
+00:15:43.790 --> 00:15:47.170
+Ahora una orden de tipo
+prompt, con un mensaje:
+
+250
+00:15:47.210 --> 00:15:52.480
+en una frase, qué hace src
+barra carrito punto js.
+
+251
+00:15:52.520 --> 00:15:55.371
+La respuesta llega enseguida,
+con disposition started.
+
+252
+00:15:55.411 --> 00:16:00.240
+Y aquí está la sutileza: esa respuesta
+solo dice que la petición se ha aceptado,
+
+253
+00:16:00.280 --> 00:16:04.080
+no que haya terminado. Detrás
+viene el chorro de eventos,
+
+254
+00:16:04.120 --> 00:16:07.120
+los mismos del modo JSON,
+hasta agent settled.
+
+255
+00:16:07.160 --> 00:16:09.719
+Si quieres saber cuándo ha
+acabado, esperas a ese evento,
+
+256
+00:16:09.759 --> 00:16:10.659
+igual que antes.
+
+257
+00:16:11.490 --> 00:16:14.298
+Hay órdenes para casi todo
+lo que haces en la interfaz:
+
+258
+00:16:14.338 --> 00:16:19.241
+steer y follow up para encolar
+mensajes, abort para pararlo,
+
+259
+00:16:19.281 --> 00:16:23.599
+set model, compact, fork, o
+bash para ejecutar un comando.
+
+260
+00:16:23.639 --> 00:16:26.553
+Y para terminar, basta con
+cerrar su entrada estándar:
+
+261
+00:16:26.593 --> 00:16:30.480
+pulsamos control d, y Pi
+se apaga de forma ordenada.
+
+262
+00:16:31.302 --> 00:16:36.714
+Ahora viene lo más interesante de RPC, y
+enlaza directamente con las extensiones.
+
+263
+00:16:36.754 --> 00:16:41.992
+En el vídeo ocho, nuestra extensión miraba
+ctx punto has UI antes de preguntar,
+
+264
+00:16:42.032 --> 00:16:45.150
+y en modo print bloqueaba
+porque no había interfaz.
+
+265
+00:16:45.190 --> 00:16:47.720
+En RPC, has UI es verdadero.
+
+266
+00:16:48.188 --> 00:16:51.857
+No hay terminal, pero hay un cliente
+al otro lado que puede contestar.
+
+267
+00:16:51.897 --> 00:16:54.583
+Así que el diálogo de
+permisos no desaparece:
+
+268
+00:16:54.623 --> 00:16:56.100
+viaja por el protocolo.
+
+269
+00:16:57.000 --> 00:17:00.966
+Funciona así. Cuando una
+extensión llama a select, confirm,
+
+270
+00:17:01.006 --> 00:17:05.860
+input o editor, Pi escribe una
+línea de tipo extension UI request,
+
+271
+00:17:05.900 --> 00:17:09.334
+con un identificador, el método,
+el título y las opciones.
+
+272
+00:17:09.374 --> 00:17:13.974
+Y espera. Tu cliente muestra la pregunta
+como quiera, y devuelve una línea de tipo
+
+273
+00:17:14.014 --> 00:17:18.152
+extension UI response con el mismo
+identificador y la opción elegida,
+
+274
+00:17:18.192 --> 00:17:22.400
+escrita exactamente igual. Las
+notificaciones y los textos del pie,
+
+275
+00:17:22.440 --> 00:17:26.160
+como nuestro contador, también llegan
+como peticiones, pero esas no esperan
+
+276
+00:17:26.200 --> 00:17:27.100
+respuesta.
+
+277
+00:17:27.720 --> 00:17:33.500
+Para verlo, un cliente mínimo, aprobador
+punto mjs, en unas cuarenta líneas de
+
+278
+00:17:33.540 --> 00:17:35.600
+JavaScript sin dependencias.
+
+279
+00:17:35.640 --> 00:17:39.519
+Lanza Pi en modo RPC con
+nuestra extensión de permisos.
+
+280
+00:17:39.559 --> 00:17:44.123
+Lee su salida cortando solo por el salto
+de línea, como manda la documentación.
+
+281
+00:17:44.163 --> 00:17:47.650
+Escribe en pantalla los trozos de texto
+de la respuesta y el nombre de cada
+
+282
+00:17:47.690 --> 00:17:53.502
+herramienta. Y cuando llega una petición
+de select, nos hace la pregunta en la
+
+283
+00:17:53.595 --> 00:17:56.080
+terminal, sí o no, y
+contesta permitir o bloquear.
+
+284
+00:17:56.655 --> 00:17:59.713
+Lo lanzamos en la tienda con
+la petición del vídeo ocho:
+
+285
+00:17:59.753 --> 00:18:03.370
+añade al README una sección
+corta sobre los tests.
+
+286
+00:18:03.410 --> 00:18:06.040
+Lo primero que llega es el
+estado del pie, como texto:
+
+287
+00:18:06.080 --> 00:18:08.550
+cero aprobadas, cero bloqueadas.
+
+288
+00:18:08.590 --> 00:18:11.680
+Después, las herramientas que
+usa el modelo, bash y read,
+
+289
+00:18:11.720 --> 00:18:16.340
+para mirar el repositorio y leer el
+README, sin preguntar porque son lecturas.
+
+290
+00:18:16.380 --> 00:18:19.780
+Al llegar al edit, nuestro cliente
+imprime el título del diálogo de permisos,
+
+291
+00:18:19.820 --> 00:18:25.590
+el mismo que veíamos en la interfaz, pi
+quiere ejecutar edit README punto md,
+
+292
+00:18:25.630 --> 00:18:26.530
+y nos pregunta.
+
+293
+00:18:26.560 --> 00:18:31.070
+Contestamos que no. Llega el pie
+actualizado, cero aprobadas y una
+
+294
+00:18:31.110 --> 00:18:35.500
+bloqueada, y el modelo nos explica que
+el cambio fue bloqueado y el README sigue
+
+295
+00:18:35.540 --> 00:18:36.440
+intacto.
+
+296
+00:18:37.263 --> 00:18:38.980
+Piensa en lo que acabamos de hacer.
+
+297
+00:18:39.020 --> 00:18:43.207
+La misma extensión, sin cambiar una
+línea, pregunta en la interfaz de Pi,
+
+298
+00:18:43.247 --> 00:18:48.040
+bloquea en un script, y pregunta a través
+de cualquier programa que hable RPC.
+
+299
+00:18:48.080 --> 00:18:51.810
+Ese programa podría ser una
+web, un bot de chat del equipo,
+
+300
+00:18:51.850 --> 00:18:55.436
+o un editor. La decisión de
+permisos sigue en la extensión;
+
+301
+00:18:55.476 --> 00:18:57.720
+dónde se pregunta lo decide el cliente.
+
+302
+00:18:58.571 --> 00:19:03.351
+Dos avisos prácticos. Para clientes
+de TypeScript, Pi exporta una clase,
+
+303
+00:19:03.391 --> 00:19:08.890
+RPC client, que lanza el proceso, empareja
+respuestas y te da métodos con tipos.
+
+304
+00:19:08.930 --> 00:19:11.570
+Pero no contesta los
+diálogos de las extensiones:
+
+305
+00:19:11.610 --> 00:19:14.621
+si cargas una que
+pregunta, los atiendes tú.
+
+306
+00:19:14.661 --> 00:19:17.054
+Y no todo lo de la interfaz llega por RPC:
+
+307
+00:19:17.094 --> 00:19:21.690
+los componentes propios, los cambios
+de pie o de cabecera y los temas no
+
+308
+00:19:21.730 --> 00:19:24.376
+funcionan, y la
+documentación lista cuáles.
+
+309
+00:19:24.416 --> 00:19:28.867
+Si una extensión depende de la terminal,
+que lo compruebe con ctx punto mode igual
+
+310
+00:19:28.907 --> 00:19:29.807
+a tui.
+
+311
+00:19:35.369 --> 00:19:37.610
+La última vía es la más directa.
+
+312
+00:19:37.740 --> 00:19:42.140
+Con el SDK no hay otro
+proceso, ni JSON, ni protocolo.
+
+313
+00:19:42.220 --> 00:19:46.240
+Importas create agent session del paquete
+de Pi, y te devuelve una sesión con la que
+
+314
+00:19:46.280 --> 00:19:48.440
+hablas con métodos normales de TypeScript.
+
+315
+00:19:49.513 --> 00:19:52.960
+Este es resumen punto ts,
+en unas veinte líneas.
+
+316
+00:19:53.000 --> 00:19:55.120
+Crea la sesión con tres opciones.
+
+317
+00:19:55.160 --> 00:19:59.585
+El directorio de trabajo, que le pasamos
+como argumento, porque decide qué AGENTS
+
+318
+00:19:59.625 --> 00:20:03.020
+punto md se carga y dónde
+trabajan las herramientas.
+
+319
+00:20:03.060 --> 00:20:06.240
+Las herramientas, solo las de
+lectura, igual que en el script.
+
+320
+00:20:06.280 --> 00:20:10.060
+Y un gestor de sesión en memoria, para
+que no quede ningún fichero de sesión.
+
+321
+00:20:11.232 --> 00:20:14.670
+Después nos suscribimos a los eventos,
+y por cada herramienta que empieza
+
+322
+00:20:14.710 --> 00:20:17.650
+escribimos su nombre por
+la salida de errores.
+
+323
+00:20:17.690 --> 00:20:21.590
+Son los mismos eventos del modo JSON, pero
+aquí llegan como objetos de TypeScript,
+
+324
+00:20:21.630 --> 00:20:25.170
+sin pasar por texto. Luego,
+prompt, con la petición:
+
+325
+00:20:25.210 --> 00:20:28.590
+lista las funciones exportadas de src.
+
+326
+00:20:28.630 --> 00:20:31.900
+Prompt devuelve una promesa que se
+resuelve cuando la ejecución termina,
+
+327
+00:20:31.940 --> 00:20:36.330
+reintentos incluidos. Leemos el texto
+final con get last assistant text,
+
+328
+00:20:36.370 --> 00:20:41.500
+y en el bloque finally, dispose, que para
+lo que quede activo y suelta los recursos.
+
+329
+00:20:42.406 --> 00:20:45.670
+Lo ejecutamos con node, que
+entiende TypeScript sin compilar,
+
+330
+00:20:45.710 --> 00:20:49.966
+contra la tienda. Por la salida de
+errores, las herramientas que usa,
+
+331
+00:20:50.006 --> 00:20:53.782
+ls y grep. Por la salida
+estándar, la lista:
+
+332
+00:20:53.822 --> 00:20:58.234
+cinco funciones en carrito punto
+js y una en envio punto js,
+
+333
+00:20:58.274 --> 00:21:00.081
+cada una con sus parámetros.
+
+334
+00:21:00.121 --> 00:21:03.920
+Y como las dos salidas van separadas, si
+redirigieras la estándar a un fichero,
+
+335
+00:21:03.960 --> 00:21:06.150
+quedaría limpio, listo para otro programa.
+
+336
+00:21:07.209 --> 00:21:11.713
+Sin opciones, create agent session se
+comporta como la línea de comandos:
+
+337
+00:21:11.753 --> 00:21:17.579
+usa el directorio de trabajo, descubre las
+extensiones, las skills y el AGENTS punto
+
+338
+00:21:17.619 --> 00:21:22.388
+md, lee tus ajustes y tus credenciales,
+y elige el modelo por defecto.
+
+339
+00:21:22.428 --> 00:21:25.950
+Cada pieza se puede cambiar: el
+modelo y el nivel de razonamiento,
+
+340
+00:21:25.990 --> 00:21:30.630
+los ajustes en memoria, o un cargador de
+recursos propio con extensiones escritas
+
+341
+00:21:30.670 --> 00:21:36.270
+en línea. Los catorce ejemplos del SDK que
+se instalan con Pi recorren todas estas
+
+342
+00:21:36.310 --> 00:21:38.250
+variantes, y merece la pena leerlos.
+
+343
+00:21:39.025 --> 00:21:42.249
+Tres diferencias con la línea
+de comandos que suelen pillar.
+
+344
+00:21:42.289 --> 00:21:46.970
+La primera, del vídeo siete: el SDK no
+carga solas las extensiones integradas,
+
+345
+00:21:47.010 --> 00:21:51.730
+ni codemode, ni tool search, ni
+MCP; si las quieres, las añades tú.
+
+346
+00:21:51.770 --> 00:21:56.590
+La segunda: sin una interfaz conectada,
+has UI es falso, así que si tu directorio
+
+347
+00:21:56.630 --> 00:22:00.426
+de agente carga nuestra extensión
+de permisos, en el SDK bloquea,
+
+348
+00:22:00.466 --> 00:22:04.947
+igual que en print. Y la tercera: las
+variables que marcan a Pi como agente,
+
+349
+00:22:04.987 --> 00:22:08.900
+AI underscore AGENT y compañía,
+no se ponen cuando lo embebes.
+
+350
+00:22:09.891 --> 00:22:11.740
+¿SDK o RPC?
+
+351
+00:22:12.440 --> 00:22:16.922
+Si tu programa es de Node o de
+Bun y quieres acceso completo,
+
+352
+00:22:17.123 --> 00:22:20.150
+el SDK. Si es de otro lenguaje, o
+prefieres que Pi viva en su propio
+
+353
+00:22:20.190 --> 00:22:24.210
+proceso, que puedas reiniciar o
+aislar sin tumbar tu programa,
+
+354
+00:22:24.250 --> 00:22:25.150
+RPC.
+
+355
+00:22:30.481 --> 00:22:35.300
+Pi programático también significa Pi en
+sitios que no son tu terminal de siempre.
+
+356
+00:22:35.340 --> 00:22:39.260
+La documentación dedica una guía a tres
+de ellos, y te cuento lo esencial de cada
+
+357
+00:22:39.300 --> 00:22:40.200
+una.
+
+358
+00:22:40.962 --> 00:22:46.670
+Tmux. Pi funciona dentro de tmux, pero
+tmux puede enviar mayúsculas enter o
+
+359
+00:22:46.710 --> 00:22:51.520
+control enter como si fueran un enter
+a secas, y para Pi no son lo mismo:
+
+360
+00:22:51.560 --> 00:22:54.830
+mayúsculas enter es un salto
+de línea, y enter envía.
+
+361
+00:22:54.870 --> 00:22:57.760
+La solución es activar
+las teclas extendidas.
+
+362
+00:22:57.800 --> 00:23:01.630
+En tmux tres punto cinco o posterior,
+dos líneas en tu configuración:
+
+363
+00:23:01.670 --> 00:23:04.358
+extended keys on, y el formato CSI u.
+
+364
+00:23:04.398 --> 00:23:07.380
+En las versiones de la tres
+punto dos a la tres punto cuatro,
+
+365
+00:23:07.420 --> 00:23:13.528
+solo la primera. Después hay que reiniciar
+el servidor de tmux y comprobar tres
+
+366
+00:23:13.568 --> 00:23:17.131
+cosas: mayúsculas enter hace
+un salto de línea, enter envía,
+
+367
+00:23:17.171 --> 00:23:19.200
+y alt enter encola un follow up.
+
+368
+00:23:20.180 --> 00:23:22.550
+Termux, para llevar Pi a Android.
+
+369
+00:23:22.590 --> 00:23:25.668
+Se instalan Node y git con el
+gestor de paquetes de Termux,
+
+370
+00:23:25.708 --> 00:23:28.790
+y Pi con npm, igual que en el vídeo dos.
+
+371
+00:23:28.830 --> 00:23:33.000
+Para que Pi vea el almacenamiento
+compartido del teléfono hay que concederlo
+
+372
+00:23:33.040 --> 00:23:38.510
+con termux setup storage, y solo conviene
+hacerlo si Pi de verdad lo necesita.
+
+373
+00:23:38.550 --> 00:23:41.859
+El portapapeles funciona con
+Termux API, pero solo con texto,
+
+374
+00:23:41.899 --> 00:23:45.770
+no con imágenes. Y como Pi no
+sabe cómo quieres que use Android,
+
+375
+00:23:45.810 --> 00:23:49.620
+la guía recomienda contárselo
+en tu AGENTS punto md global.
+
+376
+00:23:50.598 --> 00:23:55.150
+Y Windows. Puedes usar Pi de
+forma nativa o dentro de WSL.
+
+377
+00:23:55.670 --> 00:24:00.515
+En nativo, la herramienta bash usa Git
+Bash, que se instala con Git para Windows,
+
+378
+00:24:00.555 --> 00:24:04.054
+y si tienes otro bash, lo
+indicas con el ajuste shell path.
+
+379
+00:24:04.094 --> 00:24:08.010
+Hay además una herramienta opcional,
+powershell, que solo existe en Windows
+
+380
+00:24:08.050 --> 00:24:11.070
+nativo y que puedes dar al
+modelo en lugar de bash.
+
+381
+00:24:11.110 --> 00:24:15.190
+En WSL todo es Linux. Y recuerda
+los atajos del vídeo dos:
+
+382
+00:24:15.230 --> 00:24:18.690
+en Windows y WSL, el
+follow up es control q.
+
+383
+00:24:24.401 --> 00:24:29.179
+Repasemos. Pi tiene cuatro modos
+y un SDK, sobre el mismo agente.
+
+384
+00:24:29.219 --> 00:24:34.006
+Pi guion p para la respuesta final,
+y se elige solo cuando rediriges.
+
+385
+00:24:34.046 --> 00:24:39.270
+El modo JSON para todos los eventos, con
+message end como mensaje definitivo y
+
+386
+00:24:39.310 --> 00:24:42.140
+agent settled como final de verdad.
+
+387
+00:24:42.180 --> 00:24:46.780
+RPC para controlarlo desde otro proceso,
+con identificadores y con los diálogos de
+
+388
+00:24:46.820 --> 00:24:49.334
+las extensiones viajando por el protocolo.
+
+389
+00:24:49.374 --> 00:24:53.220
+Y create agent session para
+tenerlo dentro de tu programa.
+
+390
+00:24:53.872 --> 00:24:56.689
+Y tres ideas que valen
+más que cualquier opción.
+
+391
+00:24:56.729 --> 00:25:00.435
+Lo que se puede comprobar sin
+modelo lo comprueba el script.
+
+392
+00:25:00.475 --> 00:25:04.210
+El código de salida de Pi no te dice
+si el agente hizo lo que querías:
+
+393
+00:25:04.250 --> 00:25:08.260
+mira los eventos. Y en integración
+continua, solo lectura,
+
+394
+00:25:08.300 --> 00:25:12.820
+la clave como secreto, y un contenedor,
+porque aprobar no es aislar.
+
+395
+00:25:13.867 --> 00:25:19.060
+La práctica: escribe tu propio revisar
+punto sh para un repositorio tuyo.
+
+396
+00:25:19.115 --> 00:25:23.100
+Que ejecute los tests por su cuenta, que
+le pase el diff a Pi en modo JSON con
+
+397
+00:25:23.140 --> 00:25:27.840
+herramientas de solo lectura y la
+extensión de permisos, y que guarde el
+
+398
+00:25:27.880 --> 00:25:32.050
+informe y los errores. Pruébalo con una
+rama en la que un test falle y con otra en
+
+399
+00:25:32.090 --> 00:25:36.130
+la que le pidas arreglarlo, y comprueba
+que tu script detecta el bloqueo aunque Pi
+
+400
+00:25:36.170 --> 00:25:37.660
+termine con normalidad.
+
+401
+00:25:38.700 --> 00:25:41.064
+Con este vídeo cerramos el bloque de Pi.
+
+402
+00:25:41.104 --> 00:25:45.571
+En el próximo empezamos con oh
+my pi: un fork de Pi sobre Bun,
+
+403
+00:25:45.611 --> 00:25:48.725
+con un núcleo en Rust y
+las baterías incluidas.
+
+404
+00:25:48.765 --> 00:25:51.660
+Veremos qué hereda de todo lo
+que hemos aprendido, qué añade,
+
+405
+00:25:51.700 --> 00:25:56.026
+cómo se instala y cómo arrancarlo por
+primera vez con un perfil de demo.
+
+406
+00:25:56.066 --> 00:25:56.966
+Nos vemos allí.

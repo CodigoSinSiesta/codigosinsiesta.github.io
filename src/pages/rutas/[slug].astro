@@ -40,6 +40,72 @@ const tieneContrato =
       {ruta.paraQuien && <p class="meta" style="max-width: 42rem;">Para ti si: {ruta.paraQuien}</p>}
 
       {
+        ruta.porQue && (
+          <div class="ruta-bloque">
+            <h2>{ruta.porQue.titulo}</h2>
+            <p class="lead" style="max-width: 42rem;">{ruta.porQue.intro}</p>
+            <div class="grid-3" style="margin-top: 1.5rem;">
+              {ruta.porQue.puntos.map((p) => (
+                <div class="card">
+                  <h3>{p.titulo}</h3>
+                  <p>{p.texto}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {
+        ruta.equivalencias?.length && (
+          <div class="ruta-bloque">
+            <h2>Lo que aprendes aquí, en otros agentes</h2>
+            <div class="tabla-scroll">
+              <table class="tabla-equiv">
+                <thead>
+                  <tr>
+                    <th scope="col">Concepto</th>
+                    <th scope="col">En Pi y oh my pi</th>
+                    <th scope="col">En otros agentes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ruta.equivalencias.map((e) => (
+                    <tr>
+                      <th scope="row">{e.concepto}</th>
+                      <td>{e.aqui}</td>
+                      <td>{e.otros}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {ruta.equivalenciasNota && <p class="meta" style="margin-top: 0.75rem;">{ruta.equivalenciasNota}</p>}
+          </div>
+        )
+      }
+
+      {
+        ruta.etapas?.length && (
+          <div class="ruta-bloque">
+            <h2>De lo mínimo a tu propio harness</h2>
+            <ol class="etapas">
+              {ruta.etapas.map((e, i) => (
+                <li class="etapa">
+                  <span class="etapa__n" aria-hidden="true">{i + 1}</span>
+                  <div>
+                    <h3>{e.titulo}</h3>
+                    <p class="meta">{e.videos}</p>
+                    <p>{e.descripcion}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )
+      }
+
+      {
         tieneContrato && (
           <div class="grid-3" style="margin-top: 2.5rem;">
             {ruta.aprenderas?.length && (

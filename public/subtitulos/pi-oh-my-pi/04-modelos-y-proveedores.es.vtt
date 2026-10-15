@@ -1,0 +1,1478 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.230 --> 00:00:14.310
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.350 --> 00:00:17.420
+Vídeo cuatro: modelos y proveedores.
+
+3
+00:00:23.241 --> 00:00:24.671
+Pi no trae un modelo propio.
+
+4
+00:00:24.711 --> 00:00:27.051
+Es el harness, y el modelo lo pones tú.
+
+5
+00:00:27.091 --> 00:00:29.806
+En este vídeo vamos a ver todas
+las formas de conectar uno,
+
+6
+00:00:29.846 --> 00:00:33.831
+cómo elegir entre varios, cómo ajustar
+cuánto piensa y qué cuesta de verdad
+
+7
+00:00:33.871 --> 00:00:36.221
+cambiar de modelo a mitad de una tarea.
+
+8
+00:00:36.261 --> 00:00:38.821
+Y terminaremos con un modelo
+local, sin cuenta y sin coste,
+
+9
+00:00:38.861 --> 00:00:41.206
+para ver con honestidad hasta dónde llega.
+
+10
+00:00:41.823 --> 00:00:46.006
+La documentación de Pi lo resume
+en una tabla con cinco situaciones.
+
+11
+00:00:46.046 --> 00:00:51.032
+Si tienes una suscripción que Pi soporta,
+como ChatGPT, Claude o GitHub Copilot,
+
+12
+00:00:51.072 --> 00:00:53.386
+inicias sesión con barra login.
+
+13
+00:00:53.446 --> 00:00:57.136
+Si tienes una clave de API de un
+proveedor, la guardas también con barra
+
+14
+00:00:57.176 --> 00:01:00.346
+login o la pones en su
+variable de entorno.
+
+15
+00:01:00.386 --> 00:01:06.386
+Si tienes un modelo GGUF en tu disco,
+conectas Pi al router de llama punto cpp.
+
+16
+00:01:06.846 --> 00:01:10.000
+Las otras dos son para
+casos menos habituales.
+
+17
+00:01:10.040 --> 00:01:14.036
+Si tienes un servidor que habla el
+protocolo de OpenAI, de Anthropic o de
+
+18
+00:01:14.076 --> 00:01:18.556
+Google, por ejemplo Ollama, LM
+Studio o un proxy de tu empresa,
+
+19
+00:01:18.596 --> 00:01:22.186
+lo describes en un fichero
+llamado models punto json.
+
+20
+00:01:22.226 --> 00:01:26.259
+Y si el proveedor usa un protocolo propio
+o un flujo de autenticación especial,
+
+21
+00:01:26.299 --> 00:01:28.256
+se escribe una extensión que lo registre.
+
+22
+00:01:30.982 --> 00:01:35.664
+Barra login guarda lo que obtiene en auth
+punto json, dentro del directorio del
+
+23
+00:01:35.704 --> 00:01:38.501
+agente, y barra logout lo borra.
+
+24
+00:01:38.541 --> 00:01:41.681
+Las variables de entorno son la
+alternativa para servidores e integración
+
+25
+00:01:41.721 --> 00:01:45.453
+continua, donde no quieres que
+Pi escriba credenciales en disco.
+
+26
+00:01:45.493 --> 00:01:49.004
+Cuando hay varias fuentes a la vez,
+gana la opción de línea de comandos,
+
+27
+00:01:49.044 --> 00:01:54.491
+después auth punto json, después models
+punto json y por último el entorno.
+
+28
+00:01:54.963 --> 00:01:58.063
+Hay una tercera vía que
+combina lo mejor de las dos:
+
+29
+00:01:58.103 --> 00:02:02.003
+en auth punto json, en lugar de la clave,
+puedes poner un comando precedido de una
+
+30
+00:02:02.043 --> 00:02:06.148
+exclamación, por ejemplo el que
+lee la clave del llavero de macOS.
+
+31
+00:02:06.188 --> 00:02:10.153
+Pi lo ejecuta la primera vez que necesita
+la clave y guarda el resultado en memoria
+
+32
+00:02:10.193 --> 00:02:13.743
+mientras dura el proceso. Así la clave
+nunca queda escrita en un fichero de
+
+33
+00:02:13.783 --> 00:02:14.683
+texto.
+
+34
+00:02:14.964 --> 00:02:19.760
+Y para comprobar que un proveedor está
+listo sin abrir la interfaz existe pi auth
+
+35
+00:02:19.800 --> 00:02:22.204
+check, con el proveedor o el modelo.
+
+36
+00:02:22.244 --> 00:02:27.627
+Responde ready, not ready o invalid, con
+un código de salida distinto para cada
+
+37
+00:02:27.667 --> 00:02:29.844
+caso, así que encaja muy bien en scripts.
+
+38
+00:02:29.884 --> 00:02:33.384
+Cuidado con sus hermanos, pi auth
+print api key y print bearer token:
+
+39
+00:02:33.424 --> 00:02:37.564
+imprimen el secreto por pantalla y no
+deberían aparecer nunca en una grabación
+
+40
+00:02:37.604 --> 00:02:38.644
+ni en un log.
+
+41
+00:02:39.170 --> 00:02:43.065
+En nuestro directorio de demo hay
+tres proveedores con sesión iniciada:
+
+42
+00:02:43.105 --> 00:02:45.730
+DeepSeek, OpenRouter y Meta.
+
+43
+00:02:45.770 --> 00:02:48.854
+Y un cuarto sin cuenta: Ollama, en local.
+
+44
+00:02:48.894 --> 00:02:51.714
+Vamos a usar los dos
+de DeepSeek y el local.
+
+45
+00:02:51.754 --> 00:02:54.258
+Un consejo de seguridad antes de seguir:
+
+46
+00:02:54.298 --> 00:02:58.729
+auth punto json y cualquier comando
+que obtenga claves son privados.
+
+47
+00:02:58.769 --> 00:03:02.410
+Si confías en un proyecto, su
+configuración puede ejecutar código dentro
+
+48
+00:03:02.450 --> 00:03:07.010
+del proceso de Pi, así que no cargues
+configuración de carpetas que no conoces.
+
+49
+00:03:12.353 --> 00:03:14.173
+¿Qué modelos hay disponibles?
+
+50
+00:03:14.213 --> 00:03:17.331
+La respuesta más rápida está
+en la línea de comandos:
+
+51
+00:03:17.371 --> 00:03:21.623
+pi guion guion list models,
+con una palabra para filtrar.
+
+52
+00:03:21.833 --> 00:03:25.633
+Lo ejecutamos con deepseek, y la
+tabla enseña, para cada modelo,
+
+53
+00:03:25.673 --> 00:03:31.013
+el proveedor, su identificador, la ventana
+de contexto, la salida máxima y si admite
+
+54
+00:03:31.053 --> 00:03:32.436
+razonamiento e imágenes.
+
+55
+00:03:33.356 --> 00:03:35.278
+Fíjate en algo que pasa desapercibido.
+
+56
+00:03:35.318 --> 00:03:39.986
+Los primeros dos, deepseek flash y
+deepseek v4 pro, vienen directamente del
+
+57
+00:03:40.026 --> 00:03:43.482
+proveedor DeepSeek, con un millón de
+tokens de contexto y trescientos ochenta y
+
+58
+00:03:43.522 --> 00:03:47.276
+cuatro mil de salida. Debajo aparecen
+modelos muy parecidos a través de
+
+59
+00:03:47.316 --> 00:03:50.126
+OpenRouter, con otros
+nombres y otros límites:
+
+60
+00:03:50.289 --> 00:03:53.736
+el flash latest de OpenRouter, por
+ejemplo, anuncia más de novecientos mil
+
+61
+00:03:53.776 --> 00:03:55.036
+tokens de salida.
+
+62
+00:03:55.829 --> 00:04:00.329
+El mismo modelo puede llegarte por
+caminos distintos, y el camino importa.
+
+63
+00:04:00.369 --> 00:04:04.849
+Cambia el precio, cambian los límites,
+cambia quién ve tus datos y cambia la
+
+64
+00:04:04.889 --> 00:04:08.829
+fiabilidad, como comprobamos con el
+modelo gratuito de los primeros vídeos.
+
+65
+00:04:08.869 --> 00:04:12.336
+Elegir proveedor es tan
+importante como elegir modelo.
+
+66
+00:04:12.737 --> 00:04:14.497
+El catálogo tiene dos capas.
+
+67
+00:04:14.537 --> 00:04:18.687
+Pi trae uno incluido en la instalación
+y, si hay red, le superpone datos más
+
+68
+00:04:18.727 --> 00:04:22.281
+recientes de pi punto dev. Si
+quieres forzar la actualización,
+
+69
+00:04:22.321 --> 00:04:24.257
+pi update guion guion models.
+
+70
+00:04:24.697 --> 00:04:28.057
+Y si trabajas sin red, el catálogo
+que ya tienes sigue funcionando;
+
+71
+00:04:28.097 --> 00:04:32.675
+la variable PI OFFLINE o la opción guion
+guion offline desactivan cualquier acceso.
+
+72
+00:04:33.075 --> 00:04:37.339
+Si quieres explorar sin instalar nada,
+el catálogo también está en la web de pi
+
+73
+00:04:37.379 --> 00:04:40.715
+punto dev, con proveedores,
+identificadores, capacidades,
+
+74
+00:04:40.755 --> 00:04:44.955
+límites y precios. Es útil para comparar
+antes de decidir dónde abrir una cuenta.
+
+75
+00:04:45.494 --> 00:04:48.214
+Dos columnas de la tabla
+se confunden a menudo.
+
+76
+00:04:48.254 --> 00:04:52.214
+La ventana de contexto es todo lo que
+el modelo puede ver en una petición:
+
+77
+00:04:52.254 --> 00:04:56.054
+el prompt de sistema, las
+herramientas y toda la conversación.
+
+78
+00:04:56.094 --> 00:04:59.774
+La salida máxima es lo que puede
+escribir en una sola respuesta.
+
+79
+00:04:59.814 --> 00:05:03.314
+Para un agente importa sobre todo la
+primera, porque la conversación crece en
+
+80
+00:05:03.354 --> 00:05:07.344
+cada turno; la segunda limita el tamaño de
+un fichero que puede escribir de una vez.
+
+81
+00:05:07.822 --> 00:05:12.282
+Para el modelo local, el mismo comando
+con llama tres punto dos enseña una sola
+
+82
+00:05:12.322 --> 00:05:16.682
+línea: proveedor ollama, ciento
+veintiocho mil tokens de contexto,
+
+83
+00:05:16.722 --> 00:05:18.982
+sin razonamiento y sin imágenes.
+
+84
+00:05:19.022 --> 00:05:23.642
+Ese modelo no viene del catálogo; lo hemos
+declarado nosotros en models punto json,
+
+85
+00:05:23.682 --> 00:05:25.102
+y lo veremos al final del vídeo.
+
+86
+00:05:25.583 --> 00:05:27.171
+Un último detalle del selector.
+
+87
+00:05:27.211 --> 00:05:31.907
+Barra model solo enseña los modelos de
+proveedores con autenticación utilizable.
+
+88
+00:05:31.947 --> 00:05:35.493
+Si echas en falta un modelo que sabes que
+existe, lo más probable es que te falte
+
+89
+00:05:35.533 --> 00:05:38.543
+iniciar sesión en su proveedor,
+no que Pi no lo conozca.
+
+90
+00:05:43.952 --> 00:05:48.632
+Dentro de Pi, barra model abre el
+selector, y control l es el atajo.
+
+91
+00:05:48.672 --> 00:05:53.460
+Escribes para filtrar, Enter elige el
+modelo para esta sesión y control s,
+
+92
+00:05:53.500 --> 00:05:56.802
+además, lo guarda como predeterminado para
+
+93
+00:05:58.074 --> 00:05:59.872
+las sesiones nuevas. La
+sesión recuerda su modelo:
+
+94
+00:05:59.912 --> 00:06:03.742
+si la retomas otro día, vuelve con el
+que tenía, sin tocar tu predeterminado.
+
+95
+00:06:04.637 --> 00:06:08.204
+Cuando trabajas con dos o tres modelos
+a la vez, abrir el selector cada vez es
+
+96
+00:06:08.244 --> 00:06:13.439
+lento. Para eso está la rotación: control
+p pasa al siguiente modelo y mayúsculas
+
+97
+00:06:13.479 --> 00:06:18.124
+control p al anterior. Pero rotar entre
+todos los modelos disponibles no tiene
+
+98
+00:06:18.164 --> 00:06:21.174
+sentido, y en nuestra instalación
+eran cuatrocientos ocho.
+
+99
+00:06:21.754 --> 00:06:26.064
+Barra scoped models define qué
+modelos entran en la rotación.
+
+100
+00:06:26.104 --> 00:06:28.940
+Al abrirlo, los cuatrocientos
+ocho estaban activos.
+
+101
+00:06:28.980 --> 00:06:34.014
+Control x los desactiva todos, y después
+buscamos y activamos con Enter los tres
+
+102
+00:06:34.054 --> 00:06:39.624
+que nos interesan: deepseek flash,
+deepseek v4 pro y llama tres punto dos en
+
+103
+00:06:40.018 --> 00:06:42.975
+local. El pie de la lista lo
+confirma: tres de cuatrocientos ocho,
+
+104
+00:06:43.015 --> 00:06:43.915
+sin guardar.
+
+105
+00:06:44.357 --> 00:06:46.697
+Ese sin guardar es importante.
+
+106
+00:06:46.737 --> 00:06:49.597
+Por defecto, la selección
+vale solo para esta sesión.
+
+107
+00:06:49.637 --> 00:06:54.277
+Si pulsas control s, se guarda en los
+ajustes como enabled models y se aplica
+
+108
+00:06:54.317 --> 00:06:58.627
+siempre. También puedes fijarla al
+arrancar con guion guion models y una
+
+109
+00:06:58.667 --> 00:07:02.237
+lista separada por comas, que admite
+comodines, por ejemplo todos los modelos
+
+110
+00:07:02.277 --> 00:07:03.437
+de un proveedor.
+
+111
+00:07:03.881 --> 00:07:06.308
+Desde la línea de comandos
+tienes el mismo control.
+
+112
+00:07:06.348 --> 00:07:10.041
+Guion guion model acepta el
+identificador con el proveedor delante,
+
+113
+00:07:10.081 --> 00:07:14.351
+o solo un trozo del nombre, y guion guion
+provider limita la búsqueda a un proveedor
+
+114
+00:07:14.391 --> 00:07:16.721
+cuando el mismo modelo existe en varios.
+
+115
+00:07:16.761 --> 00:07:20.181
+Y guion guion api key te deja probar una
+clave temporal sin guardarla en ningún
+
+116
+00:07:20.221 --> 00:07:21.121
+sitio.
+
+117
+00:07:21.928 --> 00:07:25.734
+El predeterminado vive en settings
+punto json, en dos campos:
+
+118
+00:07:25.774 --> 00:07:28.154
+default provider y default model.
+
+119
+00:07:28.324 --> 00:07:30.926
+En la demo los fijamos
+al cambiar de proveedor:
+
+120
+00:07:30.966 --> 00:07:34.083
+deepseek y deepseek flash. Cada
+sesión nueva arranca con ellos,
+
+121
+00:07:34.123 --> 00:07:36.934
+y cada sesión retomada, con el
+modelo que tenía la última vez.
+
+122
+00:07:42.346 --> 00:07:46.761
+La segunda decisión, después del
+modelo, es cuánto le dejas razonar.
+
+123
+00:07:46.801 --> 00:07:52.101
+Pi ofrece siete niveles: off,
+minimal, low, medium, high,
+
+124
+00:07:52.188 --> 00:07:57.456
+xhigh y max. Cada modelo admite un
+subconjunto, y Pi solo te deja elegir los
+
+125
+00:07:57.496 --> 00:08:01.566
+que soporta. El nivel actual aparece
+en el pie, a la derecha del modelo.
+
+126
+00:08:02.373 --> 00:08:06.443
+Se cambia con barra thinking, o
+rotando con mayúsculas tabulador.
+
+127
+00:08:06.483 --> 00:08:11.847
+En la demo, con deepseek v4 pro, pulsamos
+mayúsculas tabulador y el nivel pasó de
+
+128
+00:08:11.887 --> 00:08:16.389
+high a max. Pi lo anuncia en la
+conversación, thinking level max,
+
+129
+00:08:16.429 --> 00:08:20.047
+y el borde del editor cambia de color,
+para que lo tengas presente sin mirar el
+
+130
+00:08:20.087 --> 00:08:20.987
+pie.
+
+131
+00:08:21.095 --> 00:08:25.685
+También se puede fijar desde la línea
+de comandos, con guion guion thinking,
+
+132
+00:08:25.725 --> 00:08:28.074
+o pegado al nombre del
+modelo con dos puntos.
+
+133
+00:08:28.114 --> 00:08:32.395
+Deepseek flash dos puntos low, por
+ejemplo, arranca ese modelo con poco
+
+134
+00:08:32.435 --> 00:08:37.225
+razonamiento. Es cómodo en scripts, donde
+quieres respuestas rápidas y baratas.
+
+135
+00:08:37.715 --> 00:08:40.255
+Ojo con un efecto de la rotación.
+
+136
+00:08:40.295 --> 00:08:45.225
+El modelo local no admite razonamiento,
+así que al pasar por él el nivel quedó en
+off.
+
+137
+00:08:45.715 --> 00:08:49.955
+Al volver a deepseek flash, el
+pie decía thinking off, no high.
+
+138
+00:08:49.995 --> 00:08:53.585
+Si rotas entre modelos con capacidades
+distintas, mira el pie antes de enviar la
+
+139
+00:08:53.625 --> 00:08:54.715
+siguiente tarea.
+
+140
+00:08:55.266 --> 00:08:57.226
+¿Cuánto razonamiento conviene?
+
+141
+00:08:57.266 --> 00:09:01.096
+No hay una regla fija. Más nivel
+suele mejorar las tareas difíciles,
+
+142
+00:09:01.136 --> 00:09:05.866
+como depurar o revisar, a cambio de
+más tiempo y más tokens de salida.
+
+143
+00:09:05.906 --> 00:09:09.716
+Para editar algo bien especificado
+o responder una pregunta concreta,
+
+144
+00:09:09.756 --> 00:09:14.206
+un nivel bajo basta. Como con los modelos,
+lo sensato es medir con tus tareas y mirar
+
+145
+00:09:14.246 --> 00:09:15.146
+el coste.
+
+146
+00:09:16.718 --> 00:09:18.484
+Un apunte sobre lo que se ve.
+
+147
+00:09:18.574 --> 00:09:22.360
+Con razonamiento activo, la respuesta
+llega precedida de bloques en gris con lo
+
+148
+00:09:22.400 --> 00:09:26.222
+que el modelo piensa. Control
+t los pliega o despliega.
+
+149
+00:09:26.262 --> 00:09:30.154
+Y aunque no los leas, esos tokens
+se generan y se cobran como salida,
+
+150
+00:09:30.194 --> 00:09:32.784
+así que un nivel alto
+también se nota en el pie.
+
+151
+00:09:38.169 --> 00:09:40.409
+Vamos con la demo central del vídeo.
+
+152
+00:09:40.449 --> 00:09:44.769
+La idea es una estrategia muy común: un
+modelo barato hace el trabajo y uno más
+
+153
+00:09:44.809 --> 00:09:49.101
+capaz lo revisa. Le pedimos a
+deepseek flash, con razonamiento high,
+
+154
+00:09:49.141 --> 00:09:53.719
+que gastos envío lance un error de tipo si
+el subtotal no es un número finito mayor o
+
+155
+00:09:53.759 --> 00:09:55.609
+igual que cero, con sus pruebas.
+
+156
+00:09:56.234 --> 00:10:00.104
+Flash lo resolvió bien. Añadió la
+validación, escribió una prueba que
+
+157
+00:10:00.144 --> 00:10:03.664
+recorre valores no válidos,
+como NaN, infinito, negativos,
+
+158
+00:10:03.704 --> 00:10:07.188
+textos, null o listas,
+y ejecutó las pruebas:
+
+159
+00:10:07.228 --> 00:10:11.544
+trece de trece. El pie marcaba cero coma
+cero cero dos dólares para toda la sesión
+
+160
+00:10:11.584 --> 00:10:12.554
+hasta ese momento.
+
+161
+00:10:13.037 --> 00:10:18.647
+Después, control p para pasar a deepseek
+v4 pro, mayúsculas tabulador hasta max,
+
+162
+00:10:18.687 --> 00:10:22.087
+y le pedimos que revisara el
+último cambio sin editar nada,
+
+163
+00:10:22.127 --> 00:10:23.027
+en
+
+164
+00:10:23.254 --> 00:10:26.689
+tres viñetas. La revisión fue buena:
+faltaba probar el caso límite cero y menos
+
+165
+00:10:26.729 --> 00:10:30.677
+cero, el cambio altera el comportamiento
+de total con envío cuando el carrito trae
+
+166
+00:10:30.717 --> 00:10:34.317
+datos corruptos, y las pruebas no
+comprobaban el mensaje del error.
+
+167
+00:10:34.828 --> 00:10:39.598
+Ahora el coste. Después de esa revisión,
+el pie pasó a cero coma cero uno dos
+
+168
+00:10:39.638 --> 00:10:44.858
+dólares. Es decir, una sola revisión con
+el modelo grande al máximo costó cinco
+
+169
+00:10:44.898 --> 00:10:47.188
+veces más que toda la tarea anterior.
+
+170
+00:10:47.228 --> 00:10:50.458
+Y en el mismo pie apareció otra
+señal: la tasa de acierto de caché,
+
+171
+00:10:50.498 --> 00:10:53.758
+que estaba por encima del
+noventa por ciento, cayó a cero.
+
+172
+00:10:54.312 --> 00:10:57.791
+¿Por qué cae? Porque la
+caché es de cada modelo.
+
+173
+00:10:57.831 --> 00:11:01.822
+Lo que el proveedor tenía guardado
+para flash no sirve para v4 pro,
+
+174
+00:11:01.862 --> 00:11:05.025
+así que la primera petición del
+modelo nuevo se paga entera.
+
+175
+00:11:05.065 --> 00:11:08.952
+Y lo mismo pasa al volver: la caché de
+flash puede haber caducado mientras tanto.
+
+176
+00:11:09.395 --> 00:11:11.755
+Barra session lo explica con números.
+
+177
+00:11:11.795 --> 00:11:16.262
+El coste total, doce milésimas de
+dólar, se desglosa por modelo físico:
+
+178
+00:11:16.302 --> 00:11:21.275
+diez para v4 pro, dos para flash
+y cero para el modelo local.
+
+179
+00:11:21.315 --> 00:11:23.998
+Y hay una línea que merece
+la pena leer despacio:
+
+180
+00:11:24.038 --> 00:11:28.925
+cache re billed, seis milésimas de dólar
+por ocho mil quinientos tokens en dos
+
+181
+00:11:28.965 --> 00:11:33.495
+fallos de caché. Es exactamente lo que
+pagamos de más por cambiar de modelo.
+
+182
+00:11:33.984 --> 00:11:37.284
+Cada cambio de modelo queda también
+registrado en el fichero de sesión,
+
+183
+00:11:37.324 --> 00:11:41.564
+como una entrada model change, igual que
+los cambios de nivel de razonamiento.
+
+184
+00:11:41.604 --> 00:11:45.514
+Por eso Pi puede reconstruir qué modelo
+atendió cada turno y repartir el coste
+
+185
+00:11:45.554 --> 00:11:46.544
+entre ellos.
+
+186
+00:11:47.047 --> 00:11:50.707
+En barra session también aparece
+el estado del cache warming.
+
+187
+00:11:50.747 --> 00:11:54.697
+Pi puede mantener caliente la caché del
+proveedor durante una ejecución larga,
+
+188
+00:11:54.737 --> 00:11:57.453
+o incluso entre ejecuciones
+con el modo idle.
+
+189
+00:11:57.493 --> 00:12:01.127
+Solo lo hace cuando el modelo declara
+cuánto dura su caché y cuando calcula que
+
+190
+00:12:01.167 --> 00:12:03.687
+se ahorrará al menos cinco céntimos.
+
+191
+00:12:03.727 --> 00:12:07.169
+En nuestro caso dice inactive,
+cache lifetime unavailable:
+
+192
+00:12:07.209 --> 00:12:10.167
+DeepSeek no declara esa
+duración, así que no se aplica.
+
+193
+00:12:10.876 --> 00:12:15.186
+La conclusión práctica: cambiar de modelo
+a mitad de tarea es una herramienta muy
+
+194
+00:12:15.226 --> 00:12:18.430
+útil, pero no es gratis.
+Agrupa el trabajo.
+
+195
+00:12:18.470 --> 00:12:22.566
+Haz varias tareas seguidas con el modelo
+barato y pasa al caro para una revisión de
+
+196
+00:12:22.606 --> 00:12:25.546
+conjunto, en lugar de
+ir y venir en cada paso.
+
+197
+00:12:25.586 --> 00:12:28.006
+Y cuando dudes, mira barra session.
+
+198
+00:12:33.503 --> 00:12:38.103
+Ahora el modelo local. Pi se integra
+directamente con el router de llama punto
+
+199
+00:12:38.143 --> 00:12:42.683
+cpp: arrancas llama server apuntando
+a una carpeta de modelos GGUF,
+
+200
+00:12:42.723 --> 00:12:46.823
+inicias sesión con barra login llama
+punto cpp, y con barra llama cargas,
+
+201
+00:12:46.863 --> 00:12:49.893
+descargas o buscas
+modelos en Hugging Face.
+
+202
+00:12:49.933 --> 00:12:52.103
+Después lo eliges con barra
+model, como cualquier otro.
+
+203
+00:12:54.443 --> 00:12:58.247
+El router se arranca sin indicar ningún
+modelo, solo la carpeta donde están:
+
+204
+00:12:58.287 --> 00:13:02.932
+llama server, guion guion models dir
+con esa carpeta, guion guion no models
+
+205
+00:13:02.972 --> 00:13:06.844
+autoload para que la carga sea explícita
+desde Pi, guion guion jinja para que
+
+206
+00:13:06.884 --> 00:13:10.049
+funcionen las plantillas de chat
+y las llamadas a herramientas,
+
+207
+00:13:10.089 --> 00:13:12.312
+y guion c con el tamaño de contexto.
+
+208
+00:13:12.352 --> 00:13:16.536
+Si algo falla, una petición a la ruta
+health del servidor te dice si está vivo.
+
+209
+00:13:17.013 --> 00:13:21.773
+Para Ollama, LM Studio, vLLM o
+cualquier servidor compatible,
+
+210
+00:13:21.813 --> 00:13:28.043
+se usa models punto json. En la demo
+declaramos un proveedor ollama con cuatro
+
+211
+00:13:28.083 --> 00:13:31.573
+datos: la URL base de su API
+compatible con OpenAI, el tipo de API,
+
+212
+00:13:31.613 --> 00:13:37.042
+una clave ficticia, porque Ollama no
+la necesita, y la lista de modelos,
+
+213
+00:13:37.082 --> 00:13:38.733
+en nuestro caso llama tres punto dos.
+
+214
+00:13:38.773 --> 00:13:43.103
+Abrir barra model recarga el fichero,
+así que los cambios se ven sin reiniciar.
+
+215
+00:13:43.647 --> 00:13:47.547
+En models punto json, la clave y
+las cabeceras admiten tres formas:
+
+216
+00:13:47.587 --> 00:13:50.936
+el texto tal cual, una variable
+de entorno con el signo dólar,
+
+217
+00:13:50.976 --> 00:13:53.147
+o un comando con exclamación.
+
+218
+00:13:53.187 --> 00:13:57.522
+A diferencia de auth punto json, aquí el
+comando se ejecuta en cada petición y no
+
+219
+00:13:57.562 --> 00:14:00.317
+se guarda en memoria, así
+que conviene que sea rápido.
+
+220
+00:14:00.831 --> 00:14:04.531
+El mismo fichero permite ajustar
+metadatos de modelos que ya existen,
+
+221
+00:14:04.571 --> 00:14:09.021
+con model overrides, por ejemplo para
+declarar su ventana de contexto real o
+
+222
+00:14:09.061 --> 00:14:12.721
+cuánto dura su caché. Esa duración es
+justo lo que el cache warming necesita
+
+223
+00:14:12.761 --> 00:14:13.711
+para funcionar.
+
+224
+00:14:14.190 --> 00:14:18.860
+Con control p llegamos a llama tres punto
+dos, un modelo de tres mil millones de
+
+225
+00:14:18.900 --> 00:14:20.420
+parámetros que corre en el
+
+226
+00:14:20.874 --> 00:14:24.420
+portátil. Le preguntamos qué
+hace src barra envio punto js,
+
+227
+00:14:24.460 --> 00:14:29.860
+en dos frases. Respondió en segundos, sin
+coste y sin que el código saliera de la
+
+228
+00:14:30.002 --> 00:14:33.200
+máquina. Pero la respuesta era falsa:
+habló de un descuento del diez por ciento
+
+229
+00:14:33.240 --> 00:14:36.330
+y de un IVA del veintiuno,
+mezclando datos de la conversación,
+
+230
+00:14:36.370 --> 00:14:37.560
+sin haber leído el fichero.
+
+231
+00:14:38.073 --> 00:14:40.673
+Le dimos otra oportunidad, más explícita:
+
+232
+00:14:40.713 --> 00:14:45.034
+usa la herramienta read para leer
+el fichero y después dime qué hace.
+
+233
+00:14:45.074 --> 00:14:47.593
+Esta vez llamó a read y
+leyó el fichero de verdad.
+
+234
+00:14:47.633 --> 00:14:53.073
+Y a continuación repitió, palabra por
+palabra, la misma respuesta equivocada.
+
+235
+00:14:53.113 --> 00:14:56.273
+Tener herramientas no garantiza
+usar bien lo que devuelven.
+
+236
+00:14:56.948 --> 00:14:59.700
+¿Es una cuestión de tamaño? En parte.
+
+237
+00:14:59.740 --> 00:15:02.980
+Un agente de programación necesita
+seguir instrucciones largas,
+
+238
+00:15:03.020 --> 00:15:06.913
+llamar a herramientas con el formato
+correcto y razonar sobre lo que obtiene.
+
+239
+00:15:06.953 --> 00:15:09.765
+Llama tres punto dos, con tres
+mil millones de parámetros,
+
+240
+00:15:09.805 --> 00:15:12.205
+se queda corto en las tres cosas.
+
+241
+00:15:12.412 --> 00:15:15.235
+Pero el tamaño no lo explica
+todo, como vamos a ver.
+
+242
+00:15:15.845 --> 00:15:18.341
+Probamos dos modelos más en LM Studio.
+
+243
+00:15:18.381 --> 00:15:21.715
+El primero, fuera de cámara: Ministral
+tres de catorce mil millones de
+
+244
+00:15:21.755 --> 00:15:24.315
+parámetros, un modelo de razonamiento.
+
+245
+00:15:24.355 --> 00:15:28.705
+Para responder solo la palabra listo tardó
+treinta y un segundos y gastó casi todos
+
+246
+00:15:28.745 --> 00:15:33.857
+sus tokens en pensar. Con el prompt de
+Pi, pasaron cinco minutos sin respuesta.
+
+247
+00:15:33.897 --> 00:15:39.064
+El segundo sí lo grabamos: Gemma cuatro
+E4B, de Google, declarado en models punto
+
+248
+00:15:39.104 --> 00:15:41.444
+json como un proveedor lmstudio.
+
+249
+00:15:41.484 --> 00:15:44.355
+Le hicimos la misma pregunta,
+pidiéndole que leyera el fichero.
+
+250
+00:15:45.239 --> 00:15:51.125
+Esta vez sí. Razonó en voz alta, llamó a
+read, leyó el fichero y respondió en dos
+
+251
+00:15:51.165 --> 00:15:54.905
+frases correctas: cuatro con noventa
+y cinco de envío por defecto,
+
+252
+00:15:54.945 --> 00:15:57.900
+y gratis cuando el subtotal
+llega a cuarenta euros.
+
+253
+00:15:57.940 --> 00:16:02.595
+Tardó unos veinte segundos, sin coste y
+sin que el código saliera del portátil.
+
+254
+00:16:02.635 --> 00:16:05.721
+Solo se dejó la validación del subtotal.
+
+255
+00:16:05.761 --> 00:16:09.195
+Un modelo local pequeño, si está
+entrenado para usar herramientas,
+
+256
+00:16:09.235 --> 00:16:11.253
+puede servir para tareas acotadas.
+
+257
+00:16:11.293 --> 00:16:13.955
+Y antes de confiar en él,
+haz lo que hemos hecho aquí:
+
+258
+00:16:13.995 --> 00:16:17.555
+dale una tarea cuya respuesta
+conozcas y comprueba que la acierta.
+
+259
+00:16:23.135 --> 00:16:26.488
+Para cerrar el recorrido, tres piezas
+avanzadas que conviene conocer,
+
+260
+00:16:26.528 --> 00:16:30.581
+aunque no las usemos hoy. La
+primera son los virtual models:
+
+261
+00:16:30.621 --> 00:16:34.595
+un modelo que eliges como cualquier otro,
+pero que en cada petición decide qué
+
+262
+00:16:34.635 --> 00:16:37.977
+modelo físico y qué nivel
+de razonamiento usar.
+
+263
+00:16:38.017 --> 00:16:42.568
+Sirven para enrutar por tipo de tarea, por
+coste o por el estado de la conversación.
+
+264
+00:16:42.608 --> 00:16:45.925
+Se registran desde una extensión, y
+la propia documentación los marca como
+
+265
+00:16:45.965 --> 00:16:47.015
+experimentales.
+
+266
+00:16:48.057 --> 00:16:50.882
+Cuando usas uno, el pie
+enseña las dos cosas:
+
+267
+00:16:50.922 --> 00:16:54.949
+el modelo virtual que elegiste y, tras una
+flecha, el modelo físico que atendió la
+
+268
+00:16:54.989 --> 00:16:57.807
+petición, con su nivel de razonamiento.
+
+269
+00:16:57.847 --> 00:17:02.861
+Y barra session reparte el coste por
+modelo físico, igual que vimos en nuestra
+demo.
+
+270
+00:17:03.322 --> 00:17:06.451
+La documentación incluye un ejemplo
+completo de enrutador que conviene leer
+
+271
+00:17:06.491 --> 00:17:07.701
+antes de escribir el tuyo.
+
+272
+00:17:08.540 --> 00:17:11.180
+La segunda son los
+modelos que no conversan.
+
+273
+00:17:11.220 --> 00:17:15.170
+Pi admite clasificadores, que responden
+preguntas tipadas sobre datos,
+
+274
+00:17:15.210 --> 00:17:18.930
+como elegir una opción o dar una
+puntuación, y modelos que generan
+
+275
+00:17:18.970 --> 00:17:24.372
+imágenes. No aparecen en barra model; se
+usan desde codemode o desde extensiones,
+
+276
+00:17:24.412 --> 00:17:26.060
+y los veremos en el vídeo siete.
+
+277
+00:17:26.522 --> 00:17:27.422
+La
+
+278
+00:17:27.650 --> 00:17:30.332
+tercera son los proveedores propios.
+
+279
+00:17:30.522 --> 00:17:34.722
+Si models punto json se queda corto,
+porque necesitas una autenticación
+
+280
+00:17:34.762 --> 00:17:38.761
+especial, descubrir modelos dinámicamente
+o hablar un protocolo distinto,
+
+281
+00:17:38.801 --> 00:17:41.932
+una extensión puede registrar
+un proveedor completo.
+
+282
+00:17:42.106 --> 00:17:46.172
+La documentación trae ejemplos para GitLab
+Duo y para una variante de Anthropic.
+
+283
+00:17:46.657 --> 00:17:50.287
+Y una forma muy práctica de usar
+todo esto sin abrir la interfaz:
+
+284
+00:17:50.327 --> 00:17:55.747
+el modo print. En la demo salimos con
+barra quit y ejecutamos pi guion p,
+
+285
+00:17:55.787 --> 00:18:01.177
+sin sesión, con el modelo deepseek
+flash dos puntos low, y una pregunta:
+
+286
+00:18:01.217 --> 00:18:06.537
+en una frase, qué hace
+src barra envio punto js.
+
+287
+00:18:06.577 --> 00:18:10.683
+La respuesta, correcta y en una
+línea: calcula los gastos de envío,
+
+288
+00:18:10.723 --> 00:18:14.216
+cuatro con noventa y cinco por
+defecto y gratis desde cuarenta euros,
+
+289
+00:18:14.256 --> 00:18:15.477
+validando el subtotal.
+
+290
+00:18:16.059 --> 00:18:18.780
+Al salir de la sesión, por
+cierto, Pi imprime cómo retomarla:
+
+291
+00:18:18.820 --> 00:18:21.743
+pi guion guion session y su identificador.
+
+292
+00:18:21.783 --> 00:18:25.969
+Es otra forma de volver exactamente donde
+lo dejaste, además de guion c y guion r.
+
+293
+00:18:26.637 --> 00:18:31.274
+Recapitulemos. Un modelo se
+conecta por suscripción, por clave,
+
+294
+00:18:31.314 --> 00:18:34.384
+en local o con un endpoint compatible.
+
+295
+00:18:34.424 --> 00:18:38.314
+El mismo modelo puede llegar por
+proveedores distintos, con precios y
+
+296
+00:18:38.354 --> 00:18:44.404
+límites distintos. Barra model elige,
+barra scoped models define la rotación y
+
+297
+00:18:44.444 --> 00:18:48.979
+control p la recorre. Mayúsculas
+tabulador ajusta el razonamiento.
+
+298
+00:18:49.019 --> 00:18:53.004
+Y cambiar de modelo a mitad de tarea tiene
+un coste en caché que barra session te
+
+299
+00:18:53.044 --> 00:18:53.944
+enseña.
+
+300
+00:18:54.584 --> 00:18:59.004
+La práctica: define en scoped
+models dos modelos de tu proveedor,
+
+301
+00:18:59.044 --> 00:19:00.474
+uno barato y uno
+
+302
+00:19:00.993 --> 00:19:03.964
+capaz. Haz una tarea pequeña con el
+barato y pide al capaz que la revise.
+
+303
+00:19:04.004 --> 00:19:10.814
+Después abre barra session y calcula
+cuánto costó la revisión y cuánto la
+recarga
+
+304
+00:19:11.270 --> 00:19:15.394
+de caché. Si tienes Ollama o LM Studio,
+añade un modelo local en models punto json
+
+305
+00:19:15.434 --> 00:19:19.114
+y ponlo a prueba con una
+pregunta cuya respuesta conozcas.
+
+306
+00:19:19.794 --> 00:19:23.024
+En el próximo vídeo hablamos
+de seguridad y aislamiento:
+
+307
+00:19:23.064 --> 00:19:27.684
+por qué Pi no pide permiso antes de
+ejecutar comandos, qué significa confiar
+
+308
+00:19:27.724 --> 00:19:30.834
+en un proyecto y cómo meter
+a Pi en un contenedor.
+
+309
+00:19:30.874 --> 00:19:31.774
+Nos vemos allí.

@@ -1,0 +1,78 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:00.760 --> 00:00:03.290
+Tu agente de programación
+no es solo el modelo.
+
+2
+00:00:03.441 --> 00:00:07.134
+Es todo lo que lo rodea: las
+instrucciones, las herramientas,
+
+3
+00:00:07.174 --> 00:00:10.852
+el contexto y la forma de comprobar
+que el trabajo está hecho.
+
+4
+00:00:11.132 --> 00:00:12.886
+A eso lo llamamos harness.
+
+5
+00:00:14.103 --> 00:00:19.216
+En este curso vamos a dominar dos: Pi,
+un agente mínimo que puedes moldear a tu
+
+6
+00:00:19.256 --> 00:00:23.151
+medida, y oh my pi, que trae de
+serie planificación, subagentes,
+
+7
+00:00:23.191 --> 00:00:27.126
+memoria y un entorno de desarrollo
+completo dentro de la terminal.
+
+8
+00:00:29.249 --> 00:00:34.642
+Empezaremos desde cero: instalar, elegir
+modelo y entender qué pasa en cada turno.
+
+9
+00:00:35.010 --> 00:00:38.760
+Después, MCP, skills
+y extensiones propias.
+
+10
+00:00:39.834 --> 00:00:44.291
+Con oh my pi aprenderás a planificar,
+repartir el trabajo entre subagentes,
+
+11
+00:00:44.337 --> 00:00:47.890
+revisar, hacer commit y endurecer
+los permisos para tu equipo.
+
+12
+00:00:49.761 --> 00:00:54.652
+Y cerraremos con método: cómo diseñar
+tu propio harness, verificar de verdad y
+
+13
+00:00:54.692 --> 00:00:56.786
+saber cuándo compensa orquestar.
+
+14
+00:00:58.095 --> 00:00:59.496
+Veintiséis vídeos.
+
+15
+00:01:00.013 --> 00:01:02.228
+Demos reales. Sin humo.
+
+16
+00:01:02.844 --> 00:01:04.717
+Formaciones Código Sin Siesta.

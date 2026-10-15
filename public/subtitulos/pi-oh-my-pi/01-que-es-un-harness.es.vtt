@@ -1,0 +1,1639 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.480 --> 00:00:13.896
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:13.936 --> 00:00:16.440
+Vídeo uno: qué es un harness de agente.
+
+3
+00:00:22.010 --> 00:00:26.210
+Cuando un agente de programación resuelve
+una tarea, solemos darle todo el mérito al
+
+4
+00:00:26.250 --> 00:00:29.790
+modelo. Pero el modelo, por sí
+solo, no lee tu repositorio,
+
+5
+00:00:29.830 --> 00:00:33.410
+no ejecuta las pruebas ni recuerda
+lo que hizo hace diez minutos.
+
+6
+00:00:33.450 --> 00:00:36.090
+Recibe texto y devuelve texto.
+
+7
+00:00:36.446 --> 00:00:38.740
+Todo lo demás lo pone otra cosa.
+
+8
+00:00:39.388 --> 00:00:41.620
+Esa otra cosa es el harness.
+
+9
+00:00:41.767 --> 00:00:44.336
+La definición más útil es
+también la más sencilla:
+
+10
+00:00:44.376 --> 00:00:47.580
+el harness es todo lo que
+no son los pesos del modelo.
+
+11
+00:00:47.620 --> 00:00:50.618
+Las instrucciones que recibe,
+las herramientas que puede usar,
+
+12
+00:00:50.658 --> 00:00:54.660
+el entorno donde se ejecutan, el estado
+que se conserva entre turnos y la forma de
+
+13
+00:00:54.700 --> 00:00:56.630
+comprobar que el trabajo está bien hecho.
+
+14
+00:00:57.385 --> 00:01:02.030
+Una frase lo resume bien: el
+modelo decide qué código escribir;
+
+15
+00:01:02.070 --> 00:01:05.758
+el harness gobierna cuándo, dónde y cómo.
+
+16
+00:01:05.798 --> 00:01:08.202
+Y de ahí sale una consecuencia importante:
+
+17
+00:01:08.242 --> 00:01:11.140
+un buen harness no vuelve
+más listo al modelo.
+
+18
+00:01:11.180 --> 00:01:13.820
+Lo que hace es volver fiable
+lo que el modelo produce.
+
+19
+00:01:14.760 --> 00:01:19.680
+Por eso dos agentes con el mismo modelo
+pueden dar resultados muy distintos.
+
+20
+00:01:19.950 --> 00:01:23.870
+Cambia el harness, y cambia lo que el
+modelo ve, lo que puede hacer y cuándo se
+
+21
+00:01:23.910 --> 00:01:29.006
+da por terminado. En este curso vamos
+a estudiar dos harnesses concretos,
+
+22
+00:01:29.046 --> 00:01:33.060
+Pi y oh my pi, pero antes
+necesitamos un vocabulario común.
+
+23
+00:01:34.092 --> 00:01:37.172
+Hay una distinción que conviene
+dejar clara desde el principio,
+
+24
+00:01:37.212 --> 00:01:40.360
+porque la palabra harness
+se usa en dos sentidos.
+
+25
+00:01:40.400 --> 00:01:43.690
+El primero es el programa que
+ejecuta el bucle del agente:
+
+26
+00:01:43.730 --> 00:01:48.397
+gestiona la sesión, las herramientas,
+los permisos y la compactación.
+
+27
+00:01:48.437 --> 00:01:51.260
+Pi y oh my pi son
+harnesses en este sentido.
+
+28
+00:01:52.691 --> 00:01:57.020
+El segundo sentido es el andamiaje que tú
+pones en tu repositorio para que cualquier
+
+29
+00:01:57.060 --> 00:02:01.792
+agente trabaje mejor: un AGENTS
+punto md con las reglas del proyecto,
+
+30
+00:02:01.832 --> 00:02:06.690
+scripts de arranque, listas de tareas,
+documentos de traspaso o rúbricas de
+
+31
+00:02:06.730 --> 00:02:09.994
+revisión. Ese andamiaje es
+portable: sirve igual para Pi,
+
+32
+00:02:10.034 --> 00:02:12.500
+para oh my pi o para
+cualquier otro agente.
+
+33
+00:02:13.158 --> 00:02:15.880
+La mayor parte del curso
+trata del primer sentido:
+
+34
+00:02:15.920 --> 00:02:19.493
+cómo funcionan Pi y oh my
+pi y cómo sacarles partido.
+
+35
+00:02:19.533 --> 00:02:24.380
+El último bloque vuelve al segundo: cómo
+diseñar el harness de tu propio proyecto.
+
+36
+00:02:24.420 --> 00:02:28.130
+Pero las dos caras se apoyan en las mismas
+piezas, y esas piezas son el mapa que
+
+37
+00:02:28.170 --> 00:02:30.380
+vamos a usar en todo el curso.
+
+38
+00:02:35.786 --> 00:02:38.500
+Vamos a usar una
+taxonomía de cinco piezas:
+
+39
+00:02:38.540 --> 00:02:43.146
+instrucciones, herramientas,
+entorno, estado y feedback.
+
+40
+00:02:43.186 --> 00:02:47.140
+Viene del curso abierto Learn Harness
+Engineering, y la elegimos porque es
+
+41
+00:02:47.180 --> 00:02:51.390
+neutral: no pertenece a ningún producto y
+sirve tanto para lo que escribes tú como
+
+42
+00:02:51.430 --> 00:02:53.160
+para lo que trae cada agente.
+
+43
+00:02:53.871 --> 00:02:56.080
+La primera pieza son las instrucciones.
+
+44
+00:02:56.120 --> 00:02:58.883
+Es lo que el modelo lee
+antes de tu petición:
+
+45
+00:02:58.923 --> 00:03:02.412
+el prompt de sistema del agente, los
+ficheros de contexto del proyecto,
+
+46
+00:03:02.452 --> 00:03:07.040
+como AGENTS punto md, las skills
+y las plantillas de prompt.
+
+47
+00:03:07.082 --> 00:03:11.006
+Una buena regla práctica: dale
+al agente un mapa, no un manual.
+
+48
+00:03:11.046 --> 00:03:14.800
+Unas decenas de líneas claras valen
+más que un documento enorme que nadie
+
+49
+00:03:14.840 --> 00:03:15.740
+mantiene.
+
+50
+00:03:16.353 --> 00:03:21.020
+Un ejemplo concreto. En nuestro
+repositorio de juguete, un AGENTS punto md
+
+51
+00:03:21.060 --> 00:03:26.300
+de diez líneas basta: cómo se ejecutan las
+pruebas, qué carpetas no se tocan y cómo
+
+52
+00:03:26.340 --> 00:03:28.303
+se escriben los mensajes de commit.
+
+53
+00:03:28.343 --> 00:03:32.590
+Con eso, cualquier agente que entre en
+el proyecto sabe verificar su trabajo sin
+
+54
+00:03:32.630 --> 00:03:34.000
+tener que preguntarlo.
+
+55
+00:03:34.648 --> 00:03:38.350
+La segunda pieza son las herramientas:
+leer ficheros, editarlos,
+
+56
+00:03:38.390 --> 00:03:42.817
+ejecutar comandos, buscar en el
+código o consultar servicios externos.
+
+57
+00:03:42.857 --> 00:03:47.360
+Las herramientas son las manos del
+agente, y con ellas llegan las políticas:
+
+58
+00:03:47.400 --> 00:03:51.656
+qué puede hacer sin preguntar, qué
+necesita aprobación y qué está prohibido.
+
+59
+00:03:51.696 --> 00:03:53.640
+El principio aquí es el mínimo privilegio.
+
+60
+00:03:54.869 --> 00:03:57.200
+Las herramientas también tienen un coste.
+
+61
+00:03:57.240 --> 00:04:00.568
+Cada herramienta que declaras
+viaja en cada petición al modelo,
+
+62
+00:04:00.608 --> 00:04:04.084
+ocupa contexto y le da una
+opción más entre la que dudar.
+
+63
+00:04:04.124 --> 00:04:08.589
+El autor de oh my pi lo resume diciendo
+que cada esquema cobra un impuesto.
+
+64
+00:04:08.629 --> 00:04:11.001
+Más herramientas no es mejor por defecto;
+
+65
+00:04:11.041 --> 00:04:13.320
+es mejor tener las
+justas y que sean buenas.
+
+66
+00:04:14.382 --> 00:04:17.194
+Pi y oh my pi están en los dos extremos.
+
+67
+00:04:17.234 --> 00:04:19.805
+Pi arranca con cuatro
+herramientas activas.
+
+68
+00:04:19.845 --> 00:04:24.380
+oh my pi tiene muchas más; en la
+configuración que usaremos en las demos,
+
+69
+00:04:24.420 --> 00:04:28.950
+su comando barra tools muestra doce
+activas de veinticuatro disponibles.
+
+70
+00:04:28.990 --> 00:04:30.970
+Ninguna cifra es buena o mala en sí misma:
+
+71
+00:04:31.010 --> 00:04:33.760
+lo importante es saber qué
+está pagando cada petición.
+
+72
+00:04:34.733 --> 00:04:39.702
+La tercera pieza es el entorno: dónde
+se ejecuta todo lo que el agente hace.
+
+73
+00:04:39.742 --> 00:04:44.287
+Tu propia máquina, un contenedor, una
+máquina virtual o un servidor remoto.
+
+74
+00:04:44.327 --> 00:04:46.439
+Aquí hay una idea que
+repetiremos en el curso:
+
+75
+00:04:46.479 --> 00:04:49.730
+quien decide no debería ser quien ejecuta.
+
+76
+00:04:49.787 --> 00:04:54.150
+La política vive en el harness, y el
+entorno solo ejecuta peticiones acotadas.
+
+77
+00:04:55.074 --> 00:05:00.810
+Un ejemplo sencillo: si el agente ejecuta
+npm install directamente en tu máquina,
+
+78
+00:05:00.870 --> 00:05:04.340
+cualquier script de instalación de una
+dependencia corre con tus permisos y puede
+
+79
+00:05:04.380 --> 00:05:08.680
+leer tus ficheros. Dentro de un
+contenedor, el mismo comando solo ve lo
+
+80
+00:05:08.720 --> 00:05:11.690
+que tú le hayas montado.
+El modelo es el mismo;
+
+81
+00:05:11.730 --> 00:05:12.880
+el riesgo, no.
+
+82
+00:05:13.674 --> 00:05:18.462
+La cuarta pieza es el estado: todo
+lo que el agente necesita recordar.
+
+83
+00:05:18.502 --> 00:05:22.110
+La conversación, los ficheros que
+ha leído, las decisiones tomadas,
+
+84
+00:05:22.150 --> 00:05:26.160
+las tareas pendientes. El
+estado tiene un enemigo natural,
+
+85
+00:05:26.200 --> 00:05:28.510
+que es el tamaño de la
+ventana de contexto.
+
+86
+00:05:28.550 --> 00:05:32.904
+Cuando se llena, el harness tiene
+que resumir, podar o traspasar,
+
+87
+00:05:32.944 --> 00:05:34.890
+y cada estrategia pierde algo distinto.
+
+88
+00:05:36.014 --> 00:05:40.045
+Pi, por ejemplo, compacta automáticamente
+cuando el contexto se acerca al límite y
+
+89
+00:05:40.085 --> 00:05:43.032
+deja un margen de reserva de
+unos dieciséis mil tokens.
+
+90
+00:05:43.072 --> 00:05:45.855
+oh my pi ofrece varias
+estrategias encadenadas:
+
+91
+00:05:45.895 --> 00:05:50.300
+resumir, quitar los resultados pesados de
+herramientas o escribir un documento de
+
+92
+00:05:50.340 --> 00:05:54.600
+traspaso y empezar limpio. Elegir bien
+depende de qué no te puedes permitir
+
+93
+00:05:54.640 --> 00:05:55.540
+perder.
+
+94
+00:05:56.362 --> 00:05:59.049
+El estado también vive
+fuera de la conversación.
+
+95
+00:05:59.089 --> 00:06:03.499
+Si el progreso de una tarea solo existe
+en el chat, se pierde al cerrar la sesión.
+
+96
+00:06:03.539 --> 00:06:07.400
+Si está escrito en el repositorio, en
+una lista de tareas o en un documento de
+
+97
+00:06:07.440 --> 00:06:10.656
+traspaso, cualquier sesión
+nueva puede retomarlo.
+
+98
+00:06:10.696 --> 00:06:14.000
+Lo que no está en ficheros,
+en la práctica, no existe.
+
+99
+00:06:14.672 --> 00:06:18.930
+La quinta pieza es el feedback: cómo
+sabemos que el trabajo está bien.
+
+100
+00:06:18.980 --> 00:06:23.250
+Pruebas que se ejecutan, linters,
+revisiones, criterios de aceptación
+
+101
+00:06:23.290 --> 00:06:27.460
+definidos de antemano. Sin feedback,
+el agente tiende a declarar victoria en
+
+102
+00:06:27.500 --> 00:06:29.857
+cuanto el código parece razonable.
+
+103
+00:06:29.897 --> 00:06:33.400
+Con feedback, tiene una forma
+objetiva de saber si ha terminado.
+
+104
+00:06:34.172 --> 00:06:37.320
+En el repositorio de juguete,
+el feedback es una orden:
+
+105
+00:06:37.360 --> 00:06:38.510
+npm test.
+
+106
+00:06:39.004 --> 00:06:42.300
+Tres pruebas, y una falla. Es
+una señal binaria y objetiva,
+
+107
+00:06:42.340 --> 00:06:47.825
+y por eso es tan valiosa: el agente no
+tiene que opinar sobre si el código está
+
+108
+00:06:47.865 --> 00:06:51.100
+bien, solo tiene que conseguir que
+la prueba pase sin romper las demás.
+
+109
+00:06:52.217 --> 00:06:56.350
+Un consejo que vale para todo el curso:
+separa a quien hace el trabajo de quien lo
+
+110
+00:06:56.390 --> 00:07:00.670
+revisa. Puede ser otra persona, otro
+agente o una batería de pruebas,
+
+111
+00:07:00.710 --> 00:07:04.370
+pero no debería ser el mismo turno del
+mismo agente que acaba de escribir el
+
+112
+00:07:04.410 --> 00:07:05.310
+código.
+
+113
+00:07:05.736 --> 00:07:09.630
+Y una sexta pieza que no forma parte de
+la taxonomía, pero que conviene tener
+
+114
+00:07:09.670 --> 00:07:14.710
+presente: las vistas. La misma sesión
+puede verse en una interfaz de terminal,
+
+115
+00:07:14.750 --> 00:07:19.330
+en un modo de texto para scripts, a través
+de un protocolo para editores o embebida
+
+116
+00:07:19.370 --> 00:07:24.270
+en tu propio programa. En Pi y en oh my pi
+todas esas vistas trabajan sobre el mismo
+
+117
+00:07:24.310 --> 00:07:25.210
+agente.
+
+118
+00:07:30.784 --> 00:07:33.382
+Veamos qué pasa cuando
+escribes una petición.
+
+119
+00:07:33.422 --> 00:07:37.462
+Usaremos el bucle de Pi, que es el
+mismo núcleo que hereda oh my pi.
+
+120
+00:07:37.502 --> 00:07:40.780
+Tu mensaje se añade a la
+rama activa de la sesión.
+
+121
+00:07:41.212 --> 00:07:44.710
+El harness monta la petición al
+modelo con el prompt de sistema,
+
+122
+00:07:44.750 --> 00:07:48.513
+esa rama, las herramientas
+disponibles y los ajustes del modelo,
+
+123
+00:07:48.553 --> 00:07:49.920
+y la envía al proveedor.
+
+124
+00:07:50.628 --> 00:07:54.505
+El modelo responde en streaming con
+texto y con llamadas a herramientas.
+
+125
+00:07:54.545 --> 00:07:59.723
+El harness registra la respuesta, ejecuta
+cada llamada y registra los resultados.
+
+126
+00:07:59.763 --> 00:08:03.503
+A eso lo llamamos un turno. Si
+los resultados piden otra vuelta,
+
+127
+00:08:03.543 --> 00:08:07.023
+empieza otro turno; si
+no, la ejecución termina.
+
+128
+00:08:07.063 --> 00:08:09.860
+Un encargo normal son
+muchos turnos encadenados.
+
+129
+00:08:10.974 --> 00:08:13.500
+Mientras el agente
+trabaja, puedes intervenir.
+
+130
+00:08:13.540 --> 00:08:16.820
+Un mensaje de steering entra en
+cuanto termina el turno actual,
+
+131
+00:08:16.860 --> 00:08:18.883
+para corregir el rumbo sin esperar.
+
+132
+00:08:18.923 --> 00:08:22.776
+Un mensaje de follow-up espera a que
+el agente acabe todo lo pendiente.
+
+133
+00:08:22.816 --> 00:08:25.628
+Y si algo va mal, puedes
+abortar la ejecución.
+
+134
+00:08:25.668 --> 00:08:28.840
+Saber cuál usar en cada
+momento ahorra muchos tokens.
+
+135
+00:08:29.635 --> 00:08:33.363
+La sesión se guarda como un
+árbol, no como una lista.
+
+136
+00:08:33.403 --> 00:08:38.730
+Cada entrada sabe cuál es su padre, y
+la rama activa es la que ve el modelo.
+
+137
+00:08:38.794 --> 00:08:43.300
+Si vuelves a un punto anterior y
+continúas, se crea una rama nueva en el
+
+138
+00:08:43.340 --> 00:08:48.510
+mismo fichero. Esto permite rebobinar y
+probar otro camino sin perder el anterior.
+
+139
+00:08:49.236 --> 00:08:53.001
+Cuando el contexto se acerca al
+límite, entra la compactación.
+
+140
+00:08:53.041 --> 00:08:56.453
+Pi resume los mensajes antiguos
+en un bloque estructurado,
+
+141
+00:08:56.493 --> 00:09:01.450
+con el objetivo, las restricciones, el
+progreso, las decisiones y los siguientes
+
+142
+00:09:01.490 --> 00:09:04.380
+pasos, y conserva los mensajes recientes.
+
+143
+00:09:04.420 --> 00:09:08.010
+El fichero original no se borra; lo que
+cambia es lo que se envía al modelo en las
+
+144
+00:09:08.050 --> 00:09:09.440
+peticiones siguientes.
+
+145
+00:09:10.665 --> 00:09:12.858
+Fíjate en que todo esto es harness.
+
+146
+00:09:12.898 --> 00:09:17.545
+El modelo no sabe que existe un árbol de
+sesión ni que su historial se ha resumido.
+
+147
+00:09:17.585 --> 00:09:20.610
+Solo ve lo que el harness
+decide enviarle en cada turno.
+
+148
+00:09:20.920 --> 00:09:24.412
+Por eso entender el turno es
+entender dónde puedes influir:
+
+149
+00:09:24.452 --> 00:09:27.800
+en lo que entra, en lo que
+puede hacer y en cuándo se para.
+
+150
+00:09:33.615 --> 00:09:36.949
+Pi es un agente para la
+terminal mínimo y extensible.
+
+151
+00:09:36.989 --> 00:09:41.400
+Su lema lo deja claro: adapta Pi a
+tu forma de trabajar, no al revés.
+
+152
+00:09:41.440 --> 00:09:44.610
+De serie trae solo cuatro
+herramientas activas:
+
+153
+00:09:44.650 --> 00:09:47.986
+leer, escribir, editar
+y ejecutar comandos.
+
+154
+00:09:48.026 --> 00:09:50.880
+Deja fuera a propósito los
+subagentes y el modo plan.
+
+155
+00:09:51.500 --> 00:09:54.537
+¿Y si los necesitas? Pi
+propone una escalera:
+
+156
+00:09:54.577 --> 00:09:57.550
+usa el mecanismo más pequeño
+que resuelva el problema.
+
+157
+00:09:57.590 --> 00:10:01.870
+Primero un AGENTS punto md; si no
+basta, una plantilla de prompt;
+
+158
+00:10:01.910 --> 00:10:04.827
+después una skill; después
+una extensión en TypeScript;
+
+159
+00:10:04.867 --> 00:10:07.953
+y al final, un paquete que
+puedes compartir con tu equipo.
+
+160
+00:10:07.993 --> 00:10:10.440
+Incluso puedes pedirle a Pi que
+escriba la extensión por ti.
+
+161
+00:10:11.476 --> 00:10:14.330
+Pi tampoco pide permiso antes
+de usar una herramienta.
+
+162
+00:10:14.370 --> 00:10:19.382
+Te enseña cada lectura, cada comando
+y cada edición, pero no se detiene a
+
+163
+00:10:19.422 --> 00:10:23.490
+preguntar. Si quieres aprobaciones o un
+sandbox, se construyen con extensiones o
+
+164
+00:10:23.530 --> 00:10:25.840
+se ejecuta Pi dentro de un contenedor.
+
+165
+00:10:25.880 --> 00:10:27.940
+Lo veremos con detalle
+en el vídeo de seguridad.
+
+166
+00:10:28.990 --> 00:10:32.280
+oh my pi nace como un fork
+de Pi a principios de 2026
+
+167
+00:10:32.823 --> 00:10:35.968
+y toma el camino contrario:
+baterías incluidas.
+
+168
+00:10:36.008 --> 00:10:40.030
+Sobre el mismo núcleo, con el bucle, el
+árbol de sesión, las extensiones y las
+
+169
+00:10:40.070 --> 00:10:44.580
+skills, añade de serie unas treinta
+herramientas y ochenta y cinco comandos.
+
+170
+00:10:45.497 --> 00:10:51.060
+Trae subagentes, modo plan, objetivos
+con presupuesto, memoria entre sesiones,
+
+171
+00:10:51.100 --> 00:10:54.850
+un servidor de lenguaje para
+navegar el código, un depurador,
+
+172
+00:10:54.890 --> 00:10:58.720
+navegador, estadísticas
+y una interfaz de git.
+
+173
+00:10:58.760 --> 00:11:02.670
+Corre sobre Bun con partes nativas en
+Rust, y lee la configuración de otros
+
+174
+00:11:02.710 --> 00:11:05.160
+agentes como Claude Code o Codex.
+
+175
+00:11:05.991 --> 00:11:08.860
+También añade ingeniería
+pensada para el modelo.
+
+176
+00:11:08.900 --> 00:11:12.380
+Una edición anclada por hash para que
+el modelo no estropee un fichero con
+
+177
+00:11:12.420 --> 00:11:16.850
+referencias antiguas. Reglas que se
+inyectan en mitad de la respuesta cuando
+
+178
+00:11:16.890 --> 00:11:21.063
+detectan un patrón. Un modelo
+asesor que revisa cada turno.
+
+179
+00:11:21.103 --> 00:11:25.560
+Y roles de modelo, para usar uno barato en
+lo sencillo y uno potente en lo difícil.
+
+180
+00:11:26.672 --> 00:11:30.908
+Un detalle importante: oh my pi
+tampoco pide permiso por defecto.
+
+181
+00:11:30.948 --> 00:11:33.860
+Su modo de aprobación de serie se llama
+
+182
+00:11:34.331 --> 00:11:37.430
+yolo. Tiene modos más prudentes,
+pero hay que activarlos.
+
+183
+00:11:37.470 --> 00:11:40.180
+Ni Pi ni oh my pi son
+seguros por accidente;
+
+184
+00:11:40.220 --> 00:11:43.000
+la seguridad es una decisión que tomas tú.
+
+185
+00:11:43.936 --> 00:11:47.164
+Ninguna de las dos filosofías
+es mejor en abstracto.
+
+186
+00:11:47.204 --> 00:11:51.506
+Pi te da un núcleo pequeño que
+entiendes entero y moldeas a tu medida.
+
+187
+00:11:51.546 --> 00:11:55.920
+oh my pi te da un taller completo desde el
+primer día, a cambio de más superficie que
+
+188
+00:11:55.960 --> 00:12:00.014
+aprender. Este curso te enseña las
+dos para que elijas con criterio,
+
+189
+00:12:00.054 --> 00:12:02.920
+y para que lo que aprendas
+en una te sirva en la otra.
+
+190
+00:12:03.561 --> 00:12:07.300
+Para situarlas, ayuda compararlas
+con otros agentes conocidos.
+
+191
+00:12:07.340 --> 00:12:11.031
+Learn Harness Engineering analiza
+varios con las mismas cinco piezas.
+
+192
+00:12:11.071 --> 00:12:14.410
+De Claude Code destaca su
+memoria por capas, sus permisos,
+
+193
+00:12:14.450 --> 00:12:18.850
+sus hooks y sus subagentes. De Codex,
+que trata el repositorio como sistema de
+
+194
+00:12:18.890 --> 00:12:23.937
+registro, con el AGENTS punto md como
+índice y aislamiento con worktrees.
+
+195
+00:12:23.977 --> 00:12:27.140
+Y de Pi, su núcleo mínimo
+con extensiones programables.
+
+196
+00:12:27.959 --> 00:12:31.670
+oh my pi se parece a Claude Code
+en ambición, y además sabe leer su
+
+197
+00:12:31.710 --> 00:12:36.980
+configuración y la de Codex: sus ficheros
+de contexto, sus servidores MCP y sus
+
+198
+00:12:37.020 --> 00:12:40.503
+skills. Eso hace que cambiar de
+herramienta sea menos traumático.
+
+199
+00:12:40.543 --> 00:12:43.720
+Lo que aprendas sobre las cinco piezas
+te sirve en cualquiera de ellos.
+
+200
+00:12:49.494 --> 00:12:51.250
+Vamos a verlo en la práctica.
+
+201
+00:12:51.290 --> 00:12:53.936
+Tenemos un repositorio de
+juguete con un fallo pequeño:
+
+202
+00:12:53.976 --> 00:12:57.460
+un carrito de la compra con un
+cupón de descuento, y tres pruebas,
+
+203
+00:12:57.500 --> 00:13:01.255
+de las que una falla. Les pedimos
+lo mismo a los dos agentes:
+
+204
+00:13:01.295 --> 00:13:05.904
+hay una prueba que falla, encuentra por
+qué, corrígelo sin tocar otros archivos y
+
+205
+00:13:05.944 --> 00:13:07.940
+ejecuta las pruebas al terminar.
+
+206
+00:13:08.504 --> 00:13:10.930
+Para que la comparación
+sea honesta, un aviso:
+
+207
+00:13:10.970 --> 00:13:15.850
+no usan el mismo modelo. oh my
+pi trabaja con GPT-5.6 Luna,
+
+208
+00:13:15.890 --> 00:13:19.654
+y Pi con Qwen 3.8 de veintisiete
+mil millones de parámetros,
+
+209
+00:13:19.694 --> 00:13:22.655
+un modelo abierto que usamos
+en su versión gratuita.
+
+210
+00:13:22.695 --> 00:13:27.180
+Eso también es harness: el mismo agente
+se puede conectar a modelos muy distintos.
+
+211
+00:13:27.923 --> 00:13:31.840
+Empecemos por oh my pi. Lo
+primero que hace es planificar:
+
+212
+00:13:31.880 --> 00:13:36.880
+crea una lista de cuatro tareas en
+dos fases, diagnóstico y corrección.
+
+213
+00:13:36.920 --> 00:13:41.839
+Después lista los ficheros del proyecto
+e intenta leer un AGENTS punto md.
+
+214
+00:13:41.879 --> 00:13:44.001
+Fíjate en la cruz roja: no existe.
+
+215
+00:13:44.041 --> 00:13:47.120
+Nadie le ha dejado instrucciones del
+proyecto, así que tendrá que deducir por
+
+216
+00:13:47.160 --> 00:13:49.780
+sí mismo cómo se ejecutan las pruebas.
+
+217
+00:13:50.348 --> 00:13:53.208
+Ejecuta las pruebas y reproduce el fallo:
+
+218
+00:13:53.248 --> 00:13:56.300
+esperábamos veintiséis
+con diez y sale veintidós.
+
+219
+00:13:56.340 --> 00:14:00.750
+Encuentra la causa: la función que aplica
+el cupón multiplica por la cantidad dos
+
+220
+00:14:00.790 --> 00:14:05.430
+veces. Y la corrige con una edición de una
+sola línea, anclada con su hash para no
+
+221
+00:14:05.470 --> 00:14:06.400
+tocar nada más.
+
+222
+00:14:07.446 --> 00:14:11.401
+Después hace lo que le pedimos:
+ejecuta las pruebas otra vez.
+
+223
+00:14:11.441 --> 00:14:13.973
+Tres pruebas, tres en
+verde, ninguna fallida.
+
+224
+00:14:14.013 --> 00:14:17.952
+Y entrega un resumen con la causa,
+la corrección y la verificación,
+
+225
+00:14:17.992 --> 00:14:20.770
+y añade que solo ha modificado un archivo.
+
+226
+00:14:20.810 --> 00:14:23.980
+Ese es el formato de entrega que
+queremos de cualquier agente:
+
+227
+00:14:24.020 --> 00:14:26.000
+causa, cambio y evidencia.
+
+228
+00:14:26.956 --> 00:14:31.850
+Ahora Pi. Aquí vemos el bucle al
+desnudo, con sus cuatro herramientas.
+
+229
+00:14:31.890 --> 00:14:36.860
+Explora con comandos de bash, lee el
+código, edita la línea y lanza las
+
+230
+00:14:37.452 --> 00:14:41.176
+pruebas. A mitad de tarea el proveedor le
+devuelve un error de límite de peticiones;
+
+231
+00:14:41.216 --> 00:14:43.662
+Pi reintenta solo y continúa.
+
+232
+00:14:43.702 --> 00:14:46.330
+Esa recuperación no la hace
+el modelo, la hace el harness.
+
+233
+00:14:47.654 --> 00:14:50.210
+Pi también desconfía de su propia edición:
+
+234
+00:14:50.250 --> 00:14:54.802
+sospecha que ha podido colar un carácter
+invisible, así que relee el fichero y
+
+235
+00:14:54.842 --> 00:14:58.142
+vuelve a pasar las pruebas. Tres en verde.
+
+236
+00:14:58.182 --> 00:15:01.530
+Corrige la misma línea que oh
+my pi, con el mismo resultado.
+
+237
+00:15:02.476 --> 00:15:04.344
+Pero fíjate en su resumen final.
+
+238
+00:15:04.384 --> 00:15:07.870
+Dice que el total salía veintitrés
+con cincuenta y ocho, y no es verdad:
+
+239
+00:15:07.910 --> 00:15:11.354
+salía veintidós. El modelo
+se ha inventado ese número.
+
+240
+00:15:11.394 --> 00:15:14.438
+Por eso la evidencia que cuenta
+es la prueba que se ejecuta,
+
+241
+00:15:14.478 --> 00:15:16.740
+no lo que el agente cuenta de sí mismo.
+
+242
+00:15:17.352 --> 00:15:20.335
+Antes de dar nada por
+bueno, miramos el diff.
+
+243
+00:15:20.375 --> 00:15:24.490
+Una línea: el descuento se aplica una
+vez sobre el importe de cada línea,
+
+244
+00:15:24.530 --> 00:15:26.480
+sin volver a multiplicar por la
+
+245
+00:15:27.108 --> 00:15:30.980
+cantidad. Es pequeño, se entiende
+y se puede revisar en segundos.
+
+246
+00:15:31.088 --> 00:15:33.190
+Un buen harness te deja
+siempre en esta posición:
+
+247
+00:15:33.230 --> 00:15:36.420
+con poco que revisar y con
+pruebas de que funciona.
+
+248
+00:15:37.532 --> 00:15:41.239
+Y una anécdota de la grabación que
+vale más que cualquier diapositiva.
+
+249
+00:15:41.279 --> 00:15:44.905
+La primera vez lanzamos los dos
+agentes a la vez, en la misma carpeta.
+
+250
+00:15:44.945 --> 00:15:49.770
+oh my pi terminó antes, y cuando Pi fue a
+mirar, se encontró el fallo ya corregido
+
+251
+00:15:49.810 --> 00:15:54.670
+por otro. Lo detectó y nos avisó, pero
+la tarea había dejado de ser suya.
+
+252
+00:15:54.710 --> 00:15:57.734
+Es exactamente el problema
+del entorno compartido:
+
+253
+00:15:57.774 --> 00:16:00.290
+dos agentes en la misma carpeta se pisan.
+
+254
+00:16:00.330 --> 00:16:03.800
+Para trabajar en paralelo, cada
+uno necesita su propio espacio.
+
+255
+00:16:04.634 --> 00:16:08.620
+Para terminar la demo, miramos
+dentro de oh my pi con barra context.
+
+256
+00:16:09.284 --> 00:16:13.480
+Antes de que escribamos nada, el prompt
+de sistema ya ocupa dos mil setecientos
+
+257
+00:16:13.520 --> 00:16:17.280
+tokens, y las descripciones de las
+herramientas, tres mil novecientos:
+
+258
+00:16:17.320 --> 00:16:19.790
+más que toda nuestra
+conversación con el agente.
+
+259
+00:16:20.171 --> 00:16:22.010
+Ese es el impuesto de las
+herramientas del que hablábamos,
+
+260
+00:16:22.050 --> 00:16:23.060
+medido.
+
+261
+00:16:24.194 --> 00:16:26.046
+Fíjate en lo que tienen en común los dos.
+
+262
+00:16:26.086 --> 00:16:30.130
+Leen antes de escribir, ejecutan las
+pruebas para comprobar el resultado y lo
+
+263
+00:16:30.170 --> 00:16:32.290
+hacen porque se lo pedimos en el encargo.
+
+264
+00:16:32.330 --> 00:16:36.500
+Ese «ejecuta las pruebas al terminar»
+es feedback que hemos puesto nosotros.
+
+265
+00:16:36.540 --> 00:16:39.740
+Sin esa frase, ninguno de los dos
+estaría obligado a verificar nada.
+
+266
+00:16:40.693 --> 00:16:45.460
+Y fíjate en lo que cambia: cómo planifica
+cada uno, cuánto contexto ocupa al
+
+267
+00:16:45.500 --> 00:16:49.842
+empezar, cuántas herramientas declara
+y cómo se recupera de los errores.
+
+268
+00:16:49.882 --> 00:16:51.784
+No hay un ganador universal.
+
+269
+00:16:51.824 --> 00:16:55.940
+Hay un harness que se ajusta mejor a
+una tarea y a una forma de trabajar.
+
+270
+00:17:01.790 --> 00:17:04.610
+Las cinco piezas no son
+solo un mapa para aprender;
+
+271
+00:17:04.650 --> 00:17:06.960
+son una herramienta de diagnóstico.
+
+272
+00:17:07.000 --> 00:17:10.460
+Cuando un agente falla, la reacción
+habitual es culpar al modelo y probar
+
+273
+00:17:10.500 --> 00:17:15.700
+otro. Muchas veces el problema está en
+el harness, y cambiar de modelo solo lo
+
+274
+00:17:15.740 --> 00:17:16.418
+esconde.
+
+275
+00:17:16.438 --> 00:17:21.000
+Haz las preguntas en orden. ¿Las
+instrucciones eran claras y estaban a la
+
+276
+00:17:21.040 --> 00:17:26.023
+vista del agente? ¿Tenía las herramientas
+adecuadas, o le sobraban tantas que se
+
+277
+00:17:26.063 --> 00:17:29.650
+perdió? ¿El entorno era el
+correcto: dependencias, permisos,
+
+278
+00:17:29.690 --> 00:17:34.170
+versión del proyecto? ¿Conservaba el
+estado necesario, o se perdió en una
+
+279
+00:17:34.210 --> 00:17:37.880
+compactación? ¿Tenía una forma
+objetiva de saber que había terminado?
+
+280
+00:17:38.816 --> 00:17:42.960
+Un ejemplo típico: el agente dice
+que ha arreglado algo y no es verdad.
+
+281
+00:17:43.000 --> 00:17:46.058
+Rara vez es un problema del modelo.
+
+282
+00:17:46.098 --> 00:17:49.350
+Casi siempre falta feedback:
+no había pruebas que ejecutar,
+
+283
+00:17:49.390 --> 00:17:52.950
+o nadie definió qué significaba terminado.
+
+284
+00:17:52.990 --> 00:17:57.230
+La solución no es otro modelo, sino
+un criterio de aceptación que se pueda
+
+285
+00:17:57.270 --> 00:17:58.200
+comprobar.
+
+286
+00:17:59.136 --> 00:18:03.110
+Otro ejemplo: en una sesión larga, el
+agente olvida una restricción que le diste
+
+287
+00:18:03.150 --> 00:18:05.950
+al principio. Es un problema de estado.
+
+288
+00:18:06.005 --> 00:18:09.940
+La restricción vivía solo en la
+conversación y se diluyó al compactar.
+
+289
+00:18:09.980 --> 00:18:13.610
+La solución es moverla a las instrucciones
+del proyecto, donde se carga en cada
+
+290
+00:18:13.650 --> 00:18:14.550
+turno.
+
+291
+00:18:15.294 --> 00:18:19.798
+Tercer ejemplo: el agente tarda
+mucho y elige herramientas raras.
+
+292
+00:18:19.838 --> 00:18:24.927
+Revisas y tiene cuarenta herramientas
+de varios servidores MCP conectados.
+
+293
+00:18:24.967 --> 00:18:26.850
+Es un problema de herramientas.
+
+294
+00:18:26.890 --> 00:18:30.254
+La solución es reducir lo que se
+declara o cargarlo bajo demanda,
+
+295
+00:18:30.294 --> 00:18:32.600
+que es justo lo que hace codemode en Pi.
+
+296
+00:18:33.799 --> 00:18:38.460
+Cuarto ejemplo: las pruebas pasan cuando
+las ejecuta el agente y fallan en la
+
+297
+00:18:38.500 --> 00:18:41.152
+integración continua. Es
+un problema de entorno:
+
+298
+00:18:41.192 --> 00:18:45.166
+otra versión de Node, otra variable
+de entorno, otra base de datos.
+
+299
+00:18:45.206 --> 00:18:50.700
+La solución es fijar versiones y que el
+agente y la integración continua arranquen
+
+300
+00:18:50.740 --> 00:18:51.425
+con el mismo script.
+
+301
+00:18:51.445 --> 00:18:54.610
+Y quinto: el agente toca
+archivos que no debía.
+
+302
+00:18:54.790 --> 00:18:58.204
+Puede ser un problema de instrucciones,
+porque nadie le dijo dónde no entrar,
+
+303
+00:18:58.244 --> 00:19:02.096
+o de políticas, porque tenía permiso
+para escribir en todas partes.
+
+304
+00:19:02.136 --> 00:19:04.480
+Lo primero se arregla
+en el AGENTS punto md;
+
+305
+00:19:04.520 --> 00:19:08.360
+lo segundo, con aprobaciones o con un
+entorno que solo monte lo necesario.
+
+306
+00:19:09.304 --> 00:19:13.140
+Hay una técnica muy útil para
+encontrar qué pieza importa:
+
+307
+00:19:13.180 --> 00:19:16.220
+quitar componentes de uno
+en uno y ver qué se rompe.
+
+308
+00:19:16.260 --> 00:19:20.274
+Quita una herramienta, una línea
+del AGENTS punto md o una prueba,
+
+309
+00:19:20.314 --> 00:19:24.789
+y observa el resultado. Lo que no
+cambia nada, probablemente sobra.
+
+310
+00:19:24.829 --> 00:19:27.260
+Lo que lo rompe todo es
+lo que hay que cuidar.
+
+311
+00:19:28.114 --> 00:19:31.667
+Y una advertencia: el harness
+se degrada como el código.
+
+312
+00:19:31.707 --> 00:19:36.197
+Las instrucciones se quedan desfasadas,
+las pruebas dejan de cubrir lo importante
+
+313
+00:19:36.237 --> 00:19:38.131
+y las herramientas se acumulan.
+
+314
+00:19:38.171 --> 00:19:42.190
+Revisarlo de vez en cuando forma parte
+del trabajo, igual que refactorizar.
+
+315
+00:19:47.970 --> 00:19:50.920
+Con este vocabulario ya
+podemos recorrer el curso.
+
+316
+00:19:50.960 --> 00:19:53.676
+Son veintiséis vídeos en cuatro bloques.
+
+317
+00:19:53.716 --> 00:19:55.530
+Este es el primero, el marco común.
+
+318
+00:19:56.454 --> 00:19:58.645
+El bloque de Pi tiene nueve vídeos.
+
+319
+00:19:58.685 --> 00:20:02.920
+Empezamos instalando Pi y haciendo una
+primera tarea, vemos cómo funciona por
+
+320
+00:20:02.960 --> 00:20:07.510
+dentro, cómo elegir modelos y proveedores,
+y cómo trabajar con seguridad.
+
+321
+00:20:07.550 --> 00:20:11.630
+Después aprendemos a personalizarlo
+sin código, conocemos MCP y codemode,
+
+322
+00:20:11.670 --> 00:20:16.140
+que son la gran novedad de la versión uno,
+escribimos extensiones propias y lo usamos
+
+323
+00:20:16.180 --> 00:20:17.320
+desde scripts.
+
+324
+00:20:18.047 --> 00:20:20.885
+El bloque de oh my pi tiene once vídeos:
+
+325
+00:20:20.925 --> 00:20:25.770
+qué cambia respecto a Pi, la interfaz y
+las sesiones, el contexto y la memoria,
+
+326
+00:20:25.810 --> 00:20:31.040
+los modelos y roles, la planificación,
+los subagentes, el entorno de desarrollo
+
+327
+00:20:31.080 --> 00:20:36.360
+integrado, git y calidad, las aprobaciones
+y reglas, cómo extenderlo y cómo usarlo en
+
+328
+00:20:36.400 --> 00:20:37.300
+equipo.
+
+329
+00:20:37.999 --> 00:20:40.771
+El último bloque, de cinco
+vídeos, es de método:
+
+330
+00:20:40.811 --> 00:20:44.800
+cómo diseñar tu propio harness, cómo
+convertir el repositorio en el sistema de
+
+331
+00:20:44.840 --> 00:20:49.708
+registro, cómo verificar de verdad,
+cuándo compensa orquestar varios agentes,
+
+332
+00:20:49.748 --> 00:20:51.860
+y un proyecto final de principio a fin.
+
+333
+00:20:52.791 --> 00:20:55.240
+Antes del siguiente
+vídeo, una práctica breve.
+
+334
+00:20:55.460 --> 00:20:58.510
+Elige una tarea que hayas hecho
+con un agente, cualquiera,
+
+335
+00:20:58.550 --> 00:21:00.710
+y analízala con las cinco piezas.
+
+336
+00:21:00.779 --> 00:21:03.950
+¿Qué instrucciones tenía?
+¿Qué herramientas usó?
+
+337
+00:21:04.306 --> 00:21:05.520
+¿Dónde se ejecutó?
+
+338
+00:21:06.126 --> 00:21:07.800
+¿Qué recordaba y qué olvidó?
+
+339
+00:21:08.098 --> 00:21:10.518
+¿Cómo supiste que había terminado?
+
+340
+00:21:10.558 --> 00:21:12.740
+Apunta qué pieza mejorarías primero.
+
+341
+00:21:13.332 --> 00:21:17.744
+En el próximo vídeo instalamos Pi
+y hacemos nuestra primera tarea.
+
+342
+00:21:17.784 --> 00:21:21.627
+El modelo pone la inteligencia;
+el harness pone todo lo demás.
+
+343
+00:21:21.667 --> 00:21:22.580
+Nos vemos dentro.

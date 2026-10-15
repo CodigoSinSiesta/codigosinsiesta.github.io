@@ -6,6 +6,11 @@ export const SITE = {
     'Código Sin Siesta: guías de aprendizaje, artículos y talleres para developers que construyen con IA sin perder el techo de calidad.',
 };
 
+// Dónde se alojan los vídeos de las guías (almacenamiento de objetos, fuera del repo: pesan demasiado para Pages).
+// Por ahora es la URL pública de desarrollo de R2; con un dominio propio (p. ej. videos.codigosinsiesta.com) bastará
+// con cambiarla aquí o con PUBLIC_VIDEOS_URL en el build.
+export const VIDEOS_BASE_URL = (import.meta.env.PUBLIC_VIDEOS_URL ?? 'https://pub-d737b0b6e6dc4ae0b7abe1ec46efa01c.r2.dev').replace(/\/$/, '');
+
 export const NAV = [
   { href: '/', label: 'Inicio' },
   { href: '/rutas', label: 'Guías' },
