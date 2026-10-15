@@ -7,8 +7,9 @@ export const SITE = {
 };
 
 // Dónde se alojan los vídeos de las guías (almacenamiento de objetos, fuera del repo: pesan demasiado para Pages).
-// Se puede sobrescribir con PUBLIC_VIDEOS_URL en el build.
-export const VIDEOS_BASE_URL = (import.meta.env.PUBLIC_VIDEOS_URL ?? 'https://videos.codigosinsiesta.com').replace(/\/$/, '');
+// Por ahora es la URL pública de desarrollo de R2; con un dominio propio (p. ej. videos.codigosinsiesta.com) bastará
+// con cambiarla aquí o con PUBLIC_VIDEOS_URL en el build.
+export const VIDEOS_BASE_URL = (import.meta.env.PUBLIC_VIDEOS_URL ?? 'https://pub-d737b0b6e6dc4ae0b7abe1ec46efa01c.r2.dev').replace(/\/$/, '');
 
 export const NAV = [
   { href: '/', label: 'Inicio' },
