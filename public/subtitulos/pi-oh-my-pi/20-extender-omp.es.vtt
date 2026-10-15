@@ -1,0 +1,1646 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.433 --> 00:00:14.310
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.350 --> 00:00:17.190
+Vídeo veinte: extender oh my pi.
+
+3
+00:00:22.800 --> 00:00:25.740
+En el bloque de Pi dedicamos
+cuatro vídeos a esto.
+
+4
+00:00:25.780 --> 00:00:29.620
+En el seis personalizamos sin código,
+con prompt templates y skills.
+
+5
+00:00:29.660 --> 00:00:31.780
+En el siete conectamos servidores MCP.
+
+6
+00:00:31.820 --> 00:00:35.520
+En el ocho escribimos extensiones,
+y en el nueve las empaquetamos.
+
+7
+00:00:35.560 --> 00:00:37.240
+Hoy no vamos a repetir nada de eso.
+
+8
+00:00:37.280 --> 00:00:41.370
+La pregunta es otra: si ya sabes
+extender Pi, ¿qué cambia en oh my pi?
+
+9
+00:00:42.250 --> 00:00:46.250
+La respuesta corta es que las piezas son
+las mismas, pero viven en otros sitios y
+
+10
+00:00:46.290 --> 00:00:49.745
+llegan por más caminos. Para
+compartir un prompt con el equipo,
+
+11
+00:00:49.785 --> 00:00:53.590
+lo natural es un comando de proyecto,
+en una carpeta del repositorio.
+
+12
+00:00:53.630 --> 00:00:57.580
+Las skills se pueden compartir con Pi,
+y además hay un registro público para
+
+13
+00:00:57.620 --> 00:01:01.874
+instalarlas. Las extensiones de
+Pi se cargan casi sin cambios.
+
+14
+00:01:01.914 --> 00:01:05.160
+Y hay dos piezas que Pi no
+tiene: plugins y marketplaces,
+
+15
+00:01:05.200 --> 00:01:07.300
+compatibles con los de Claude Code.
+
+16
+00:01:07.863 --> 00:01:11.090
+Vamos a ir de lo más
+ligero a lo más potente.
+
+17
+00:01:11.195 --> 00:01:14.508
+Un comando de proyecto, que
+es solo un fichero de texto.
+
+18
+00:01:14.548 --> 00:01:17.964
+Una skill, que usarán
+tanto Pi como oh my pi.
+
+19
+00:01:18.004 --> 00:01:21.592
+El registro de skills. Nuestras
+extensiones del vídeo ocho,
+
+20
+00:01:21.632 --> 00:01:24.660
+funcionando en oh my pi,
+y dónde se quedan cortas.
+
+21
+00:01:24.700 --> 00:01:28.440
+El panel que lo enseña todo,
+los plugins y los marketplaces.
+
+22
+00:01:28.480 --> 00:01:32.200
+Y MCP y SSH, más deprisa,
+porque ya conoces la idea.
+
+23
+00:01:33.286 --> 00:01:35.773
+En pantalla tienes la
+tabla que usaremos de mapa.
+
+24
+00:01:35.813 --> 00:01:38.268
+A la izquierda, dónde
+vivía cada pieza en Pi:
+
+25
+00:01:38.308 --> 00:01:42.339
+el directorio del agente y la
+carpeta punto pi del proyecto.
+
+26
+00:01:42.379 --> 00:01:46.457
+A la derecha, dónde vive en oh my
+pi: punto o eme pe en el proyecto,
+
+27
+00:01:46.497 --> 00:01:50.620
+la carpeta de tu perfil, y además
+las carpetas de otras herramientas,
+
+28
+00:01:50.660 --> 00:01:52.583
+como punto claude o punto agents.
+
+29
+00:01:52.623 --> 00:01:56.620
+Es la misma idea del vídeo once: oh
+my pi lee mucho más de lo que escribe.
+
+30
+00:01:57.813 --> 00:01:59.870
+Y un hilo que recorre todo el vídeo.
+
+31
+00:02:00.074 --> 00:02:03.970
+En el vídeo once dijimos que
+oh my pi no tiene barra trust.
+
+32
+00:02:04.460 --> 00:02:08.090
+Hoy veremos qué significa eso para cada
+pieza que extiende oh my pi desde un
+
+33
+00:02:08.130 --> 00:02:12.780
+repositorio, y lo cerraremos con una lista
+concreta de lo que se carga al abrir una
+
+34
+00:02:12.820 --> 00:02:13.720
+carpeta.
+
+35
+00:02:14.206 --> 00:02:18.886
+Trabajamos como siempre: la tienda, el
+perfil demo, ahora con oh my pi dieciocho
+
+36
+00:02:18.926 --> 00:02:22.590
+punto once y DeepSeek V cuatro
+Pro, en una rama de usar y tirar,
+
+37
+00:02:22.630 --> 00:02:26.870
+demo veinte, con un cambio sin
+commitear para tener algo que revisar:
+
+38
+00:02:26.910 --> 00:02:30.160
+el límite del envío gratis sube
+de cuarenta a cincuenta euros.
+
+39
+00:02:36.055 --> 00:02:38.495
+Empezamos por un comando
+que no es nuestro.
+
+40
+00:02:38.535 --> 00:02:42.310
+Si abres oh my pi dentro de su propio
+repositorio, en el menú aparece barra
+
+41
+00:02:42.350 --> 00:02:45.800
+triage. Parece un comando
+incluido, y no lo es:
+
+42
+00:02:45.840 --> 00:02:50.020
+es un fichero Markdown en la carpeta
+punto o eme pe barra commands de ese
+
+43
+00:02:50.060 --> 00:02:54.166
+repositorio. Lo enseñamos con
+head, sin abrir oh my pi ahí.
+
+44
+00:02:54.206 --> 00:02:57.960
+Es un prompt largo que clasifica las
+issues de GitHub recientes y les pone
+
+45
+00:02:58.000 --> 00:03:01.253
+etiquetas. Precisamente
+por eso no lo ejecutamos:
+
+46
+00:03:01.293 --> 00:03:02.640
+escribe en GitHub.
+
+47
+00:03:03.388 --> 00:03:08.566
+Fíjate en la forma. Un comando de proyecto
+es un fichero punto md en punto o eme pe
+
+48
+00:03:08.606 --> 00:03:11.930
+barra commands. El nombre del
+fichero es el nombre del comando.
+
+49
+00:03:11.970 --> 00:03:16.566
+Si tiene frontmatter, description es lo
+que verás en el menú y argument hint,
+
+50
+00:03:16.606 --> 00:03:20.472
+la pista de los argumentos. El resto
+es el prompt que se envía al modelo.
+
+51
+00:03:20.512 --> 00:03:24.196
+Dólar ARGUMENTS recibe todo lo
+que escribas después del comando,
+
+52
+00:03:24.236 --> 00:03:27.320
+y dólar uno, dólar dos,
+cada palabra por separado.
+
+53
+00:03:28.101 --> 00:03:30.810
+Nuestro ejemplo es inofensivo a propósito.
+
+54
+00:03:30.850 --> 00:03:35.221
+Se llama repaso, y pide repasar los
+cambios sin commitear antes de un commit:
+
+55
+00:03:35.261 --> 00:03:40.820
+git status, git diff con estadísticas y
+npm test, y una respuesta en tres viñetas,
+
+56
+00:03:40.860 --> 00:03:42.360
+sin editar nada.
+
+57
+00:03:43.401 --> 00:03:48.527
+Con oh my pi abierto, escribimos
+barra rep, y no aparece nada nuestro.
+
+58
+00:03:48.567 --> 00:03:51.040
+Creamos la carpeta y copiamos
+el fichero desde el otro panel.
+
+59
+00:03:51.080 --> 00:03:55.195
+Seguiría sin aparecer, porque oh
+my pi no vigila esas carpetas.
+
+60
+00:03:55.235 --> 00:04:00.800
+Barra reload plugins vuelve a buscar
+comandos, skills, agentes y servidores
+
+61
+00:04:00.840 --> 00:04:03.960
+MCP, y responde plugins reloaded.
+
+62
+00:04:04.400 --> 00:04:08.320
+Ahora sí: barra repaso, con la
+pista foco y su descripción.
+
+63
+00:04:09.143 --> 00:04:12.373
+Lo ejecutamos con un foco:
+las pruebas del envío.
+
+64
+00:04:12.413 --> 00:04:15.519
+En la conversación vemos lo que
+de verdad le llega al modelo:
+
+65
+00:04:15.559 --> 00:04:20.360
+el texto del fichero, con dólar
+ARGUMENTS ya sustituido por nuestro foco.
+
+66
+00:04:20.400 --> 00:04:25.373
+Pro ejecuta git status y el diff
+en una línea, y npm test en otra,
+
+67
+00:04:25.413 --> 00:04:27.480
+y la tarjeta de los tests sale en rojo.
+
+68
+00:04:28.436 --> 00:04:31.790
+La respuesta llega en tres
+viñetas, sin tocar nada.
+
+69
+00:04:31.977 --> 00:04:35.840
+Qué cambia: el umbral del envío
+gratis, de cuarenta a cincuenta.
+
+70
+00:04:35.880 --> 00:04:40.741
+Si pasan las pruebas: no, fallan
+tres, una del envío y dos del carrito.
+
+71
+00:04:40.781 --> 00:04:45.954
+Y qué falta según el AGENTS punto md:
+actualizar las pruebas al nuevo umbral,
+
+72
+00:04:45.994 --> 00:04:49.120
+y además un comentario que
+sigue diciendo cuarenta euros.
+
+73
+00:04:50.088 --> 00:04:53.004
+¿Por qué no un prompt template,
+como en el vídeo seis?
+
+74
+00:04:53.044 --> 00:04:56.174
+Aquel vivía en el directorio
+del agente de Pi, en tu máquina.
+
+75
+00:04:56.214 --> 00:05:01.180
+Este vive en el repositorio y se versiona
+con el código, así que todo el equipo
+
+76
+00:05:01.220 --> 00:05:03.060
+tiene el mismo barra repaso.
+
+77
+00:05:03.100 --> 00:05:06.850
+Si hay dos con el mismo nombre, gana
+el del proyecto sobre el de tu perfil.
+
+78
+00:05:06.890 --> 00:05:10.710
+Y los incluidos de oh my pi
+reservan su nombre antes que nadie:
+
+79
+00:05:10.750 --> 00:05:15.690
+un review punto md propio quedaría tapado
+por el barra review del vídeo dieciocho.
+
+80
+00:05:16.594 --> 00:05:19.457
+Y punto o eme pe barra
+commands no es el único sitio.
+
+81
+00:05:19.497 --> 00:05:23.730
+oh my pi recoge también los comandos
+de punto claude, punto codex,
+
+82
+00:05:23.770 --> 00:05:28.681
+OpenCode y punto agents. Si un repositorio
+ya tiene comandos para Claude Code,
+
+83
+00:05:28.721 --> 00:05:31.050
+en oh my pi aparecen sin hacer nada.
+
+84
+00:05:36.725 --> 00:05:39.700
+Las skills funcionan igual
+que en el vídeo seis.
+
+85
+00:05:39.740 --> 00:05:44.610
+Una carpeta con un SKILL punto md, cuyo
+nombre y descripción viajan en el system
+
+86
+00:05:44.650 --> 00:05:48.814
+prompt, y cuyo contenido el modelo
+lee solo cuando lo necesita.
+
+87
+00:05:48.854 --> 00:05:50.410
+Lo que cambia es dónde las busca oh my pi:
+
+88
+00:05:50.450 --> 00:05:55.410
+en punto o eme pe barra skills,
+en el perfil, en el registro,
+
+89
+00:05:55.450 --> 00:06:01.580
+en los plugins, en punto claude, en punto
+codex y en punto agents barra skills.
+
+90
+00:06:02.217 --> 00:06:05.780
+Esa última ruta es la interesante,
+porque Pi también la lee.
+
+91
+00:06:05.820 --> 00:06:10.983
+Una skill en punto agents barra skills del
+repositorio sirve para los dos agentes.
+
+92
+00:06:11.023 --> 00:06:13.841
+Copiamos allí la skill de notas
+de versión del vídeo seis,
+
+93
+00:06:13.881 --> 00:06:15.020
+sin cambiar una coma.
+
+94
+00:06:16.076 --> 00:06:18.310
+Barra reload plugins otra vez.
+
+95
+00:06:18.786 --> 00:06:23.840
+Escribimos barra skill dos puntos y una
+letra, y aparece skill dos puntos notas de
+
+96
+00:06:23.880 --> 00:06:28.890
+versión, con su descripción: oh my pi
+registra un comando por cada skill.
+
+97
+00:06:28.930 --> 00:06:32.700
+Lo usamos con un texto detrás:
+de los últimos seis commits.
+
+98
+00:06:33.775 --> 00:06:39.130
+Pro lee la carpeta de la skill y su SKILL
+punto md, ejecuta git log con los seis
+
+99
+00:06:39.170 --> 00:06:42.830
+últimos commits, y responde con
+el formato que pide la skill:
+
+100
+00:06:42.870 --> 00:06:48.810
+novedades, correcciones, sin hashes, y
+la línea final, incluye seis commits.
+
+101
+00:06:48.870 --> 00:06:52.169
+Como en Pi, una skill no cuesta
+casi nada hasta que se usa,
+
+102
+00:06:52.209 --> 00:06:53.820
+y cuando se usa, se nota.
+
+103
+00:06:55.073 --> 00:07:00.026
+Un detalle propio de oh my pi: las skills
+también tienen una dirección interna,
+
+104
+00:07:00.066 --> 00:07:05.030
+skill dos barras y el nombre, para que una
+skill apunte a sus scripts o referencias
+
+105
+00:07:05.070 --> 00:07:08.270
+con rutas relativas,
+sin salir de su carpeta.
+
+106
+00:07:08.310 --> 00:07:11.500
+Aquí el modelo prefirió leer el
+fichero por su ruta, que también vale.
+
+107
+00:07:12.287 --> 00:07:13.960
+Y otro detalle:
+
+108
+00:07:14.598 --> 00:07:18.654
+barra skillful. Barra skillful
+status responde skill listing on:
+
+109
+00:07:18.784 --> 00:07:21.100
+la lista de skills viaja
+en el system prompt.
+
+110
+00:07:21.140 --> 00:07:23.780
+Barra context, del vídeo
+trece, lo confirma:
+
+111
+00:07:23.820 --> 00:07:26.660
+la categoría skills, veinte tokens.
+
+112
+00:07:26.700 --> 00:07:31.505
+Con barra skillful off, el aviso dice que
+el listado queda desactivado para esta
+
+113
+00:07:31.545 --> 00:07:33.460
+sesión, y barra context baja a cero.
+
+114
+00:07:33.500 --> 00:07:38.050
+A cambio, el modelo ya no sabe qué skills
+hay, y solo las usa si las invocas tú.
+
+115
+00:07:38.090 --> 00:07:39.570
+Volvemos a dejarlo en on.
+
+116
+00:07:40.573 --> 00:07:42.790
+Ahora, la diferencia que importa.
+
+117
+00:07:42.830 --> 00:07:46.220
+En el otro panel abrimos
+Pi en la misma tienda.
+
+118
+00:07:46.290 --> 00:07:51.000
+Antes de empezar, Pi pregunta: trust
+project folder, ¿confías en esta carpeta?
+
+119
+00:07:51.040 --> 00:07:55.040
+La pregunta sale porque ha
+encontrado punto agents barra skills.
+
+120
+00:07:55.080 --> 00:07:59.220
+Ofrece confiar en la carpeta, en
+la de arriba, solo esta sesión,
+
+121
+00:07:59.260 --> 00:08:00.260
+o no confiar.
+
+122
+00:08:00.912 --> 00:08:06.240
+Elegimos no confiar, solo en esta
+sesión, para no guardar ninguna decisión.
+
+123
+00:08:06.610 --> 00:08:12.880
+Pi arranca y avisa: este proyecto no es
+de confianza, y sus recursos y paquetes se
+
+124
+00:08:13.250 --> 00:08:16.380
+ignoran. oh my pi cargó la misma
+carpeta sin preguntar nada.
+
+125
+00:08:16.420 --> 00:08:20.810
+Una skill es texto, pero texto que tu
+modelo obedece, y puede pedirle que
+
+126
+00:08:20.850 --> 00:08:21.980
+ejecute scripts.
+
+127
+00:08:27.780 --> 00:08:32.950
+oh my pi tiene un registro público de
+skills, en skills punto o eme pe punto ese
+
+128
+00:08:32.990 --> 00:08:37.680
+hache. Se maneja desde la sesión con
+barra skills, que tiene cuatro verbos:
+
+129
+00:08:37.720 --> 00:08:40.501
+search, install, installed y update.
+
+130
+00:08:40.541 --> 00:08:45.712
+Y desde la terminal con o eme pe
+skill, que añade publicar y versionar,
+
+131
+00:08:45.752 --> 00:08:47.280
+para quien mantiene skills.
+
+132
+00:08:47.892 --> 00:08:51.040
+En este vídeo no instalamos nada
+de ahí, y no buscamos en directo,
+
+133
+00:08:51.080 --> 00:08:54.339
+porque los resultados llevan
+nombres de usuario de terceros.
+
+134
+00:08:54.379 --> 00:08:56.330
+Lo vemos en una diapositiva.
+
+135
+00:08:56.630 --> 00:09:00.567
+Los paquetes se nombran con arroba,
+quien lo publica, barra y el nombre,
+
+136
+00:09:00.607 --> 00:09:01.800
+como en npm.
+
+137
+00:09:02.937 --> 00:09:07.590
+Por defecto se instalan en el proyecto,
+con un skills punto json y un fichero lock
+
+138
+00:09:07.630 --> 00:09:11.240
+con la versión exacta, para que
+todo el equipo tenga la misma.
+
+139
+00:09:11.444 --> 00:09:12.880
+Con guion g, para tu usuario.
+
+140
+00:09:14.146 --> 00:09:18.119
+Lo que hace bien: antes de desempaquetar,
+comprueba la huella del paquete,
+
+141
+00:09:18.159 --> 00:09:20.680
+y si no coincide, no instala nada.
+
+142
+00:09:20.775 --> 00:09:24.746
+Y si la skill trae scripts o
+ejecutables, se detiene y pregunta:
+
+143
+00:09:24.786 --> 00:09:28.521
+install skill with scripts,
+con la lista de lo que trae.
+
+144
+00:09:28.561 --> 00:09:32.349
+Desde la terminal, guion
+y salta esa pregunta.
+
+145
+00:09:32.389 --> 00:09:34.560
+No lo uses con paquetes
+que no hayas leído.
+
+146
+00:09:35.324 --> 00:09:38.171
+Lo que no hace: revisar el contenido.
+
+147
+00:09:38.211 --> 00:09:42.750
+La huella garantiza que recibes lo que
+se publicó, no que lo publicado sea
+
+148
+00:09:42.790 --> 00:09:47.810
+inofensivo. Una skill del registro es
+texto de otra persona que tu modelo va a
+
+149
+00:09:47.850 --> 00:09:51.313
+seguir, y scripts que puede
+ejecutar con tus permisos.
+
+150
+00:09:51.353 --> 00:09:54.160
+Léelo antes, como leerías
+un script de instalación.
+
+151
+00:09:54.756 --> 00:10:00.015
+Si algún día quieres publicar una skill
+tuya, el camino es o eme pe skill publish,
+
+152
+00:10:00.055 --> 00:10:01.859
+con una cuenta en el registro.
+
+153
+00:10:01.899 --> 00:10:04.822
+Tiene un modo de prueba que
+empaqueta y valida sin publicar,
+
+154
+00:10:04.862 --> 00:10:07.180
+y vigila las cadenas con forma de
+
+155
+00:10:07.667 --> 00:10:10.830
+credencial: para publicar aunque las
+encuentre hay que pedirlo con una opción
+
+156
+00:10:10.870 --> 00:10:13.830
+expresa. Publicar no lo
+hacemos en este curso:
+
+157
+00:10:13.870 --> 00:10:16.750
+lo que sale de tu máquina
+se explica, no se enseña.
+
+158
+00:10:22.372 --> 00:10:26.193
+En el vídeo once prometimos comprobar si
+las extensiones que escribimos para Pi
+
+159
+00:10:26.233 --> 00:10:29.130
+funcionan en oh my pi. Toca cumplirlo.
+
+160
+00:10:29.881 --> 00:10:32.840
+La razón por la que pueden
+funcionar es concreta.
+
+161
+00:10:32.880 --> 00:10:36.730
+Antes de ejecutar un módulo, oh my pi
+reescribe los imports de los paquetes de
+
+162
+00:10:36.770 --> 00:10:41.200
+Pi hacia sus propias copias, y TypeBox,
+que usamos para los parámetros de la
+
+163
+00:10:41.240 --> 00:10:44.761
+herramienta de tests, se redirige
+a una versión compatible.
+
+164
+00:10:44.801 --> 00:10:49.075
+Y si le das una carpeta con package
+punto json, acepta el manifiesto pi punto
+
+165
+00:10:49.115 --> 00:10:50.590
+extensions del vídeo nueve.
+
+166
+00:10:51.499 --> 00:10:55.140
+Así que salimos y arrancamos
+oh my pi con guion e
+
+167
+00:10:55.965 --> 00:10:58.350
+y la carpeta de nuestras extensiones.
+
+168
+00:10:58.620 --> 00:11:01.450
+No hay una lista de extensiones
+en el arranque, como en Pi,
+
+169
+00:11:01.490 --> 00:11:05.200
+pero debajo del editor aparece
+el pie de permisos punto ts:
+
+170
+00:11:05.240 --> 00:11:08.010
+cero aprobadas, cero bloqueadas.
+
+171
+00:11:08.259 --> 00:11:12.550
+Barra hola Ana, y aparece
+el saludo: hola, Ana.
+
+172
+00:11:12.642 --> 00:11:15.470
+El comando del vídeo
+ocho, sin tocar una línea.
+
+173
+00:11:16.372 --> 00:11:19.174
+Ahora una pregunta que
+ponga a trabajar al resto:
+
+174
+00:11:19.214 --> 00:11:23.375
+qué ficheros de test hay en la
+tienda y si pasan los del carrito.
+
+175
+00:11:23.415 --> 00:11:25.615
+Y aquí aparece la primera sorpresa.
+
+176
+00:11:25.655 --> 00:11:30.320
+Para buscar ficheros, Pro usa glob,
+una herramienta que en Pi no existía.
+
+177
+00:11:30.360 --> 00:11:36.050
+Nuestra lista de lectura dice read,
+grep, find, ls y ejecutar tests.
+
+178
+00:11:36.090 --> 00:11:40.090
+Glob no está, así que aparece
+el diálogo de permisos punto ts,
+
+179
+00:11:40.130 --> 00:11:44.329
+el del vídeo nueve: Pi quiere
+ejecutar glob, con permitir,
+
+180
+00:11:44.369 --> 00:11:47.136
+permitir siempre en esta rama o bloquear.
+
+181
+00:11:47.176 --> 00:11:48.260
+Permitimos.
+
+182
+00:11:48.824 --> 00:11:53.370
+El node guion guion test del carrito pasa
+sin preguntar, porque está en la lista de
+
+183
+00:11:53.410 --> 00:11:55.750
+comandos seguros de nuestra extensión.
+
+184
+00:11:55.790 --> 00:12:00.959
+Fíjate en otro detalle: el modelo ni
+siquiera usó nuestra herramienta ejecutar
+
+185
+00:12:00.999 --> 00:12:04.710
+tests; con las herramientas
+de oh my pi, prefirió bash.
+
+186
+00:12:04.750 --> 00:12:07.902
+Responde con una tabla: dos
+ficheros de test, y en el carrito,
+
+187
+00:12:07.942 --> 00:12:09.673
+diez de doce, con dos fallos.
+
+188
+00:12:09.713 --> 00:12:11.430
+Y el pie sube a una aprobada.
+
+189
+00:12:12.494 --> 00:12:17.255
+Probamos las rutas protegidas:
+añade a AGENTS punto md una regla,
+
+190
+00:12:17.295 --> 00:12:19.530
+no usar dependencias externas.
+
+191
+00:12:19.732 --> 00:12:24.392
+La edición sale en rojo, con nuestro
+motivo, AGENTS punto md está protegido,
+
+192
+00:12:24.432 --> 00:12:26.350
+y el aviso de ruta protegida.
+
+193
+00:12:26.390 --> 00:12:30.025
+En su razonamiento, Pro se plantea
+probar por bash y lo descarta:
+
+194
+00:12:30.065 --> 00:12:31.806
+sería saltarse la protección.
+
+195
+00:12:31.846 --> 00:12:34.100
+Nos propone la línea para
+que la añadamos nosotros.
+
+196
+00:12:35.033 --> 00:12:38.467
+Ahora los límites, que son
+el motivo de este capítulo.
+
+197
+00:12:38.507 --> 00:12:42.711
+El primero ya lo has visto: la
+extensión conoce las herramientas de Pi.
+
+198
+00:12:42.751 --> 00:12:48.671
+oh my pi trae unas treinta, y glob, lsp,
+ast grep o task acabarán en el diálogo.
+
+199
+00:12:48.711 --> 00:12:50.820
+Para usarla de verdad, revisa sus listas.
+
+200
+00:12:51.870 --> 00:12:56.030
+El segundo: si el modelo edita
+varios ficheros en una sola llamada,
+
+201
+00:12:56.070 --> 00:12:59.783
+oh my pi entrega una lista
+de rutas, no una ruta.
+
+202
+00:12:59.823 --> 00:13:03.300
+Nuestra comprobación solo mira
+una, y la protección no lo vería.
+
+203
+00:13:04.334 --> 00:13:06.797
+El tercero afecta al
+estado del vídeo nueve.
+
+204
+00:13:06.837 --> 00:13:10.909
+Allí reconstruíamos lo permitido al
+arrancar y al navegar por el árbol.
+
+205
+00:13:10.949 --> 00:13:16.110
+En oh my pi, rebobinar con barra branch,
+del vídeo doce, lanza otro evento,
+
+206
+00:13:16.150 --> 00:13:19.513
+session branch, que nuestra
+extensión no escucha.
+
+207
+00:13:19.553 --> 00:13:22.900
+La documentación de oh my pi
+recomienda reconstruir en los tres.
+
+208
+00:13:23.934 --> 00:13:27.470
+El cuarto: las herramientas de una
+extensión que no declaran nivel cuentan
+
+209
+00:13:27.510 --> 00:13:31.960
+como exec. Con el modo write del vídeo
+diecinueve, ejecutar tests pediría
+
+210
+00:13:32.000 --> 00:13:36.220
+aprobación. Y el quinto:
+no hay barra reload.
+
+211
+00:13:36.260 --> 00:13:40.430
+Si cambias el código de una extensión,
+barra restart relanza oh my pi con los
+
+212
+00:13:40.470 --> 00:13:42.340
+mismos flags y retoma la sesión.
+
+213
+00:13:43.247 --> 00:13:46.818
+¿Y si escribes una extensión
+nueva pensando ya en oh my pi?
+
+214
+00:13:46.858 --> 00:13:50.600
+La forma es la misma: una factoría
+por defecto que recibe pi.
+
+215
+00:13:50.640 --> 00:13:55.798
+Importas los tipos del paquete de oh my
+pi, usas pi punto zod para los parámetros,
+
+216
+00:13:55.838 --> 00:13:59.870
+y tus herramientas declaran
+su nivel, read, write o exec.
+
+217
+00:13:59.910 --> 00:14:03.610
+Una herramienta de solo lectura que dice
+read no necesita ninguna lista como la
+
+218
+00:14:03.650 --> 00:14:04.550
+nuestra.
+
+219
+00:14:10.338 --> 00:14:13.970
+Con tanto origen distinto, hace falta un
+sitio donde ver qué se ha cargado y de
+
+220
+00:14:14.010 --> 00:14:18.893
+dónde. Es barra extensions, que
+abre el Extension Control Center.
+
+221
+00:14:18.933 --> 00:14:23.822
+Arriba, una pestaña por origen: incluidos,
+Claude Code, las carpetas de agentes,
+
+222
+00:14:23.862 --> 00:14:29.524
+Codex, Cursor, Copilot,
+VS Code, MCP, SSH y más.
+
+223
+00:14:29.767 --> 00:14:33.130
+Lo recorremos sin tocar ningún
+interruptor, porque cada cambio se guarda
+
+224
+00:14:33.170 --> 00:14:34.820
+en la configuración.
+
+225
+00:14:35.484 --> 00:14:39.015
+Buscamos notas, y ahí está nuestra skill:
+
+226
+00:14:39.055 --> 00:14:42.017
+activa, que viene de las
+carpetas de agentes del proyecto,
+
+227
+00:14:42.057 --> 00:14:44.610
+con su ruta y sus instrucciones.
+
+228
+00:14:44.650 --> 00:14:49.960
+Buscamos repaso: activo, que
+viene de oh my pi en el proyecto,
+
+229
+00:14:50.000 --> 00:14:54.170
+con su pista, foco, y la nota
+de que acepta dólar ARGUMENTS.
+
+230
+00:14:55.132 --> 00:14:58.160
+Cuando un comando no hace lo
+que esperas, mira aquí primero.
+
+231
+00:14:58.803 --> 00:15:02.890
+Fíjate en lo que no sale: las
+extensiones que cargamos con guion e.
+
+232
+00:15:02.932 --> 00:15:05.663
+Buscamos permisos y no aparece.
+
+233
+00:15:05.703 --> 00:15:08.470
+El panel enseña lo que oh my
+pi descubre en sus carpetas,
+
+234
+00:15:08.510 --> 00:15:10.060
+no lo que le pasas a mano.
+
+235
+00:15:10.890 --> 00:15:13.004
+Y en lo que sí sale, que es mucho.
+
+236
+00:15:13.044 --> 00:15:17.540
+El panel lista también, desactivadas, las
+skills de otras herramientas que tienes en
+
+237
+00:15:17.580 --> 00:15:20.066
+tu carpeta personal, con sus rutas.
+
+238
+00:15:20.106 --> 00:15:22.134
+Por eso en el vídeo lo filtramos.
+
+239
+00:15:22.174 --> 00:15:26.270
+En nuestra máquina, además, dos skills
+personales de las carpetas de agentes
+
+240
+00:15:26.310 --> 00:15:30.280
+aparecían activas aunque habíamos
+apagado esa fuente en el perfil.
+
+241
+00:15:30.320 --> 00:15:33.760
+Es justo para lo que sirve este
+panel: descubrir lo que se ha colado.
+
+242
+00:15:34.699 --> 00:15:38.060
+La forma estable de instalar
+extensiones son los plugins.
+
+243
+00:15:38.100 --> 00:15:42.790
+Un plugin es un paquete que declara
+sus extensiones y puede traer skills,
+
+244
+00:15:42.830 --> 00:15:48.111
+comandos, hooks, herramientas,
+agentes, reglas y servidores MCP.
+
+245
+00:15:48.151 --> 00:15:53.630
+O eme pe plugin install lo instala desde
+npm o git, y o eme pe plugin link enlaza
+
+246
+00:15:53.670 --> 00:15:58.143
+una carpeta local, el equivalente
+del pi install del vídeo nueve.
+
+247
+00:15:58.183 --> 00:16:02.450
+Al instalar, oh my pi ejecuta la
+extensión para comprobar que carga:
+
+248
+00:16:02.490 --> 00:16:04.520
+instalar ya es ejecutar su código.
+
+249
+00:16:05.472 --> 00:16:09.570
+Barra plugins lista los instalados, y
+en nuestro perfil responde que no hay
+
+250
+00:16:09.610 --> 00:16:13.480
+ninguno. Y barra marketplace
+list, que no hay marketplaces,
+
+251
+00:16:13.520 --> 00:16:17.440
+con una sugerencia: añadir el
+catálogo oficial de Anthropic.
+
+252
+00:16:17.600 --> 00:16:21.985
+Un marketplace es un repositorio con
+un catálogo marketplace punto json,
+
+253
+00:16:22.025 --> 00:16:25.242
+en el formato de oh my pi
+o en el de Claude Code.
+
+254
+00:16:25.282 --> 00:16:30.270
+Con add lo añades, con discover lo
+exploras y con install instalas un plugin,
+
+255
+00:16:30.310 --> 00:16:32.920
+para tu usuario o solo para el proyecto.
+
+256
+00:16:32.960 --> 00:16:34.080
+No añadimos ninguno.
+
+257
+00:16:39.750 --> 00:16:42.250
+MCP lo conoces del vídeo siete.
+
+258
+00:16:42.290 --> 00:16:44.460
+En oh my pi el comando se llama barra mcp,
+
+259
+00:16:45.063 --> 00:16:51.713
+y su ayuda lo resume: add, list,
+test, enable, disable, reload,
+
+260
+00:16:51.753 --> 00:16:54.534
+la gestión del inicio de sesión
+de los servidores remotos,
+
+261
+00:16:54.574 --> 00:16:58.250
+e incluso búsqueda en un
+registro de servidores, Smithery.
+
+262
+00:16:58.290 --> 00:17:01.220
+Solo enseñamos la ayuda, porque la lista
+puede mostrar configuraciones de otras
+
+263
+00:17:01.260 --> 00:17:02.460
+herramientas de tu máquina.
+
+264
+00:17:03.575 --> 00:17:06.610
+Lo que cambia es de
+dónde lee los servidores.
+
+265
+00:17:06.650 --> 00:17:12.358
+Los suyos, en punto o eme pe barra mcp
+punto json, del proyecto o del perfil.
+
+266
+00:17:12.398 --> 00:17:16.388
+Y además traduce los de Claude
+Code, Codex, Gemini, Cursor,
+
+267
+00:17:16.428 --> 00:17:18.663
+Windsurf, OpenCode y VS Code, y
+
+268
+00:17:19.490 --> 00:17:22.540
+un mcp punto json en la raíz del proyecto.
+
+269
+00:17:22.625 --> 00:17:25.192
+Lo que no lee es la configuración de Pi.
+
+270
+00:17:25.232 --> 00:17:30.200
+El formato de base es el mismo, así que
+el servidor tienda fs del vídeo siete se
+
+271
+00:17:30.240 --> 00:17:34.425
+puede copiar a punto o eme
+pe barra mcp punto json;
+
+272
+00:17:34.465 --> 00:17:37.660
+lo que era solo de Pi, como
+el codemode, se queda fuera.
+
+273
+00:17:38.499 --> 00:17:41.890
+Sobre el coste de las herramientas, la
+idea del vídeo siete sigue valiendo con
+
+274
+00:17:41.930 --> 00:17:47.950
+otro nombre. Donde Pi tenía codemode, oh
+my pi puede montar las herramientas MCP
+
+275
+00:17:48.043 --> 00:17:52.060
+como dispositivos xd dos barras, que
+el modelo descubre cuando las necesita,
+
+276
+00:17:52.100 --> 00:17:54.900
+como vimos con barra
+tools en el vídeo once.
+
+277
+00:17:56.140 --> 00:17:58.540
+Un apunte de seguridad
+que enlaza con el final.
+
+278
+00:17:58.580 --> 00:18:02.840
+Un servidor MCP local es un
+programa que oh my pi arranca.
+
+279
+00:18:02.880 --> 00:18:07.380
+Si está en el mcp punto json del
+proyecto, arranca al abrir la carpeta.
+
+280
+00:18:07.420 --> 00:18:11.600
+Y en esa configuración, un valor que
+empieza por exclamación se ejecuta como
+
+281
+00:18:11.640 --> 00:18:17.620
+comando de shell. En Pi, punto pi barra
+mcp punto json esperaba a tu confianza.
+
+282
+00:18:18.242 --> 00:18:22.362
+Barra ssh es más sencillo.
+Su ayuda tiene tres verbos:
+
+283
+00:18:22.402 --> 00:18:25.930
+add, con el nombre, el host, el
+usuario, el puerto y la clave,
+
+284
+00:18:25.970 --> 00:18:30.060
+en el proyecto o en tu
+perfil; list y remove.
+
+285
+00:18:30.240 --> 00:18:34.268
+Después, las herramientas de lectura,
+escritura y búsqueda aceptan direcciones
+
+286
+00:18:34.308 --> 00:18:38.126
+ese ese hache dos barras, el
+nombre de la máquina y la ruta.
+
+287
+00:18:38.166 --> 00:18:42.220
+Tampoco enseñamos la lista, porque
+mostraría hosts y rutas de claves.
+
+288
+00:18:47.713 --> 00:18:49.886
+Ahora sí, el hilo de todo el vídeo.
+
+289
+00:18:49.926 --> 00:18:54.198
+En Pi, barra trust decide si se
+carga lo que trae un proyecto,
+
+290
+00:18:54.238 --> 00:18:56.200
+y acabamos de ver esa pregunta.
+
+291
+00:18:56.240 --> 00:18:59.680
+En oh my pi esa decisión no existe.
+
+292
+00:18:59.790 --> 00:19:03.000
+Una extensión puede preguntar
+si el proyecto es de confianza,
+
+293
+00:19:03.040 --> 00:19:05.200
+y la respuesta es siempre que sí.
+
+294
+00:19:05.240 --> 00:19:09.346
+La documentación lo dice tal cual: oh my
+pi no pide confianza por carpeta antes de
+
+295
+00:19:09.386 --> 00:19:11.220
+cargar lo que trae el proyecto.
+
+296
+00:19:12.209 --> 00:19:14.076
+Juntemos lo que hemos
+visto en este bloque.
+
+297
+00:19:14.116 --> 00:19:18.510
+Al abrir oh my pi en un repositorio
+se cargan sus comandos y sus skills,
+
+298
+00:19:18.550 --> 00:19:22.230
+de punto o eme pe, de punto
+claude y de punto agents.
+
+299
+00:19:22.670 --> 00:19:25.749
+Sus reglas. Sus agentes,
+del vídeo dieciséis.
+
+300
+00:19:25.789 --> 00:19:29.909
+Su configuración, que puede poner el
+modo yolo, como vimos en el diecinueve.
+
+301
+00:19:29.949 --> 00:19:32.866
+Sus hooks y sus
+extensiones, que son código.
+
+302
+00:19:32.906 --> 00:19:35.131
+Sus servidores MCP, que son programas.
+
+303
+00:19:35.171 --> 00:19:37.520
+Y los plugins instalados
+para ese proyecto.
+
+304
+00:19:38.251 --> 00:19:42.744
+Piensa en un caso concreto. Clonas un
+repositorio para revisar una contribución
+
+305
+00:19:42.784 --> 00:19:47.030
+y lo abres con oh my pi. En su
+punto o eme pe hay un hook que,
+
+306
+00:19:47.070 --> 00:19:52.030
+al arrancar, lee tus variables de entorno,
+y un servidor MCP local que manda lo que
+
+307
+00:19:52.070 --> 00:19:56.320
+quiera a donde quiera. No has
+escrito ni un prompt, y ya ha pasado.
+
+308
+00:19:56.360 --> 00:20:00.020
+En Pi, con la confianza en su valor de
+fábrica, eso no se habría cargado hasta
+
+309
+00:20:00.060 --> 00:20:01.200
+que dijeras que sí.
+
+310
+00:20:02.088 --> 00:20:05.200
+¿Qué puedes hacer? Lo
+primero, lo más barato:
+
+311
+00:20:05.480 --> 00:20:08.861
+antes de abrir un repositorio ajeno,
+mira sus carpetas punto o eme pe,
+
+312
+00:20:08.901 --> 00:20:12.151
+punto claude y punto
+agents, y su mcp punto json.
+
+313
+00:20:12.191 --> 00:20:16.112
+Después, las opciones de arranque,
+que el repositorio no puede cambiar:
+
+314
+00:20:16.152 --> 00:20:21.310
+guion guion no extensions, guion guion no
+skills, o guion guion trusted extension
+
+315
+00:20:21.350 --> 00:20:25.020
+con una ruta absoluta. La
+propia documentación avisa:
+
+316
+00:20:25.060 --> 00:20:26.470
+ninguna es un sandbox.
+
+317
+00:20:27.325 --> 00:20:31.037
+Los ajustes, como desactivar
+los servidores MCP del proyecto,
+
+318
+00:20:31.077 --> 00:20:33.991
+ayudan, pero recuerda el vídeo diecinueve:
+
+319
+00:20:34.031 --> 00:20:36.693
+la capa del proyecto gana a la tuya.
+
+320
+00:20:36.733 --> 00:20:40.338
+Para un repositorio ajeno, confía en
+los flags, no en la configuración.
+
+321
+00:20:40.378 --> 00:20:43.904
+Y para un código que no conoces, la
+respuesta es la de los vídeos cinco y
+
+322
+00:20:43.944 --> 00:20:47.920
+diecinueve: un contenedor.
+Extender no es aislar.
+
+323
+00:20:53.326 --> 00:20:58.940
+Repasemos. Un comando de proyecto es un
+Markdown en punto o eme pe barra commands,
+
+324
+00:20:58.980 --> 00:21:05.170
+con dólar ARGUMENTS, versionado con el
+código, y barra reload plugins lo recoge.
+
+325
+00:21:05.210 --> 00:21:10.012
+Las skills en punto agents barra
+skills sirven para Pi y para oh my pi;
+
+326
+00:21:10.052 --> 00:21:14.360
+se invocan con barra skill dos puntos y
+su nombre, y barra skillful decide si la
+
+327
+00:21:14.400 --> 00:21:17.090
+lista viaja en el system prompt.
+
+328
+00:21:17.130 --> 00:21:21.280
+El registro instala skills con la huella
+comprobada y avisa si traen scripts.
+
+329
+00:21:21.996 --> 00:21:26.440
+Tus extensiones de Pi cargan con guion
+e, pero conocen las herramientas de Pi,
+
+330
+00:21:26.480 --> 00:21:29.807
+no escuchan barra branch, y
+se recargan con barra restart.
+
+331
+00:21:29.847 --> 00:21:34.980
+Barra extensions te dice qué se cargó y
+de dónde, y te enseña lo que se ha colado.
+
+332
+00:21:35.020 --> 00:21:39.300
+Plugins y marketplaces, compatibles con
+Claude Code, empaquetan todo lo anterior.
+
+333
+00:21:40.078 --> 00:21:43.268
+Y lo que no cambia: oh my
+pi no tiene barra trust.
+
+334
+00:21:43.308 --> 00:21:47.238
+Todo lo que extiende oh my pi desde
+una carpeta se carga al abrirla.
+
+335
+00:21:47.278 --> 00:21:50.140
+En toda la demo, el coste se
+quedó en un par de céntimos.
+
+336
+00:21:50.963 --> 00:21:55.730
+La práctica: en una rama de tu proyecto,
+convierte el prompt que más repites en un
+
+337
+00:21:55.770 --> 00:22:00.180
+comando de punto o eme pe barra
+commands, con dólar ARGUMENTS,
+
+338
+00:22:00.485 --> 00:22:06.308
+y una de tus skills en punto agents barra
+skills para que la vean Pi y oh my pi.
+
+339
+00:22:06.348 --> 00:22:11.310
+Después carga tu extensión de Pi con guion
+e y apunta qué herramientas de oh my pi le
+
+340
+00:22:11.350 --> 00:22:15.520
+faltan en sus listas. Y abre barra
+extensions para ver qué más se carga en tu
+
+341
+00:22:15.560 --> 00:22:16.620
+máquina.
+
+342
+00:22:17.404 --> 00:22:20.522
+En el próximo vídeo sacamos
+oh my pi de la terminal:
+
+343
+00:22:20.562 --> 00:22:25.620
+o eme pe guion p en scripts e
+integración continua, el modo JSON,
+
+344
+00:22:25.660 --> 00:22:28.648
+RPC, el SDK y ACP para editores.
+
+345
+00:22:28.688 --> 00:22:29.600
+Nos vemos allí.

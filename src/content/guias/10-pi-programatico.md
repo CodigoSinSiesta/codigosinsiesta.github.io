@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 10
 duracion: "26 min"
 video: "10-pi-programatico.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/10-pi-programatico.es.vtt"
 ---
 
 Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como librería. Lo metemos en un pipeline real.

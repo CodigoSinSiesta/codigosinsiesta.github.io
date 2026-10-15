@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 8
 duracion: "21 min"
 video: "08-extensiones-i.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/08-extensiones-i.es.vtt"
 ---
 
 la API de extensiones (comandos, herramientas propias y eventos). Construimos en directo el modo de aprobación que Pi no trae de serie.

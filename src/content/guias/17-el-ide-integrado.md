@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 17
 duracion: "24 min"
 video: "17-el-ide-integrado.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/17-el-ide-integrado.es.vtt"
 ---
 
 lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas y ediciones por estructura del código, y lectura de PDF o bases de datos.

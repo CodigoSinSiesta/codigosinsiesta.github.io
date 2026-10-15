@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 4
 duracion: "20 min"
 video: "04-modelos-y-proveedores.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/04-modelos-y-proveedores.es.vtt"
 ---
 
 todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuánto razonan, y lo que cuesta de verdad cambiar de modelo a mitad de tarea. Cerramos probando modelos locales.

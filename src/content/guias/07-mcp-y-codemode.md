@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 7
 duracion: "17 min"
 video: "07-mcp-y-codemode.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/07-mcp-y-codemode.es.vtt"
 ---
 
 la gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, donde el modelo escribe código para llamar a las herramientas y ahorra contexto.

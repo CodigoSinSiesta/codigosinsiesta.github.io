@@ -1,0 +1,1680 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.513 --> 00:00:13.920
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:13.960 --> 00:00:16.420
+Vídeo quince: planificar y dirigir.
+
+3
+00:00:22.036 --> 00:00:24.860
+En el vídeo catorce repartimos
+el trabajo entre modelos.
+
+4
+00:00:24.900 --> 00:00:29.020
+Barra prewalk dejaba que el modelo capaz
+planificara y pasara el testigo al rápido
+
+5
+00:00:29.060 --> 00:00:32.430
+en la primera edición, y el
+advisor revisaba cada turno.
+
+6
+00:00:32.470 --> 00:00:34.950
+Pero la forma de trabajar
+seguía siendo la misma:
+
+7
+00:00:34.990 --> 00:00:38.660
+tú escribes, el agente trabaja hasta que
+cree que ha terminado y te devuelve el
+
+8
+00:00:38.700 --> 00:00:42.520
+control. Hoy cambiamos eso.
+Vamos a decidir quién aprueba,
+
+9
+00:00:42.560 --> 00:00:45.200
+cuándo para el agente
+y cuánto puede gastar.
+
+10
+00:00:46.000 --> 00:00:49.104
+oh my pi trae para eso
+cuatro modos de trabajo.
+
+11
+00:00:49.144 --> 00:00:52.820
+El modo plan, en el que el agente solo
+investiga y te entrega un plan para
+
+12
+00:00:52.860 --> 00:00:56.703
+aprobar. El modo goal, un objetivo
+que persigue turno tras turno,
+
+13
+00:00:56.743 --> 00:00:58.468
+con un presupuesto de tokens.
+
+14
+00:00:58.508 --> 00:01:03.174
+El modo loop, que repite un mensaje hasta
+un límite o hasta que un comando dé la
+
+15
+00:01:03.214 --> 00:01:07.830
+señal. Y el modo vibe, en el que la
+sesión deja de programar y dirige a otros
+
+16
+00:01:07.870 --> 00:01:08.770
+agentes.
+
+17
+00:01:09.596 --> 00:01:12.581
+Junto a los modos hay dos
+herramientas que valen siempre:
+
+18
+00:01:12.621 --> 00:01:15.431
+la cola de mensajes y la lista de tareas.
+
+19
+00:01:15.471 --> 00:01:18.240
+Y una regla que atraviesa todo el vídeo:
+
+20
+00:01:18.280 --> 00:01:21.559
+plan, goal y vibe no se pueden combinar.
+
+21
+00:01:21.599 --> 00:01:24.760
+Al final entenderás por qué, y verás
+que la forma de usarlos juntos es
+
+22
+00:01:24.800 --> 00:01:29.320
+encadenarlos: primero un plan,
+después un objetivo que lo ejecuta.
+
+23
+00:01:30.029 --> 00:01:34.357
+Trabajamos en la tienda, con el perfil
+demo y los dos modelos del vídeo catorce:
+
+24
+00:01:34.397 --> 00:01:39.092
+DeepSeek V cuatro Pro, el capaz,
+y DeepSeek Flash, el rápido.
+
+25
+00:01:39.132 --> 00:01:42.770
+Y una novedad: oh my pi ha sacado la
+versión dieciocho punto seis punto tres
+
+26
+00:01:42.810 --> 00:01:47.201
+mientras preparábamos el vídeo, así
+que actualizamos antes de grabar.
+
+27
+00:01:47.241 --> 00:01:51.200
+Nada de lo de hoy cambia en ella, pero la
+regla del curso es grabar siempre con la
+
+28
+00:01:51.240 --> 00:01:52.140
+última.
+
+29
+00:01:52.853 --> 00:01:55.090
+Antes de nada, un vistazo gratis.
+
+30
+00:01:55.142 --> 00:02:00.520
+Escribimos barra p ele, y el
+menú dice plan off y plan review:
+
+31
+00:02:00.560 --> 00:02:02.729
+el modo plan no está activo.
+
+32
+00:02:02.769 --> 00:02:08.311
+Con barra g o aparecen los demás: goal
+off, guided goal con su descripción,
+
+33
+00:02:08.351 --> 00:02:13.030
+vibe off y loop off. Guided goal enseña
+una descripción en lugar de un estado
+
+34
+00:02:13.070 --> 00:02:15.090
+porque no es un modo, es una acción.
+
+35
+00:02:21.173 --> 00:02:25.604
+¿Por qué planificar aparte? Porque el
+error más caro no es un fallo de sintaxis:
+
+36
+00:02:25.644 --> 00:02:28.770
+es código correcto para
+el problema equivocado.
+
+37
+00:02:28.810 --> 00:02:32.900
+Cuando el agente empieza a editar a la vez
+que piensa, cada malentendido se convierte
+
+38
+00:02:32.940 --> 00:02:34.690
+en cambios que hay que deshacer.
+
+39
+00:02:34.730 --> 00:02:36.539
+El modo plan separa las dos cosas.
+
+40
+00:02:36.579 --> 00:02:40.006
+El agente explora sin tocar
+el proyecto, escribe un plan,
+
+41
+00:02:40.046 --> 00:02:42.180
+y nada se ejecuta hasta
+que tú lo apruebas.
+
+42
+00:02:43.193 --> 00:02:47.006
+Primero, el rol plan, que en el
+vídeo catorce solo nombramos.
+
+43
+00:02:47.046 --> 00:02:51.483
+Abrimos barra model, filtramos
+por deepseek, elegimos Pro y,
+
+44
+00:02:51.523 --> 00:02:55.650
+en la barra de roles, plan,
+con razonamiento high.
+
+45
+00:02:55.690 --> 00:02:58.445
+Asignar un rol que no es default
+no cambia la conversación:
+
+46
+00:02:58.485 --> 00:03:01.680
+se guarda en el perfil y
+espera a que alguien lo use.
+
+47
+00:03:01.740 --> 00:03:03.655
+Asignar plan no entra en modo plan.
+
+48
+00:03:03.695 --> 00:03:07.280
+Lo que pasa es que, al entrar, oh
+my pi cambia al modelo de plan.
+
+49
+00:03:08.412 --> 00:03:14.160
+Para entrar hay dos caminos:
+barra plan, o alt mayúsculas pe.
+
+50
+00:03:14.200 --> 00:03:20.061
+Escribimos barra plan. El aviso dice
+plan mode enabled, y el fichero del plan:
+
+51
+00:03:20.101 --> 00:03:24.176
+local dos puntos barra
+barra PLAN punto md.
+
+52
+00:03:24.515 --> 00:03:28.230
+Local es una carpeta de la
+sesión, fuera de tu repositorio.
+
+53
+00:03:28.270 --> 00:03:32.927
+Y fíjate en el pie: el modelo
+ha pasado solo de Flash a Pro,
+
+54
+00:03:32.967 --> 00:03:34.780
+y al lado aparece plan.
+
+55
+00:03:35.381 --> 00:03:39.140
+¿Qué cambia mientras dura? Las
+herramientas de escritura y edición
+
+56
+00:03:39.180 --> 00:03:42.920
+rechazan tocar el proyecto; si el modelo
+lo intenta, recibe un error que le dice
+
+57
+00:03:42.960 --> 00:03:47.335
+que el árbol de trabajo es de solo
+lectura y que escriba su plan en local.
+
+58
+00:03:47.375 --> 00:03:49.733
+Tampoco puede renombrar
+ni borrar ficheros.
+
+59
+00:03:49.773 --> 00:03:53.741
+Y la herramienta ask, la que te hace
+preguntas, no tiene temporizador:
+
+60
+00:03:53.781 --> 00:03:55.580
+el agente espera tu respuesta.
+
+61
+00:03:56.571 --> 00:04:00.057
+El modo plan también decide
+cómo termina cada turno.
+
+62
+00:04:00.097 --> 00:04:04.820
+El agente tiene dos salidas: preguntarte
+algo con ask, o escribir el plan en un
+
+63
+00:04:04.860 --> 00:04:09.968
+fichero de local que termina en guion plan
+punto md y proponerlo escribiendo en un
+
+64
+00:04:10.008 --> 00:04:14.291
+dispositivo especial, equis de
+dos puntos barra barra propose.
+
+65
+00:04:14.331 --> 00:04:18.960
+Si un turno acaba sin ninguna de las dos,
+oh my pi le recuerda que tiene que elegir.
+
+66
+00:04:19.642 --> 00:04:23.600
+Le pedimos esto: que el carrito
+acepte códigos de cupón.
+
+67
+00:04:23.640 --> 00:04:27.766
+Bienvenida diez resta un diez por
+ciento del subtotal, antes del envío,
+
+68
+00:04:27.806 --> 00:04:30.460
+y un código desconocido da un error claro.
+
+69
+00:04:30.500 --> 00:04:33.320
+Que investigue y prepare un plan con
+
+70
+00:04:33.989 --> 00:04:38.912
+tests. Pro lee el carrito, los gastos de
+envío, los tests y el AGENTS punto md,
+
+71
+00:04:38.952 --> 00:04:43.420
+busca quién usa cada función, y en poco
+más de un minuto escribe el plan en local
+
+72
+00:04:43.460 --> 00:04:47.620
+y lo propone. Sin preguntas:
+tenía todo lo que necesitaba.
+
+73
+00:04:48.534 --> 00:04:52.700
+Un límite que conviene decir
+claro: planificar no es aislar.
+
+74
+00:04:52.900 --> 00:04:56.440
+Las herramientas de escritura y
+edición se niegan a tocar el proyecto,
+
+75
+00:04:56.480 --> 00:04:59.860
+pero el modo plan es una forma
+de trabajar, no un sandbox.
+
+76
+00:04:59.900 --> 00:05:02.660
+No lo uses para abrir un
+repositorio en el que no confías.
+
+77
+00:05:02.700 --> 00:05:05.790
+Para eso está el aislamiento del vídeo
+cinco, y los permisos de herramientas,
+
+78
+00:05:05.830 --> 00:05:07.620
+que veremos en el vídeo diecinueve.
+
+79
+00:05:13.444 --> 00:05:17.382
+Cuando el agente propone, se abre
+la revisión a pantalla completa.
+
+80
+00:05:17.422 --> 00:05:20.082
+Arriba a la izquierda,
+el índice de secciones:
+
+81
+00:05:20.122 --> 00:05:25.690
+contexto, enfoque, ficheros críticos,
+verificación, y supuestos y contingencias.
+
+82
+00:05:25.750 --> 00:05:27.724
+En el centro, el plan entero.
+
+83
+00:05:27.764 --> 00:05:31.300
+Y abajo, plan mode, next
+step, con las opciones.
+
+84
+00:05:31.340 --> 00:05:35.200
+Es lo más parecido a revisar un pull
+request antes de que exista el código:
+
+85
+00:05:35.240 --> 00:05:37.840
+es barato cambiar de idea
+ahora, y caro después.
+
+86
+00:05:38.818 --> 00:05:42.310
+Leemos el contexto y hay
+algo que no nos gusta.
+
+87
+00:05:42.350 --> 00:05:45.793
+El carrito ya acepta un cupón
+como objeto, con un porcentaje,
+
+88
+00:05:45.833 --> 00:05:50.640
+y el plan propone quitar esa forma
+y aceptar solo el código en texto.
+
+89
+00:05:50.680 --> 00:05:54.590
+Los tests son los únicos que la
+usan, dice, así que no rompe nada.
+
+90
+00:05:54.630 --> 00:05:58.340
+Puede que sea verdad hoy, pero no queremos
+cambiar una API pública por el camino.
+
+91
+00:05:59.262 --> 00:06:03.240
+Con tabulador pasamos al índice,
+y abajo cambian las teclas:
+
+92
+00:06:03.280 --> 00:06:08.870
+a para anotar, e para editar,
+d para borrar, u para deshacer.
+
+93
+00:06:08.930 --> 00:06:12.130
+Sobre contexto, pulsamos a y escribimos:
+
+94
+00:06:12.170 --> 00:06:17.530
+no elimines la API de objeto; total con
+cupón debe seguir aceptando el porcentaje
+
+95
+00:06:17.570 --> 00:06:20.160
+y además un código en texto.
+
+96
+00:06:20.200 --> 00:06:21.600
+Enter guarda la nota.
+
+97
+00:06:22.225 --> 00:06:25.640
+Bajamos a verificación
+y anotamos otra cosa:
+
+98
+00:06:25.763 --> 00:06:29.562
+añade un caso con un subtotal
+que no dé céntimos exactos,
+
+99
+00:06:29.602 --> 00:06:31.100
+para comprobar el
+
+100
+00:06:31.689 --> 00:06:35.470
+redondeo. Las notas aparecen debajo de
+cada sección, y en el índice las secciones
+
+101
+00:06:35.510 --> 00:06:41.040
+anotadas llevan un lápiz. Volvemos a las
+opciones con tabulador y elegimos refine
+
+102
+00:06:41.080 --> 00:06:41.980
+plan.
+
+103
+00:06:42.475 --> 00:06:44.871
+Las notas viajan al agente como respuesta.
+
+104
+00:06:44.911 --> 00:06:48.540
+En pantalla se ven como un mensaje:
+refinement feedback on the plan,
+
+105
+00:06:48.580 --> 00:06:50.575
+con cada nota bajo su sección.
+
+106
+00:06:50.615 --> 00:06:53.270
+Pro rehace el plan y lo vuelve a proponer.
+
+107
+00:06:53.310 --> 00:06:56.714
+Ahora el contexto dice que la API
+de objeto se conserva tal cual,
+
+108
+00:06:56.754 --> 00:07:00.759
+y aparece una función auxiliar nueva
+que acepta un objeto o un código.
+
+109
+00:07:00.799 --> 00:07:04.600
+Y en la verificación, un caso de
+veintinueve con noventa y nueve euros que
+
+110
+00:07:04.648 --> 00:07:06.200
+debe dar veintiséis con noventa y nueve.
+
+111
+00:07:07.075 --> 00:07:13.223
+Ahora, las opciones. Approve and execute
+aprueba y empieza con el contexto vacío:
+
+112
+00:07:13.263 --> 00:07:15.970
+el plan es lo único que
+pasa a la ejecución.
+
+113
+00:07:16.010 --> 00:07:20.267
+Approve and compact context aprueba
+y compacta antes de ejecutar,
+
+114
+00:07:20.307 --> 00:07:26.060
+y compactar gasta modelo. Approve and keep
+context lo conserva todo y te dice cuántos
+
+115
+00:07:26.100 --> 00:07:29.662
+tokens llevas: aquí, unos treinta
+y cuatro mil de un millón.
+
+116
+00:07:29.702 --> 00:07:31.863
+Refine plan pide otra vuelta.
+
+117
+00:07:31.903 --> 00:07:36.200
+Y save and quit guarda el plan en un
+fichero y sale del modo plan sin ejecutar.
+
+118
+00:07:36.920 --> 00:07:40.190
+Fíjate en la línea de
+encima: continue with.
+
+119
+00:07:40.230 --> 00:07:45.130
+Es un selector con los roles, smol,
+default y slow, que decide qué modelo
+
+120
+00:07:45.170 --> 00:07:48.716
+ejecuta el plan aprobado,
+y debajo te dice cuál es.
+
+121
+00:07:48.756 --> 00:07:52.501
+En el vídeo catorce, prewalk hacía ese
+cambio solo, en la primera edición.
+
+122
+00:07:52.541 --> 00:07:54.973
+Aquí lo decides tú, con el plan delante.
+
+123
+00:07:55.013 --> 00:07:59.277
+Si cierras la revisión con escape, sigues
+en modo plan, y barra plan review la
+
+124
+00:07:59.317 --> 00:08:00.217
+reabre.
+
+125
+00:08:00.975 --> 00:08:04.730
+Tres detalles más. Al aprobar,
+si la sesión no tenía nombre,
+
+126
+00:08:04.770 --> 00:08:09.581
+toma el título del plan. El ajuste
+plan autosave, apagado de fábrica,
+
+127
+00:08:09.621 --> 00:08:14.770
+guarda cada plan aprobado en la carpeta
+punto omp barra plans del proyecto.
+
+128
+00:08:14.810 --> 00:08:18.201
+Y para trabajar sin interfaz
+existe guion guion plan yolo:
+
+129
+00:08:18.241 --> 00:08:23.595
+planifica en solo lectura, aprueba solo y
+ejecuta con el destino de guion guion plan
+
+130
+00:08:23.635 --> 00:08:25.850
+yolo into, que por defecto es smol.
+
+131
+00:08:25.890 --> 00:08:29.660
+Sin revisión humana, claro: úsalo solo
+con planes que no te importe rehacer.
+
+132
+00:08:30.734 --> 00:08:34.150
+Hoy elegimos save and quit, porque
+queremos ejecutar con presupuesto,
+
+133
+00:08:34.190 --> 00:08:38.520
+y eso es otro modo. oh my pi propone
+una ruta dentro de la tienda,
+
+134
+00:08:38.560 --> 00:08:43.729
+con un nombre sacado del título del
+plan, en mayúsculas y con guiones bajos:
+
+135
+00:08:43.769 --> 00:08:46.977
+códigos de cupón plan punto md.
+
+136
+00:08:47.017 --> 00:08:53.170
+Aceptamos. El aviso dice saved plan to
+y la ruta, y se abre una sesión nueva,
+
+137
+00:08:53.210 --> 00:08:55.600
+ya fuera del modo plan,
+con Flash en el pie.
+
+138
+00:09:01.415 --> 00:09:05.783
+El modo goal convierte una petición
+en un objetivo persistente.
+
+139
+00:09:05.823 --> 00:09:09.518
+Cuando el agente cede el turno, oh
+my pi no te devuelve el control:
+
+140
+00:09:09.558 --> 00:09:12.410
+le recuerda el objetivo
+y le pide que siga.
+
+141
+00:09:12.450 --> 00:09:16.290
+Así, turno tras turno, hasta que el
+propio modelo lo da por cumplido con una
+
+142
+00:09:16.330 --> 00:09:19.430
+herramienta que solo
+existe en este modo, goal.
+
+143
+00:09:19.562 --> 00:09:22.300
+En el pie verás el objetivo
+y lo que lleva gastado.
+
+144
+00:09:23.270 --> 00:09:25.050
+Barra goal tiene subcomandos.
+
+145
+00:09:25.090 --> 00:09:27.463
+Set fija o sustituye el objetivo.
+
+146
+00:09:27.503 --> 00:09:32.380
+Show enseña el detalle. Pause
+lo detiene y resume lo retoma.
+
+147
+00:09:32.599 --> 00:09:35.135
+Drop lo abandona, con confirmación.
+
+148
+00:09:35.175 --> 00:09:39.970
+Y budget cambia el presupuesto,
+con un número de tokens u off.
+
+149
+00:09:40.010 --> 00:09:43.690
+Desde la línea de comandos, guion guion
+goal arranca una sesión directamente en
+
+150
+00:09:43.730 --> 00:09:44.660
+este modo.
+
+151
+00:09:45.652 --> 00:09:51.258
+Ahora, lo delicado. Barra goal con un
+objetivo escrito lo crea sin presupuesto y
+
+152
+00:09:51.298 --> 00:09:53.410
+empieza a trabajar en el acto.
+
+153
+00:09:53.504 --> 00:09:57.600
+Si después pides barra goal budget,
+durante ese rato el agente ha trabajado
+
+154
+00:09:57.640 --> 00:09:58.760
+sin límite.
+
+155
+00:09:59.340 --> 00:10:02.650
+Y no puedes pulsar escape para ganar
+tiempo, porque interrumpir pausa el
+
+156
+00:10:02.690 --> 00:10:07.340
+objetivo. Por eso, para el trabajo
+de verdad, usamos el otro camino.
+
+157
+00:10:07.961 --> 00:10:11.790
+Barra guided goal hace que el agente te
+entreviste en el chat antes de fijar el
+
+158
+00:10:11.830 --> 00:10:14.402
+objetivo, con una pregunta por turno.
+
+159
+00:10:14.442 --> 00:10:18.527
+Busca cinco cosas: criterios de
+éxito que se puedan comprobar,
+
+160
+00:10:18.567 --> 00:10:24.321
+cómo se comprueban, cuántos intentos
+admite, el alcance y cuándo debe parar.
+
+161
+00:10:24.361 --> 00:10:27.190
+Lo que puede sacar del
+repositorio no te lo pregunta.
+
+162
+00:10:27.244 --> 00:10:30.730
+Al terminar crea el objetivo con la
+herramienta goal, que sí admite un
+
+163
+00:10:30.770 --> 00:10:32.180
+presupuesto desde el principio.
+
+164
+00:10:33.230 --> 00:10:39.532
+Escribimos barra guided goal, implementar
+el plan guardado en códigos de cupón plan
+
+165
+00:10:39.572 --> 00:10:43.740
+punto md. Flash razona
+en voz alta qué le falta:
+
+166
+00:10:44.170 --> 00:10:49.040
+la verificación la saca del repositorio,
+npm test, y el criterio de hecho,
+
+167
+00:10:49.080 --> 00:10:53.590
+del AGENTS punto md. Primera
+pregunta, de seis como
+
+168
+00:10:54.047 --> 00:10:57.720
+mucho: cuántos ciclos de implementar
+y probar autoriza antes de parar.
+
+169
+00:10:57.785 --> 00:10:58.980
+Le damos cinco.
+
+170
+00:10:59.640 --> 00:11:05.570
+Segunda, el alcance: solo el plan, o
+también ajustes, documentación o tests
+
+171
+00:11:05.610 --> 00:11:10.070
+extra. Solo el plan y sus pruebas,
+y si hay que tocar otro fichero,
+
+172
+00:11:10.110 --> 00:11:11.010
+que
+
+173
+00:11:11.294 --> 00:11:13.810
+pregunte. Tercera, las
+condiciones de parada.
+
+174
+00:11:13.850 --> 00:11:17.838
+Elegimos decidir y documentar:
+ante una ambigüedad menor,
+
+175
+00:11:17.878 --> 00:11:21.223
+la opción más conservadora,
+anotada en el resumen.
+
+176
+00:11:21.263 --> 00:11:25.510
+Y añadimos: pon un presupuesto
+de doscientos mil tokens.
+
+177
+00:11:25.550 --> 00:11:27.390
+Con eso tiene sus cinco campos.
+
+178
+00:11:28.292 --> 00:11:32.883
+Aparece la tarjeta de goal: set,
+activo, el objetivo, y debajo,
+
+179
+00:11:32.923 --> 00:11:35.080
+cero de doscientos mil tokens.
+
+180
+00:11:35.220 --> 00:11:38.187
+El presupuesto está
+desde el primer momento.
+
+181
+00:11:38.227 --> 00:11:41.400
+Flash lee el plan, comprueba que
+los quince tests de partida pasan,
+
+182
+00:11:41.440 --> 00:11:45.370
+hace los cambios en el carrito y sus
+tests, y verifica por consola los números
+
+183
+00:11:45.410 --> 00:11:49.548
+del plan: diez por ciento, treinta
+y seis con cincuenta y tres,
+
+184
+00:11:49.588 --> 00:11:52.400
+y veintiséis con noventa y
+nueve en el caso del redondeo.
+
+185
+00:11:53.211 --> 00:11:57.783
+Y cierra: la tarjeta de goal pasa
+a complete, con doce mil tokens de
+
+186
+00:11:57.823 --> 00:12:02.310
+doscientos mil, ciento ochenta y ocho
+mil libres, en veintitrés segundos.
+
+187
+00:12:02.350 --> 00:12:06.521
+Veintiún tests de veintiuno,
+y una tabla de comprobaciones.
+
+188
+00:12:06.561 --> 00:12:09.070
+Una sola vuelta, sin reintentos.
+
+189
+00:12:09.110 --> 00:12:11.180
+El presupuesto no hizo
+falta, pero estaba ahí.
+
+190
+00:12:12.152 --> 00:12:16.770
+¿Qué cuenta el presupuesto? Los tokens de
+entrada, los que se escriben en la caché y
+
+191
+00:12:16.810 --> 00:12:21.020
+los de salida. Las lecturas de caché
+no cuentan, así que mide trabajo
+
+192
+00:12:21.538 --> 00:12:23.630
+nuevo. Y al llegar al
+límite no corta en seco:
+
+193
+00:12:23.670 --> 00:12:28.513
+el objetivo pasa a budget limited, el
+agente recibe un aviso para cerrar y oh my
+
+194
+00:12:28.553 --> 00:12:30.690
+pi deja de pedirle que continúe.
+
+195
+00:12:30.730 --> 00:12:35.030
+Recuerda también quién decide el final: el
+modelo, que puede declarar cumplido algo
+
+196
+00:12:35.070 --> 00:12:35.980
+que no lo está.
+
+197
+00:12:41.854 --> 00:12:45.051
+Para ver cómo se dirige un
+objetivo en marcha, lanzamos otro,
+
+198
+00:12:45.091 --> 00:12:49.683
+esta vez con barra goal a secas,
+sin presupuesto, a propósito:
+
+199
+00:12:49.723 --> 00:12:55.290
+añade un segundo cupón, envío gratis, que
+deje a cero los gastos de envío sin tocar
+
+200
+00:12:55.330 --> 00:13:00.280
+el subtotal, con sus tests.
+Y enseguida, barra goal show:
+
+201
+00:13:00.320 --> 00:13:05.889
+el objetivo, el estado active,
+cero tokens, y entre paréntesis,
+
+202
+00:13:05.929 --> 00:13:08.070
+no budget. Es justo el
+riesgo del que hablábamos.
+
+203
+00:13:09.299 --> 00:13:12.210
+Mientras Flash trabaja,
+mira encima del editor.
+
+204
+00:13:12.250 --> 00:13:16.285
+Ahí está la lista de tareas, que el
+agente mantiene con la herramienta todo.
+
+205
+00:13:16.325 --> 00:13:19.440
+Se organiza en fases, y
+cada tarea tiene un estado:
+
+206
+00:13:19.480 --> 00:13:24.180
+pendiente, en curso, completada,
+abandonada o bloqueada.
+
+207
+00:13:24.220 --> 00:13:28.240
+Cuando todas se cierran, la lista se
+esconde, pero sigue guardada en la sesión.
+
+208
+00:13:30.701 --> 00:13:33.220
+Barra todo te deja tocar esa lista a ti.
+
+209
+00:13:33.390 --> 00:13:36.772
+Edit la abre en tu editor
+como Markdown, con casillas.
+
+210
+00:13:36.812 --> 00:13:42.350
+Append añade una tarea, start la
+marca en curso, done la completa,
+
+211
+00:13:42.390 --> 00:13:45.702
+drop la abandona y rm la quita.
+
+212
+00:13:45.742 --> 00:13:52.060
+Probamos: barra todo append,
+documentación, explicar los cupones en el
+
+213
+00:13:52.396 --> 00:13:55.850
+README. La línea gris confirma que se ha
+añadido, y la tarea aparece en una fase
+
+214
+00:13:55.890 --> 00:13:56.830
+nueva de la lista.
+
+215
+00:13:57.729 --> 00:14:00.030
+La cola es la otra forma de dirigir.
+
+216
+00:14:00.083 --> 00:14:03.480
+Si escribes y pulsas Enter mientras
+trabaja, tu mensaje le llega en el
+
+217
+00:14:03.520 --> 00:14:06.460
+siguiente paso, entre
+herramientas: es guiar.
+
+218
+00:14:06.601 --> 00:14:09.770
+Si lo encolas, espera a que
+el agente ceda el turno.
+
+219
+00:14:09.810 --> 00:14:14.850
+Barra queue y el mensaje: cuando termines,
+dime en una línea qué ficheros has
+
+220
+00:14:14.890 --> 00:14:19.416
+cambiado. El aviso dice queued
+message for when the agent yields,
+
+221
+00:14:19.456 --> 00:14:23.000
+y abajo aparece after
+yield, uno, con el mensaje.
+
+222
+00:14:24.057 --> 00:14:26.847
+Y a veces quieres que todo
+se detenga sin perder nada.
+
+223
+00:14:26.887 --> 00:14:32.070
+Barra pause congela al agente, a sus
+subagentes y al advisor en su siguiente
+
+224
+00:14:32.110 --> 00:14:35.340
+punto seguro, sin abortar
+nada, hasta que reanudas.
+
+225
+00:14:35.380 --> 00:14:38.810
+Es distinto de escape a secas,
+que interrumpe el turno y,
+
+226
+00:14:38.850 --> 00:14:40.920
+en modo goal, pausa el objetivo.
+
+227
+00:14:42.070 --> 00:14:45.792
+Flash termina enseguida:
+veinticuatro tests de veinticuatro,
+
+228
+00:14:45.832 --> 00:14:50.100
+la tarjeta en complete con catorce
+mil tokens en treinta y tres segundos.
+
+229
+00:14:50.158 --> 00:14:53.760
+Y entonces llega el mensaje
+encolado, como un turno más:
+
+230
+00:14:53.800 --> 00:14:56.215
+solo ha cambiado el carrito y sus tests.
+
+231
+00:14:56.319 --> 00:14:59.790
+Nada más: src barra envio punto
+js y el resto del repositorio,
+
+232
+00:14:59.830 --> 00:15:00.880
+intactos.
+
+233
+00:15:07.077 --> 00:15:10.671
+Con el segundo objetivo todavía
+activo, hicimos dos pruebas.
+
+234
+00:15:10.711 --> 00:15:14.623
+Escribimos barra plan, y
+la respuesta fue un aviso:
+
+235
+00:15:14.663 --> 00:15:18.040
+exit goal mode first, sal
+primero del modo goal.
+
+236
+00:15:18.080 --> 00:15:21.170
+Y en el menú, plan decía
+blocked by goal mode.
+
+237
+00:15:21.334 --> 00:15:24.100
+No es un error: es una regla del diseño.
+
+238
+00:15:24.746 --> 00:15:28.984
+La regla completa. El modo
+plan bloquea goal y vibe.
+
+239
+00:15:29.024 --> 00:15:32.764
+El modo goal, activo o en
+pausa, bloquea plan y vibe.
+
+240
+00:15:32.804 --> 00:15:34.930
+Y vibe bloquea a los otros dos.
+
+241
+00:15:34.970 --> 00:15:36.960
+Para pasar de uno a otro,
+cierras el que tienes.
+
+242
+00:15:37.984 --> 00:15:40.595
+¿Por qué? Porque cada
+modo cambia dos cosas:
+
+243
+00:15:40.635 --> 00:15:43.700
+las herramientas del agente
+y quién decide parar.
+
+244
+00:15:43.740 --> 00:15:47.530
+Plan deja al agente en solo
+lectura y para en tu aprobación.
+
+245
+00:15:47.570 --> 00:15:51.530
+Goal añade la herramienta goal y no para
+hasta que el modelo da el objetivo por
+
+246
+00:15:51.570 --> 00:15:53.755
+cumplido o se acaba el presupuesto.
+
+247
+00:15:53.795 --> 00:15:57.099
+Vibe le quita la edición y le da
+herramientas para dirigir a otros.
+
+248
+00:15:57.139 --> 00:16:01.509
+Combinarlos sería pedirle a la vez que no
+toque nada, que siga sin preguntar y que
+
+249
+00:16:01.549 --> 00:16:02.620
+no programe él.
+
+250
+00:16:03.658 --> 00:16:07.200
+La forma de usarlos juntos es
+encadenarlos, que es justo lo que hemos
+
+251
+00:16:07.240 --> 00:16:12.190
+hecho: un plan revisado, guardado en un
+fichero, y un objetivo con presupuesto que
+
+252
+00:16:12.230 --> 00:16:15.080
+lo ejecuta. Las demás
+piezas sí se combinan.
+
+253
+00:16:15.120 --> 00:16:18.350
+La cola y la lista de tareas
+funcionan en cualquier modo.
+
+254
+00:16:18.390 --> 00:16:20.660
+Y barra loop tampoco es excluyente.
+
+255
+00:16:26.232 --> 00:16:28.617
+Barra loop activa el modo bucle.
+
+256
+00:16:28.657 --> 00:16:33.400
+Mientras está activo, el mensaje que
+envíes se reenvía cada vez que el agente
+
+257
+00:16:33.440 --> 00:16:36.798
+cede el turno. La diferencia
+con goal es de fondo.
+
+258
+00:16:36.838 --> 00:16:40.010
+En goal, el modelo decide
+cuándo ha terminado.
+
+259
+00:16:40.050 --> 00:16:44.500
+En loop, el modelo no decide nada: el
+mismo mensaje se repite hasta que algo de
+
+260
+00:16:44.540 --> 00:16:50.640
+fuera lo para. Por eso un bucle sin límite
+es la forma más directa de gastar sin
+
+261
+00:16:50.680 --> 00:16:50.543
+techo.
+
+262
+00:16:50.563 --> 00:16:52.641
+Hay tres formas de acotarlo.
+
+263
+00:16:52.681 --> 00:16:55.952
+Un número: barra loop diez. Una duración:
+
+264
+00:16:55.992 --> 00:16:59.500
+barra loop diez eme,
+en minutos, o en horas.
+
+265
+00:16:59.706 --> 00:17:04.420
+Y una condición: guion guion while o guion
+guion until, seguido de un comando entre
+
+266
+00:17:04.460 --> 00:17:08.780
+comillas. Con until, el bucle
+sigue mientras el comando falla,
+
+267
+00:17:08.820 --> 00:17:10.650
+y para cuando sale con cero.
+
+268
+00:17:10.690 --> 00:17:14.390
+Con while, al revés. Puedes combinar
+un número con una condición.
+
+269
+00:17:15.363 --> 00:17:17.140
+Dos matices de la condición.
+
+270
+00:17:17.180 --> 00:17:19.870
+Se evalúa después de cada vuelta,
+nunca antes de la primera:
+
+271
+00:17:19.910 --> 00:17:21.296
+la primera vuelta siempre ocurre.
+
+272
+00:17:21.336 --> 00:17:25.290
+Y si el comando sale con un código
+raro, no arranca o tarda más de treinta
+
+273
+00:17:25.330 --> 00:17:28.300
+segundos, el bucle se apaga con un error.
+
+274
+00:17:28.340 --> 00:17:31.780
+Así un verificador roto no se
+convierte en un bucle infinito.
+
+275
+00:17:32.191 --> 00:17:35.840
+Escape suspende el bucle, y
+barra loop otra vez lo apaga.
+
+276
+00:17:36.762 --> 00:17:40.676
+La demo. En la otra pestaña
+escribimos nosotros un test nuevo:
+
+277
+00:17:40.716 --> 00:17:45.320
+el código bienvenida diez, escrito en
+minúsculas, también debe aceptarse.
+
+278
+00:17:45.520 --> 00:17:50.588
+Ejecutamos node guion guion test:
+veinticuatro pasan, uno falla,
+
+279
+00:17:50.628 --> 00:17:52.650
+y el código de salida es uno.
+
+280
+00:17:52.690 --> 00:17:55.320
+Es lo que necesita until para seguir.
+
+281
+00:17:55.936 --> 00:18:00.070
+En oh my pi escribimos barra
+loop tres, guion guion until,
+
+282
+00:18:00.620 --> 00:18:04.500
+node guion guion test, y el
+mensaje: ejecuta los tests y,
+
+283
+00:18:04.540 --> 00:18:08.300
+si alguno falla, corrige
+el código de src, nunca los
+
+284
+00:18:09.137 --> 00:18:13.020
+tests. El aviso dice loop mode
+enabled, limitado a tres iteraciones,
+
+285
+00:18:13.060 --> 00:18:17.409
+tres restantes, continuando hasta que
+node guion guion test tenga éxito.
+
+286
+00:18:17.449 --> 00:18:22.140
+Y el pie lo recuerda: loop running, tres
+de tres, until node guion guion test.
+
+287
+00:18:23.500 --> 00:18:26.982
+Flash ejecuta los tests, ve
+el fallo y corrige el carrito:
+
+288
+00:18:27.022 --> 00:18:30.550
+el código se pasa a mayúsculas antes de
+buscarlo, y el mensaje de error sigue
+
+289
+00:18:30.590 --> 00:18:32.689
+mostrando lo que escribió el usuario.
+
+290
+00:18:32.729 --> 00:18:35.984
+Veinticinco de veinticinco.
+Y avisa de una cosa:
+
+291
+00:18:36.024 --> 00:18:39.700
+la tarea del README que añadimos sigue
+pendiente, porque estaba fuera del alcance
+
+292
+00:18:39.740 --> 00:18:42.663
+de la entrevista, y no la
+toca sin que se lo pidamos.
+
+293
+00:18:42.703 --> 00:18:46.612
+Cede el turno, oh my pi ejecuta
+el comando, sale con cero,
+
+294
+00:18:46.652 --> 00:18:50.620
+y la línea gris dice que la condición
+se cumple y que el modo bucle se apaga.
+
+295
+00:18:50.660 --> 00:18:54.040
+Una sola vuelta. El tres era
+un techo, no un objetivo.
+
+296
+00:18:55.115 --> 00:18:59.821
+Entre vuelta y vuelta pasa algo más,
+y lo decide el ajuste loop mode.
+
+297
+00:19:00.165 --> 00:19:05.470
+Prompt, el de fábrica, reenvía el mensaje
+sin más, así que el contexto crece en cada
+
+298
+00:19:05.510 --> 00:19:10.167
+vuelta. Compact compacta antes de cada
+vuelta, como vimos en el vídeo trece,
+
+299
+00:19:10.207 --> 00:19:14.640
+y eso gasta modelo. Y reset empieza de
+cero cada vez, como si cada vuelta fuera
+
+300
+00:19:14.680 --> 00:19:18.330
+una sesión nueva; es la única
+opción que no se puede usar en vibe.
+
+301
+00:19:18.402 --> 00:19:21.440
+Para un bucle corto como
+el nuestro, prompt basta.
+
+302
+00:19:22.381 --> 00:19:27.600
+Los riesgos, sin rodeos. La condición
+la escribes tú, y es tu verificador:
+
+303
+00:19:27.640 --> 00:19:30.998
+si es floja, el bucle para
+en un resultado flojo.
+
+304
+00:19:31.038 --> 00:19:34.240
+Un modelo con prisa podría cambiar
+el test en lugar del código,
+
+305
+00:19:34.280 --> 00:19:37.592
+y por eso lo prohibimos en el mensaje
+y lo comprobamos con git diff:
+
+306
+00:19:37.632 --> 00:19:40.875
+nuestro test sigue tal cual lo escribimos.
+
+307
+00:19:40.915 --> 00:19:43.800
+Cuándo compensa un bucle lo
+veremos en el vídeo veinticinco.
+
+308
+00:19:49.559 --> 00:19:51.798
+El último modo es el más distinto.
+
+309
+00:19:51.838 --> 00:19:56.098
+Con barra vibe, la sesión deja de
+programar y pasa a ser directora.
+
+310
+00:19:56.138 --> 00:20:00.450
+Sus herramientas se reducen a leer, la
+lista de tareas, y cinco herramientas para
+
+311
+00:20:00.490 --> 00:20:05.090
+manejar trabajadores: spawn para
+crearlos, send para mandarles un mensaje,
+
+312
+00:20:05.130 --> 00:20:10.540
+wait para esperar a que terminen, kill
+para pararlos y list para ver cómo van.
+
+313
+00:20:11.686 --> 00:20:15.510
+Los trabajadores son agentes completos
+y persistentes, cada uno con su
+
+314
+00:20:15.550 --> 00:20:17.980
+conversación. Hay dos tipos.
+
+315
+00:20:18.020 --> 00:20:21.996
+Fast usa el modelo de smol, para
+trabajo mecánico y borradores.
+
+316
+00:20:22.036 --> 00:20:26.984
+Good usa el rol task, para decisiones
+y para revisar lo que hizo fast.
+
+317
+00:20:27.024 --> 00:20:30.535
+Empiezan en blanco, así que cada
+encargo tiene que explicarse solo:
+
+318
+00:20:30.575 --> 00:20:34.320
+ficheros, restricciones y
+cómo se sabe que está hecho.
+
+319
+00:20:35.178 --> 00:20:39.010
+La directora reparte y, cuando llega
+un resultado, lo verifica leyendo los
+
+320
+00:20:39.050 --> 00:20:42.240
+ficheros que tocaron. La
+documentación lo deja claro:
+
+321
+00:20:42.280 --> 00:20:45.420
+que un trabajador termine solo
+significa que su turno acabó,
+
+322
+00:20:45.460 --> 00:20:47.490
+no que lo que dice sea cierto.
+
+323
+00:20:47.530 --> 00:20:51.490
+Para salir, barra vibe otra vez: se
+cancelan los trabajadores y el aviso te
+
+324
+00:20:51.530 --> 00:20:52.520
+dice cuántos.
+
+325
+00:20:53.367 --> 00:20:56.313
+Hoy lo dejamos en la
+diapositiva, por coste.
+
+326
+00:20:56.353 --> 00:20:59.790
+Cada trabajador es una conversación
+entera, con su contexto,
+
+327
+00:20:59.830 --> 00:21:03.270
+y varios en paralelo multiplican
+el gasto en poco tiempo.
+
+328
+00:21:03.310 --> 00:21:07.632
+Los subagentes, el Agent Hub y el
+trabajo en paralelo son el tema del vídeo
+
+329
+00:21:07.672 --> 00:21:08.572
+dieciséis.
+
+330
+00:21:14.094 --> 00:21:19.230
+Repasemos. Barra plan, o alt mayúsculas
+pe, deja al agente en solo lectura con el
+
+331
+00:21:19.270 --> 00:21:22.905
+modelo del rol plan. El plan
+se propone para revisión.
+
+332
+00:21:22.945 --> 00:21:27.661
+En la revisión anotas por secciones,
+refinas, apruebas con o sin contexto,
+
+333
+00:21:27.701 --> 00:21:31.899
+eliges con continue with qué rol
+lo ejecuta, o lo guardas y sales.
+
+334
+00:21:31.939 --> 00:21:35.340
+Y recuerda que es una forma
+de trabajar, no un sandbox.
+
+335
+00:21:36.950 --> 00:21:40.153
+Barra guided goal te entrevista y fija
+el presupuesto desde el principio;
+
+336
+00:21:40.193 --> 00:21:44.220
+barra goal a secas lo
+deja sin presupuesto.
+
+337
+00:21:44.260 --> 00:21:48.362
+El presupuesto cuenta entrada,
+escritura de caché y salida,
+
+338
+00:21:48.402 --> 00:21:50.320
+y frena sin cortar en seco.
+
+339
+00:21:50.800 --> 00:21:53.960
+La lista de tareas y la cola
+dirigen sin interrumpir.
+
+340
+00:21:54.000 --> 00:21:59.585
+Barra loop repite un mensaje, acotado
+por número, duración o un comando.
+
+341
+00:21:59.625 --> 00:22:02.334
+Barra vibe dirige trabajadores.
+
+342
+00:22:02.599 --> 00:22:05.860
+Plan, goal y vibe se
+encadenan, no se mezclan.
+
+343
+00:22:06.895 --> 00:22:12.510
+La práctica: en tu perfil de pruebas,
+asigna un modelo al rol plan y pide un
+
+344
+00:22:12.550 --> 00:22:14.620
+plan para un cambio pequeño.
+
+345
+00:22:14.795 --> 00:22:19.470
+Anota una sección con algo que no te
+convenza, refínalo y guárdalo con save and
+
+346
+00:22:19.510 --> 00:22:25.290
+quit. Después, lanza barra guided goal
+para ejecutarlo, con un presupuesto
+
+347
+00:22:25.330 --> 00:22:30.450
+decidido antes. Al terminar, compara
+los tokens con lo que habías previsto,
+
+348
+00:22:30.490 --> 00:22:31.800
+y revisa el diff.
+
+349
+00:22:32.396 --> 00:22:35.830
+En el próximo vídeo, subagentes
+y trabajo en paralelo:
+
+350
+00:22:35.870 --> 00:22:40.568
+la herramienta task y sus agentes,
+el Agent Hub, tus propios agentes,
+
+351
+00:22:40.608 --> 00:22:45.220
+agentes en segundo plano con barra
+tan y los trabajos con barra jobs.
+
+352
+00:22:45.470 --> 00:22:46.370
+Nos vemos allí.

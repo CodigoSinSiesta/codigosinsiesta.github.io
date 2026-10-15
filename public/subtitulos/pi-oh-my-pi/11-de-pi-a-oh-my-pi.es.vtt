@@ -1,0 +1,1816 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.527 --> 00:00:14.864
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.904 --> 00:00:17.880
+Vídeo once: de Pi a oh my pi.
+
+3
+00:00:23.791 --> 00:00:26.360
+Durante nueve vídeos
+hemos trabajado con Pi.
+
+4
+00:00:26.400 --> 00:00:30.087
+Lo instalamos, lo abrimos por
+dentro, le cambiamos el modelo,
+
+5
+00:00:30.127 --> 00:00:33.472
+lo metimos en un contenedor,
+lo personalizamos sin código,
+
+6
+00:00:33.512 --> 00:00:38.190
+le conectamos servidores MCP, le
+escribimos extensiones y lo sacamos de la
+
+7
+00:00:38.230 --> 00:00:40.273
+terminal para usarlo en scripts.
+
+8
+00:00:40.313 --> 00:00:45.590
+Todo sobre la misma idea: un núcleo
+pequeño que entiendes entero y al que le
+
+9
+00:00:45.710 --> 00:00:46.610
+añades lo que necesitas.
+
+10
+00:00:46.645 --> 00:00:48.939
+Hoy empieza el bloque de oh my pi.
+
+11
+00:00:48.979 --> 00:00:52.774
+Recuerda el vídeo uno: allí lo
+presentamos como la filosofía contraria,
+
+12
+00:00:52.814 --> 00:00:55.060
+la de las baterías incluidas.
+
+13
+00:00:55.222 --> 00:00:59.870
+Subagentes, modo plan, memoria,
+servidor de lenguaje, depurador,
+
+14
+00:00:59.910 --> 00:01:04.625
+navegador, estadísticas y una
+interfaz de git, todo de serie.
+
+15
+00:01:04.665 --> 00:01:06.190
+No vamos a repetir esa lista.
+
+16
+00:01:06.230 --> 00:01:10.719
+Este vídeo responde a otra pregunta, la
+que se hace alguien que ya sabe usar Pi:
+
+17
+00:01:10.759 --> 00:01:13.660
+¿qué me llevo, qué cambia
+de sitio y qué es nuevo?
+
+18
+00:01:14.616 --> 00:01:19.070
+El plan es este. Primero, qué es
+exactamente oh my pi y por qué corre sobre
+
+19
+00:01:19.110 --> 00:01:23.030
+otro motor. Después, qué
+hereda de Pi y qué no.
+
+20
+00:01:23.070 --> 00:01:26.540
+Luego lo instalamos y lo arrancamos
+por primera vez en un perfil aislado,
+
+21
+00:01:26.580 --> 00:01:30.990
+sin enseñar ninguna cuenta. Recorremos los
+cuatro comandos que conviene conocer el
+
+22
+00:01:31.030 --> 00:01:36.320
+primer día: barra changelog, barra
+hotkeys, barra tools y barra settings.
+
+23
+00:01:36.510 --> 00:01:39.049
+Vemos qué recoge de
+Claude Code y de Codex.
+
+24
+00:01:39.089 --> 00:01:43.530
+Y terminamos con una tabla, Pi frente a
+oh my pi, para que sepas cuándo usar cada
+
+25
+00:01:43.570 --> 00:01:44.470
+uno.
+
+26
+00:01:44.937 --> 00:01:49.872
+Una nota sobre el modelo. En los vídeos de
+este bloque, oh my pi trabaja con DeepSeek
+
+27
+00:01:49.912 --> 00:01:54.558
+V cuatro punto uno Flash, el mismo modelo
+barato que usamos en Pi desde el vídeo
+
+28
+00:01:54.598 --> 00:01:57.660
+tres, con su clave en
+una variable de entorno.
+
+29
+00:01:57.743 --> 00:02:01.740
+Hoy apenas lo vamos a usar: casi todo lo
+que veremos funciona sin gastar un solo
+
+30
+00:02:01.780 --> 00:02:02.680
+token.
+
+31
+00:02:08.088 --> 00:02:09.915
+Empecemos por la relación entre los dos.
+
+32
+00:02:09.955 --> 00:02:14.430
+oh my pi no es una capa encima de
+Pi ni un paquete de extensiones.
+
+33
+00:02:14.470 --> 00:02:19.039
+Es un fork: una copia del código
+de Pi que evoluciona por su cuenta.
+
+34
+00:02:19.079 --> 00:02:22.090
+Su historial lo dice así. La
+primera versión con el nuevo nombre,
+
+35
+00:02:22.130 --> 00:02:26.048
+del dos de enero de dos mil veintiséis,
+remite a las versiones anteriores de Pi,
+
+36
+00:02:26.088 --> 00:02:28.776
+y el changelog conserva toda esa historia.
+
+37
+00:02:28.816 --> 00:02:33.460
+Poco después, el binario dejó de
+llamarse pi y pasó a llamarse o eme pe.
+
+38
+00:02:34.357 --> 00:02:36.240
+Un fork no significa ruptura.
+
+39
+00:02:36.280 --> 00:02:39.894
+oh my pi mantiene una guía para
+seguir trayendo cambios de Pi,
+
+40
+00:02:39.934 --> 00:02:44.194
+con su último punto de sincronización
+completo en marzo, y desde entonces sigue
+
+41
+00:02:44.234 --> 00:02:48.550
+portando piezas sueltas. Por ejemplo, el
+calentamiento de la caché de prompts que
+
+42
+00:02:48.590 --> 00:02:52.860
+vimos en el vídeo cuatro llegó
+a oh my pi copiado de Pi.
+
+43
+00:02:52.900 --> 00:02:56.350
+Lo publica Stencil Labs, con
+licencia MIT, y Mario Zechner,
+
+44
+00:02:56.390 --> 00:02:59.260
+el autor de Pi, figura
+entre sus colaboradores.
+
+45
+00:03:00.280 --> 00:03:02.892
+La diferencia más visible está debajo.
+
+46
+00:03:02.932 --> 00:03:05.180
+Pi es TypeScript sobre Node.
+
+47
+00:03:05.220 --> 00:03:10.130
+oh my pi corre sobre Bun, otro runtime de
+JavaScript, y su guía de portado lo deja
+
+48
+00:03:10.170 --> 00:03:15.440
+claro: aquí se usa Bun, y las APIs de Node
+solo se mantienen donde encajan mejor.
+
+49
+00:03:15.480 --> 00:03:18.070
+Además, lleva un módulo
+nativo escrito en Rust.
+
+50
+00:03:18.110 --> 00:03:21.377
+Ahí viven la búsqueda de texto,
+que usa el motor de ripgrep,
+
+51
+00:03:21.417 --> 00:03:25.570
+la terminal y el shell, el pintado de
+imágenes en la terminal y otras piezas
+
+52
+00:03:25.610 --> 00:03:27.440
+donde la velocidad importa.
+
+53
+00:03:28.142 --> 00:03:30.890
+¿Por qué te importa a ti, que
+no vas a tocar ese código?
+
+54
+00:03:30.930 --> 00:03:35.530
+Por dos razones prácticas. La primera:
+se distribuye como un binario autónomo,
+
+55
+00:03:35.570 --> 00:03:38.400
+que no necesita que tengas
+Node ni Bun instalados.
+
+56
+00:03:38.440 --> 00:03:42.854
+La segunda: la herramienta de bash
+no usa tu shell, sino uno embebido.
+
+57
+00:03:42.894 --> 00:03:46.100
+Casi siempre te dará igual, pero
+si un comando se comporta raro,
+
+58
+00:03:46.140 --> 00:03:48.060
+recuerda que no es tu shell de siempre.
+
+59
+00:03:48.758 --> 00:03:51.181
+Y queda el rastro del
+origen en muchos sitios.
+
+60
+00:03:51.221 --> 00:03:55.470
+Los paquetes se llaman pi algo,
+dentro del scope oh my pi,
+
+61
+00:03:55.644 --> 00:03:59.580
+y muchas variables de entorno
+siguen empezando por PI underscore.
+
+62
+00:03:59.620 --> 00:04:02.580
+Lo que aprendiste del bloque B
+te va a sonar constantemente.
+
+63
+00:04:08.361 --> 00:04:12.754
+Lo que se hereda tal cual es el núcleo
+que estudiamos en el vídeo tres.
+
+64
+00:04:12.794 --> 00:04:18.030
+El bucle de turnos, con steering cuando
+escribes mientras trabaja y follow up para
+
+65
+00:04:18.096 --> 00:04:22.140
+encolar. La sesión como árbol en
+un fichero JSONL, con sus ramas.
+
+66
+00:04:22.180 --> 00:04:24.400
+Adjuntar ficheros con arroba.
+
+67
+00:04:24.440 --> 00:04:28.980
+Los modos print, JSON y RPC, y
+el SDK con create agent session,
+
+68
+00:04:29.020 --> 00:04:32.728
+del vídeo diez. Las skills
+que se cargan bajo demanda.
+
+69
+00:04:32.768 --> 00:04:35.890
+Y las extensiones que escuchan
+eventos, incluido tool call,
+
+70
+00:04:35.930 --> 00:04:39.670
+el que usamos en el vídeo ocho para
+construir nuestro modo de aprobación.
+
+71
+00:04:40.730 --> 00:04:44.150
+Pero muchas cosas cambian de sitio, y
+conviene saberlo antes de buscarlas donde
+
+72
+00:04:44.190 --> 00:04:49.296
+no están. La configuración ya no es
+settings punto json dentro de punto pi,
+
+73
+00:04:49.336 --> 00:04:56.250
+sino config punto yml, en YAML, dentro de
+punto o eme pe barra agent en tu carpeta
+
+74
+00:04:56.290 --> 00:04:57.460
+personal.
+
+75
+00:04:58.080 --> 00:05:02.671
+Las credenciales ya no van en auth punto
+json, sino en una base de datos SQLite,
+
+76
+00:05:02.711 --> 00:05:06.250
+agent punto db, que admite
+varias cuentas por proveedor.
+
+77
+00:05:06.290 --> 00:05:09.860
+Y la herramienta que en Pi se llamaba
+find, para buscar ficheros por patrón,
+
+78
+00:05:09.900 --> 00:05:10.990
+aquí se llama glob.
+
+79
+00:05:11.822 --> 00:05:17.170
+Lo importante para quien viene de Pi: oh
+my pi no usa punto pi como su carpeta de
+
+80
+00:05:17.210 --> 00:05:22.200
+configuración. Tus ajustes de Pi, tus
+prompt templates y tu directorio del
+
+81
+00:05:22.240 --> 00:05:24.320
+agente no se trasladan solos.
+
+82
+00:05:24.380 --> 00:05:28.560
+El template barra review que hicimos en
+el vídeo seis vive en el directorio del
+
+83
+00:05:28.600 --> 00:05:31.323
+agente de Pi, así que oh my pi no lo verá.
+
+84
+00:05:31.363 --> 00:05:35.680
+Y además oh my pi ya trae su propio barra
+review, que veremos en el vídeo dieciocho.
+
+85
+00:05:36.623 --> 00:05:38.340
+Las extensiones son otra historia.
+
+86
+00:05:38.380 --> 00:05:42.837
+oh my pi mantiene adaptadores para
+cargar extensiones escritas para Pi:
+
+87
+00:05:42.877 --> 00:05:46.560
+reescribe sus imports y acepta el
+manifiesto de los paquetes de Pi.
+
+88
+00:05:46.600 --> 00:05:49.250
+Así que la extensión de permisos
+del vídeo ocho, en principio,
+
+89
+00:05:49.290 --> 00:05:52.305
+puede funcionar aquí. Lo
+comprobaremos en el vídeo veinte,
+
+90
+00:05:52.345 --> 00:05:56.430
+el de extender oh my pi, porque algunas
+piezas de la interfaz no se comportan
+
+91
+00:05:56.470 --> 00:05:57.370
+igual.
+
+92
+00:05:57.918 --> 00:05:59.550
+Y una idea para no perderse.
+
+93
+00:05:59.590 --> 00:06:03.780
+Cuando algo de Pi no está donde lo
+esperas, casi siempre es por uno de tres
+
+94
+00:06:03.820 --> 00:06:08.610
+motivos: cambió de nombre, cambió de
+formato, o ahora viene integrado y ya no
+
+95
+00:06:08.650 --> 00:06:09.780
+hace falta la extensión.
+
+96
+00:06:10.570 --> 00:06:14.599
+Lo que añade lo iremos desmontando
+en este bloque, una pieza por vídeo.
+
+97
+00:06:14.639 --> 00:06:17.104
+La interfaz y las sesiones en el doce.
+
+98
+00:06:17.144 --> 00:06:19.550
+El contexto y la memoria en el trece.
+
+99
+00:06:19.590 --> 00:06:22.560
+Modelos, roles y
+razonamiento en el catorce.
+
+100
+00:06:22.600 --> 00:06:24.732
+Planificar y dirigir en el quince.
+
+101
+00:06:24.772 --> 00:06:29.466
+Subagentes en el dieciséis. El entorno
+de desarrollo integrado en el diecisiete.
+
+102
+00:06:29.506 --> 00:06:31.676
+Git y calidad en el dieciocho.
+
+103
+00:06:31.716 --> 00:06:34.108
+Aprobaciones y reglas en el diecinueve.
+
+104
+00:06:34.148 --> 00:06:38.776
+Extenderlo en el veinte, y usarlo desde
+programas y en equipo en el veintiuno.
+
+105
+00:06:38.816 --> 00:06:41.720
+Hoy solo necesitamos tenerlo
+instalado y saber movernos.
+
+106
+00:06:47.494 --> 00:06:50.190
+Instalar oh my pi es una línea.
+
+107
+00:06:50.230 --> 00:06:54.940
+En macOS y Linux, curl contra o eme
+pe punto ese hache barra install,
+
+108
+00:06:54.980 --> 00:06:56.804
+con una tubería a ese hache.
+
+109
+00:06:56.844 --> 00:06:58.710
+En Windows, el equivalente en
+
+110
+00:06:59.166 --> 00:07:02.440
+PowerShell, y la web destaca que
+funciona en Windows de forma nativa,
+
+111
+00:07:02.480 --> 00:07:06.130
+sin WSL. También hay fórmula
+de Homebrew y paquete de Bun.
+
+112
+00:07:06.170 --> 00:07:10.150
+Para actualizar, o eme pe update, y con
+guion guion check solo comprueba si hay
+
+113
+00:07:10.190 --> 00:07:11.380
+versión nueva.
+
+114
+00:07:12.342 --> 00:07:16.090
+En nuestro equipo ya está instalado, así
+que no ejecutamos el instalador delante de
+
+115
+00:07:16.130 --> 00:07:20.531
+la cámara. Comprobamos la versión
+con o eme pe guion guion version:
+
+116
+00:07:20.571 --> 00:07:24.918
+dieciocho punto seis punto
+uno, la última cuando grabamos.
+
+117
+00:07:24.958 --> 00:07:29.210
+oh my pi publica versiones muy a menudo,
+así que es normal que veas un número más
+
+118
+00:07:29.250 --> 00:07:34.380
+alto. Por eso en este curso actualizamos
+antes de cada vídeo y leemos el changelog.
+
+119
+00:07:35.140 --> 00:07:38.011
+Hay piezas opcionales que no
+vienen en la instalación básica,
+
+120
+00:07:38.051 --> 00:07:41.265
+como el entorno de Python para la
+herramienta que ejecuta código,
+
+121
+00:07:41.305 --> 00:07:43.190
+o los modelos locales de voz.
+
+122
+00:07:43.230 --> 00:07:47.527
+Se instalan con o eme pe setup,
+seguido de python o de speech.
+
+123
+00:07:47.567 --> 00:07:51.440
+Y con guion guion check, o eme
+pe setup solo te dice qué falta,
+
+124
+00:07:51.480 --> 00:07:54.500
+sin instalar nada. Para este
+vídeo no necesitamos ninguna.
+
+125
+00:07:55.440 --> 00:07:58.747
+Antes de arrancarlo, una decisión
+que te recomiendo copiar:
+
+126
+00:07:58.787 --> 00:08:04.700
+los perfiles. Con guion guion profile y un
+nombre, oh my pi usa un directorio propio
+
+127
+00:08:04.740 --> 00:08:08.970
+dentro de punto o eme pe barra
+profiles, con sus propios ajustes,
+
+128
+00:08:09.010 --> 00:08:11.650
+credenciales, sesiones y cachés.
+
+129
+00:08:11.690 --> 00:08:15.506
+Es lo mismo que hacíamos en Pi con
+PI underscore CODING underscore AGENT
+
+130
+00:08:15.546 --> 00:08:18.020
+underscore DIR, pero integrado.
+
+131
+00:08:18.060 --> 00:08:20.860
+Nosotros grabamos con un
+perfil que se llama demo.
+
+132
+00:08:21.497 --> 00:08:24.197
+Y aquí hay un detalle
+que nos afecta de lleno.
+
+133
+00:08:24.237 --> 00:08:28.080
+Nuestra terminal tiene exportada esa
+variable, apuntando al directorio de Pi
+
+134
+00:08:28.120 --> 00:08:32.493
+del curso. El perfil por defecto
+de oh my pi también la respeta.
+
+135
+00:08:32.533 --> 00:08:36.404
+Si arrancáramos sin perfil, oh
+my pi usaría el directorio de Pi,
+
+136
+00:08:36.444 --> 00:08:40.340
+y en el primer arranque migraría
+su settings punto json a YAML y lo
+
+137
+00:08:40.380 --> 00:08:44.403
+renombraría. Los perfiles con
+nombre ignoran esa variable.
+
+138
+00:08:44.443 --> 00:08:48.950
+Por eso, en este bloque, todas nuestras
+órdenes llevan guion guion profile demo.
+
+139
+00:08:49.657 --> 00:08:53.041
+Antes del primer arranque
+preparamos el perfil sin modelo,
+
+140
+00:08:53.081 --> 00:08:57.568
+con o eme pe config set. Desactivamos
+una pieza llamada archive,
+
+141
+00:08:57.608 --> 00:09:00.328
+que deja al modelo consultar
+sesiones de otros proyectos,
+
+142
+00:09:00.368 --> 00:09:03.844
+y la carga de skills y comandos
+personales de otras herramientas.
+
+143
+00:09:03.884 --> 00:09:08.253
+Útil en tu día a día, pero en una
+grabación enseñaría cosas que no son de la
+
+144
+00:09:08.293 --> 00:09:12.810
+tienda. Lo comprobamos: echo de
+la variable de Pi, que apunta a su
+
+145
+00:09:13.370 --> 00:09:17.421
+directorio; o eme pe config path,
+que da la carpeta del perfil demo;
+
+146
+00:09:17.461 --> 00:09:22.160
+y config get, que confirma el modo de
+aprobación, yolo, y archive desactivado.
+
+147
+00:09:23.113 --> 00:09:28.000
+Entramos en la tienda y lanzamos
+o eme pe guion guion profile demo.
+
+148
+00:09:28.040 --> 00:09:31.063
+Como el perfil es nuevo, aparece
+el asistente de configuración,
+
+149
+00:09:31.103 --> 00:09:34.330
+en cinco pasos. El primero
+es el de proveedores:
+
+150
+00:09:34.370 --> 00:09:39.310
+una lista donde eliges con quién iniciar
+sesión, desde suscripciones como la de
+
+151
+00:09:39.350 --> 00:09:42.837
+ChatGPT o Claude hasta
+OpenRouter o GitHub Copilot.
+
+152
+00:09:42.877 --> 00:09:44.100
+Puedes conectar varios.
+
+153
+00:09:44.986 --> 00:09:48.910
+Esta pantalla, igual que barra login,
+enseña cuentas y correos en cuanto
+
+154
+00:09:48.950 --> 00:09:52.400
+conectas algo, así que no la
+vas a ver rellena en este curso.
+
+155
+00:09:52.440 --> 00:09:56.755
+Nosotros no iniciamos sesión: la clave de
+DeepSeek ya está en la variable de entorno
+
+156
+00:09:56.795 --> 00:10:01.940
+DEEPSEEK underscore API underscore
+KEY, que oh my pi lee igual que Pi.
+
+157
+00:10:01.980 --> 00:10:04.717
+Así que pulsamos escape
+para saltar el paso.
+
+158
+00:10:04.757 --> 00:10:08.559
+Si conectas una cuenta, oh my pi
+abre el navegador, tú autorizas,
+
+159
+00:10:08.599 --> 00:10:11.700
+y la credencial se guarda en
+la base de datos del perfil.
+
+160
+00:10:11.740 --> 00:10:15.440
+Para volver a esta pantalla, el comando
+es barra setup, que también se llama barra
+
+161
+00:10:15.480 --> 00:10:16.380
+providers.
+
+162
+00:10:21.848 --> 00:10:25.180
+El segundo paso es elegir el modelo
+por defecto, entre los que tienes
+
+163
+00:10:25.220 --> 00:10:29.948
+configurados. Escribimos flash para
+filtrar, aparecen los modelos de DeepSeek
+
+164
+00:10:29.988 --> 00:10:35.240
+con su contexto y su precio por millón
+de tokens, y confirmamos deepseek flash.
+
+165
+00:10:35.280 --> 00:10:37.240
+Los tres pasos siguientes
+son de apariencia:
+
+166
+00:10:37.280 --> 00:10:39.990
+los símbolos que tu terminal
+pinta bien, la forma del editor,
+
+167
+00:10:40.030 --> 00:10:44.480
+con una vista previa en directo y
+hasta un estilo Pi y otro Claude Code,
+
+168
+00:10:44.520 --> 00:10:48.606
+y el tema. Dejamos los valores por
+defecto, oh my pi guarda la configuración,
+
+169
+00:10:48.646 --> 00:10:49.620
+y ya estamos dentro.
+
+170
+00:10:50.585 --> 00:10:53.450
+La pantalla tiene tres zonas
+que te resultarán familiares:
+
+171
+00:10:53.490 --> 00:10:58.488
+arriba la conversación, abajo el editor,
+y entre los dos la línea de estado.
+
+172
+00:10:58.528 --> 00:11:02.620
+En ella ves el modelo, el nivel de
+thinking, la carpeta, el uso de contexto y
+
+173
+00:11:02.660 --> 00:11:06.560
+el coste. Es el pie de Pi del
+vídeo dos, con más información.
+
+174
+00:11:07.372 --> 00:11:10.016
+Hacemos una primera
+petición de solo lectura:
+
+175
+00:11:10.056 --> 00:11:14.980
+qué hace src barra envio punto
+js y cómo se ejecutan los tests,
+
+176
+00:11:15.020 --> 00:11:16.250
+sin cambiar
+
+177
+00:11:16.874 --> 00:11:21.780
+nada. oh my pi lee tres cosas a la vez, el
+fichero, la carpeta de tests y el package
+
+178
+00:11:21.820 --> 00:11:26.019
+punto json, después lee el
+test del envío, y contesta:
+
+179
+00:11:26.059 --> 00:11:30.850
+las constantes, la validación, el umbral
+de cuarenta euros y cómo se ejecutan las
+
+180
+00:11:30.890 --> 00:11:34.363
+pruebas. Termina con
+no he modificado nada.
+
+181
+00:11:34.403 --> 00:11:38.603
+Y fíjate en la esquina: oh my pi le
+ha puesto título a la sesión solo,
+
+182
+00:11:38.643 --> 00:11:42.320
+explicar src envio punto
+js y ejecución de tests.
+
+183
+00:11:43.078 --> 00:11:46.209
+Una petición así cuesta muy
+poco, pero no es gratis.
+
+184
+00:11:46.249 --> 00:11:49.996
+A partir de aquí, cada vez que
+algo llame al modelo te lo diremos.
+
+185
+00:11:50.036 --> 00:11:52.060
+Lo que viene ahora, en
+cambio, no gasta nada.
+
+186
+00:11:57.982 --> 00:12:01.790
+Con el agente en marcha, cuatro
+comandos para orientarte el primer día.
+
+187
+00:12:01.989 --> 00:12:05.550
+Ninguno llama al modelo y ninguno enseña
+datos tuyos, así que puedes probarlos
+
+188
+00:12:05.590 --> 00:12:07.220
+tranquilo en cualquier perfil.
+
+189
+00:12:08.118 --> 00:12:10.050
+El primero, barra changelog.
+
+190
+00:12:10.118 --> 00:12:11.960
+Muestra las novedades de la versión.
+
+191
+00:12:12.000 --> 00:12:15.566
+Con last y un número,
+solo las últimas entradas;
+
+192
+00:12:15.606 --> 00:12:20.509
+con full, todas. Barra changelog last dos
+nos enseña la dieciocho punto seis punto
+
+193
+00:12:20.549 --> 00:12:25.060
+cero y la dieciocho punto seis punto uno,
+de los días tres y cuatro de octubre:
+
+194
+00:12:25.100 --> 00:12:28.700
+mejoras en la vista de roles de barra
+models, correcciones en la edición anclada
+
+195
+00:12:28.740 --> 00:12:30.060
+y en barra by the way.
+
+196
+00:12:31.145 --> 00:12:35.367
+Al arrancar después de una actualización,
+oh my pi ya te enseña un resumen,
+
+197
+00:12:35.407 --> 00:12:39.840
+y eso se controla con un ajuste,
+startup punto changelog mode.
+
+198
+00:12:39.880 --> 00:12:43.331
+Merece la pena leerlo: en una
+herramienta que publica casi a diario,
+
+199
+00:12:43.371 --> 00:12:45.500
+es la forma de enterarte
+de que algo ha cambiado.
+
+200
+00:12:46.525 --> 00:12:51.460
+El segundo, barra hotkeys, con todos
+los atajos de teclado en tablas.
+
+201
+00:12:51.500 --> 00:12:55.480
+Muchos los conoces de Pi: enter para
+enviar, escape para interrumpir,
+
+202
+00:12:55.520 --> 00:12:58.310
+control o para desplegar la
+salida de las herramientas.
+
+203
+00:12:58.350 --> 00:13:02.780
+Otros son nuevos. Control p recorre los
+modelos por rol, alt p elige un modelo
+
+204
+00:13:02.820 --> 00:13:06.430
+solo para un rato, y
+alt m asigna los roles.
+
+205
+00:13:06.802 --> 00:13:11.500
+Mayúsculas tab cambia el nivel de
+thinking, y alt mayúsculas p activa el
+
+206
+00:13:12.183 --> 00:13:15.565
+modo plan. Alt a, o control s, abre el
+hub de agentes, que veremos en el vídeo
+
+207
+00:13:15.605 --> 00:13:20.460
+dieciséis. Y hasta hay voz: mantener
+el espacio pulsado para dictar.
+
+208
+00:13:21.199 --> 00:13:24.561
+Los atajos se cambian en
+keybindings punto yml.
+
+209
+00:13:24.601 --> 00:13:28.683
+Y una curiosidad: es lo único que un
+perfil hereda del perfil por defecto,
+
+210
+00:13:28.723 --> 00:13:30.740
+porque tu teclado no
+cambia de un perfil a otro.
+
+211
+00:13:31.703 --> 00:13:36.130
+El tercero, barra tools, una tabla con
+las herramientas que ve el agente y la
+
+212
+00:13:36.170 --> 00:13:38.672
+descripción que recibe
+el modelo de cada una.
+
+213
+00:13:38.712 --> 00:13:42.960
+Con nuestro modelo hay doce
+activas: read, bash, edit, ask,
+
+214
+00:13:43.000 --> 00:13:48.572
+eval, glob, grep, task, wait,
+todo, web search y write.
+
+215
+00:13:48.612 --> 00:13:51.552
+Y al final, tres con una
+dirección x d delante:
+
+216
+00:13:51.592 --> 00:13:56.420
+ast edit, debug y lsp. Son
+herramientas descubribles:
+
+217
+00:13:56.460 --> 00:13:59.500
+el modelo no carga su descripción
+completa en cada turno,
+
+218
+00:13:59.540 --> 00:14:03.054
+solo sabe que existen, y lee su
+documentación cuando las necesita.
+
+219
+00:14:03.094 --> 00:14:06.536
+Es la misma idea que el modo deferred
+y tool search del vídeo siete,
+
+220
+00:14:06.576 --> 00:14:07.700
+con otra forma.
+
+221
+00:14:08.475 --> 00:14:11.420
+Fíjate también en lo largas
+que son esas descripciones:
+
+222
+00:14:11.460 --> 00:14:16.300
+la de read explica cómo leer rangos de
+líneas, PDFs, bases de datos SQLite o
+
+223
+00:14:16.340 --> 00:14:20.690
+archivos comprimidos. El recuento
+depende del modelo y de tu configuración,
+
+224
+00:14:20.730 --> 00:14:22.990
+así que el tuyo puede no ser el nuestro.
+
+225
+00:14:23.030 --> 00:14:27.760
+Pero compáralo con las cuatro herramientas
+de Pi y entenderás lo de las baterías
+
+226
+00:14:28.048 --> 00:14:31.095
+incluidas. Cada herramienta tiene un coste
+en contexto, y lo mediremos en el vídeo
+
+227
+00:14:31.135 --> 00:14:32.035
+trece.
+
+228
+00:14:32.788 --> 00:14:37.090
+El cuarto es barra settings,
+un panel con once pestañas:
+
+229
+00:14:37.130 --> 00:14:41.822
+apariencia, modelo, interacción,
+contexto, memoria, ficheros,
+
+230
+00:14:41.862 --> 00:14:45.860
+shell, herramientas, tareas,
+proveedores y plugins.
+
+231
+00:14:45.900 --> 00:14:49.250
+Dentro de cada una, secciones a la
+izquierda y ajustes a la derecha,
+
+232
+00:14:49.290 --> 00:14:51.078
+con una línea de ayuda abajo.
+
+233
+00:14:51.118 --> 00:14:54.810
+Se cambia de pestaña con las flechas,
+tiene buscador, y casi todo se aplica en
+
+234
+00:14:54.850 --> 00:14:55.750
+caliente.
+
+235
+00:14:56.681 --> 00:14:58.460
+Lo recorremos sin cambiar nada.
+
+236
+00:14:58.500 --> 00:15:01.840
+En interacción, la sección de
+aprobaciones dice tool approval:
+
+237
+00:15:01.880 --> 00:15:05.690
+yolo, y las políticas
+por herramienta, vacías.
+
+238
+00:15:05.730 --> 00:15:09.310
+Recuerda el vídeo uno: oh my pi
+tampoco pide permiso por defecto.
+
+239
+00:15:09.350 --> 00:15:13.823
+Tiene modos más prudentes, write y always
+ask, y los configuraremos en el vídeo
+
+240
+00:15:13.863 --> 00:15:16.890
+diecinueve, como prometimos
+en los vídeos cinco y ocho.
+
+241
+00:15:16.930 --> 00:15:20.155
+En la misma pestaña están el
+modo de steering y de follow up,
+
+242
+00:15:20.195 --> 00:15:23.870
+la acción del doble escape, que es
+rebobinar, y las secciones de arranque y
+
+243
+00:15:23.910 --> 00:15:25.080
+actualizaciones.
+
+244
+00:15:30.941 --> 00:15:33.830
+Ahora, dónde se guarda lo que cambias.
+
+245
+00:15:33.870 --> 00:15:37.850
+Las escrituras del panel van a la
+configuración global, la de tu perfil.
+
+246
+00:15:37.890 --> 00:15:41.827
+Si quieres ajustes solo para un
+repositorio, los escribes a mano en punto
+
+247
+00:15:41.867 --> 00:15:46.436
+o eme pe barra config punto
+yml, en la raíz del proyecto.
+
+248
+00:15:46.740 --> 00:15:50.210
+Ojo: oh my pi solo lo busca en
+la carpeta desde la que arrancas,
+
+249
+00:15:50.250 --> 00:15:51.938
+no en las carpetas superiores.
+
+250
+00:15:51.978 --> 00:15:55.780
+Y para una sola ejecución, guion
+guion config con un fichero aparte,
+
+251
+00:15:55.820 --> 00:15:56.860
+que no se guarda nunca.
+
+252
+00:15:57.770 --> 00:15:59.921
+El orden de prioridad, de menor a mayor:
+
+253
+00:15:59.961 --> 00:16:03.961
+los valores de fábrica, la
+configuración global, la del proyecto,
+
+254
+00:16:04.001 --> 00:16:07.874
+los ficheros de guion guion config,
+las opciones de la línea de comandos,
+
+255
+00:16:07.914 --> 00:16:12.190
+y por encima de todo, las variables
+de entorno propias de cada ajuste.
+
+256
+00:16:12.230 --> 00:16:15.455
+Los objetos se fusionan, pero
+las listas se reemplazan enteras.
+
+257
+00:16:15.495 --> 00:16:18.720
+Cuando un ajuste no hace caso,
+casi siempre es por esto.
+
+258
+00:16:19.315 --> 00:16:23.070
+Desde fuera de la sesión tienes
+lo mismo con o eme pe config:
+
+259
+00:16:23.276 --> 00:16:26.130
+list, get, set y reset.
+
+260
+00:16:26.608 --> 00:16:32.406
+La clave se escribe completa, con puntos,
+como en tools punto approval mode.
+
+261
+00:16:32.446 --> 00:16:37.040
+Es la forma más cómoda de preparar un
+perfil y de comprobar qué valor está
+
+262
+00:16:37.261 --> 00:16:41.206
+ganando. Y si una clave no existe, o
+eme pe config list te enseña todas,
+
+263
+00:16:41.246 --> 00:16:42.320
+agrupadas por pestaña.
+
+264
+00:16:43.466 --> 00:16:47.779
+Un consejo de uso. Lo que es
+tuyo, como el tema o tus atajos,
+
+265
+00:16:47.819 --> 00:16:49.120
+va en la configuración global.
+
+266
+00:16:49.160 --> 00:16:53.310
+Lo que es del proyecto, como el modo de
+aprobación que quiere tu equipo o los
+
+267
+00:16:53.350 --> 00:16:58.140
+modelos que se pueden usar, va en
+el config punto yml del repositorio,
+
+268
+00:16:58.251 --> 00:16:59.391
+y se versiona con el código.
+
+269
+00:16:59.431 --> 00:17:02.470
+Así cualquiera que abra ese repositorio
+con oh my pi trabaja con las mismas
+
+270
+00:17:02.510 --> 00:17:03.410
+reglas.
+
+271
+00:17:04.807 --> 00:17:08.139
+Antes de seguir, comprobamos que
+el perfil ha hecho su trabajo.
+
+272
+00:17:08.179 --> 00:17:11.778
+Salimos con barra exit, o con control d.
+
+273
+00:17:11.818 --> 00:17:16.443
+Listamos la carpeta del perfil
+demo: ahí están su config punto yml,
+
+274
+00:17:16.483 --> 00:17:20.130
+su base de datos y sus
+sesiones, que no abrimos.
+
+275
+00:17:20.189 --> 00:17:22.564
+Y listamos el directorio de Pi del curso:
+
+276
+00:17:22.604 --> 00:17:25.184
+sigue exactamente igual que antes.
+
+277
+00:17:25.224 --> 00:17:31.865
+Para volver, o eme pe guion guion profile
+demo guion c retoma la última sesión de
+
+278
+00:17:32.110 --> 00:17:33.010
+esta carpeta, igual que en Pi.
+
+279
+00:17:37.852 --> 00:17:42.521
+En el vídeo uno dijimos que oh my pi sabe
+leer la configuración de Claude Code y de
+
+280
+00:17:42.561 --> 00:17:46.790
+Codex. Es verdad, pero tiene un matiz
+importante, y conviene entenderlo bien.
+
+281
+00:17:47.850 --> 00:17:50.800
+oh my pi busca configuración
+en varias raíces:
+
+282
+00:17:50.840 --> 00:17:56.140
+la suya, punto o eme pe, y también punto
+claude, punto codex y punto gemini,
+
+283
+00:17:56.457 --> 00:17:59.860
+además de las reglas de Cursor,
+Windsurf, Cline o Copilot.
+
+284
+00:17:59.900 --> 00:18:03.380
+A nivel de proyecto, todo
+eso se lee por defecto.
+
+285
+00:18:03.555 --> 00:18:06.750
+Un CLAUDE punto md en tu
+repositorio, un AGENTS punto md,
+
+286
+00:18:06.790 --> 00:18:12.290
+las skills y los comandos de punto claude
+o los servidores MCP del proyecto entran
+
+287
+00:18:12.330 --> 00:18:13.660
+sin configurar nada.
+
+288
+00:18:14.654 --> 00:18:16.769
+A nivel de usuario es al revés.
+
+289
+00:18:16.809 --> 00:18:20.050
+Lo que tienes en tu carpeta
+personal para otras herramientas,
+
+290
+00:18:20.090 --> 00:18:24.630
+como el CLAUDE punto md global de Claude
+Code o el AGENTS punto md de Codex,
+
+291
+00:18:24.670 --> 00:18:29.250
+no se carga hasta que lo activas
+con el ajuste enabled providers.
+
+292
+00:18:29.290 --> 00:18:33.120
+Es una decisión sensata: tus instrucciones
+personales para otra herramienta no tienen
+
+293
+00:18:33.160 --> 00:18:36.408
+por qué valer aquí. Y en nuestra
+grabación tiene una ventaja:
+
+294
+00:18:36.448 --> 00:18:39.780
+lo que haya en nuestra configuración
+personal de Claude Code no aparece.
+
+295
+00:18:40.877 --> 00:18:44.831
+Lo vemos con un ejemplo. En la tienda
+hemos dejado un comando en el formato de
+
+296
+00:18:44.871 --> 00:18:49.049
+Claude Code: un fichero markdown
+dentro de punto claude barra commands,
+
+297
+00:18:49.089 --> 00:18:53.358
+llamado resumen envio, con una
+descripción y una petición.
+
+298
+00:18:53.398 --> 00:19:00.506
+Escribimos barra r e s en oh my pi, y
+ahí está, junto a los comandos propios.
+
+299
+00:19:00.546 --> 00:19:03.380
+Lo ejecutamos, esta vez sí con modelo.
+
+300
+00:19:04.829 --> 00:19:11.546
+El comando se expande a su texto, lee src
+envio punto js y resume en tres viñetas,
+
+301
+00:19:11.586 --> 00:19:14.870
+y el modelo nos devuelve tres
+viñetas sobre las reglas de envío,
+
+302
+00:19:14.910 --> 00:19:18.460
+sin editar nada. Como ya había
+leído el fichero en esta sesión,
+
+303
+00:19:18.500 --> 00:19:20.100
+ni siquiera lo vuelve a abrir.
+
+304
+00:19:20.140 --> 00:19:21.580
+No hemos tocado ni un ajuste.
+
+305
+00:19:22.630 --> 00:19:24.680
+También puedes traerte conversaciones.
+
+306
+00:19:24.720 --> 00:19:31.010
+Con guion guion from claude o guion guion
+from codex, oh my pi importa una sesión de
+
+307
+00:19:31.050 --> 00:19:34.590
+esas herramientas y la convierte
+en una sesión suya, nueva.
+
+308
+00:19:34.630 --> 00:19:39.520
+Dentro de la interfaz, lo mismo con barra
+resume arroba claude o arroba codex.
+
+309
+00:19:39.560 --> 00:19:43.443
+Esto solo lo ves en diapositiva, porque
+esas listas enseñan tus sesiones reales,
+
+310
+00:19:43.483 --> 00:19:46.420
+y la carpeta de Claude
+Code no depende del perfil.
+
+311
+00:19:47.140 --> 00:19:51.410
+Una excepción a propósito: los subagentes
+definidos en punto claude barra agents se
+
+312
+00:19:51.450 --> 00:19:54.060
+ignoran, porque su formato es distinto.
+
+313
+00:19:54.100 --> 00:19:58.091
+Los de oh my pi viven en punto o eme pe
+barra agents, y los veremos en el vídeo
+
+314
+00:19:58.131 --> 00:19:59.031
+dieciséis.
+
+315
+00:19:59.719 --> 00:20:02.880
+Y el apunte honesto, que
+enlaza con el vídeo cinco.
+
+316
+00:20:02.920 --> 00:20:07.070
+En Pi, la configuración del proyecto
+solo se cargaba si confiabas en él,
+
+317
+00:20:07.110 --> 00:20:10.160
+con barra trust. oh my
+pi no tiene barra trust:
+
+318
+00:20:10.260 --> 00:20:14.693
+lo que trae el repositorio, sus reglas,
+sus comandos y sus servidores MCP,
+
+319
+00:20:14.733 --> 00:20:19.990
+se carga al arrancar. Súmale que el modo
+por defecto es yolo y que las extensiones
+
+320
+00:20:20.030 --> 00:20:25.479
+no van en sandbox. Un repositorio que no
+conoces es texto e instrucciones de otra
+
+321
+00:20:25.519 --> 00:20:29.440
+persona. Revisa sus carpetas punto o
+eme pe y punto claude antes de abrirlo,
+
+322
+00:20:29.480 --> 00:20:31.140
+o hazlo dentro de un contenedor.
+
+323
+00:20:37.072 --> 00:20:40.903
+Con todo esto, ya podemos poner
+los dos agentes lado a lado.
+
+324
+00:20:40.943 --> 00:20:44.500
+Tienes la tabla en pantalla; te
+cuento cómo leerla, fila a fila.
+
+325
+00:20:45.130 --> 00:20:47.811
+Origen. Pi es el proyecto original.
+
+326
+00:20:47.851 --> 00:20:52.487
+oh my pi es un fork de principios de dos
+mil veintiséis que sigue trayendo cambios
+
+327
+00:20:52.527 --> 00:20:57.200
+de Pi. Motor. Pi es TypeScript sobre
+Node veintidós punto diecinueve o
+
+328
+00:20:57.672 --> 00:21:00.743
+superior. oh my pi corre sobre
+Bun, con partes nativas en Rust,
+
+329
+00:21:00.783 --> 00:21:03.250
+y se distribuye como binario autónomo.
+
+330
+00:21:03.290 --> 00:21:06.245
+Configuración. Pi usa JSON en punto pi.
+
+331
+00:21:06.285 --> 00:21:11.223
+oh my pi usa YAML en punto o
+eme pe, con perfiles integrados.
+
+332
+00:21:11.263 --> 00:21:16.043
+Credenciales: un fichero JSON en Pi, una
+base de datos con varias cuentas en oh my
+
+333
+00:21:16.083 --> 00:21:16.983
+pi.
+
+334
+00:21:17.382 --> 00:21:20.610
+Herramientas. Pi arranca
+con cuatro activas:
+
+335
+00:21:20.650 --> 00:21:23.400
+leer, escribir, editar y bash.
+
+336
+00:21:23.440 --> 00:21:29.330
+oh my pi trae unas treinta; con nuestro
+modelo, doce activas y tres descubribles,
+
+337
+00:21:29.370 --> 00:21:32.750
+con lectura de casi cualquier
+formato, servidor de lenguaje,
+
+338
+00:21:32.790 --> 00:21:36.910
+depurador, subagentes y
+edición anclada por hash.
+
+339
+00:21:36.950 --> 00:21:40.221
+Comandos. Pi tiene unos
+veinticinco integrados;
+
+340
+00:21:40.261 --> 00:21:44.180
+oh my pi, ochenta y cinco.
+Subagentes y modo plan:
+
+341
+00:21:44.220 --> 00:21:47.030
+en Pi, como extensiones de
+ejemplo; en oh my pi, de serie,
+
+342
+00:21:47.070 --> 00:21:49.600
+junto con los objetivos con presupuesto.
+
+343
+00:21:50.410 --> 00:21:55.037
+Seguridad. Pi no tiene aprobaciones,
+pero sí confianza de proyecto.
+
+344
+00:21:55.077 --> 00:21:58.910
+oh my pi tiene aprobaciones con
+tres modos, aunque el de fábrica,
+
+345
+00:21:58.950 --> 00:22:03.338
+yolo, no pregunta nada, y no
+tiene confianza de proyecto.
+
+346
+00:22:03.378 --> 00:22:06.822
+Ninguno de los dos te protege
+si no tomas tú las decisiones.
+
+347
+00:22:06.862 --> 00:22:08.414
+Otros agentes.
+
+348
+00:22:08.880 --> 00:22:11.793
+Pi lee AGENTS punto md y CLAUDE punto md.
+
+349
+00:22:11.833 --> 00:22:17.069
+oh my pi lee además la configuración de
+proyecto de media docena de herramientas,
+
+350
+00:22:17.109 --> 00:22:21.280
+la de usuario si se lo pides, e importa
+sesiones de Claude Code y de Codex.
+
+351
+00:22:22.133 --> 00:22:25.503
+Y la última fila, la que más
+importa para el resto del curso:
+
+352
+00:22:25.543 --> 00:22:30.540
+lo que se mantiene. El bucle, el
+árbol de sesión, los modos print,
+
+353
+00:22:30.580 --> 00:22:35.640
+JSON y RPC, el SDK, las skills
+y las extensiones por eventos.
+
+354
+00:22:35.680 --> 00:22:38.200
+Todo lo que aprendiste en
+el bloque B sigue valiendo.
+
+355
+00:22:38.240 --> 00:22:40.400
+Lo que cambia es cuánto viene ya montado.
+
+356
+00:22:41.306 --> 00:22:45.241
+¿Cuál elegir? Pi, cuando quieres
+entender y controlar cada pieza,
+
+357
+00:22:45.281 --> 00:22:50.085
+cuando prefieres un contexto pequeño, o
+cuando vas a construir tu propio harness
+
+358
+00:22:50.125 --> 00:22:53.670
+encima. oh my pi, cuando quieres un taller
+completo desde el primer día y estás
+
+359
+00:22:53.710 --> 00:22:56.924
+dispuesto a aprender su
+superficie, que es grande.
+
+360
+00:22:56.964 --> 00:23:00.460
+Y nada te impide tener los dos: cada
+uno guarda sus cosas en su sitio,
+
+361
+00:23:00.500 --> 00:23:02.739
+siempre que no los cruces con
+la misma variable de entorno,
+
+362
+00:23:02.779 --> 00:23:03.679
+como hemos visto.
+
+363
+00:23:04.587 --> 00:23:10.140
+Repasemos. oh my pi es un fork de Pi
+sobre Bun, con partes nativas en Rust.
+
+364
+00:23:10.180 --> 00:23:14.510
+Hereda el bucle, el árbol de
+sesión, los modos y el SDK.
+
+365
+00:23:14.550 --> 00:23:17.490
+Cambia de sitio la configuración,
+que pasa a YAML en punto o eme pe,
+
+366
+00:23:17.530 --> 00:23:21.460
+y las credenciales, que
+pasan a una base de datos.
+
+367
+00:23:21.500 --> 00:23:24.527
+Se instala con una línea y
+se usa mejor con perfiles.
+
+368
+00:23:24.567 --> 00:23:28.964
+Barra changelog te cuenta qué ha cambiado,
+barra hotkeys te enseña el teclado,
+
+369
+00:23:29.004 --> 00:23:32.604
+barra tools lo que ve el agente, y
+barra settings lo que puedes ajustar.
+
+370
+00:23:32.644 --> 00:23:37.120
+Y lee la configuración de proyecto de
+Claude Code y de Codex sin pedirte nada.
+
+371
+00:23:38.029 --> 00:23:41.920
+La práctica: crea tu propio perfil
+de pruebas con guion guion profile,
+
+372
+00:23:42.490 --> 00:23:46.900
+pasa el asistente, y dedica diez minutos
+a barra settings sin cambiar nada,
+
+373
+00:23:46.940 --> 00:23:52.340
+solo leyendo las pestañas. Después abre
+con ese perfil un repositorio tuyo que ya
+
+374
+00:23:52.380 --> 00:23:57.000
+use Claude Code o Codex, y apunta qué
+ha recogido oh my pi por su cuenta:
+
+375
+00:23:57.040 --> 00:24:00.480
+contexto, comandos, skills, servidores.
+
+376
+00:24:01.063 --> 00:24:03.040
+Compara esa lista con lo que esperabas.
+
+377
+00:24:03.986 --> 00:24:07.510
+En el próximo vídeo entramos
+en la interfaz y las sesiones:
+
+378
+00:24:07.550 --> 00:24:11.850
+atajos, el selector de comandos,
+y la diferencia entre rebobinar,
+
+379
+00:24:11.890 --> 00:24:16.430
+bifurcar y navegar el árbol, con
+barra branch, barra fork y barra tree.
+
+380
+00:24:16.760 --> 00:24:17.660
+Nos vemos allí.

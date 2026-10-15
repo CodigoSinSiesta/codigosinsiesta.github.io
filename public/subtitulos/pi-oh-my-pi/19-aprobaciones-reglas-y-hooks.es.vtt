@@ -1,0 +1,1673 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.453 --> 00:00:14.103
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.143 --> 00:00:18.040
+Vídeo diecinueve:
+aprobaciones, reglas y hooks.
+
+3
+00:00:23.730 --> 00:00:26.486
+Este vídeo cierra una
+promesa que viene de lejos.
+
+4
+00:00:26.526 --> 00:00:31.280
+En el vídeo cinco dijimos que Pi no trae
+modos de aprobación y que oh my pi sí,
+
+5
+00:00:31.320 --> 00:00:36.107
+y que los veríamos aquí. En el vídeo
+ocho construimos el nuestro a mano en Pi,
+
+6
+00:00:36.147 --> 00:00:40.445
+con el evento tool call. Y en el
+dieciocho terminamos con una frase:
+
+7
+00:00:40.485 --> 00:00:44.480
+lo que hasta ahora eran instrucciones,
+como el solo lectura del reviewer,
+
+8
+00:00:44.520 --> 00:00:47.593
+pasarían a ser límites.
+Hoy toca cumplirlo.
+
+9
+00:00:48.412 --> 00:00:52.203
+Recuerda de dónde partimos.
+oh my pi viene en modo yolo:
+
+10
+00:00:52.243 --> 00:00:55.480
+aprueba todo sin preguntar. Lo
+comprobamos en el vídeo once,
+
+11
+00:00:55.520 --> 00:00:57.850
+y lo hemos visto en cada
+demo desde entonces.
+
+12
+00:00:57.890 --> 00:01:03.370
+Los subagentes, el reviewer con bash o el
+navegador funcionan sin que nadie les pida
+
+13
+00:01:03.410 --> 00:01:04.310
+permiso.
+
+14
+00:01:05.291 --> 00:01:11.537
+El objetivo de hoy es concreto: endurecer
+oh my pi para un repositorio de equipo.
+
+15
+00:01:11.577 --> 00:01:14.420
+Un fichero de configuración
+dentro del propio repositorio,
+
+16
+00:01:14.460 --> 00:01:17.919
+versionado con el código, para que
+cualquiera que lo abra con oh my pi
+
+17
+00:01:17.959 --> 00:01:19.887
+trabaje con las mismas reglas.
+
+18
+00:01:19.927 --> 00:01:23.590
+Veremos cuatro piezas. El modo de
+aprobación, con las políticas por
+
+19
+00:01:23.630 --> 00:01:25.467
+herramienta y los patrones de bash.
+
+20
+00:01:25.507 --> 00:01:29.030
+Un hook para lo que la
+configuración no alcanza.
+
+21
+00:01:29.070 --> 00:01:31.322
+Las reglas TTSR, con barra o eme efe ge.
+
+22
+00:01:31.362 --> 00:01:33.220
+Y la redacción de secretos.
+
+23
+00:01:34.087 --> 00:01:36.778
+Y un hilo que nos
+acompañará todo el vídeo:
+
+24
+00:01:36.818 --> 00:01:39.961
+el fichero permisos
+punto ts del vídeo ocho.
+
+25
+00:01:40.001 --> 00:01:44.010
+Allí tuvimos una lista de herramientas
+de lectura, una lista de comandos de bash
+
+26
+00:01:44.050 --> 00:01:49.270
+seguros, un diálogo con tres opciones,
+rutas protegidas y un bloqueo cuando no
+
+27
+00:01:49.310 --> 00:01:54.114
+había interfaz. Iremos pieza a pieza
+viendo qué trae oh my pi de serie,
+
+28
+00:01:54.154 --> 00:01:57.460
+qué hace distinto y qué tienes
+que seguir escribiendo tú.
+
+29
+00:01:58.024 --> 00:02:01.862
+Trabajamos en la tienda, con el
+perfil demo y DeepSeek V cuatro Pro,
+
+30
+00:02:01.902 --> 00:02:04.781
+en una rama de usar y
+tirar, demo diecinueve.
+
+31
+00:02:04.821 --> 00:02:07.980
+La tienda no tiene remoto, así
+que nada sale de la máquina.
+
+32
+00:02:13.618 --> 00:02:15.363
+La base del sistema es sencilla.
+
+33
+00:02:15.403 --> 00:02:18.230
+Cada herramienta de oh
+my pi declara un nivel.
+
+34
+00:02:18.270 --> 00:02:23.060
+Read, para lo que solo lee. Write, para lo
+que modifica el espacio de trabajo pero no
+
+35
+00:02:23.100 --> 00:02:27.324
+ejecuta código arbitrario, como
+editar o escribir ficheros.
+
+36
+00:02:27.364 --> 00:02:31.900
+Y exec, para lo que ejecuta
+código: bash, eval, el navegador,
+
+37
+00:02:31.940 --> 00:02:35.600
+el depurador o la herramienta
+task, que lanza subagentes.
+
+38
+00:02:36.233 --> 00:02:39.529
+Es nuestra lista de lectura
+del vídeo ocho, pero al revés:
+
+39
+00:02:39.569 --> 00:02:43.100
+en lugar de que tú enumeres las
+herramientas seguras, cada herramienta
+
+40
+00:02:43.140 --> 00:02:48.250
+dice qué es. Si una no declara nada,
+se trata como exec, que es lo prudente.
+
+41
+00:02:48.290 --> 00:02:52.550
+Y un detalle que conviene saber: las
+herramientas MCP cuentan siempre como
+
+42
+00:02:52.590 --> 00:02:55.231
+write, digan lo que digan sus anotaciones.
+
+43
+00:02:55.271 --> 00:02:59.629
+Si tienes una que borra o publica,
+nómbrala en las políticas por herramienta
+
+44
+00:02:59.669 --> 00:03:01.240
+y ponle prompt o deny.
+
+45
+00:03:02.049 --> 00:03:04.583
+Sobre esos niveles actúa el modo.
+
+46
+00:03:04.623 --> 00:03:08.780
+Always ask aprueba solo la lectura
+y pregunta por todo lo demás.
+
+47
+00:03:08.820 --> 00:03:13.463
+Write aprueba lectura y escritura,
+y pregunta por lo que ejecuta.
+
+48
+00:03:13.503 --> 00:03:16.460
+Y yolo, el de fábrica, lo aprueba todo.
+
+49
+00:03:16.500 --> 00:03:20.010
+Para un repositorio de equipo,
+write es un buen punto de partida:
+
+50
+00:03:20.050 --> 00:03:24.060
+las ediciones quedan en git y se pueden
+revisar, y lo que ejecuta comandos pasa
+
+51
+00:03:24.100 --> 00:03:25.000
+por ti.
+
+52
+00:03:25.746 --> 00:03:32.259
+Empezamos sin modelo. En el otro panel,
+config get tools punto approval mode
+
+53
+00:03:32.299 --> 00:03:36.609
+responde yolo. Ahora miramos el fichero
+que hemos preparado para el equipo.
+
+54
+00:03:36.649 --> 00:03:40.641
+Arriba, approval mode write, y
+dos políticas por herramienta:
+
+55
+00:03:40.681 --> 00:03:45.270
+bash prompt y eval prompt. Debajo,
+una lista de patrones de bash,
+
+56
+00:03:45.310 --> 00:03:49.330
+que veremos enseguida, y
+al final, secrets enabled.
+
+57
+00:03:50.402 --> 00:03:56.383
+Lo copiamos a punto o eme pe barra config
+punto yml, en la raíz de la tienda,
+
+58
+00:03:56.423 --> 00:04:00.740
+y repetimos el config
+get. Ahora responde write.
+
+59
+00:04:00.780 --> 00:04:04.410
+Es el orden de capas del vídeo once: la
+configuración del proyecto gana a la de tu
+
+60
+00:04:04.450 --> 00:04:05.350
+perfil.
+
+61
+00:04:06.135 --> 00:04:10.265
+Arrancamos oh my pi y abrimos
+barra settings, solo para mirar.
+
+62
+00:04:10.305 --> 00:04:14.480
+En la pestaña de interacción, el grupo
+de aprobaciones ya enseña lo que manda el
+
+63
+00:04:14.520 --> 00:04:18.472
+proyecto: el modo write y
+las dos políticas, en gris.
+
+64
+00:04:18.512 --> 00:04:21.230
+En la pestaña shell está el
+interruptor de los comandos compuestos,
+
+65
+00:04:21.270 --> 00:04:26.260
+apagado. En proveedores, dentro de
+privacidad, ocultar secretos aparece
+
+66
+00:04:26.300 --> 00:04:31.910
+activado. Y en contexto, el bloque de
+reglas TTSR, con las reglas incluidas
+
+67
+00:04:31.950 --> 00:04:36.420
+activas. Salimos sin cambiar nada: barra
+settings escribe en la configuración de tu
+
+68
+00:04:36.460 --> 00:04:41.000
+perfil, y lo que queremos compartir
+va en el fichero del repositorio.
+
+69
+00:04:46.553 --> 00:04:52.090
+Le pedimos una tarea normal: una función
+texto envío que devuelva los gastos de
+
+70
+00:04:52.130 --> 00:04:56.520
+envío como texto para mostrar, con
+coma decimal y el símbolo del euro,
+
+71
+00:04:56.560 --> 00:04:59.860
+con su prueba, y que ejecute npm test.
+
+72
+00:05:00.835 --> 00:05:05.530
+Lo primero que hace Pro es seguir el
+AGENTS punto md, que pide empezar con git
+
+73
+00:05:05.570 --> 00:05:09.878
+status y git log, y los
+encadena en una sola línea.
+
+74
+00:05:09.918 --> 00:05:13.577
+A la vez lanza npm test.
+Y fíjate en la diferencia.
+
+75
+00:05:13.617 --> 00:05:18.680
+Npm test se ejecuta sin preguntar, porque
+está en la lista de patrones permitidos.
+
+76
+00:05:18.720 --> 00:05:21.690
+La línea de git, en
+cambio, abre el diálogo:
+
+77
+00:05:21.730 --> 00:05:25.250
+permitir la herramienta bash,
+con el comando completo debajo,
+
+78
+00:05:25.290 --> 00:05:27.890
+y dos opciones, Approve y Deny.
+
+79
+00:05:27.930 --> 00:05:29.650
+Lo leemos y aprobamos.
+
+80
+00:05:30.568 --> 00:05:35.326
+¿Por qué pregunta por git status y
+git log, si los dos están permitidos?
+
+81
+00:05:35.366 --> 00:05:38.706
+Porque un patrón allow tiene que
+encajar con el comando entero,
+
+82
+00:05:38.746 --> 00:05:41.198
+y nunca aprueba una línea compuesta.
+
+83
+00:05:41.238 --> 00:05:43.444
+Es la misma precaución
+que tuvimos en el ocho:
+
+84
+00:05:43.484 --> 00:05:47.547
+ls seguido de un rm empieza por ls.
+
+85
+00:05:47.587 --> 00:05:49.876
+Allí lo resolvimos troceando el comando;
+
+86
+00:05:49.916 --> 00:05:52.040
+aquí, por defecto, se pregunta.
+
+87
+00:05:52.866 --> 00:05:57.520
+Si te molesta, existe allow compound
+commands, el interruptor que vimos
+
+88
+00:05:57.560 --> 00:06:02.470
+apagado. Cuando lo activas, oh my pi
+trocea cadenas sencillas unidas solo por
+
+89
+00:06:02.510 --> 00:06:07.193
+doble ampersand, con argumentos literales,
+y si todos los trozos están permitidos,
+
+90
+00:06:07.233 --> 00:06:11.147
+pasa. Nada de variables,
+redirecciones ni tuberías.
+
+91
+00:06:11.187 --> 00:06:14.800
+Nosotros lo dejamos apagado:
+preferimos una pregunta de más.
+
+92
+00:06:15.602 --> 00:06:19.380
+Aquí está la primera diferencia
+con nuestro permisos punto ts.
+
+93
+00:06:19.420 --> 00:06:23.500
+Allí había tres opciones, y una era
+permitir siempre en esta sesión.
+
+94
+00:06:23.540 --> 00:06:27.653
+En oh my pi, el diálogo de las
+herramientas solo tiene aprobar o denegar.
+
+95
+00:06:27.693 --> 00:06:30.440
+Lo que quieres permitir siempre
+se escribe en la configuración,
+
+96
+00:06:30.480 --> 00:06:34.767
+como un patrón. Es más trabajo la primera
+vez, pero no se olvida al cerrar la
+
+97
+00:06:34.807 --> 00:06:36.620
+sesión, y lo comparte todo el equipo.
+
+98
+00:06:37.584 --> 00:06:39.690
+Lo demás pasa sin preguntar.
+
+99
+00:06:39.730 --> 00:06:42.180
+Las lecturas, porque son nivel read.
+
+100
+00:06:42.220 --> 00:06:46.900
+Las tres ediciones, del código y de las
+pruebas, porque en modo write la escritura
+
+101
+00:06:46.940 --> 00:06:49.907
+se aprueba sola. Y npm
+test otra vez al final:
+
+102
+00:06:49.947 --> 00:06:54.460
+dieciocho de dieciocho. Igual que en el
+vídeo ocho, lo que no cambia nada no te
+
+103
+00:06:54.500 --> 00:06:58.900
+interrumpe. Un modo que pregunta por todo
+acaba con la persona aprobando sin leer.
+
+104
+00:06:59.967 --> 00:07:01.898
+Quédate con un detalle del código.
+
+105
+00:07:01.938 --> 00:07:06.100
+Para formatear el importe, Pro ha usado
+toFixed con dos decimales y luego ha
+
+106
+00:07:06.140 --> 00:07:08.440
+cambiado el punto por una coma.
+
+107
+00:07:08.480 --> 00:07:11.360
+Funciona, pero volveremos a
+ello cuando hablemos de reglas.
+
+108
+00:07:17.070 --> 00:07:22.030
+Ahora sí, los patrones. Bash punto
+patterns es una lista ordenada de reglas,
+
+109
+00:07:22.070 --> 00:07:26.510
+cada una con un texto y una
+decisión: allow, prompt o deny.
+
+110
+00:07:26.550 --> 00:07:30.054
+Gana la primera que encaja. El
+único comodín es el asterisco,
+
+111
+00:07:30.094 --> 00:07:32.560
+y los espacios repetidos
+se tratan como uno.
+
+112
+00:07:33.386 --> 00:07:36.864
+Nuestra primera regla es git
+push seguido de un asterisco,
+
+113
+00:07:36.904 --> 00:07:42.672
+con deny. Lo probamos: le pedimos que
+haga commit de src y de test siguiendo el
+
+114
+00:07:42.712 --> 00:07:45.440
+AGENTS punto md, y que lo suba al remoto.
+
+115
+00:07:45.480 --> 00:07:49.779
+Primero comprueba el estado, encadenado,
+así que pregunta y aprobamos.
+
+116
+00:07:49.819 --> 00:07:52.848
+Después el git add con el
+commit, también encadenado:
+
+117
+00:07:52.888 --> 00:07:56.800
+aprobamos, y el commit se crea con el
+mensaje en español que pide la tienda.
+
+118
+00:07:57.451 --> 00:07:59.928
+El push, en cambio, ni siquiera pregunta.
+
+119
+00:07:59.968 --> 00:08:04.320
+La tarjeta sale en rojo: la herramienta
+bash está bloqueada por la política,
+
+120
+00:08:04.360 --> 00:08:05.694
+por el patrón git
+
+121
+00:08:06.471 --> 00:08:09.029
+push. Y merece la pena leer
+lo que piensa el modelo.
+
+122
+00:08:09.069 --> 00:08:13.190
+Se pregunta si hay otro camino, si podría
+escribirlo de otra forma que no empiece
+
+123
+00:08:13.230 --> 00:08:18.113
+por git push. Y se responde a sí
+mismo: eso sería saltarse la política,
+
+124
+00:08:18.153 --> 00:08:19.210
+y no debe
+
+125
+00:08:20.031 --> 00:08:22.730
+hacerlo. Comprueba que tampoco
+hay remoto y nos lo cuenta.
+
+126
+00:08:23.787 --> 00:08:26.410
+Bien por el modelo, pero
+no te quedes con eso.
+
+127
+00:08:26.450 --> 00:08:28.870
+La política no depende
+de su buena voluntad:
+
+128
+00:08:28.910 --> 00:08:32.610
+un deny es absoluto y no
+lo salta ni el modo yolo.
+
+129
+00:08:32.650 --> 00:08:37.160
+Además, a diferencia del allow, deny y
+prompt sí miran cada trozo de una línea
+
+130
+00:08:37.200 --> 00:08:42.500
+compuesta, separada por doble ampersand,
+punto y coma, tuberías o subshells.
+
+131
+00:08:42.540 --> 00:08:45.640
+Un cd seguido de un git
+push también se bloquea.
+
+132
+00:08:46.573 --> 00:08:49.663
+Además de los tuyos, bash
+trae patrones críticos:
+
+133
+00:08:49.703 --> 00:08:54.238
+borrar desde la raíz, una fork bomb,
+descargar un script y ejecutarlo,
+
+134
+00:08:54.278 --> 00:08:59.503
+o apagar la máquina. En los modos
+write y always ask obligan a preguntar,
+
+135
+00:08:59.543 --> 00:09:02.000
+aunque un allow tuyo los cubriera.
+
+136
+00:09:02.040 --> 00:09:05.746
+Pero ojo con un error común:
+en yolo, ese aviso se ignora.
+
+137
+00:09:05.786 --> 00:09:08.580
+El modo de fábrica no
+te protege ni de esos.
+
+138
+00:09:09.270 --> 00:09:11.251
+Ahora, las políticas por herramienta.
+
+139
+00:09:11.291 --> 00:09:16.120
+Bash prompt parece redundante, porque
+en modo write bash ya pregunta.
+
+140
+00:09:16.160 --> 00:09:21.420
+No lo es. Las opciones guion guion yolo y
+guion guion auto approve fuerzan el modo
+
+141
+00:09:21.460 --> 00:09:25.700
+yolo en una sesión, pero las políticas
+por herramienta y los deny se siguen
+
+142
+00:09:25.740 --> 00:09:30.290
+respetando. Y eval prompt cierra un
+hueco que avisa la documentación:
+
+143
+00:09:30.330 --> 00:09:34.320
+los patrones solo gobiernan bash, y eval
+puede lanzar una shell desde Python o
+
+144
+00:09:34.360 --> 00:09:37.400
+JavaScript. Si endureces
+bash, endurece también eval.
+
+145
+00:09:38.362 --> 00:09:40.435
+Probamos el modo sin interfaz.
+
+146
+00:09:40.475 --> 00:09:45.845
+En el otro panel, o eme pe en modo print
+le pide que ejecute node guion guion
+
+147
+00:09:45.885 --> 00:09:49.150
+version. No hay patrón que lo
+permita, así que necesita aprobación,
+
+148
+00:09:49.190 --> 00:09:51.480
+y en modo print nadie puede darla.
+
+149
+00:09:51.554 --> 00:09:56.430
+La llamada no se ejecuta, y el modelo nos
+lo explica con las tres salidas que le
+
+150
+00:09:56.470 --> 00:09:58.850
+propone oh my pi. La primera
+es poner el modo yolo.
+
+151
+00:09:58.890 --> 00:10:04.160
+No le hagas caso: la buena es añadir
+un patrón allow para ese comando.
+
+152
+00:10:04.809 --> 00:10:09.100
+Y los subagentes. En el vídeo
+dieciséis dijimos que trabajan en yolo,
+
+153
+00:10:09.140 --> 00:10:11.175
+porque no tienen a quién preguntar.
+
+154
+00:10:11.215 --> 00:10:14.411
+Es verdad, con un matiz importante
+que da la documentación:
+
+155
+00:10:14.451 --> 00:10:19.030
+un deny tuyo también se aplica dentro de
+un subagente, y lo que se resuelve como
+
+156
+00:10:19.070 --> 00:10:21.020
+prompt no se aprueba, se rechaza.
+
+157
+00:10:21.914 --> 00:10:23.951
+Eso cumple lo del vídeo dieciocho.
+
+158
+00:10:23.991 --> 00:10:27.830
+El reviewer tiene bash, y sus
+instrucciones le piden usarlo solo para
+
+159
+00:10:27.870 --> 00:10:30.657
+git diff, git log o git show.
+
+160
+00:10:30.697 --> 00:10:33.564
+Con bash prompt y esos comandos
+en la lista de permitidos,
+
+161
+00:10:33.604 --> 00:10:36.981
+que es justo nuestro fichero,
+el reviewer puede ejecutarlos,
+
+162
+00:10:37.021 --> 00:10:38.861
+y cualquier otro comando se rechaza.
+
+163
+00:10:38.901 --> 00:10:41.154
+Ya no es una petición: es un límite.
+
+164
+00:10:41.194 --> 00:10:45.200
+Eso sí, afecta a todos los subagentes,
+y cubre solo lo que nombra.
+
+165
+00:10:50.799 --> 00:10:55.082
+En el ocho protegimos dos rutas: el
+AGENTS punto md y la carpeta punto git.
+
+166
+00:10:55.122 --> 00:10:58.071
+oh my pi no trae nada parecido de serie.
+
+167
+00:10:58.111 --> 00:11:02.270
+Y en modo write, el problema es mayor: una
+edición del AGENTS punto md pasaría sin
+
+168
+00:11:02.310 --> 00:11:06.160
+preguntar. Las políticas son
+por herramienta, no por fichero.
+
+169
+00:11:06.200 --> 00:11:08.200
+Para esto hacen falta código y un hook.
+
+170
+00:11:09.117 --> 00:11:11.680
+En oh my pi, hook es un nombre heredado.
+
+171
+00:11:11.720 --> 00:11:15.736
+Es un módulo de TypeScript con la misma
+forma que las extensiones del vídeo ocho:
+
+172
+00:11:15.776 --> 00:11:20.619
+una función por defecto que recibe la API
+y se engancha a los eventos con pi punto
+
+173
+00:11:20.659 --> 00:11:25.338
+on. Lo que lo hace hook es dónde vive:
+en punto o eme pe barra hooks barra pre o
+
+174
+00:11:25.378 --> 00:11:28.460
+barra post, del proyecto o de tu perfil.
+
+175
+00:11:28.610 --> 00:11:30.780
+Directamente en la carpeta
+hooks no se descubre.
+
+176
+00:11:31.755 --> 00:11:34.592
+Este es rutas protegidas punto ts.
+
+177
+00:11:34.632 --> 00:11:38.860
+Es el bloque de rutas de nuestro
+permisos punto ts, trasladado.
+
+178
+00:11:38.907 --> 00:11:43.370
+Escucha tool call, y si la
+herramienta es edit, write o ast edit,
+
+179
+00:11:43.410 --> 00:11:48.370
+mira cada ruta. En oh my pi no hay
+herramientas aparte para borrar o mover:
+
+180
+00:11:48.410 --> 00:11:53.570
+van dentro de edit. Si la ruta es el
+AGENTS punto md o está dentro de punto
+
+181
+00:11:53.610 --> 00:11:58.380
+git, avisa en pantalla y devuelve
+block true con el motivo.
+
+182
+00:11:59.094 --> 00:12:01.363
+Y hemos añadido dos rutas más.
+
+183
+00:12:01.403 --> 00:12:06.660
+La propia carpeta punto o eme pe: la
+configuración, los hooks y las reglas del
+
+184
+00:12:06.700 --> 00:12:11.686
+equipo viven en el repositorio, y en modo
+write editar un fichero se aprueba solo.
+
+185
+00:12:11.726 --> 00:12:16.370
+Sin esta línea, el modelo podría cambiar
+el modo a yolo editando el fichero que lo
+
+186
+00:12:17.145 --> 00:12:19.940
+limita. Y la carpeta datos
+del vídeo diecisiete:
+
+187
+00:12:19.980 --> 00:12:24.640
+allí dijimos que su solo lectura era una
+petición, y esto la convierte en barrera.
+
+188
+00:12:25.572 --> 00:12:29.670
+Lo copiamos a la carpeta de hooks del
+proyecto, salimos y retomamos la sesión
+
+189
+00:12:29.710 --> 00:12:34.860
+con guion ce. Le pedimos que añada al
+AGENTS punto md una regla sobre cómo
+
+190
+00:12:34.900 --> 00:12:39.570
+mostrar importes. Pro lee el fichero,
+intenta editarlo, y la edición sale en
+
+191
+00:12:39.610 --> 00:12:45.125
+rojo con nuestro motivo: AGENTS punto md
+está protegido y no se puede modificar.
+
+192
+00:12:45.165 --> 00:12:47.100
+Debajo, el aviso de ruta protegida.
+
+193
+00:12:48.186 --> 00:12:51.616
+El modelo lo entiende como un
+bloqueo firme y no busca atajos:
+
+194
+00:12:51.656 --> 00:12:55.220
+nos propone la línea exacta
+para que la añadamos nosotros.
+
+195
+00:12:55.260 --> 00:12:59.102
+Si hubiera intentado escribirla
+por bash, con sed o con un echo,
+
+196
+00:12:59.142 --> 00:13:02.680
+ese comando no está en la lista de
+permitidos, así que habría aparecido el
+
+197
+00:13:02.720 --> 00:13:07.020
+diálogo. Hacen falta las dos capas: el
+hook para la herramienta de edición,
+
+198
+00:13:07.060 --> 00:13:09.000
+y la política de bash para el atajo.
+
+199
+00:13:09.922 --> 00:13:12.208
+Lo demás que aprendiste
+en el ocho vale igual.
+
+200
+00:13:12.248 --> 00:13:17.339
+Si el handler de tool call lanza un
+error, la herramienta se bloquea.
+
+201
+00:13:17.379 --> 00:13:21.637
+Ctx punto has UI te dice si
+hay alguien para responder.
+
+202
+00:13:21.677 --> 00:13:25.770
+Y tool result te deja reescribir la salida
+de una herramienta antes de que la vea el
+
+203
+00:13:25.810 --> 00:13:29.620
+modelo; la documentación trae un
+ejemplo que tacha claves de API.
+
+204
+00:13:35.380 --> 00:13:38.790
+Pasamos de lo que el
+modelo hace a cómo lo hace.
+
+205
+00:13:38.969 --> 00:13:43.140
+Hasta ahora, para que el modelo siguiera
+una convención, la poníamos en el AGENTS
+
+206
+00:13:43.180 --> 00:13:46.565
+punto md, o en un RULES punto
+md, como en el vídeo trece.
+
+207
+00:13:46.605 --> 00:13:51.189
+Eso viaja en cada petición y gasta
+contexto, y aun así el modelo puede
+
+208
+00:13:51.229 --> 00:13:52.129
+olvidarlo.
+
+209
+00:13:52.893 --> 00:13:59.830
+oh my pi añade otra forma: las reglas
+TTSR, time traveling stream rules.
+
+210
+00:13:59.870 --> 00:14:05.360
+Una regla TTSR es un fichero Markdown con
+un encabezado de metadatos y un cuerpo.
+
+211
+00:14:05.400 --> 00:14:09.680
+El encabezado dice qué vigilar; el
+cuerpo, qué debería haber hecho el modelo.
+
+212
+00:14:10.586 --> 00:14:13.005
+La vigilancia ocurre
+mientras el modelo escribe.
+
+213
+00:14:13.045 --> 00:14:17.542
+oh my pi mira el texto de la respuesta
+y los argumentos de las herramientas,
+
+214
+00:14:17.582 --> 00:14:20.540
+y si aparece el patrón, corta
+la respuesta en ese instante,
+
+215
+00:14:20.580 --> 00:14:22.659
+antes de que la herramienta se ejecute.
+
+216
+00:14:22.699 --> 00:14:26.550
+Descarta lo que llevaba escrito, inyecta
+el cuerpo de la regla como un aviso del
+
+217
+00:14:26.590 --> 00:14:28.240
+sistema y le pide que lo intente otra vez.
+
+218
+00:14:28.280 --> 00:14:32.520
+De ahí lo de viajar en el tiempo: es
+como volver a un momento antes del error.
+
+219
+00:14:33.471 --> 00:14:37.975
+Hay tres formas de disparo.
+Condition, una expresión regular.
+
+220
+00:14:38.015 --> 00:14:41.438
+Ast condition, un patrón
+estructural de ast grep.
+
+221
+00:14:41.478 --> 00:14:45.020
+Y question, una pregunta en lenguaje
+natural que responde un modelo juez cuando
+
+222
+00:14:45.060 --> 00:14:48.670
+la salida ha terminado. Esta
+última no puede cortar nada,
+
+223
+00:14:48.710 --> 00:14:51.610
+porque llega tarde, y
+además necesita un juez.
+
+224
+00:14:51.650 --> 00:14:56.342
+Cada regla acota dónde mira, con scope:
+por ejemplo, solo las ediciones de
+
+225
+00:14:56.382 --> 00:14:57.500
+ficheros punto js.
+
+226
+00:14:58.354 --> 00:15:02.652
+En los ajustes vimos el bloque
+de TTSR: el modo de contexto,
+
+227
+00:15:02.692 --> 00:15:07.120
+descartar; interrumpir,
+siempre; repetir, una vez.
+
+228
+00:15:07.373 --> 00:15:11.030
+Las reglas se buscan en punto o
+eme pe barra rules del proyecto,
+
+229
+00:15:11.070 --> 00:15:15.140
+en las de tu perfil y en las carpetas
+de reglas de otros agentes como Cursor o
+
+230
+00:15:15.180 --> 00:15:18.430
+Copilot. Y oh my pi trae
+veintisiete incluidas.
+
+231
+00:15:18.845 --> 00:15:23.880
+En el otro panel, o eme
+pe ttsr list las enseña:
+
+232
+00:15:23.920 --> 00:15:27.480
+de Go, de Rust y de TypeScript.
+
+233
+00:15:28.070 --> 00:15:29.320
+Ninguna mira ficheros punto js,
+así que en la tienda no hacen nada.
+
+234
+00:15:35.215 --> 00:15:39.450
+Escribir una regla a mano no es difícil,
+pero acertar con la expresión regular y el
+
+235
+00:15:39.490 --> 00:15:43.610
+alcance lleva un rato. Barra
+o eme efe ge lo hace por ti:
+
+236
+00:15:43.650 --> 00:15:46.180
+le das una queja y te propone una regla.
+
+237
+00:15:46.813 --> 00:15:52.217
+Volvamos a texto envío. El toFixed con el
+cambio del punto por la coma choca con el
+
+238
+00:15:52.257 --> 00:15:56.207
+AGENTS punto md, que pide
+redondear con Math punto round.
+
+239
+00:15:56.247 --> 00:16:00.147
+Y para mostrar importes en
+España hay una herramienta mejor,
+
+240
+00:16:00.187 --> 00:16:03.740
+Intl punto NumberFormat, que
+ya pone la coma y el euro.
+
+241
+00:16:04.616 --> 00:16:07.960
+Escribimos barra o eme efe ge y la queja:
+
+242
+00:16:08.028 --> 00:16:12.700
+no uses toFixed con importes; redondea
+como dice el AGENTS punto md y para
+
+243
+00:16:12.740 --> 00:16:16.315
+mostrar usa Intl punto NumberFormat.
+
+244
+00:16:16.355 --> 00:16:20.430
+El modelo activo escribe la regla, y oh my
+pi comprueba que habría saltado con algo
+
+245
+00:16:20.470 --> 00:16:23.012
+que el modelo hizo antes
+en esta conversación.
+
+246
+00:16:23.052 --> 00:16:26.222
+Aquí encaja: texto envío usó toFixed.
+
+247
+00:16:26.262 --> 00:16:30.720
+Si no, lo reintenta hasta tres veces,
+o te pregunta si guardarla igualmente.
+
+248
+00:16:31.389 --> 00:16:36.910
+El borrador es bueno. Se llama no
+toFixed importes, y vigila dos cosas:
+
+249
+00:16:36.950 --> 00:16:41.340
+una llamada a toFixed y un replace
+que cambia el punto por la coma.
+
+250
+00:16:41.380 --> 00:16:44.290
+Solo en ediciones y escrituras
+de ficheros punto js.
+
+251
+00:16:44.330 --> 00:16:47.129
+Y el cuerpo dice qué hacer en su lugar.
+
+252
+00:16:47.169 --> 00:16:51.370
+Nos pregunta dónde guardarla: en este
+proyecto, en la configuración global o
+
+253
+00:16:51.410 --> 00:16:53.658
+corregirla con nuestras indicaciones.
+
+254
+00:16:53.698 --> 00:16:56.493
+La guardamos en el proyecto,
+para que la comparta el equipo,
+
+255
+00:16:56.533 --> 00:16:59.180
+y queda registrada en vivo, sin reiniciar.
+
+256
+00:17:00.066 --> 00:17:04.110
+En el otro panel miramos el fichero,
+con su encabezado y su cuerpo.
+
+257
+00:17:04.315 --> 00:17:07.630
+Y la probamos sin gastar
+modelo: o eme pe ttsr
+
+258
+00:17:08.220 --> 00:17:15.110
+test, como si fuera una edición de carrito
+punto js, con una línea que usa toFixed.
+
+259
+00:17:15.169 --> 00:17:19.380
+Responde que se dispara una regla, la
+nuestra, con la condición que ha encajado.
+
+260
+00:17:20.231 --> 00:17:24.030
+Y en vivo, le pedimos una función
+texto total para el carrito,
+
+261
+00:17:24.070 --> 00:17:28.310
+igual que texto envío. Aquí la
+regla no ha tenido que cortar nada.
+
+262
+00:17:28.350 --> 00:17:33.290
+En su razonamiento, Pro la llama regla del
+proyecto y la sigue desde el principio.
+
+263
+00:17:33.330 --> 00:17:38.080
+Pide ejecutar un node guion e para
+ver exactamente qué devuelve Intl,
+
+264
+00:17:38.187 --> 00:17:41.190
+y como no es un patrón
+permitido, aprobamos.
+
+265
+00:17:41.230 --> 00:17:45.120
+Descubre que Intl pone un espacio
+que no se parte antes del euro.
+
+266
+00:17:46.211 --> 00:17:48.110
+Al final hace más de lo que pedimos.
+
+267
+00:17:48.150 --> 00:17:53.380
+Texto total usa Intl, y texto envío
+también, porque el toFixed incumplía la
+
+268
+00:17:53.420 --> 00:17:58.500
+regla nueva. Ajusta las pruebas a ese
+espacio, y diecinueve de diecinueve.
+
+269
+00:17:58.540 --> 00:18:02.101
+Una regla que se cumple sin dispararse es
+la mejor señal de que está bien escrita,
+
+270
+00:18:02.141 --> 00:18:03.140
+y no ha costado nada.
+
+271
+00:18:09.067 --> 00:18:13.287
+Queda la última línea de nuestro
+fichero, secrets enabled.
+
+272
+00:18:13.327 --> 00:18:18.280
+Todo lo que el modelo lee, sea un fichero,
+la salida de un comando o un mensaje tuyo,
+
+273
+00:18:18.320 --> 00:18:23.400
+viaja al proveedor. La redacción de
+secretos de oh my pi sustituye los valores
+
+274
+00:18:23.440 --> 00:18:27.880
+sensibles por un marcador antes de
+enviarlos, y viene apagada de fábrica.
+
+275
+00:18:28.510 --> 00:18:31.578
+Cuando la activas, reúne
+secretos de tres sitios.
+
+276
+00:18:31.618 --> 00:18:36.047
+Las variables de entorno cuyo nombre suena
+a secreto, como las que contienen key,
+
+277
+00:18:36.087 --> 00:18:39.950
+token o password, si su valor
+tiene al menos ocho caracteres.
+
+278
+00:18:40.024 --> 00:18:45.235
+Los ficheros secrets punto yml,
+el de tu perfil y el del proyecto.
+
+279
+00:18:45.275 --> 00:18:48.570
+Y unas expresiones incluidas
+para formatos conocidos:
+
+280
+00:18:48.610 --> 00:18:52.480
+tokens de GitHub, claves de proveedores
+de modelos o claves privadas.
+
+281
+00:18:53.191 --> 00:18:56.098
+Cada valor se cambia por un
+marcador entre signos de dólar,
+
+282
+00:18:56.138 --> 00:18:59.660
+que no deja adivinar el valor, porque se
+calcula con una clave que solo existe en
+
+283
+00:18:59.700 --> 00:19:03.160
+tu máquina. Y si el modelo usa
+ese marcador en un comando,
+
+284
+00:19:03.200 --> 00:19:06.910
+oh my pi lo sustituye por el valor
+real justo antes de ejecutarlo.
+
+285
+00:19:06.950 --> 00:19:09.720
+El modelo puede usar un
+secreto que nunca ha visto.
+
+286
+00:19:10.686 --> 00:19:12.800
+Lo probamos con un valor falso.
+
+287
+00:19:12.840 --> 00:19:17.599
+Antes de arrancar exportamos una
+variable llamada TOKEN guion bajo DEMO,
+
+288
+00:19:17.639 --> 00:19:20.146
+con un texto que dice
+que no es un secreto.
+
+289
+00:19:20.186 --> 00:19:24.358
+Le pedimos que ejecute un echo de
+esa variable y que, sin copiarla,
+
+290
+00:19:24.398 --> 00:19:27.180
+nos diga cuántos caracteres ve y por cuál
+
+291
+00:19:27.845 --> 00:19:30.742
+empieza. El comando lleva una variable
+y no hay patrón que lo permita,
+
+292
+00:19:30.782 --> 00:19:33.140
+así que pregunta, y aprobamos.
+
+293
+00:19:33.883 --> 00:19:38.350
+En la tarjeta de la herramienta vemos
+nuestro texto, porque oh my pi restaura
+
+294
+00:19:38.390 --> 00:19:40.240
+los marcadores en la vista local.
+
+295
+00:19:40.280 --> 00:19:45.078
+Pero el modelo ve otra cosa: dos
+dólares, una ristra de letras y números,
+
+296
+00:19:45.118 --> 00:19:49.450
+y otros dos dólares. Cuenta dieciocho
+caracteres y dice que empieza por un
+
+297
+00:19:49.490 --> 00:19:53.280
+dólar. Nuestro texto tiene
+veintiséis y empieza por e.
+
+298
+00:19:53.873 --> 00:19:58.110
+Y el remate. En su respuesta, el modelo
+escribe el marcador para decir qué ha
+
+299
+00:19:58.150 --> 00:20:02.518
+visto, y en tu pantalla aparece
+el valor real, restaurado.
+
+300
+00:20:02.558 --> 00:20:05.650
+No te confundas: el modelo
+no lo ha visto nunca.
+
+301
+00:20:05.690 --> 00:20:09.840
+Si te pidiera listar todas las
+variables de entorno con env o printenv,
+
+302
+00:20:09.880 --> 00:20:12.970
+deniégalo: en una terminal
+real ahí hay claves de verdad.
+
+303
+00:20:13.990 --> 00:20:16.295
+Ahora los huecos, que son importantes.
+
+304
+00:20:16.335 --> 00:20:22.400
+El system prompt no se redacta, y ahí van
+tu AGENTS punto md y tu RULES punto md:
+
+305
+00:20:22.440 --> 00:20:24.300
+nunca pongas un secreto
+
+306
+00:20:24.847 --> 00:20:27.510
+en ellos. La exportación
+de sesiones tampoco
+
+307
+00:20:27.975 --> 00:20:31.770
+redacta. El secrets punto yml del
+proyecto se versiona, así que ahí solo van
+
+308
+00:20:31.810 --> 00:20:34.560
+expresiones regulares, nunca valores.
+
+309
+00:20:34.801 --> 00:20:38.667
+Y un secreto con una forma desconocida,
+en una variable con un nombre inocente,
+
+310
+00:20:38.707 --> 00:20:39.800
+sale tal cual.
+
+311
+00:20:45.305 --> 00:20:49.140
+Los límites, juntos. El
+primero, el del vídeo ocho:
+
+312
+00:20:49.180 --> 00:20:53.108
+aprobar no es aislar. La documentación
+lo dice con esas palabras:
+
+313
+00:20:53.148 --> 00:20:57.222
+los patrones son una política de
+aprobación, no un confinamiento.
+
+314
+00:20:57.262 --> 00:21:01.350
+Un comando aprobado tiene todo el acceso
+de tu shell, y los patrones comparan
+
+315
+00:21:01.390 --> 00:21:05.950
+texto. Git guion ce punto
+push no empieza por git push.
+
+316
+00:21:05.990 --> 00:21:10.110
+Con nuestra configuración preguntaría,
+pero si hubieras puesto allow a algo
+
+317
+00:21:10.150 --> 00:21:11.250
+amplio, pasaría.
+
+318
+00:21:12.317 --> 00:21:16.087
+El segundo es propio de oh my
+pi, y conviene decirlo claro.
+
+319
+00:21:16.127 --> 00:21:21.233
+La capa del proyecto gana a la tuya,
+y oh my pi no tiene barra trust.
+
+320
+00:21:21.273 --> 00:21:24.730
+El mismo fichero que hoy endurece la
+tienda podría, en un repositorio que
+
+321
+00:21:24.770 --> 00:21:28.487
+clonas, poner el modo yolo o
+permitir cualquier comando.
+
+322
+00:21:28.527 --> 00:21:32.107
+Y los hooks del proyecto son
+código que se ejecuta al arrancar.
+
+323
+00:21:32.147 --> 00:21:36.131
+Por eso nuestro hook protege su propia
+carpeta, y por eso los cambios en punto o
+
+324
+00:21:36.171 --> 00:21:39.820
+eme pe se revisan en el diff
+como cualquier otro código.
+
+325
+00:21:40.614 --> 00:21:45.271
+Antes de abrir un repositorio ajeno,
+mira su carpeta punto o eme pe.
+
+326
+00:21:45.311 --> 00:21:49.380
+Y para lo que no conoces, la respuesta
+sigue siendo la del vídeo cinco:
+
+327
+00:21:49.420 --> 00:21:54.500
+un contenedor. En cuanto al coste,
+toda la demo se quedó en tres céntimos.
+
+328
+00:21:55.483 --> 00:22:00.240
+Repasemos. Las herramientas
+declaran nivel read, write o exec,
+
+329
+00:22:00.280 --> 00:22:03.900
+y tools punto approval mode
+decide qué se aprueba solo;
+
+330
+00:22:03.940 --> 00:22:07.860
+yolo es el de fábrica y write
+es un buen punto de partida.
+
+331
+00:22:07.900 --> 00:22:12.093
+El diálogo tiene Approve y Deny; lo
+permanente va en la configuración.
+
+332
+00:22:12.133 --> 00:22:17.330
+Bash punto patterns ordena reglas allow,
+prompt y deny, donde deny es absoluto y
+
+333
+00:22:17.370 --> 00:22:20.120
+allow no cubre líneas compuestas.
+
+334
+00:22:20.921 --> 00:22:25.350
+Las políticas por herramienta sobreviven
+a guion guion yolo y llegan a los
+
+335
+00:22:25.390 --> 00:22:29.760
+subagentes. Los hooks cubren lo
+que la configuración no alcanza.
+
+336
+00:22:29.800 --> 00:22:34.320
+Las reglas TTSR corrigen al modelo en
+mitad del stream, y barra o eme efe ge las
+
+337
+00:22:34.360 --> 00:22:37.181
+escribe a partir de una queja.
+
+338
+00:22:37.221 --> 00:22:40.500
+Y la redacción de secretos
+ayuda, pero no lo tapa todo.
+
+339
+00:22:41.500 --> 00:22:45.885
+La práctica: en una rama de tu
+proyecto y con tu perfil de pruebas,
+
+340
+00:22:45.925 --> 00:22:52.050
+escribe un punto o eme pe barra
+config punto yml con el modo write,
+
+341
+00:22:52.090 --> 00:22:56.790
+bash en prompt y una lista corta de
+comandos permitidos, más un deny para lo
+
+342
+00:22:56.830 --> 00:23:01.476
+que nunca debe pasar. Trabaja con él una
+tarde y apunta cada pregunta que te sobra:
+
+343
+00:23:01.516 --> 00:23:04.278
+cada una es un patrón allow que te falta.
+
+344
+00:23:04.318 --> 00:23:09.126
+Y la próxima vez que el modelo haga algo
+que te moleste, prueba barra o eme efe ge
+
+345
+00:23:09.166 --> 00:23:12.700
+y comprueba la regla
+con o eme pe ttsr test.
+
+346
+00:23:13.648 --> 00:23:16.660
+En el próximo vídeo extendemos oh my pi:
+
+347
+00:23:16.700 --> 00:23:20.760
+extensiones, skills y su
+registro, marketplaces y plugins,
+
+348
+00:23:20.800 --> 00:23:24.970
+servidores MCP, comandos propios del
+proyecto, y cómo encaja todo lo que
+
+349
+00:23:25.010 --> 00:23:27.540
+escribimos para Pi. Nos vemos allí.

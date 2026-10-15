@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 5
 duracion: "24 min"
 video: "05-seguridad-y-aislamiento.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/05-seguridad-y-aislamiento.es.vtt"
 ---
 
 Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una superficie de ataque, qué protege la confianza de proyecto y cómo meter Pi entero en un contenedor.

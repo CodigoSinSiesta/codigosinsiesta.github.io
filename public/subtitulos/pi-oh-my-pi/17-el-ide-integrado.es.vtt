@@ -1,0 +1,1782 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.510 --> 00:00:14.189
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.229 --> 00:00:17.320
+Vídeo diecisiete: el entorno
+de desarrollo integrado.
+
+3
+00:00:23.484 --> 00:00:27.866
+En el vídeo anterior repartimos trabajo
+entre agentes y aprendimos una regla:
+
+4
+00:00:27.906 --> 00:00:32.000
+quien reparte, verifica. Hoy
+toca la otra mitad de esa idea.
+
+5
+00:00:32.040 --> 00:00:35.910
+Para verificar bien, el agente necesita
+las mismas herramientas que usas tú cuando
+
+6
+00:00:35.950 --> 00:00:40.198
+programas: un servidor de lenguaje
+que sepa dónde se usa cada función,
+
+7
+00:00:40.238 --> 00:00:43.249
+un depurador que pare el
+programa y enseñe las variables,
+
+8
+00:00:43.289 --> 00:00:45.800
+y una forma de editar que
+no rompa nada por el camino.
+
+9
+00:00:46.819 --> 00:00:50.455
+Tu editor tiene todo eso, pero
+el agente no ve tu editor.
+
+10
+00:00:50.495 --> 00:00:53.581
+oh my pi se lo da en
+forma de herramientas:
+
+11
+00:00:53.621 --> 00:00:57.592
+LSP, para el servidor de lenguaje;
+debug, para el depurador;
+
+12
+00:00:57.632 --> 00:01:01.783
+ast grep y ast edit, para buscar
+y reescribir por estructura;
+
+13
+00:01:01.823 --> 00:01:04.378
+y eval, para ejecutar código con estado.
+
+14
+00:01:04.418 --> 00:01:07.498
+Más una herramienta read que
+abre casi cualquier cosa.
+
+15
+00:01:07.538 --> 00:01:11.400
+Es un entorno de desarrollo sin ventanas,
+pensado para que lo maneje el modelo.
+
+16
+00:01:12.370 --> 00:01:14.800
+La razón de fondo es la de todo el curso:
+
+17
+00:01:14.840 --> 00:01:18.279
+dar al modelo hechos en
+lugar de suposiciones.
+
+18
+00:01:18.319 --> 00:01:22.240
+Si el modelo adivina dónde se
+llama una función, a veces acierta.
+
+19
+00:01:22.280 --> 00:01:25.040
+Si se lo pregunta al servidor
+de lenguaje, lo sabe.
+
+20
+00:01:25.080 --> 00:01:29.183
+Y si adivina por qué falla un
+test, puede arreglar el síntoma.
+
+21
+00:01:29.223 --> 00:01:33.120
+Si para el programa y mira las
+variables, encuentra la causa.
+
+22
+00:01:33.760 --> 00:01:36.953
+Antes de seguir, una aclaración,
+porque el nombre confunde.
+
+23
+00:01:36.993 --> 00:01:39.772
+El comando barra debug
+no abre el depurador:
+
+24
+00:01:39.812 --> 00:01:43.360
+abre un selector de diagnóstico
+del propio oh my pi, con logs,
+
+25
+00:01:43.400 --> 00:01:45.940
+informes y peticiones en crudo.
+
+26
+00:01:46.001 --> 00:01:49.474
+El depurador es la herramienta
+debug, y la maneja el modelo.
+
+27
+00:01:49.514 --> 00:01:52.450
+A barra debug le dedicamos
+una diapositiva más adelante.
+
+28
+00:01:53.411 --> 00:01:56.400
+Además veremos los
+otros comandos del tema:
+
+29
+00:01:56.440 --> 00:02:01.463
+barra add dir, barra remove dir y barra
+dirs, para trabajar con varias carpetas a
+
+30
+00:02:01.503 --> 00:02:04.510
+la vez, y barra browser y barra
+computer, que controlan el navegador y el
+
+31
+00:02:04.550 --> 00:02:08.940
+escritorio. Todo en la tienda
+de siempre, con el perfil demo,
+
+32
+00:02:08.980 --> 00:02:11.840
+ahora en oh my pi dieciocho punto
+siete, y con DeepSeek V cuatro Pro,
+
+33
+00:02:11.880 --> 00:02:15.000
+que razona más, porque hoy
+hay que pensar el código.
+
+34
+00:02:15.761 --> 00:02:18.630
+El orden será el de una tarea real.
+
+35
+00:02:18.697 --> 00:02:22.290
+Primero, dar al agente acceso a una
+carpeta de datos que no está en el
+
+36
+00:02:22.330 --> 00:02:25.864
+repositorio. Después,
+leer lo que hay en ella.
+
+37
+00:02:25.904 --> 00:02:29.930
+Luego, un refactor con el servidor de
+lenguaje, una limpieza con búsqueda
+
+38
+00:02:29.970 --> 00:02:33.499
+estructural y un fallo que
+encontraremos con el depurador.
+
+39
+00:02:33.539 --> 00:02:37.950
+Al final, eval, el navegador y el
+escritorio, y los límites de todo esto.
+
+40
+00:02:43.805 --> 00:02:47.640
+Empezamos por el espacio de trabajo,
+porque condiciona todo lo demás.
+
+41
+00:02:47.790 --> 00:02:53.100
+Una sesión de oh my pi tiene un directorio
+de trabajo y puede tener más raíces.
+
+42
+00:02:53.203 --> 00:02:55.740
+Junto a la tienda hemos preparado
+una carpeta llamada datos,
+
+43
+00:02:55.780 --> 00:03:00.597
+con la tarifa de envío en PDF y una
+base de datos SQLite de pedidos.
+
+44
+00:03:00.637 --> 00:03:03.780
+No es parte del repositorio, pero
+queremos que el agente la vea.
+
+45
+00:03:04.700 --> 00:03:10.350
+Escribimos barra dirs. Aparece una sola
+raíz, la tienda, marcada como working
+
+46
+00:03:10.390 --> 00:03:16.840
+directory. Ahora, barra add
+dir punto punto barra datos;
+
+47
+00:03:16.880 --> 00:03:17.964
+el autocompletado ya ofrece la carpeta.
+
+48
+00:03:18.004 --> 00:03:20.565
+El aviso dice added y
+vuelve a listar las raíces:
+
+49
+00:03:20.605 --> 00:03:24.202
+ya son dos. Si la carpeta no
+existe, o no es una carpeta,
+
+50
+00:03:24.242 --> 00:03:26.180
+te lo dice y no cambia nada.
+
+51
+00:03:26.879 --> 00:03:30.920
+¿Qué cambia por dentro? oh my
+pi regenera el system prompt.
+
+52
+00:03:30.960 --> 00:03:35.390
+Añade un bloque con las raíces extra y
+le dice al modelo que use rutas absolutas
+
+53
+00:03:35.430 --> 00:03:37.880
+bajo ellas para leer, buscar
+
+54
+00:03:38.433 --> 00:03:42.977
+y editar. Además carga el AGENTS punto
+md de cada raíz y su árbol de ficheros.
+
+55
+00:03:43.017 --> 00:03:47.183
+Nuestra carpeta datos tiene uno de dos
+líneas que dice que es de solo lectura.
+
+56
+00:03:47.223 --> 00:03:49.380
+El agente lo sabrá sin que se lo repitas.
+
+57
+00:03:50.324 --> 00:03:52.699
+La lista de raíces se guarda en la sesión:
+
+58
+00:03:52.739 --> 00:03:54.698
+si la retomas mañana, vuelven.
+
+59
+00:03:54.738 --> 00:03:59.059
+Si las quieres en todas las sesiones,
+existe el ajuste workspace punto
+
+60
+00:03:59.099 --> 00:04:04.304
+additional directories, y al arrancar,
+la opción guion guion add dir.
+
+61
+00:04:04.344 --> 00:04:07.510
+Y una prueba: barra remove dir punto.
+
+62
+00:04:07.550 --> 00:04:11.210
+Se niega: cannot remove the working
+directory, y te sugiere barra move,
+
+63
+00:04:11.250 --> 00:04:13.580
+del vídeo doce, para cambiarlo.
+
+64
+00:04:14.421 --> 00:04:17.860
+¿Cuándo sirve esto? Cuando
+el cambio cruza repositorios:
+
+65
+00:04:17.900 --> 00:04:21.800
+una aplicación y la librería
+que usa, un servicio y su
+
+66
+00:04:22.353 --> 00:04:25.762
+cliente, el código y la
+documentación que vive en otro sitio.
+
+67
+00:04:25.802 --> 00:04:30.697
+En lugar de abrir dos sesiones y copiar
+de una a otra, abres una con dos raíces,
+
+68
+00:04:30.737 --> 00:04:33.180
+y el agente ve ambas con
+sus propias instrucciones.
+
+69
+00:04:34.106 --> 00:04:36.213
+Un aviso que conviene tener claro.
+
+70
+00:04:36.253 --> 00:04:38.980
+Añadir una carpeta no es aislarla.
+
+71
+00:04:39.040 --> 00:04:42.900
+Si el agente puede editar en la
+tienda, puede editar en datos.
+
+72
+00:04:42.940 --> 00:04:47.010
+La frase de solo lectura de su
+AGENTS punto md es una petición,
+
+73
+00:04:47.050 --> 00:04:51.460
+no una barrera. Imponer permisos de
+verdad es el tema del vídeo diecinueve.
+
+74
+00:04:57.265 --> 00:05:02.110
+Ya tenemos la carpeta. Le pedimos al
+agente que lea la tarifa en el PDF,
+
+75
+00:05:02.150 --> 00:05:06.302
+que mire qué tablas tiene la base de
+datos de pedidos y que busque pedidos de
+
+76
+00:05:06.342 --> 00:05:09.263
+cuarenta euros o más a los
+que se les cobró envío.
+
+77
+00:05:09.303 --> 00:05:10.240
+Sin cambiar nada.
+
+78
+00:05:11.152 --> 00:05:16.220
+La herramienta read, con un único
+parámetro, la ruta, abre casi todo.
+
+79
+00:05:16.260 --> 00:05:19.419
+Para el PDF, lo convierte a
+texto y se lo da al modelo;
+
+80
+00:05:19.459 --> 00:05:23.245
+lo mismo haría con un Word,
+una hoja de cálculo o un ePub.
+
+81
+00:05:23.285 --> 00:05:27.984
+Y en la pantalla se ve justo eso:
+read, tarifas envío punto pdf,
+
+82
+00:05:28.024 --> 00:05:31.896
+y debajo el modelo resume la tabla
+de tarifas, con el envío gratis desde
+
+83
+00:05:31.936 --> 00:05:33.400
+cuarenta euros sin IVA.
+
+84
+00:05:34.391 --> 00:05:37.140
+Para la base de datos, read también sirve:
+
+85
+00:05:37.180 --> 00:05:42.480
+reconoce SQLite, lista las tablas, enseña
+el esquema y acepta filtros o una consulta
+
+86
+00:05:42.520 --> 00:05:45.250
+SQL, en un modo que impide escribir.
+
+87
+00:05:45.290 --> 00:05:49.139
+Pero Pro hizo otra cosa:
+usó sqlite tres desde bash.
+
+88
+00:05:49.179 --> 00:05:52.435
+Funciona igual, y el resultado es
+el mismo, pero conviene saberlo:
+
+89
+00:05:52.475 --> 00:05:56.485
+el modelo elige la herramienta,
+y con bash nada impide escribir.
+
+90
+00:05:56.525 --> 00:05:59.860
+Si quieres la garantía de solo
+lectura, pídele que use read.
+
+91
+00:06:00.730 --> 00:06:05.670
+El resultado: los pedidos diez cero uno y
+diez cero dos superan los cuarenta euros y
+
+92
+00:06:05.710 --> 00:06:08.023
+se les cobraron cuatro
+noventa y cinco de envío.
+
+93
+00:06:08.063 --> 00:06:09.000
+El resto,
+
+94
+00:06:09.488 --> 00:06:15.100
+bien. Y compara con el código: el umbral
+de src barra envio punto js es cuarenta,
+
+95
+00:06:15.140 --> 00:06:18.755
+igual que la tarifa. Así que el error
+está en los datos, no en el código.
+
+96
+00:06:18.795 --> 00:06:22.640
+Hasta añade un matiz del PDF que el
+código no modela, el envío urgente.
+
+97
+00:06:23.606 --> 00:06:26.350
+Los sufijos también sirven para el código.
+
+98
+00:06:26.390 --> 00:06:31.230
+Dos puntos y dos números lee solo ese
+rango de líneas, y dos puntos raw devuelve
+
+99
+00:06:31.270 --> 00:06:35.460
+el fichero tal cual. Sin sufijo,
+si el fichero de código es largo,
+
+100
+00:06:35.500 --> 00:06:39.230
+read entrega un resumen con las
+declaraciones y pliega los cuerpos,
+
+101
+00:06:39.270 --> 00:06:41.831
+y al final dice qué rangos volver a leer.
+
+102
+00:06:41.871 --> 00:06:45.900
+El modelo ve la forma del fichero sin
+gastar contexto en lo que no necesita.
+
+103
+00:06:46.843 --> 00:06:49.590
+Y abre direcciones internas de oh my pi.
+
+104
+00:06:49.630 --> 00:06:52.580
+Ya conoces agent y history
+del vídeo dieciséis.
+
+105
+00:06:52.620 --> 00:06:58.121
+Hay más, y una interesa aquí: pr
+dos puntos barra barra y el número,
+
+106
+00:06:58.161 --> 00:07:03.092
+que lee una pull request de GitHub con
+sus comentarios, y su diff si añades barra
+
+107
+00:07:03.132 --> 00:07:07.872
+diff. Por debajo usa el cliente gh,
+con tu cuenta y el repositorio remoto.
+
+108
+00:07:07.912 --> 00:07:11.660
+La tienda no tiene remoto y no vamos a
+enseñar cuentas, así que se queda en esta
+
+109
+00:07:11.700 --> 00:07:12.600
+diapositiva.
+
+110
+00:07:13.432 --> 00:07:16.250
+Un detalle más, que
+vimos en el vídeo once.
+
+111
+00:07:16.290 --> 00:07:20.744
+Cuando read entrega un fichero de código,
+cada línea lleva delante su número,
+
+112
+00:07:20.784 --> 00:07:24.560
+y la lectura lleva una etiqueta
+corta que la identifica.
+
+113
+00:07:24.660 --> 00:07:29.670
+Eso es hashline, la edición anclada,
+y es la base de cómo edita oh my pi,
+
+114
+00:07:29.710 --> 00:07:31.080
+como veremos dentro de un momento.
+
+115
+00:07:36.937 --> 00:07:42.500
+Pasamos al refactor. Queremos cambiar
+el nombre de la función gastos envio por
+
+116
+00:07:42.540 --> 00:07:45.232
+calcular envio en todo el proyecto.
+
+117
+00:07:45.272 --> 00:07:49.610
+Podríamos pedírselo al modelo sin más,
+y lo haría con grep y varias ediciones.
+
+118
+00:07:49.650 --> 00:07:52.779
+Funciona casi siempre.
+El casi es el problema:
+
+119
+00:07:52.819 --> 00:07:56.610
+un nombre parecido en un comentario,
+una importación con alias,
+
+120
+00:07:56.650 --> 00:07:57.900
+un fichero que no ha mirado.
+
+121
+00:07:59.196 --> 00:08:02.590
+Un servidor de lenguaje resuelve
+eso porque entiende el código:
+
+122
+00:08:02.630 --> 00:08:06.926
+sabe qué es una definición, qué es
+una referencia y qué es solo texto.
+
+123
+00:08:06.966 --> 00:08:10.945
+oh my pi habla el protocolo
+LSP, el mismo que usa tu editor,
+
+124
+00:08:10.985 --> 00:08:15.191
+y arranca el servidor solo. Mira dos
+cosas en el directorio de trabajo:
+
+125
+00:08:15.231 --> 00:08:18.510
+un marcador de proyecto y
+el binario del servidor.
+
+126
+00:08:18.550 --> 00:08:22.470
+Para JavaScript, el marcador es el
+package punto json, y el servidor,
+
+127
+00:08:22.510 --> 00:08:26.220
+typescript language server, que en
+esta máquina está instalado con npm.
+
+128
+00:08:27.626 --> 00:08:33.110
+Le pedimos que use la herramienta LSP, que
+busque las referencias de gastos envio y
+
+129
+00:08:33.150 --> 00:08:36.657
+que prepare una vista previa del
+cambio de nombre, sin aplicarla.
+
+130
+00:08:36.697 --> 00:08:40.550
+Lo de la vista previa hay que pedirlo:
+la acción rename aplica los cambios
+
+131
+00:08:40.590 --> 00:08:43.180
+directamente salvo que
+se le diga lo contrario.
+
+132
+00:08:43.736 --> 00:08:47.430
+Pro encuentra diez
+referencias en tres ficheros:
+
+133
+00:08:47.470 --> 00:08:53.404
+la definición en envio punto js, la
+importación y la llamada en carrito punto
+
+134
+00:08:53.444 --> 00:08:57.170
+js, y la importación y
+seis llamadas en el test.
+
+135
+00:08:57.210 --> 00:09:01.060
+Las pone en una tabla. Y
+descubre una rareza del servidor:
+
+136
+00:09:01.332 --> 00:09:05.010
+preguntando desde la definición,
+solo devolvía la definición;
+
+137
+00:09:05.050 --> 00:09:08.400
+preguntando desde un uso,
+el conjunto completo.
+
+138
+00:09:08.440 --> 00:09:12.993
+La tarjeta LSP rename, con apply
+false, enseña la vista previa:
+
+139
+00:09:13.033 --> 00:09:14.820
+uno, dos y siete cambios.
+
+140
+00:09:15.782 --> 00:09:18.785
+Le decimos que lo aplique
+y que ejecute los tests:
+
+141
+00:09:18.825 --> 00:09:23.705
+quince de quince. Pero en el otro
+panel, git diff enseña algo más:
+
+142
+00:09:23.745 --> 00:09:28.122
+el título de un test, gastos envio
+lanza TypeError, también ha cambiado.
+
+143
+00:09:28.162 --> 00:09:31.540
+El servidor de lenguaje no lo tocó,
+porque es una cadena de texto.
+
+144
+00:09:31.580 --> 00:09:35.540
+Fue el modelo, que después del rename hizo
+una edición aparte para que el título no
+
+145
+00:09:35.580 --> 00:09:40.980
+quedara obsoleto. Y lo dijo: siete
+ediciones vía LSP, más una manual.
+
+146
+00:09:41.602 --> 00:09:45.980
+Es razonable, pero es una decisión que
+tomó él, y conviene verla en el diff.
+
+147
+00:09:46.020 --> 00:09:50.876
+El servidor de lenguaje es preciso; el
+modelo que lo usa tiene criterio propio.
+
+148
+00:09:50.916 --> 00:09:55.347
+La herramienta LSP hace más: ir a la
+definición, ver el tipo con hover,
+
+149
+00:09:55.387 --> 00:09:58.914
+listar símbolos, aplicar las
+acciones rápidas del servidor.
+
+150
+00:09:58.954 --> 00:10:03.110
+Y cuando el agente escribe un fichero,
+oh my pi le devuelve los diagnósticos del
+
+151
+00:10:03.150 --> 00:10:04.700
+servidor en la misma vuelta.
+
+152
+00:10:05.755 --> 00:10:11.130
+Para otros lenguajes es lo mismo: rust
+analyzer, gopls, pyright y unas cincuenta
+
+153
+00:10:11.170 --> 00:10:13.353
+configuraciones más vienen de serie.
+
+154
+00:10:13.393 --> 00:10:16.659
+Si el binario está instalado y
+el marcador existe, funciona.
+
+155
+00:10:16.699 --> 00:10:21.780
+Si necesitas otro, se declara en un LSP
+punto json dentro de punto o eme pe.
+
+156
+00:10:22.805 --> 00:10:24.670
+Dos detalles de funcionamiento.
+
+157
+00:10:24.710 --> 00:10:28.847
+El servidor no arranca al abrir oh my
+pi, sino la primera vez que se usa,
+
+158
+00:10:28.887 --> 00:10:32.165
+así que la primera
+consulta tarda un poco más.
+
+159
+00:10:32.205 --> 00:10:36.720
+Y se comparte por proyecto: si tienes
+varias sesiones o subagentes en la misma
+
+160
+00:10:36.760 --> 00:10:40.870
+carpeta, hablan con el mismo servidor
+en lugar de arrancar uno cada uno.
+
+161
+00:10:41.114 --> 00:10:46.390
+Recuerda, eso sí, del vídeo dieciséis: en
+modo plan, los subagentes no tienen LSP.
+
+162
+00:10:52.176 --> 00:10:56.951
+Ahora, cómo edita. En el vídeo uno
+hablamos de la edición anclada.
+
+163
+00:10:56.991 --> 00:11:00.940
+Esta es su forma concreta. Cuando
+el modelo quiere cambiar un fichero,
+
+164
+00:11:00.980 --> 00:11:03.060
+no copia el texto viejo para buscarlo.
+
+165
+00:11:03.100 --> 00:11:07.180
+Copia la etiqueta de la última
+lectura y dice qué líneas sustituye,
+
+166
+00:11:07.220 --> 00:11:11.886
+por número. Si el fichero cambió desde
+entonces, la etiqueta no coincide y oh my
+
+167
+00:11:11.926 --> 00:11:13.820
+pi no aplica el cambio a ciegas.
+
+168
+00:11:13.860 --> 00:11:17.120
+Solo lo recupera si puede demostrar
+que el resultado es seguro.
+
+169
+00:11:17.950 --> 00:11:21.045
+La gramática es pequeña, y
+la tienes en la diapositiva.
+
+170
+00:11:21.085 --> 00:11:25.553
+Put sustituye un rango de líneas,
+o inserta antes o después de una.
+
+171
+00:11:25.593 --> 00:11:28.810
+Cut corta un rango y lo guarda,
+para pegarlo en otro sitio,
+
+172
+00:11:28.850 --> 00:11:34.080
+incluso en otro fichero. Rem
+borra el fichero, y mv lo mueve.
+
+173
+00:11:34.197 --> 00:11:37.980
+Todos los números se refieren a la lectura
+original, así que el modelo no tiene que
+
+174
+00:11:38.020 --> 00:11:39.940
+recalcular nada después de cada cambio.
+
+175
+00:11:40.950 --> 00:11:45.790
+Hay otra regla menos visible: el modelo
+no puede editar líneas que no ha visto.
+
+176
+00:11:45.830 --> 00:11:50.420
+Si read le enseñó un resumen con partes
+plegadas, antes de tocar esas partes tiene
+
+177
+00:11:50.460 --> 00:11:53.660
+que leerlas. Eso evita ediciones
+sobre código imaginado.
+
+178
+00:11:54.585 --> 00:11:59.878
+Un apunte honesto. Hashline es el modo
+por defecto, pero según la documentación
+
+179
+00:11:59.918 --> 00:12:04.252
+algunos modelos usan en su lugar un
+modo clásico de buscar y sustituir,
+
+180
+00:12:04.292 --> 00:12:06.520
+entre ellos la familia de DeepSeek.
+
+181
+00:12:06.560 --> 00:12:10.300
+Lo vimos en la tabla de barra tools:
+la herramienta edit se describe como
+
+182
+00:12:10.340 --> 00:12:13.850
+sustitución de cadenas, con
+coincidencia difusa de espacios.
+
+183
+00:12:14.759 --> 00:12:19.890
+Siguiente petición. En carrito punto js
+hay tres redondeos a céntimos escritos a
+
+184
+00:12:19.930 --> 00:12:23.422
+mano, con la fórmula de
+nuestro AGENTS punto md.
+
+185
+00:12:23.462 --> 00:12:27.760
+Le pedimos que los encuentre con ast
+grep, que los sustituya con ast edit por
+
+186
+00:12:27.800 --> 00:12:32.243
+llamadas a una función redondear,
+enseñándonos antes la vista previa,
+
+187
+00:12:32.283 --> 00:12:34.430
+y que después cree esa función.
+
+188
+00:12:34.590 --> 00:12:38.310
+El orden importa: si la función
+existiera antes, su propio cuerpo también
+
+189
+00:12:38.350 --> 00:12:41.600
+coincidiría con el patrón y
+acabaría llamándose a sí misma.
+
+190
+00:12:42.930 --> 00:12:45.765
+Ast grep busca por
+estructura, no por texto.
+
+191
+00:12:45.805 --> 00:12:48.244
+El patrón se escribe
+como código, con huecos:
+
+192
+00:12:48.284 --> 00:12:52.630
+math punto round de dólar
+equis por cien, entre cien.
+
+193
+00:12:52.670 --> 00:12:56.619
+Dólar equis atrapa cualquier
+expresión, por larga que sea,
+
+194
+00:12:56.659 --> 00:12:59.640
+y los espacios o los
+saltos de línea dan igual.
+
+195
+00:12:59.680 --> 00:13:03.320
+Un aviso: ast grep viene
+desactivada de fábrica.
+
+196
+00:13:03.360 --> 00:13:05.640
+La hemos activado en el
+perfil demo antes de grabar.
+
+197
+00:13:06.595 --> 00:13:12.099
+Aparece la tarjeta AST grep: el patrón,
+tres coincidencias en un fichero.
+
+198
+00:13:12.139 --> 00:13:16.975
+Las líneas nueve, treinta y dos y
+cuarenta y tres de carrito punto js.
+
+199
+00:13:17.015 --> 00:13:19.298
+Y en la cuarenta y tres hay un problema:
+
+200
+00:13:19.338 --> 00:13:23.706
+la expresión va entre paréntesis, así
+que dólar equis los atrapa también,
+
+201
+00:13:23.746 --> 00:13:26.560
+y la sustitución quedaría
+con paréntesis dobles.
+
+202
+00:13:28.631 --> 00:13:32.560
+Pro lo ve en la propia propuesta
+de ast edit, que no toca nada:
+
+203
+00:13:32.600 --> 00:13:35.660
+enseña cada línea antes y después.
+
+204
+00:13:35.730 --> 00:13:39.906
+Prueba con dos reglas a la vez y la vista
+previa muestra una colisión en la línea
+
+205
+00:13:39.946 --> 00:13:43.938
+cuarenta y tres. Así que la descarta,
+escribiendo en equis de dos puntos barra
+
+206
+00:13:43.978 --> 00:13:45.863
+barra reject, con el motivo.
+
+207
+00:13:45.903 --> 00:13:52.230
+Y lo hace en dos etapas: primero una
+regla solo para la línea con paréntesis,
+
+208
+00:13:52.270 --> 00:13:55.910
+que aprueba con equis de dos puntos barra
+barra resolve, y después la general para
+
+209
+00:13:55.950 --> 00:13:56.880
+las otras dos.
+
+210
+00:13:57.832 --> 00:14:01.934
+Un aviso: le pedimos que nos enseñara
+la vista previa antes de aplicar,
+
+211
+00:14:01.974 --> 00:14:06.400
+y la enseñó, pero también aprobó
+él mismo cada etapa sin esperarnos.
+
+212
+00:14:06.440 --> 00:14:09.830
+Las tarjetas de descartar y
+aceptar quedan en la conversación,
+
+213
+00:14:09.870 --> 00:14:14.180
+con su motivo. Si quieres decidir tú,
+pídele explícitamente que pare tras la
+
+214
+00:14:14.220 --> 00:14:19.090
+propuesta. Después añade la función
+redondear, con una edición normal,
+
+215
+00:14:19.130 --> 00:14:21.640
+y ejecuta los tests: quince de quince.
+
+216
+00:14:27.450 --> 00:14:32.240
+Ahora, un fallo. En el otro
+panel rompemos a mano el cupón:
+
+217
+00:14:32.280 --> 00:14:34.372
+hacemos que el descuento
+se aplique dos veces.
+
+218
+00:14:34.412 --> 00:14:39.393
+Node guion guion test falla en el
+caso del cupón del diez por ciento.
+
+219
+00:14:39.433 --> 00:14:42.650
+Al agente le pedimos que
+no toque el código todavía:
+
+220
+00:14:42.690 --> 00:14:47.270
+que use la herramienta debug, lance
+el test del carrito, ponga un punto de
+
+221
+00:14:47.310 --> 00:14:52.440
+ruptura dentro de total con cupon y
+nos enseñe las variables cuando pare.
+
+222
+00:14:53.482 --> 00:14:57.580
+La herramienta debug habla el protocolo
+DAP, el de los depuradores de los
+
+223
+00:14:57.620 --> 00:15:00.230
+editores. oh my pi no
+trae un depurador propio:
+
+224
+00:15:00.270 --> 00:15:02.631
+usa adaptadores que ya existen.
+
+225
+00:15:02.671 --> 00:15:08.391
+gdb y lldb para C y Rust, debugpy
+para Python, delve para Go y,
+
+226
+00:15:08.431 --> 00:15:12.590
+para JavaScript, js debug, el
+adaptador de Visual Studio Code.
+
+227
+00:15:12.630 --> 00:15:13.810
+Este último no viene con oh my pi.
+
+228
+00:15:13.850 --> 00:15:17.441
+Lo instalamos antes de grabar,
+siguiendo su documentación.
+
+229
+00:15:17.481 --> 00:15:19.380
+Corre con el node de tu máquina.
+
+230
+00:15:19.998 --> 00:15:23.680
+El agente lanza el test con
+el adaptador js debug adapter,
+
+231
+00:15:23.720 --> 00:15:26.340
+pone el punto de ruptura y continúa.
+
+232
+00:15:26.540 --> 00:15:30.710
+Las tarjetas lo cuentan: debug
+variables, sesión debug dos,
+
+233
+00:15:30.750 --> 00:15:36.940
+estado stopped, motivo breakpoint, en
+total con cupon, línea treinta y siete.
+
+234
+00:15:36.980 --> 00:15:39.815
+Primero para en un test sin
+cupón, donde no pasa nada.
+
+235
+00:15:39.855 --> 00:15:42.420
+Después, en el del cupón
+del diez por ciento:
+
+236
+00:15:42.460 --> 00:15:45.640
+el total ya vale veintiséis
+con uno, descontado por línea.
+
+237
+00:15:46.591 --> 00:15:53.108
+Entonces avanza una línea, step over, y
+el total pasa a veintitrés con cuarenta y
+
+238
+00:15:53.148 --> 00:15:58.319
+nueve. Ahí está: el descuento se aplica
+dos veces, una por línea y otra sobre el
+
+239
+00:15:58.359 --> 00:16:01.646
+total. Pro lo explica, dice que el
+código sigue intacto, como pedimos,
+
+240
+00:16:01.686 --> 00:16:03.717
+y propone quitar la segunda línea.
+
+241
+00:16:03.757 --> 00:16:07.260
+Le decimos que lo arregle:
+borra la línea treinta y siete,
+
+242
+00:16:07.300 --> 00:16:09.540
+ejecuta los tests, quince de quince.
+
+243
+00:16:10.478 --> 00:16:12.610
+El repertorio es el de
+cualquier depurador.
+
+244
+00:16:12.650 --> 00:16:16.480
+Puntos de ruptura por línea o por
+función, con condición si quieres.
+
+245
+00:16:16.520 --> 00:16:20.720
+Continuar, avanzar una línea, entrar
+en una función o salir de ella.
+
+246
+00:16:20.760 --> 00:16:24.910
+Ver la pila de llamadas, los ámbitos y
+sus variables, y evaluar expresiones en el
+
+247
+00:16:24.950 --> 00:16:28.691
+punto donde está parado. Y
+leer la salida del programa.
+
+248
+00:16:28.731 --> 00:16:33.118
+Cada paso es una llamada a la herramienta,
+y tú ves en la conversación qué ha pedido
+
+249
+00:16:33.158 --> 00:16:34.780
+y qué le ha contestado el depurador.
+
+250
+00:16:35.840 --> 00:16:39.520
+Tres detalles. Solo hay una
+sesión de depuración a la vez;
+
+251
+00:16:39.560 --> 00:16:42.090
+para abrir otra hay que
+terminar la anterior.
+
+252
+00:16:42.130 --> 00:16:46.310
+Puede engancharse a un proceso en marcha,
+por su identificador de proceso o por un
+
+253
+00:16:46.350 --> 00:16:51.163
+puerto. Y si tu lenguaje necesita otro
+adaptador, se declara en un dap punto
+
+254
+00:16:51.203 --> 00:16:52.103
+json.
+
+255
+00:16:52.927 --> 00:16:56.440
+Y ahora sí, barra debug, en diapositiva.
+
+256
+00:16:56.590 --> 00:17:00.330
+Es un selector con herramientas para
+diagnosticar al propio oh my pi:
+
+257
+00:17:00.370 --> 00:17:04.600
+los logs recientes, un perfil de
+rendimiento, información del sistema y del
+
+258
+00:17:04.640 --> 00:17:08.370
+terminal, las respuestas en crudo del
+proveedor, un paquete de informe con la
+
+259
+00:17:08.410 --> 00:17:11.810
+sesión y los logs, y una
+limpieza de la caché.
+
+260
+00:17:11.850 --> 00:17:14.310
+Sirve para reportar un fallo de oh my pi.
+
+261
+00:17:14.350 --> 00:17:17.730
+No lo abrimos en pantalla porque
+enseña sesiones y peticiones tal cual.
+
+262
+00:17:17.770 --> 00:17:20.460
+Si generas un informe,
+revísalo antes de compartirlo.
+
+263
+00:17:26.223 --> 00:17:28.818
+La última herramienta del entorno es eval.
+
+264
+00:17:28.858 --> 00:17:33.150
+Ejecuta una celda de JavaScript o de
+Python en un proceso que se mantiene vivo:
+
+265
+00:17:33.190 --> 00:17:37.070
+lo que definas en una llamada sigue ahí
+en la siguiente, como en un cuaderno.
+
+266
+00:17:37.110 --> 00:17:41.805
+Le pedimos que importe el carrito y
+calcule el total con envío para carritos
+
+267
+00:17:41.845 --> 00:17:44.910
+de treinta y nueve con noventa y nueve,
+cuarenta y cuarenta y cinco euros,
+
+268
+00:17:44.950 --> 00:17:47.550
+con y sin cupón del diez por ciento.
+
+269
+00:17:48.614 --> 00:17:52.390
+Aparece la celda, computing total
+con envío matrix, en ochenta y cinco
+
+270
+00:17:52.430 --> 00:17:58.340
+milisegundos, y una tabla. Y con ella,
+un hallazgo que no habíamos pedido:
+
+271
+00:17:58.380 --> 00:18:02.013
+con cuarenta euros y el cupón, el
+cliente paga más que sin cupón.
+
+272
+00:18:02.053 --> 00:18:06.390
+Cuarenta y ocho con cincuenta y uno
+frente a cuarenta y ocho con cuarenta.
+
+273
+00:18:06.430 --> 00:18:09.985
+El descuento le baja el subtotal a
+treinta y seis, por debajo del umbral,
+
+274
+00:18:10.025 --> 00:18:14.063
+y vuelve a pagar envío. Es justo
+lo que dice la tarifa del PDF,
+
+275
+00:18:14.103 --> 00:18:16.360
+y es un caso de negocio que
+merece una conversación.
+
+276
+00:18:17.437 --> 00:18:20.630
+¿Por qué no node guion e con bash?
+
+277
+00:18:20.670 --> 00:18:24.080
+Porque cada llamada a bash
+empieza de cero, y eval no.
+
+278
+00:18:24.650 --> 00:18:28.600
+Además, desde una celda se puede llamar
+a otras herramientas de la sesión y hasta
+
+279
+00:18:28.640 --> 00:18:32.710
+lanzar subagentes. Y una aclaración:
+los cuadernos de Jupyter,
+
+280
+00:18:32.750 --> 00:18:37.010
+oh my pi los lee y edita como
+texto, pero no los ejecuta.
+
+281
+00:18:37.143 --> 00:18:38.840
+Para ejecutar código está eval.
+
+282
+00:18:39.882 --> 00:18:44.341
+Encima de eval viven dos complementos,
+que la documentación llama preludes.
+
+283
+00:18:44.381 --> 00:18:48.410
+El primero es browser: un navegador
+Chromium que el agente maneja desde una
+
+284
+00:18:48.450 --> 00:18:50.650
+celda, con pestañas con nombre.
+
+285
+00:18:50.690 --> 00:18:56.213
+Puede abrir una página, observarla, hacer
+clic, rellenar campos o hacer capturas.
+
+286
+00:18:56.253 --> 00:18:58.296
+La primera vez descarga Chromium.
+
+287
+00:18:58.336 --> 00:19:00.962
+Para leer una página
+estática basta con read;
+
+288
+00:19:01.002 --> 00:19:02.920
+browser es para interactuar.
+
+289
+00:19:03.694 --> 00:19:08.924
+Hay otra forma de usarlo que conviene
+conocer, aunque no la enseñemos:
+
+290
+00:19:08.964 --> 00:19:13.189
+un relé que adopta una pestaña de tu
+propio Chrome, con tus sesiones iniciadas.
+
+291
+00:19:13.229 --> 00:19:16.140
+Es muy útil para probar una
+aplicación en la que ya has entrado.
+
+292
+00:19:16.180 --> 00:19:20.190
+Y es justo por eso delicado: lo que haga
+el agente en esa pestaña lo hace con tu
+
+293
+00:19:20.230 --> 00:19:21.130
+cuenta.
+
+294
+00:19:21.694 --> 00:19:26.859
+El comando barra browser cambia el modo
+del navegador entre oculto y visible.
+
+295
+00:19:26.899 --> 00:19:30.781
+Ojo: sin argumento, alterna, y
+lo guarda en la configuración.
+
+296
+00:19:30.821 --> 00:19:34.939
+Por eso hoy no lo tocamos. Si lo
+cambias, hazlo en tu perfil de pruebas,
+
+297
+00:19:34.979 --> 00:19:38.400
+y recuerda que el modo visible
+abre ventanas en tu escritorio.
+
+298
+00:19:39.036 --> 00:19:42.614
+El segundo es computer, y
+este va solo en diapositiva.
+
+299
+00:19:42.654 --> 00:19:47.410
+Da al agente tu escritorio real: capturas
+de pantalla, el árbol de accesibilidad de
+
+300
+00:19:47.450 --> 00:19:51.199
+las ventanas, el ratón, el
+teclado y el portapapeles.
+
+301
+00:19:51.239 --> 00:19:54.825
+Viene apagado. Barra computer on
+lo activa solo para la sesión,
+
+302
+00:19:54.865 --> 00:19:59.749
+barra computer off lo apaga y barra
+computer status dice cómo está.
+
+303
+00:19:59.789 --> 00:20:02.640
+No lo vamos a activar en cámara,
+y enseguida verás por qué.
+
+304
+00:20:08.296 --> 00:20:13.530
+Los límites, sin rodeos. El primero: todas
+estas herramientas ejecutan cosas en tu
+
+305
+00:20:13.570 --> 00:20:18.020
+máquina. El servidor de lenguaje y el
+adaptador del depurador son programas que
+
+306
+00:20:18.060 --> 00:20:19.520
+oh my pi arranca
+
+307
+00:20:19.987 --> 00:20:21.700
+por ti. Eval ejecuta código.
+
+308
+00:20:21.805 --> 00:20:24.299
+El depurador ejecuta el
+programa que le pidas.
+
+309
+00:20:24.339 --> 00:20:28.220
+Lo que en tu editor decides con
+un clic, aquí lo decide el modelo.
+
+310
+00:20:28.851 --> 00:20:30.830
+El segundo es el modo de aprobación.
+
+311
+00:20:30.870 --> 00:20:35.165
+Recuerda que oh my pi viene en
+yolo: aprueba todo sin preguntar.
+
+312
+00:20:35.205 --> 00:20:38.771
+Las herramientas distinguen
+lectura, escritura y ejecución,
+
+313
+00:20:38.811 --> 00:20:43.099
+y eval, el navegador y el depurador
+piden permiso de ejecución.
+
+314
+00:20:43.139 --> 00:20:47.490
+Pero en yolo nadie lo pide. Con computer
+activado, eso significa que el modelo
+
+315
+00:20:47.530 --> 00:20:51.930
+puede mover tu ratón y escribir en
+tus aplicaciones sin consultarte.
+
+316
+00:20:51.970 --> 00:20:55.282
+La propia documentación recomienda
+el modo write para usarlo,
+
+317
+00:20:55.322 --> 00:20:58.780
+y una cuenta o una máquina virtual
+dedicadas para lo arriesgado.
+
+318
+00:20:59.644 --> 00:21:04.490
+El tercero: lo que el agente ve en
+pantalla, en una web o en un PDF no es una
+
+319
+00:21:04.530 --> 00:21:07.450
+orden. Es texto que viene de fuera.
+
+320
+00:21:07.490 --> 00:21:11.950
+Una página puede contener instrucciones
+escondidas, y un navegador con tu sesión
+
+321
+00:21:11.990 --> 00:21:13.820
+iniciada actúa en tu nombre.
+
+322
+00:21:13.860 --> 00:21:18.240
+Limitar los dominios del navegador ayuda,
+pero la documentación lo dice claro:
+
+323
+00:21:18.280 --> 00:21:19.310
+no es un sandbox.
+
+324
+00:21:20.369 --> 00:21:22.769
+El cuarto, las dependencias.
+
+325
+00:21:22.809 --> 00:21:27.267
+El servidor de lenguaje y el adaptador
+del depurador no vienen con oh my pi,
+
+326
+00:21:27.307 --> 00:21:29.860
+y si faltan, la herramienta falla o no
+
+327
+00:21:30.447 --> 00:21:34.062
+aparece. Antes de confiar en el LSP de
+un proyecto, pregúntale por su estado.
+
+328
+00:21:34.102 --> 00:21:37.383
+Y recuerda que solo busca marcadores
+en el directorio de trabajo,
+
+329
+00:21:37.423 --> 00:21:38.740
+no en las carpetas que añadas.
+
+330
+00:21:40.047 --> 00:21:43.680
+¿Y el coste? La buena noticia es
+que casi todo lo de hoy es local.
+
+331
+00:21:43.720 --> 00:21:48.448
+El servidor de lenguaje, el depurador
+y ast grep no gastan modelo.
+
+332
+00:21:48.488 --> 00:21:52.930
+Lo que gasta son los turnos que deciden
+qué hacer, y la salida que vuelve al
+
+333
+00:21:52.970 --> 00:21:57.120
+contexto. Toda esta demo, con Pro
+razonando a fondo, costó unos cuatro
+
+334
+00:21:57.160 --> 00:22:01.810
+céntimos. Y conviene pedir lo concreto:
+una tabla, un rango de líneas,
+
+335
+00:22:01.850 --> 00:22:03.180
+una referencia.
+
+336
+00:22:04.379 --> 00:22:07.410
+Si te quedas con una pauta
+práctica, que sea esta.
+
+337
+00:22:07.450 --> 00:22:09.892
+Activa solo lo que vayas a usar.
+
+338
+00:22:09.932 --> 00:22:14.031
+Instala el servidor de lenguaje y el
+adaptador del depurador de tus lenguajes,
+
+339
+00:22:14.071 --> 00:22:18.760
+y comprueba que responden. Deja computer
+apagado, y el navegador en tu perfil de
+
+340
+00:22:18.800 --> 00:22:20.775
+pruebas hasta que lo necesites.
+
+341
+00:22:20.815 --> 00:22:23.682
+Y pide siempre la vista previa
+antes de un cambio grande,
+
+342
+00:22:23.722 --> 00:22:26.700
+sea un rename o una
+reescritura estructural.
+
+343
+00:22:32.180 --> 00:22:37.335
+Repasemos. read es la puerta
+única: ficheros, PDF y documentos,
+
+344
+00:22:37.375 --> 00:22:43.000
+bases SQLite en solo lectura, archivos
+comprimidos, páginas web y direcciones
+
+345
+00:22:43.040 --> 00:22:47.740
+internas como pr. La herramienta LSP
+habla con el servidor de lenguaje:
+
+346
+00:22:47.780 --> 00:22:52.050
+referencias, definiciones y cambios de
+nombre, con vista previa si la pides,
+
+347
+00:22:52.090 --> 00:22:54.390
+y diagnósticos después de escribir.
+
+348
+00:22:54.430 --> 00:22:57.720
+La herramienta debug maneja
+un depurador por DAP;
+
+349
+00:22:57.760 --> 00:23:01.560
+barra debug es otra cosa, el
+diagnóstico del propio oh my pi.
+
+350
+00:23:02.196 --> 00:23:05.989
+Hashline edita por número de línea
+y etiqueta, en una sola llamada,
+
+351
+00:23:06.029 --> 00:23:08.308
+y se niega si el fichero cambió.
+
+352
+00:23:08.348 --> 00:23:11.300
+Ast grep busca por
+estructura y viene apagada;
+
+353
+00:23:11.340 --> 00:23:14.845
+ast edit reescribe por
+estructura, siempre con propuesta,
+
+354
+00:23:14.885 --> 00:23:17.870
+que se aplica con
+resolve o se descarta con
+
+355
+00:23:18.405 --> 00:23:21.407
+reject. Eval mantiene vivo un
+proceso de JavaScript o Python,
+
+356
+00:23:21.447 --> 00:23:25.430
+con dos complementos: browser,
+que se gobierna con barra browser,
+
+357
+00:23:25.470 --> 00:23:30.120
+y computer, apagado
+salvo barra computer on.
+
+358
+00:23:30.160 --> 00:23:33.800
+Y barra add dir, barra remove dir y barra
+dirs gestionan las carpetas de la sesión.
+
+359
+00:23:34.665 --> 00:23:38.560
+La práctica: en tu perfil de pruebas,
+abre un proyecto tuyo con un servidor de
+
+360
+00:23:38.600 --> 00:23:41.930
+lenguaje instalado. Pregunta
+por su estado con LSP.
+
+361
+00:23:42.248 --> 00:23:46.280
+Pide las referencias de una función y una
+vista previa de su cambio de nombre antes
+
+362
+00:23:46.430 --> 00:23:50.390
+de aplicarla. Luego rompe algo a propósito
+y pide que lo encuentre con el depurador
+
+363
+00:23:50.430 --> 00:23:54.760
+antes de tocar el código. Y apunta qué te
+ha dado cada herramienta que no te habría
+
+364
+00:23:54.800 --> 00:23:55.700
+dado grep.
+
+365
+00:23:56.746 --> 00:23:59.860
+En el próximo vídeo cerramos
+el ciclo del cambio:
+
+366
+00:23:59.900 --> 00:24:04.210
+git, calidad y entrega. La
+interfaz de barra git, con su diff,
+
+367
+00:24:04.250 --> 00:24:09.611
+el staging y los commits; barra wt,
+para llevar la sesión a un worktree;
+
+368
+00:24:09.651 --> 00:24:13.297
+barra review; o eme pe
+commit en modo de prueba;
+
+369
+00:24:13.337 --> 00:24:16.873
+las quejas que recoge Auto
+QA, con o eme pe grievances;
+
+370
+00:24:16.913 --> 00:24:19.138
+y barra security, solo explicado.
+
+371
+00:24:19.178 --> 00:24:20.078
+Nos vemos allí.

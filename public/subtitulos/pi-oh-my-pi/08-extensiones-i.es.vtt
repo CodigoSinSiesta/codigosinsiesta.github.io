@@ -1,0 +1,1607 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.240 --> 00:00:14.110
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.150 --> 00:00:17.446
+Vídeo ocho: extensiones, primera parte.
+
+3
+00:00:17.486 --> 00:00:19.870
+Comandos, herramientas y eventos.
+
+4
+00:00:25.570 --> 00:00:28.851
+Hasta ahora hemos personalizado
+Pi sin escribir código:
+
+5
+00:00:28.891 --> 00:00:33.818
+ficheros de contexto, prompts, skills,
+ajustes, y en el vídeo anterior,
+
+6
+00:00:33.858 --> 00:00:38.547
+servidores MCP. Todo eso cambia lo que
+el modelo sabe o lo que tiene a mano.
+
+7
+00:00:38.587 --> 00:00:41.735
+Pero hay cosas que ninguna
+instrucción puede garantizar.
+
+8
+00:00:41.775 --> 00:00:45.648
+Pedirle al modelo que te pregunte
+antes de borrar algo es una petición.
+
+9
+00:00:45.688 --> 00:00:49.398
+Hacer que Pi no ejecute nada
+sin tu permiso es código.
+
+10
+00:00:49.438 --> 00:00:51.078
+Para eso están las extensiones.
+
+11
+00:00:51.860 --> 00:00:56.372
+Una extensión es un módulo de TypeScript
+que se ejecuta dentro del proceso de Pi.
+
+12
+00:00:56.412 --> 00:01:00.848
+Exporta por defecto una función, la
+factoría, que recibe un objeto pi con toda
+
+13
+00:01:00.888 --> 00:01:04.775
+la API de extensiones. Desde ahí
+puede registrar comandos con barra,
+
+14
+00:01:04.815 --> 00:01:07.565
+herramientas que el modelo
+puede llamar, atajos de teclado,
+
+15
+00:01:07.605 --> 00:01:11.928
+opciones de línea de comandos,
+proveedores de modelos o servidores MCP.
+
+16
+00:01:11.968 --> 00:01:14.398
+Y, sobre todo, puede
+escuchar los eventos de Pi:
+
+17
+00:01:14.438 --> 00:01:17.948
+cuando empieza la sesión, cuando llega un
+mensaje, cuando el modelo pide ejecutar
+
+18
+00:01:17.988 --> 00:01:19.118
+una herramienta.
+
+19
+00:01:19.843 --> 00:01:21.678
+No hace falta compilar nada.
+
+20
+00:01:21.718 --> 00:01:25.598
+Pi carga el TypeScript directamente con
+jiti, así que escribes un fichero punto
+
+21
+00:01:25.638 --> 00:01:30.447
+ts, lo guardas y lo cargas. Para
+desarrollar, lo más cómodo es la opción
+
+22
+00:01:30.487 --> 00:01:35.148
+guion e, de extension, que carga un
+fichero concreto solo para esa ejecución.
+
+23
+00:01:35.188 --> 00:01:38.878
+Para tenerla siempre, la extensión va en
+la carpeta extensions del directorio de tu
+
+24
+00:01:38.918 --> 00:01:42.937
+agente, y para un proyecto,
+en punto pi barra extensions.
+
+25
+00:01:42.977 --> 00:01:46.478
+Recuerda lo del vídeo cinco: las
+extensiones del proyecto solo se cargan si
+
+26
+00:01:46.518 --> 00:01:50.258
+confías en él, porque una extensión
+es código que corre con tus permisos.
+
+27
+00:01:51.179 --> 00:01:55.268
+Y esto conviene repetirlo: una
+extensión puede leer tus prompts,
+
+28
+00:01:55.308 --> 00:01:59.162
+tus ficheros, tus credenciales
+y el historial de la sesión,
+
+29
+00:01:59.202 --> 00:02:03.948
+y ejecutar lo que quiera. Instala solo
+las que entiendas o vengan de alguien de
+
+30
+00:02:03.988 --> 00:02:04.888
+confianza.
+
+31
+00:02:05.315 --> 00:02:07.519
+En este vídeo vamos a escribir tres.
+
+32
+00:02:07.559 --> 00:02:10.363
+Una que añade un comando, otra
+que añade una herramienta,
+
+33
+00:02:10.403 --> 00:02:14.788
+y la tercera, la importante: un modo de
+aprobación, para que Pi te pregunte antes
+
+34
+00:02:14.828 --> 00:02:18.478
+de tocar nada. Pi no lo trae de serie,
+a propósito, y en cincuenta líneas lo
+
+35
+00:02:18.518 --> 00:02:19.958
+tendremos funcionando.
+
+36
+00:02:25.697 --> 00:02:27.568
+Empezamos por lo más pequeño.
+
+37
+00:02:27.608 --> 00:02:30.408
+Esta es la extensión hola punto ts entera.
+
+38
+00:02:30.458 --> 00:02:35.058
+Importa el tipo extension API,
+exporta la factoría y, dentro,
+
+39
+00:02:35.098 --> 00:02:38.799
+llama a register command con
+el nombre del comando, hola,
+
+40
+00:02:38.839 --> 00:02:41.318
+una descripción, y un handler.
+
+41
+00:02:41.358 --> 00:02:45.408
+El handler recibe dos cosas: el texto
+que escribas después del comando,
+
+42
+00:02:45.448 --> 00:02:47.258
+y un contexto, ctx.
+
+43
+00:02:47.906 --> 00:02:51.602
+Ese contexto es tu puerta a todo
+lo que rodea a la extensión:
+
+44
+00:02:51.642 --> 00:02:56.868
+el directorio de trabajo, el modelo
+activo, la sesión y la interfaz.
+
+45
+00:02:57.168 --> 00:03:03.088
+Con ctx punto ui punto notify mostramos
+una notificación con el saludo.
+
+46
+00:03:03.939 --> 00:03:07.860
+La cargamos con pi guion
+e y la ruta del fichero.
+
+47
+00:03:07.900 --> 00:03:11.551
+En el arranque, Pi lista las
+extensiones cargadas, y ahí está,
+
+48
+00:03:11.591 --> 00:03:12.898
+hola punto ts.
+
+49
+00:03:14.010 --> 00:03:16.868
+Al escribir una barra, el
+comando aparece en el selector,
+
+50
+00:03:16.908 --> 00:03:19.105
+junto a los de serie, con su descripción.
+
+51
+00:03:19.145 --> 00:03:23.717
+Y si escribimos barra hola
+Ana, aparece la notificación:
+
+52
+00:03:23.757 --> 00:03:24.658
+hola, Ana.
+
+53
+00:03:25.493 --> 00:03:29.278
+Parece poco, pero los comandos son la
+forma de dar a tu equipo atajos propios,
+
+54
+00:03:29.318 --> 00:03:33.088
+con lógica de verdad: lanzar una
+revisión con un formato concreto,
+
+55
+00:03:33.128 --> 00:03:36.808
+cambiar de modelo y de herramientas
+a la vez, o abrir un formulario.
+
+56
+00:03:36.848 --> 00:03:39.128
+La interfaz ofrece más piezas que notify:
+
+57
+00:03:39.168 --> 00:03:43.702
+select para elegir entre opciones,
+confirm para un sí o un no,
+
+58
+00:03:43.742 --> 00:03:48.818
+input para pedir un texto, editor para un
+texto largo, y set status para dejar un
+
+59
+00:03:48.858 --> 00:03:51.538
+texto fijo en el pie.
+Todas son asíncronas:
+
+60
+00:03:51.578 --> 00:03:53.498
+tu código espera a que
+la persona responda.
+
+61
+00:03:54.327 --> 00:03:57.885
+Un detalle importante: los
+comandos los ejecutas tú.
+
+62
+00:03:57.925 --> 00:03:59.877
+El modelo no puede llamarlos.
+
+63
+00:03:59.917 --> 00:04:03.538
+Si quieres darle algo al modelo, lo
+que necesitas es una herramienta.
+
+64
+00:04:08.918 --> 00:04:13.778
+La segunda extensión, tests punto ts,
+registra una herramienta para ejecutar los
+
+65
+00:04:13.818 --> 00:04:17.550
+tests de la tienda. Es verdad que el
+modelo ya podría lanzarlos con bash,
+
+66
+00:04:17.590 --> 00:04:20.436
+pero una herramienta
+propia tiene tres ventajas:
+
+67
+00:04:20.476 --> 00:04:25.145
+hace siempre lo mismo, devuelve solo lo
+que importa en vez de páginas de salida,
+
+68
+00:04:25.185 --> 00:04:29.078
+y, como veremos enseguida, se puede tratar
+distinto a la hora de pedir permisos.
+
+69
+00:04:30.327 --> 00:04:33.573
+Una herramienta tiene un
+nombre, ejecutar tests;
+
+70
+00:04:33.613 --> 00:04:36.966
+una etiqueta para la
+interfaz; y una descripción.
+
+71
+00:04:37.006 --> 00:04:39.197
+Ojo con la descripción,
+porque es para el modelo:
+
+72
+00:04:39.237 --> 00:04:41.732
+es lo que lee para decidir cuándo usarla.
+
+73
+00:04:41.772 --> 00:04:44.525
+Y luego los parámetros,
+que se definen con TypeBox.
+
+74
+00:04:44.565 --> 00:04:49.258
+TypeBox es una librería que construye
+esquemas JSON con sintaxis de TypeScript:
+
+75
+00:04:49.298 --> 00:04:52.491
+type punto object, type punto
+string, type punto optional.
+
+76
+00:04:52.531 --> 00:04:55.491
+De ese esquema salen dos cosas a la vez:
+
+77
+00:04:55.531 --> 00:04:59.531
+el JSON schema que viaja al modelo
+con la definición de la herramienta,
+
+78
+00:04:59.571 --> 00:05:01.944
+y el tipo de TypeScript de
+los parámetros en tu código.
+
+79
+00:05:01.984 --> 00:05:05.781
+Pi, además, valida los argumentos contra
+el esquema antes de llamar a tu función.
+
+80
+00:05:06.602 --> 00:05:11.712
+Aquí hay un único parámetro, fichero,
+opcional, con su propia descripción:
+
+81
+00:05:11.752 --> 00:05:15.522
+un fichero de test concreto, u
+omitirlo para ejecutarlos todos.
+
+82
+00:05:17.446 --> 00:05:19.479
+Lo demás es la función execute.
+
+83
+00:05:19.519 --> 00:05:23.219
+Recibe el identificador de la
+llamada, los parámetros ya validados,
+
+84
+00:05:23.259 --> 00:05:27.939
+una señal para cancelar, una función
+para informar del progreso y el contexto.
+
+85
+00:05:27.979 --> 00:05:31.296
+La nuestra lanza node guion
+guion test con el reporter TAP,
+
+86
+00:05:31.336 --> 00:05:36.059
+que es fácil de leer, y saca de la salida
+cuántas pruebas pasan y cuántas fallan.
+
+87
+00:05:36.553 --> 00:05:40.938
+El resultado tiene dos partes, y es una
+distinción que conviene entender bien.
+
+88
+00:05:40.978 --> 00:05:44.743
+Content es lo que ve el modelo:
+aquí, una línea con el recuento y,
+
+89
+00:05:44.783 --> 00:05:48.403
+si hay fallos, cuáles. Details es para ti:
+
+90
+00:05:48.443 --> 00:05:52.163
+datos estructurados que se guardan en la
+sesión, que puedes usar para dibujar la
+
+91
+00:05:52.203 --> 00:05:55.253
+herramienta en la interfaz o
+para reconstruir el estado.
+
+92
+00:05:55.293 --> 00:05:56.953
+Lo usaremos mucho en el próximo vídeo.
+
+93
+00:05:57.409 --> 00:06:01.839
+¿Y si algo va mal? Si no se ha ejecutado
+ningún test, lanzamos un error.
+
+94
+00:06:01.879 --> 00:06:05.949
+Lanzar un error desde execute es la forma
+de decirle al modelo que la herramienta ha
+
+95
+00:06:06.008 --> 00:06:08.745
+fallado; devolver un objeto,
+aunque contenga la palabra error,
+
+96
+00:06:08.785 --> 00:06:09.809
+cuenta como éxito.
+
+97
+00:06:10.581 --> 00:06:14.849
+Cargamos la extensión y preguntamos:
+¿pasan los tests del carrito?
+
+98
+00:06:14.889 --> 00:06:19.905
+El modelo elige nuestra herramienta y le
+pasa el fichero test barra carrito punto
+
+99
+00:06:19.945 --> 00:06:23.345
+test punto js. Doce pasan, cero fallan.
+
+100
+00:06:23.385 --> 00:06:25.539
+Y eso es todo lo que entra en el contexto.
+
+101
+00:06:26.504 --> 00:06:30.479
+Las herramientas propias aceptan
+también todo lo que vimos con MCP:
+
+102
+00:06:30.546 --> 00:06:34.849
+la exposición, para que solo se llamen
+desde codemode o se carguen con tool
+
+103
+00:06:34.889 --> 00:06:38.609
+search, y las anotaciones, que dicen
+si una herramienta solo lee o si es
+
+104
+00:06:38.649 --> 00:06:39.549
+destructiva.
+
+105
+00:06:45.250 --> 00:06:47.669
+Comandos y herramientas añaden cosas.
+
+106
+00:06:47.709 --> 00:06:50.917
+Los eventos te dejan intervenir
+en lo que Pi ya hace.
+
+107
+00:06:50.957 --> 00:06:54.689
+Se escuchan con pi punto on, el
+nombre del evento y un handler,
+
+108
+00:06:54.729 --> 00:06:57.199
+y en Pi uno punto cero hay cuarenta y uno.
+
+109
+00:06:57.993 --> 00:07:01.879
+Para orientarte, piensa en una
+petición de principio a fin.
+
+110
+00:07:01.979 --> 00:07:06.219
+Session start, cuando arranca la sesión,
+buen sitio para preparar recursos.
+
+111
+00:07:06.259 --> 00:07:10.549
+Input, cuando escribes algo, y que puede
+transformarlo antes de que llegue al
+
+112
+00:07:10.755 --> 00:07:13.969
+modelo. Before agent start, justo
+antes de empezar a trabajar,
+
+113
+00:07:14.009 --> 00:07:17.419
+que puede cambiar el system
+prompt de esa petición.
+
+114
+00:07:17.459 --> 00:07:20.919
+Turn start y turn end, cada
+vuelta del bucle del agente.
+
+115
+00:07:20.959 --> 00:07:23.579
+Tool call, cuando el modelo
+pide ejecutar una herramienta,
+
+116
+00:07:23.619 --> 00:07:27.189
+y tool result, cuando la
+herramienta ha terminado.
+
+117
+00:07:27.229 --> 00:07:28.979
+Agent end, cuando el agente termina.
+
+118
+00:07:29.019 --> 00:07:32.679
+Y session shutdown, al cerrar,
+para liberar lo que hayas abierto.
+
+119
+00:07:33.335 --> 00:07:38.080
+Hay más: eventos de la sesión, como
+antes de compactar o antes de bifurcar,
+
+120
+00:07:38.120 --> 00:07:42.229
+que se pueden cancelar; eventos del
+proveedor, para ver las peticiones o las
+
+121
+00:07:42.269 --> 00:07:45.999
+respuestas; y context, que te deja
+reescribir los mensajes que se envían al
+
+122
+00:07:46.039 --> 00:07:47.559
+modelo en cada petición.
+
+123
+00:07:48.412 --> 00:07:51.649
+Lo importante es que no todos hacen
+lo mismo con lo que devuelves.
+
+124
+00:07:51.689 --> 00:07:54.599
+Unos solo avisan: lo
+que devuelvas se ignora.
+
+125
+00:07:54.639 --> 00:07:58.468
+Otros transforman: tu valor de
+retorno sustituye al original.
+
+126
+00:07:58.508 --> 00:08:01.189
+Y otros pueden cancelar la operación.
+
+127
+00:08:01.229 --> 00:08:05.609
+Cada evento declara su tipo de resultado,
+y TypeScript te lo dice mientras escribes.
+
+128
+00:08:06.602 --> 00:08:08.949
+El que nos interesa hoy es tool call.
+
+129
+00:08:08.989 --> 00:08:11.939
+Llega antes de que se ejecute la
+herramienta, con su nombre y los
+
+130
+00:08:11.979 --> 00:08:14.289
+argumentos que ha pedido el modelo.
+
+131
+00:08:14.329 --> 00:08:19.019
+Puedes dejarla pasar sin devolver nada,
+modificar los argumentos en el sitio,
+
+132
+00:08:19.059 --> 00:08:22.049
+o devolver block true con un motivo.
+
+133
+00:08:22.089 --> 00:08:26.079
+Si la bloqueas, la herramienta no se
+ejecuta, y el modelo recibe el motivo como
+
+134
+00:08:26.119 --> 00:08:28.439
+resultado, igual que si hubiera fallado.
+
+135
+00:08:29.339 --> 00:08:32.114
+Y un detalle de diseño
+que nos viene muy bien:
+
+136
+00:08:32.154 --> 00:08:36.308
+si tu handler de tool call lanza un
+error, Pi bloquea la herramienta.
+
+137
+00:08:36.348 --> 00:08:39.466
+Es un fallo seguro. Si tu control
+de permisos tiene un error,
+
+138
+00:08:39.506 --> 00:08:41.079
+la acción no se ejecuta.
+
+139
+00:08:46.965 --> 00:08:51.013
+Antes de construir algo más serio,
+cinco reglas que te ahorrarán sustos,
+
+140
+00:08:51.053 --> 00:08:54.959
+porque una extensión vive dentro
+de Pi y comparte su ciclo de vida.
+
+141
+00:08:55.887 --> 00:08:58.760
+La primera: la factoría solo registra.
+
+142
+00:08:58.800 --> 00:09:03.239
+No arranques procesos, sockets,
+temporizadores ni vigilantes de ficheros
+
+143
+00:09:03.279 --> 00:09:08.196
+dentro de ella, porque a veces se cargan
+las extensiones sin llegar a abrir una
+
+144
+00:09:08.236 --> 00:09:11.863
+sesión. Lo que tenga que vivir mientras
+dura la sesión, arráncalo en session start
+
+145
+00:09:11.903 --> 00:09:16.649
+o en el comando o la herramienta que lo
+necesite, y ciérralo en session shutdown.
+
+146
+00:09:16.688 --> 00:09:19.869
+Y que ese cierre se pueda
+ejecutar dos veces sin romperse,
+
+147
+00:09:19.909 --> 00:09:24.399
+porque cancelar, recargar, cambiar de
+sesión y salir pueden acabar llamándolo
+
+148
+00:09:24.439 --> 00:09:25.339
+todos.
+
+149
+00:09:25.906 --> 00:09:29.459
+La segunda: no todos los
+contextos son iguales.
+
+150
+00:09:29.499 --> 00:09:33.789
+El ctx que recibe un comando tiene
+operaciones que el de un evento o una
+
+151
+00:09:33.829 --> 00:09:38.519
+herramienta no tiene: esperar a
+que el agente termine, recargar,
+
+152
+00:09:38.559 --> 00:09:40.746
+navegar por el árbol o cambiar de sesión.
+
+153
+00:09:40.786 --> 00:09:44.780
+Son solo para comandos porque,
+llamadas desde dentro de un evento,
+
+154
+00:09:44.820 --> 00:09:47.699
+bloquearían a Pi esperándose a sí mismo.
+
+155
+00:09:47.739 --> 00:09:52.369
+Si una herramienta necesita recargar, la
+solución del ejemplo reload runtime es
+
+156
+00:09:52.409 --> 00:09:56.819
+encolar un mensaje con el comando, y
+que lo ejecute Pi cuando quede libre.
+
+157
+00:09:57.693 --> 00:10:02.499
+La tercera: las herramientas de un mismo
+mensaje pueden ejecutarse en paralelo.
+
+158
+00:10:02.539 --> 00:10:07.369
+Si el modelo pide tres lecturas a la vez,
+tus handlers de tool call pueden estar
+
+159
+00:10:07.409 --> 00:10:09.823
+atendiendo tres llamadas al mismo tiempo.
+
+160
+00:10:09.863 --> 00:10:13.659
+No supongas que la anterior ya ha
+terminado, y si tu herramienta guarda
+
+161
+00:10:13.699 --> 00:10:17.865
+estado en memoria y lo modifica, márcala
+para que se ejecute en secuencia.
+
+162
+00:10:17.905 --> 00:10:21.719
+Para las que modifican ficheros, Pi ofrece
+una cola que evita que dos ediciones se
+
+163
+00:10:21.759 --> 00:10:22.659
+pisen.
+
+164
+00:10:23.639 --> 00:10:27.393
+La cuarta: los errores. Si un
+handler de un evento falla,
+
+165
+00:10:27.433 --> 00:10:30.559
+Pi lo informa y sigue
+adelante siempre que puede.
+
+166
+00:10:30.599 --> 00:10:32.649
+Las excepciones son
+las que ya hemos visto:
+
+167
+00:10:32.689 --> 00:10:36.349
+un fallo en tool call bloquea la
+herramienta, y un fallo dentro de execute
+
+168
+00:10:36.389 --> 00:10:39.779
+se convierte en un resultado
+de error para el modelo.
+
+169
+00:10:39.819 --> 00:10:42.270
+Y una salida demasiado
+larga tampoco es buena idea:
+
+170
+00:10:42.310 --> 00:10:45.979
+si tu herramienta puede devolver mucho
+texto, recórtalo y dile al modelo dónde
+
+171
+00:10:46.019 --> 00:10:47.099
+está el resto.
+
+172
+00:10:48.094 --> 00:10:52.859
+Y la quinta: los modos. Las extensiones se
+cargan igual en el modo interactivo que en
+
+173
+00:10:52.899 --> 00:10:57.688
+un script, así que lo que dependa de
+la terminal tiene que estar protegido.
+
+174
+00:10:57.728 --> 00:11:03.059
+Ctx punto mode te dice en qué modo estás,
+y ctx punto has UI si hay alguien que
+
+175
+00:11:03.099 --> 00:11:07.379
+pueda contestar un diálogo. La lógica
+de tus herramientas y eventos no debería
+
+176
+00:11:07.419 --> 00:11:08.619
+depender de la interfaz.
+
+177
+00:11:09.655 --> 00:11:12.394
+Sobre las importaciones,
+un apunte práctico.
+
+178
+00:11:12.434 --> 00:11:15.869
+Las extensiones pueden importar los
+paquetes de Pi, como el de tipos y
+
+179
+00:11:15.909 --> 00:11:19.775
+TypeBox, sin instalarlos,
+porque Pi los resuelve por ti.
+
+180
+00:11:19.815 --> 00:11:24.159
+Para cualquier otra dependencia de npm,
+pon un package punto json junto a la
+
+181
+00:11:24.199 --> 00:11:28.619
+extensión, o mejor, conviértela en un
+paquete de Pi, que es lo que haremos en el
+
+182
+00:11:28.659 --> 00:11:29.819
+próximo vídeo.
+
+183
+00:11:30.841 --> 00:11:34.909
+Y si vienes de otros agentes: esto es más
+parecido a un plugin de un editor que a
+
+184
+00:11:34.949 --> 00:11:39.743
+los hooks de Claude Code. No es un script
+que Pi llama y del que lee la salida,
+
+185
+00:11:39.783 --> 00:11:43.909
+sino código que corre dentro de Pi,
+con acceso directo a su estado y a su
+
+186
+00:11:43.949 --> 00:11:47.459
+interfaz. Más potente, y
+por eso mismo, más delicado.
+
+187
+00:11:53.168 --> 00:11:55.009
+Ya tenemos todas las piezas.
+
+188
+00:11:55.049 --> 00:11:58.480
+Recuerda el vídeo cinco: Pi
+no tiene modos de permiso.
+
+189
+00:11:58.520 --> 00:12:02.106
+Ejecuta lo que el modelo decide,
+y la seguridad la pones tú,
+
+190
+00:12:02.146 --> 00:12:05.934
+aislando el entorno. oh my pi
+sí trae modos de aprobación,
+
+191
+00:12:05.974 --> 00:12:08.158
+y los veremos en el vídeo diecinueve.
+
+192
+00:12:08.198 --> 00:12:12.999
+Pero con un evento, un diálogo y un poco
+de lógica, podemos tener el nuestro en Pi.
+
+193
+00:12:13.970 --> 00:12:18.259
+Este es permisos punto
+ts. Arriba, dos listas.
+
+194
+00:12:18.299 --> 00:12:21.295
+Herramientas de solo lectura,
+que pasan sin preguntar:
+
+195
+00:12:21.335 --> 00:12:25.169
+read, grep, find, ls y
+nuestra ejecutar tests.
+
+196
+00:12:25.209 --> 00:12:28.909
+Y comandos de bash que
+tampoco cambian nada:
+
+197
+00:12:29.089 --> 00:12:35.800
+cd, ls, cat, git status, git log,
+git diff, ejecutar los tests y poco
+
+198
+00:12:35.840 --> 00:12:36.740
+más.
+
+199
+00:12:37.581 --> 00:12:39.657
+Un detalle de seguridad en esa lista.
+
+200
+00:12:39.697 --> 00:12:42.303
+No basta con mirar cómo
+empieza el comando.
+
+201
+00:12:42.343 --> 00:12:49.419
+Ls y después rm guion rf empieza por
+ls, y cat algo con una redirección
+
+202
+00:12:49.459 --> 00:12:51.119
+puede sobrescribir un fichero.
+
+203
+00:12:51.159 --> 00:12:55.579
+Por eso la función bash seguro corta
+el comando por cada doble ampersand,
+
+204
+00:12:55.619 --> 00:12:59.965
+punto y coma o tubería, exige que
+todos los trozos sean seguros,
+
+205
+00:13:00.005 --> 00:13:03.699
+y cualquier redirección o sustitución
+de comandos va directa a la pregunta.
+
+206
+00:13:04.619 --> 00:13:08.579
+Dentro de la factoría, un conjunto con
+lo que hayas permitido para siempre,
+
+207
+00:13:08.619 --> 00:13:12.439
+y dos contadores. Y luego,
+el handler de tool call.
+
+208
+00:13:12.479 --> 00:13:14.989
+Si la herramienta es de
+lectura, sale sin devolver nada:
+
+209
+00:13:15.029 --> 00:13:19.159
+puede ejecutarse. Si es bash y
+el comando es seguro, también.
+
+210
+00:13:19.199 --> 00:13:21.559
+Si ya la habías permitido
+para siempre, también.
+
+211
+00:13:22.619 --> 00:13:26.290
+Si no hay interfaz, no hay a
+quién preguntar, y bloqueamos.
+
+212
+00:13:26.330 --> 00:13:27.239
+Lo veremos al final.
+
+213
+00:13:28.247 --> 00:13:32.734
+Y si hay interfaz, preguntamos
+con ctx punto ui punto select:
+
+214
+00:13:32.774 --> 00:13:36.339
+Pi quiere ejecutar, la
+acción, y tres opciones.
+
+215
+00:13:36.379 --> 00:13:40.419
+Permitir, permitir siempre
+en esta sesión, o bloquear.
+
+216
+00:13:40.831 --> 00:13:44.949
+Actualizamos los contadores, los
+mostramos en el pie con set status,
+
+217
+00:13:44.989 --> 00:13:48.919
+y si la respuesta no es permitir,
+devolvemos block true con el motivo:
+
+218
+00:13:48.959 --> 00:13:50.949
+el usuario lo ha bloqueado.
+
+219
+00:13:52.331 --> 00:13:55.689
+Copiamos la extensión a la carpeta
+extensions de nuestro directorio de
+
+220
+00:13:55.729 --> 00:14:00.359
+agente, así que a partir de ahora se carga
+siempre, y arrancamos Pi con la extensión
+
+221
+00:14:00.399 --> 00:14:04.531
+de tests además. En la lista
+del arranque aparecen las dos:
+
+222
+00:14:04.571 --> 00:14:05.919
+permisos y tests.
+
+223
+00:14:06.463 --> 00:14:12.003
+Le pedimos algo con varios pasos: añade al
+README una sección corta sobre los tests,
+
+224
+00:14:12.043 --> 00:14:13.599
+y comprueba que siguen pasando.
+
+225
+00:14:14.349 --> 00:14:16.652
+Fíjate en lo que no pregunta.
+
+226
+00:14:16.692 --> 00:14:20.474
+El modelo mira el estado del
+repositorio con git status y git log,
+
+227
+00:14:20.514 --> 00:14:24.349
+y lee el README. Después intenta
+usar nuestra herramienta de tests,
+
+228
+00:14:24.389 --> 00:14:27.839
+pero le pasa como fichero la
+palabra null, entre comillas.
+
+229
+00:14:27.879 --> 00:14:30.700
+No se ejecuta ningún test, nuestra
+herramienta lanza el error,
+
+230
+00:14:30.740 --> 00:14:34.585
+y Pi lo pinta en rojo: así se
+ve un fallo de herramienta.
+
+231
+00:14:34.625 --> 00:14:38.329
+El modelo lo entiende y recurre a npm
+test, que también está en la lista de
+
+232
+00:14:38.369 --> 00:14:42.051
+seguros. Todo eso es lectura,
+y pasa sin interrumpirte.
+
+233
+00:14:42.091 --> 00:14:45.409
+Un modo de aprobación que pregunta por
+todo acaba con la persona aprobando sin
+
+234
+00:14:45.449 --> 00:14:47.519
+leer, que es lo mismo que no tenerlo.
+
+235
+00:14:48.224 --> 00:14:51.359
+Y cuando llega la edición
+del README, Pi se detiene.
+
+236
+00:14:51.425 --> 00:14:55.547
+Encima del diálogo vemos el cambio
+propuesto, el diff, con las líneas nuevas.
+
+237
+00:14:55.587 --> 00:14:58.335
+Debajo, nuestra pregunta, con la acción:
+
+238
+00:14:58.375 --> 00:15:02.620
+edit README punto md. Permitimos,
+y el modelo termina la tarea.
+
+239
+00:15:02.660 --> 00:15:06.199
+En el pie, nuestro contador:
+una aprobada, cero bloqueadas.
+
+240
+00:15:06.860 --> 00:15:09.014
+Ahora le pedimos que
+haga commit del cambio.
+
+241
+00:15:09.054 --> 00:15:12.349
+Esto ya no es lectura: git
+add, git commit con su mensaje,
+
+242
+00:15:12.389 --> 00:15:14.648
+y un git log para comprobarlo.
+
+243
+00:15:14.688 --> 00:15:19.079
+El diálogo aparece con el comando
+completo, y esta vez elegimos bloquear.
+
+244
+00:15:20.098 --> 00:15:23.637
+El modelo recibe nuestro motivo
+como resultado de la herramienta,
+
+245
+00:15:23.677 --> 00:15:26.349
+el usuario lo ha bloqueado, y no insiste:
+
+246
+00:15:26.389 --> 00:15:30.109
+dice que no se ha ejecutado nada y
+pregunta si lo intenta con otro mensaje o
+
+247
+00:15:30.149 --> 00:15:33.029
+preferimos revisarlo
+antes. El pie lo refleja:
+
+248
+00:15:33.069 --> 00:15:34.779
+una aprobada, una bloqueada.
+
+249
+00:15:35.792 --> 00:15:38.909
+Permitir siempre en esta
+sesión guarda la acción exacta.
+
+250
+00:15:38.949 --> 00:15:42.143
+Si el modelo vuelve a pedir la
+misma edición o el mismo comando,
+
+251
+00:15:42.183 --> 00:15:45.219
+pasa sin preguntar. Y es
+de verdad en esta sesión:
+
+252
+00:15:45.259 --> 00:15:48.338
+una sesión nueva, con barra
+new, carga la extensión de cero,
+
+253
+00:15:48.378 --> 00:15:50.009
+y el conjunto empieza vacío.
+
+254
+00:15:55.465 --> 00:15:58.889
+Lo bueno de escribir tu propio modo
+de aprobación es que puedes ajustarlo
+
+255
+00:15:58.929 --> 00:16:02.429
+mientras trabajas. Pongamos que hay
+ficheros que nunca quieres que el modelo
+
+256
+00:16:02.469 --> 00:16:06.219
+toque, ni siquiera preguntando:
+las instrucciones del proyecto,
+
+257
+00:16:06.259 --> 00:16:08.819
+en AGENTS punto md, y
+la carpeta punto git.
+
+258
+00:16:10.140 --> 00:16:13.468
+En otra pestaña, el diff de
+permisos punto ts con el cambio,
+
+259
+00:16:13.508 --> 00:16:15.614
+que copiamos a la carpeta del agente.
+
+260
+00:16:15.654 --> 00:16:20.182
+Una lista de rutas protegidas, y una
+regla nueva al principio del handler:
+
+261
+00:16:20.222 --> 00:16:24.110
+si la herramienta es write o
+edit y la ruta es una de esas,
+
+262
+00:16:24.150 --> 00:16:28.019
+una notificación de aviso
+y block true, sin diálogo.
+
+263
+00:16:28.644 --> 00:16:32.748
+No hace falta salir de Pi. Barra
+reload vuelve a cargar las extensiones,
+
+264
+00:16:32.788 --> 00:16:36.969
+las skills, los prompts, los
+temas y los ficheros de contexto.
+
+265
+00:16:37.009 --> 00:16:39.579
+El pie con el contador desaparece.
+
+266
+00:16:39.619 --> 00:16:42.939
+Reload no actualiza la extensión en
+caliente, sino que tira el entorno de
+
+267
+00:16:42.979 --> 00:16:47.789
+extensiones y lo crea de nuevo, así que
+los contadores y lo permitido para siempre
+
+268
+00:16:47.829 --> 00:16:50.942
+vuelven a cero. Si algo tiene
+que sobrevivir a una recarga,
+
+269
+00:16:50.982 --> 00:16:53.879
+hay que guardarlo, y eso es
+el tema del próximo vídeo.
+
+270
+00:16:54.647 --> 00:17:01.449
+Probamos: añade a AGENTS punto md una
+regla para no usar dependencias externas.
+
+271
+00:17:01.916 --> 00:17:06.379
+El modelo prepara la edición, y en lugar
+del diálogo aparece nuestro motivo en rojo
+
+272
+00:17:06.419 --> 00:17:10.685
+y el aviso: ruta
+protegida, AGENTS punto md.
+
+273
+00:17:10.725 --> 00:17:11.659
+Sin opción a permitir.
+
+274
+00:17:12.921 --> 00:17:15.139
+Y ahora, algo muy instructivo.
+
+275
+00:17:15.179 --> 00:17:20.164
+El modelo no se rinde a la primera: piensa
+que quizá el fichero es de solo lectura,
+
+276
+00:17:20.204 --> 00:17:23.928
+e intenta comprobarlo y
+cambiar sus permisos con chmod.
+
+277
+00:17:24.169 --> 00:17:28.749
+Ese comando no está en la lista de
+seguros, así que nuestra extensión lo para
+
+278
+00:17:28.789 --> 00:17:31.214
+y nos pregunta. Lo bloqueamos.
+
+279
+00:17:31.254 --> 00:17:35.899
+Y solo entonces el modelo se detiene:
+nos cuenta que el fichero está protegido,
+
+280
+00:17:35.939 --> 00:17:39.006
+nos propone el texto de la regla
+para que la añadamos nosotros,
+
+281
+00:17:39.046 --> 00:17:41.311
+y pregunta si queremos desprotegerlo.
+
+282
+00:17:41.351 --> 00:17:44.209
+Quédate con esta escena, porque
+volveremos a ella en un momento.
+
+283
+00:17:45.274 --> 00:17:49.929
+Este ciclo, editar el fichero, barra
+reload y probar, es la forma de
+
+284
+00:17:49.969 --> 00:17:53.844
+desarrollar extensiones. Y fíjate
+en que la extensión de tests,
+
+285
+00:17:53.884 --> 00:17:56.718
+cargada con guion e, también se recarga:
+
+286
+00:17:56.758 --> 00:18:00.459
+si cambias su código, barra
+reload lo vuelve a leer del disco.
+
+287
+00:18:05.956 --> 00:18:08.734
+Las extensiones se cargan
+en todos los modos de Pi:
+
+288
+00:18:08.774 --> 00:18:14.629
+el interactivo, el modo print con
+pi guion p, el modo JSON y el modo
+
+289
+00:18:15.130 --> 00:18:18.369
+RPC. En los dos primeros que no
+son interactivos no hay diálogos.
+
+290
+00:18:18.409 --> 00:18:22.999
+Por eso nuestra extensión mira ctx
+punto has UI antes de preguntar.
+
+291
+00:18:23.944 --> 00:18:26.551
+Salimos de Pi y lo probamos en modo print:
+
+292
+00:18:26.591 --> 00:18:29.399
+haz commit del cambio del README.
+
+293
+00:18:29.439 --> 00:18:33.509
+El modelo intenta el commit, nuestra
+extensión lo bloquea con el motivo,
+
+294
+00:18:33.549 --> 00:18:37.699
+sin interfaz para aprobar la
+acción, y el modelo nos lo explica:
+
+295
+00:18:37.739 --> 00:18:40.999
+los comandos de solo lectura,
+como git status, sí funcionan,
+
+296
+00:18:41.039 --> 00:18:45.359
+pero git add y git commit necesitan una
+aprobación que aquí nadie puede dar.
+
+297
+00:18:45.399 --> 00:18:49.039
+Nos deja el estado del repositorio y
+los dos comandos para hacerlo a mano.
+
+298
+00:18:49.079 --> 00:18:53.025
+Es la decisión segura: si Pi corre en
+un script o en integración continua,
+
+299
+00:18:53.065 --> 00:18:55.679
+lo que no esté en la lista
+de seguros no se ejecuta.
+
+300
+00:18:56.571 --> 00:18:59.409
+Algunas variantes que puedes
+construir sobre esta base.
+
+301
+00:18:59.449 --> 00:19:03.159
+Los diálogos aceptan un timeout:
+si nadie responde en, digamos,
+
+302
+00:19:03.199 --> 00:19:08.418
+treinta segundos, se cierran solos, y tu
+extensión puede tratarlo como un bloqueo.
+
+303
+00:19:08.458 --> 00:19:11.659
+En lugar de una lista de comandos,
+puedes decidir con las anotaciones de las
+
+304
+00:19:11.699 --> 00:19:16.436
+herramientas, como hace Codex: preguntar
+por todo lo que no sea de solo lectura,
+
+305
+00:19:16.476 --> 00:19:19.910
+que incluye las herramientas MCP
+que se declaran destructivas.
+
+306
+00:19:19.950 --> 00:19:23.404
+La documentación de Pi trae
+ese fragmento casi listo.
+
+307
+00:19:23.444 --> 00:19:26.229
+Y Pi incluye ejemplos
+instalados que conviene leer:
+
+308
+00:19:26.269 --> 00:19:30.869
+permission gate, protected paths, confirm
+destructive, que pide confirmación antes
+
+309
+00:19:30.909 --> 00:19:34.689
+de borrar o cambiar de sesión,
+y status line, con el pie.
+
+310
+00:19:35.415 --> 00:19:40.442
+Y ahora, lo que no es. Esto es un
+modo de aprobación, no un aislamiento.
+
+311
+00:19:40.482 --> 00:19:45.699
+Acuérdate del chmod: bloqueamos la
+edición, y el modelo buscó otro camino por
+
+312
+00:19:45.739 --> 00:19:49.369
+bash. Esta vez lo cazamos porque
+chmod no está en la lista de seguros.
+
+313
+00:19:49.409 --> 00:19:53.209
+Pero la extensión se basa en reconocer
+comandos con expresiones regulares,
+
+314
+00:19:53.249 --> 00:19:57.089
+y un modelo con prisa, o un texto
+malicioso en tu repositorio,
+
+315
+00:19:57.129 --> 00:19:59.519
+puede encontrar caminos
+que no hayas previsto.
+
+316
+00:19:59.559 --> 00:20:02.231
+Te protege de errores y te
+da control, que es mucho.
+
+317
+00:20:02.271 --> 00:20:05.909
+Pero contra un ataque, la respuesta
+sigue siendo la del vídeo cinco:
+
+318
+00:20:05.949 --> 00:20:10.069
+limitar lo que Pi puede alcanzar, con
+un contenedor o una máquina aparte.
+
+319
+00:20:10.109 --> 00:20:11.719
+Lo ideal es combinar las dos cosas.
+
+320
+00:20:17.647 --> 00:20:22.629
+Repasemos. Una extensión es un módulo de
+TypeScript con una factoría que recibe la
+
+321
+00:20:22.669 --> 00:20:26.728
+API de Pi. Register command
+añade comandos que ejecutas tú.
+
+322
+00:20:26.768 --> 00:20:31.499
+Register tool añade herramientas que llama
+el modelo, con parámetros definidos con
+
+323
+00:20:31.539 --> 00:20:35.582
+TypeBox y un resultado con content
+para el modelo y details para ti.
+
+324
+00:20:35.622 --> 00:20:39.889
+Pi punto on te engancha a los eventos,
+y tool call puede bloquear cualquier
+
+325
+00:20:39.929 --> 00:20:42.111
+herramienta antes de que se ejecute.
+
+326
+00:20:42.151 --> 00:20:45.099
+Barra reload vuelve a cargarlo
+todo mientras trabajas.
+
+327
+00:20:46.052 --> 00:20:51.389
+La práctica: copia permisos punto ts,
+adapta la lista de comandos seguros a tu
+
+328
+00:20:51.429 --> 00:20:53.619
+proyecto, y úsalo una tarde.
+
+329
+00:20:53.659 --> 00:20:56.818
+Apunta qué te pregunta de más
+y qué te pregunta de menos,
+
+330
+00:20:56.858 --> 00:20:59.169
+y ajústalo con barra reload.
+
+331
+00:20:59.209 --> 00:21:02.429
+Después añade una herramienta
+propia para algo que hagas a menudo:
+
+332
+00:21:02.469 --> 00:21:06.019
+los tests, el linter o el
+despliegue a un entorno de pruebas.
+
+333
+00:21:07.002 --> 00:21:09.639
+En el próximo vídeo seguimos
+con las extensiones:
+
+334
+00:21:09.679 --> 00:21:13.449
+estado que sobrevive a rebobinar la
+sesión, el fallo típico al hacerlo,
+
+335
+00:21:13.489 --> 00:21:17.019
+y cómo empaquetar, instalar
+y publicar tus extensiones.
+
+336
+00:21:17.059 --> 00:21:17.959
+Nos vemos allí.

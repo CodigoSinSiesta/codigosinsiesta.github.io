@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 2
 duracion: "23 min"
 video: "02-instalar-pi-primera-tarea.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/02-instalar-pi-primera-tarea.es.vtt"
 ---
 
 instalación, inicio de sesión y elección de modelo. Primera tarea real: referenciar ficheros, ejecutar comandos, corregir el rumbo a mitad de trabajo y leer el pie (contexto, caché y coste).

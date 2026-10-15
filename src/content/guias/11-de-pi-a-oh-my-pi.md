@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 11
 duracion: "24 min"
 video: "11-de-pi-a-oh-my-pi.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/11-de-pi-a-oh-my-pi.es.vtt"
 ---
 
 qué hereda omp de Pi y qué añade, primer arranque e importación de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar.

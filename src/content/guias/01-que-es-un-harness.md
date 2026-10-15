@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 1
 duracion: "22 min"
 video: "01-que-es-un-harness.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/01-que-es-un-harness.es.vtt"
 ---
 
 los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas, entorno, estado y feedback. Vemos la misma tarea con Pi y con oh my pi para comparar dos filosofías.

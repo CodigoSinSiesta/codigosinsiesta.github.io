@@ -22,6 +22,8 @@ const guias = defineCollection({
     duracion: z.string().default(''),
     // Nombre del fichero de vídeo dentro del bucket de vídeos (ver VIDEOS_BASE_URL).
     video: z.string().optional(),
+    // Ruta (desde la raíz del sitio) de los subtítulos WebVTT del vídeo, en español.
+    subtitulos: z.string().optional(),
   }),
 });
 

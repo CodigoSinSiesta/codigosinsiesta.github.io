@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 12
 duracion: "25 min"
 video: "12-la-tui-y-las-sesiones.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/12-la-tui-y-las-sesiones.es.vtt"
 ---
 
 atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar una sesión en omp.

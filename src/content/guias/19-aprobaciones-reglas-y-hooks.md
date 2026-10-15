@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 19
 duracion: "24 min"
 video: "19-aprobaciones-reglas-y-hooks.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/19-aprobaciones-reglas-y-hooks.es.vtt"
 ---
 
 endurecer omp para un repositorio de equipo con modos de aprobación, reglas que se activan solas, hooks y protección de secretos.

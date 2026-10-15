@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 9
 duracion: "24 min"
 video: "09-extensiones-ii-y-paquetes.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/09-extensiones-ii-y-paquetes.es.vtt"
 ---
 
 extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y cómo evitarlo. Empaquetar, instalar y publicar.

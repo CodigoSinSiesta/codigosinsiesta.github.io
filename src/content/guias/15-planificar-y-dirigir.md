@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 15
 duracion: "23 min"
 video: "15-planificar-y-dirigir.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/15-planificar-y-dirigir.es.vtt"
 ---
 
 planes revisables, objetivos con presupuesto, bucles con condición de parada y colas de tareas. Cuándo usar cada modo y por qué no se combinan.

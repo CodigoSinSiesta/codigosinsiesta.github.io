@@ -1,0 +1,1859 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.540 --> 00:00:14.165
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.205 --> 00:00:16.660
+Vídeo trece: contexto y memoria.
+
+3
+00:00:22.824 --> 00:00:27.217
+En el vídeo tres vimos cómo Pi monta lo
+que el modelo recibe en cada petición:
+
+4
+00:00:27.257 --> 00:00:31.124
+el prompt de sistema con tus ficheros
+de contexto, las herramientas,
+
+5
+00:00:31.164 --> 00:00:33.277
+y la rama activa de la conversación.
+
+6
+00:00:33.317 --> 00:00:36.400
+Vimos también la compactación:
+cuando la conversación no cabe,
+
+7
+00:00:36.440 --> 00:00:40.000
+se resume lo antiguo y se
+conservan los mensajes recientes.
+
+8
+00:00:40.040 --> 00:00:43.719
+Y sacamos una lección incómoda:
+el resumen lo escribe un modelo,
+
+9
+00:00:43.759 --> 00:00:45.180
+y puede equivocarse.
+
+10
+00:00:46.020 --> 00:00:49.800
+oh my pi hereda esa idea,
+pero la lleva mucho más lejos.
+
+11
+00:00:49.840 --> 00:00:54.100
+No tiene una forma de compactar,
+sino cinco, encadenadas en orden.
+
+12
+00:00:54.140 --> 00:00:56.850
+Puede adelgazar una sesión
+sin llamar al modelo.
+
+13
+00:00:56.890 --> 00:01:00.070
+Puede resumir en segundo plano
+antes de que lo necesites.
+
+14
+00:01:00.110 --> 00:01:04.670
+Y añade algo que Pi no tiene: memoria
+entre sesiones, para que lo aprendido en
+
+15
+00:01:04.710 --> 00:01:06.780
+una conversación llegue a la siguiente.
+
+16
+00:01:07.680 --> 00:01:12.860
+El plan de hoy tiene tres verbos:
+medir, adelgazar y traspasar.
+
+17
+00:01:12.900 --> 00:01:17.244
+Mediremos con barra context, y por fin
+cumpliremos lo que prometimos en el vídeo
+
+18
+00:01:17.284 --> 00:01:20.756
+once: cuánto contexto
+cuestan las herramientas.
+
+19
+00:01:20.796 --> 00:01:25.738
+Adelgazaremos con barra shake, sin
+modelo, y con barra compact y sus modos.
+
+20
+00:01:25.778 --> 00:01:28.000
+Y traspasaremos con barra handoff.
+
+21
+00:01:28.098 --> 00:01:32.700
+Después, barra by the way y el contexto
+extendido, y al final la memoria.
+
+22
+00:01:33.573 --> 00:01:38.253
+Trabajamos como siempre en la tienda, con
+el perfil demo y DeepSeek V cuatro punto
+
+23
+00:01:38.293 --> 00:01:41.694
+uno Flash, que tiene una
+ventana de un millón de tokens.
+
+24
+00:01:41.734 --> 00:01:44.463
+Hoy sí editamos algún test,
+porque no vamos a rebobinar.
+
+25
+00:01:44.503 --> 00:01:48.207
+Y varios comandos de hoy llaman al
+modelo sin que el nombre lo sugiera:
+
+26
+00:01:48.247 --> 00:01:52.160
+barra compact, barra handoff
+y las preguntas laterales.
+
+27
+00:01:52.206 --> 00:01:54.500
+Te lo iremos diciendo,
+porque eso es dinero.
+
+28
+00:02:00.414 --> 00:02:05.361
+Empezamos sin gastar nada. Arrancamos oh
+my pi con el perfil demo y la opción guion
+
+29
+00:02:05.401 --> 00:02:10.469
+guion no session, para no dejar una sesión
+a medias, y escribimos barra context.
+
+30
+00:02:11.188 --> 00:02:15.310
+Aparece un informe, context usage, con
+el nombre del modelo y el tamaño de su
+
+31
+00:02:15.350 --> 00:02:20.079
+ventana: un millón. En esta versión, el
+informe ya no se queda en la conversación:
+
+32
+00:02:20.119 --> 00:02:22.680
+lo miras, pulsas escape y desaparece.
+
+33
+00:02:23.576 --> 00:02:27.246
+El informe tiene un medidor de
+bloques de colores y una leyenda.
+
+34
+00:02:27.286 --> 00:02:30.235
+System prompt es el prompt
+de sistema de oh my pi:
+
+35
+00:02:30.275 --> 00:02:34.951
+dos mil seiscientos tokens. System tools
+son las definiciones de las herramientas:
+
+36
+00:02:34.991 --> 00:02:38.870
+tres mil setecientos. System context
+recoge lo que se inyecta además,
+
+37
+00:02:38.910 --> 00:02:42.581
+como tus ficheros de contexto:
+cuatrocientos cuarenta y dos.
+
+38
+00:02:42.621 --> 00:02:46.089
+Skills, cero, porque el
+perfil demo no las carga.
+
+39
+00:02:46.129 --> 00:02:48.480
+Y Messages, cero: aún
+no hemos escrito nada.
+
+40
+00:02:49.472 --> 00:02:52.700
+Debajo, el espacio libre
+y una franja rayada:
+
+41
+00:02:52.740 --> 00:02:57.120
+el autocompact buffer, ciento cincuenta
+mil tokens, el quince por ciento de la
+
+42
+00:02:57.160 --> 00:03:02.470
+ventana. Es la reserva que oh my pi deja
+libre para la respuesta y para compactar a
+
+43
+00:03:02.510 --> 00:03:06.160
+tiempo. Ahora veremos de dónde
+sale ese quince por ciento.
+
+44
+00:03:06.200 --> 00:03:10.170
+Lo importante: sabes de un vistazo cuánto
+margen te queda antes de que algo pase sin
+
+45
+00:03:10.210 --> 00:03:11.110
+pedirlo.
+
+46
+00:03:12.043 --> 00:03:15.640
+Fíjate en las herramientas. En una
+sesión vacía, sin haber escrito nada,
+
+47
+00:03:15.680 --> 00:03:19.910
+son lo más grande de la petición,
+más que el propio prompt de sistema.
+
+48
+00:03:19.950 --> 00:03:22.620
+Es lo que vimos en el vídeo
+siete con los servidores MCP:
+
+49
+00:03:22.660 --> 00:03:27.680
+cada herramienta viaja en cada petición,
+con su nombre, su descripción y sus
+
+50
+00:03:27.720 --> 00:03:32.780
+parámetros. En el vídeo doce vimos que el
+perfil demo tiene doce activas de veinte
+
+51
+00:03:32.820 --> 00:03:36.700
+disponibles. Eso se paga en
+cada turno, aunque no las uses.
+
+52
+00:03:37.555 --> 00:03:41.510
+Lo comprobamos. Salimos y volvemos
+a entrar con guion guion tools
+
+53
+00:03:42.065 --> 00:03:46.606
+y solo cuatro herramientas:
+read, bash, edit y write.
+
+54
+00:03:46.646 --> 00:03:52.423
+Barra context otra vez. System tools
+baja de tres mil setecientos a mil cien.
+
+55
+00:03:52.463 --> 00:03:56.316
+Y el prompt de sistema también adelgaza,
+de dos mil seiscientos a dos mil,
+
+56
+00:03:56.356 --> 00:04:00.191
+porque parte de sus instrucciones hablan
+de las herramientas que ya no están.
+
+57
+00:04:00.231 --> 00:04:05.120
+En total, la sesión vacía pasa de seis mil
+setecientos tokens a tres mil seiscientos.
+
+58
+00:04:05.726 --> 00:04:08.100
+No te estamos diciendo
+que quites herramientas:
+
+59
+00:04:08.140 --> 00:04:11.829
+con un millón de tokens de
+ventana, tres mil son poca cosa.
+
+60
+00:04:11.869 --> 00:04:15.815
+Te decimos que ahora sabes medir lo que
+cuestan, que era la promesa del vídeo
+
+61
+00:04:15.855 --> 00:04:20.693
+once. Y que con un modelo de ventana
+pequeña, o con muchos servidores MCP,
+
+62
+00:04:20.733 --> 00:04:22.720
+esta cuenta sí cambia decisiones.
+
+63
+00:04:23.650 --> 00:04:25.491
+Una nota sobre el prompt de sistema.
+
+64
+00:04:25.531 --> 00:04:29.696
+Tus ficheros de contexto, como AGENTS
+punto md, se cargan al empezar.
+
+65
+00:04:29.736 --> 00:04:34.370
+Pero oh my pi admite además un
+RULES punto md, en punto omp,
+
+66
+00:04:34.791 --> 00:04:38.562
+que se convierte en una regla fija
+y viaja completo en cada petición.
+
+67
+00:04:38.602 --> 00:04:42.510
+Sirve para lo poco que debe seguir a la
+vista aunque la conversación crezca o se
+
+68
+00:04:42.550 --> 00:04:43.450
+compacte.
+
+69
+00:04:43.880 --> 00:04:47.738
+Un atajo para no abrir el
+informe: el selector de comandos.
+
+70
+00:04:47.778 --> 00:04:52.803
+Al escribir barra c o, barra context ya
+dice en su descripción uno por ciento,
+
+71
+00:04:52.843 --> 00:04:55.886
+seis mil seiscientos noventa
+y nueve de un millón.
+
+72
+00:04:55.926 --> 00:04:59.195
+Barra compact repite el porcentaje.
+
+73
+00:04:59.235 --> 00:05:02.215
+Y barra extended context dice off.
+
+74
+00:05:02.379 --> 00:05:06.250
+Es lo que vimos en el vídeo doce: muchas
+descripciones del menú te cuentan el
+
+75
+00:05:06.290 --> 00:05:07.190
+estado.
+
+76
+00:05:12.441 --> 00:05:16.670
+Antes de adelgazar a mano, conviene
+saber qué hace oh my pi por su cuenta.
+
+77
+00:05:16.740 --> 00:05:19.719
+Como Pi, compacta cuando el
+contexto supera un umbral.
+
+78
+00:05:19.759 --> 00:05:23.815
+Pero la reserva cambia. Pi guardaba
+siempre dieciséis mil trescientos ochenta
+
+79
+00:05:23.855 --> 00:05:27.707
+y cuatro tokens. oh my pi
+reserva el mayor de dos valores:
+
+80
+00:05:27.747 --> 00:05:31.195
+esos mismos tokens, o el quince
+por ciento de la ventana.
+
+81
+00:05:31.235 --> 00:05:33.852
+Con un millón de tokens,
+el quince por ciento gana:
+
+82
+00:05:33.892 --> 00:05:36.220
+los ciento cincuenta
+mil de la franja rayada.
+
+83
+00:05:37.396 --> 00:05:41.564
+El umbral se puede fijar a mano, con un
+porcentaje o con un número de tokens,
+
+84
+00:05:41.604 --> 00:05:43.121
+en los ajustes de compactación.
+
+85
+00:05:43.161 --> 00:05:46.720
+Y según la documentación se
+comprueba en dos momentos:
+
+86
+00:05:46.847 --> 00:05:50.469
+al terminar un turno, y también
+a mitad de un turno largo,
+
+87
+00:05:50.509 --> 00:05:53.292
+entre una llamada a
+herramienta y la siguiente.
+
+88
+00:05:53.332 --> 00:05:56.770
+Es importante en tareas con muchas
+herramientas, donde un solo turno puede
+
+89
+00:05:56.810 --> 00:05:58.340
+llenar la ventana.
+
+90
+00:05:59.169 --> 00:06:03.605
+Lo más llamativo es la compactación
+especulativa, activada de fábrica.
+
+91
+00:06:03.645 --> 00:06:07.590
+Cuando te acercas al umbral, oh my pi
+empieza a preparar el resumen en segundo
+
+92
+00:06:07.630 --> 00:06:09.840
+plano, sin parar tu trabajo.
+
+93
+00:06:09.880 --> 00:06:14.835
+Cuando cruzas el umbral, ese resumen
+ya está listo y se aplica al instante.
+
+94
+00:06:14.875 --> 00:06:18.760
+Hoy no lo veremos: con un millón de
+tokens, nuestra sesión de juguete no se
+
+95
+00:06:18.800 --> 00:06:20.300
+acerca ni de lejos.
+
+96
+00:06:21.053 --> 00:06:23.650
+Hay también limpieza previa, sin modelo.
+
+97
+00:06:23.690 --> 00:06:27.480
+Si los resultados de herramientas ocupan
+mucho, oh my pi puede sustituir los
+
+98
+00:06:27.520 --> 00:06:32.528
+antiguos por un aviso de salida truncada,
+protegiendo siempre los más recientes.
+
+99
+00:06:32.568 --> 00:06:36.196
+Las lecturas de un fichero que has vuelto
+a leer después se dan por superadas.
+
+100
+00:06:36.236 --> 00:06:39.643
+Y los resultados inútiles, como
+una búsqueda sin coincidencias,
+
+101
+00:06:39.683 --> 00:06:41.060
+se quedan en una línea.
+
+102
+00:06:42.070 --> 00:06:44.722
+Recuerda lo que dijimos
+al final del vídeo doce:
+
+103
+00:06:44.762 --> 00:06:48.421
+el contexto lleno no se
+reintenta, eso es compactación.
+
+104
+00:06:48.461 --> 00:06:52.880
+Si el proveedor responde que la petición
+no cabe, oh my pi compacta y reintenta el
+
+105
+00:06:52.920 --> 00:06:54.620
+turno. Tú solo ves el aviso.
+
+106
+00:06:55.585 --> 00:06:59.530
+¿Y cómo compacta? Recorriendo
+una lista de métodos en orden,
+
+107
+00:06:59.570 --> 00:07:02.260
+el ajuste compaction method order.
+
+108
+00:07:02.330 --> 00:07:07.025
+De fábrica es remote, snapcompact,
+handoff, shake y soft.
+
+109
+00:07:07.065 --> 00:07:11.720
+Si un método no está disponible para
+tu modelo, o falla, pasa al siguiente.
+
+110
+00:07:11.760 --> 00:07:15.543
+Esa lista es la clave del vídeo: cada
+nombre es una forma distinta de adelgazar,
+
+111
+00:07:15.583 --> 00:07:17.650
+y ahora vamos a ver
+casi todas en la tienda.
+
+112
+00:07:23.513 --> 00:07:25.720
+Primero, hacemos crecer la sesión.
+
+113
+00:07:25.910 --> 00:07:29.320
+Arrancamos una sesión
+normal y le pedimos tres
+
+114
+00:07:29.773 --> 00:07:32.790
+cosas. Leer todos los ficheros de src y
+
+115
+00:07:33.326 --> 00:07:35.841
+de test, ejecutar los
+tests y resumir la tienda:
+
+116
+00:07:35.881 --> 00:07:40.705
+quince de quince pasan. Mirar un
+registro de pedidos de dos mil líneas,
+
+117
+00:07:40.745 --> 00:07:44.851
+que hemos dejado fuera del repositorio,
+y contar los errores de envío.
+
+118
+00:07:44.891 --> 00:07:48.840
+Y añadir un test para un subtotal
+de exactamente cuarenta euros.
+
+119
+00:07:49.567 --> 00:07:51.532
+El segundo turno tiene una lección.
+
+120
+00:07:51.572 --> 00:07:55.240
+Esperábamos que leyera las
+dos mil líneas, y no lo hizo:
+
+121
+00:07:55.280 --> 00:07:59.560
+usó grep desde bash y solo trajo
+las catorce líneas con error.
+
+122
+00:07:59.600 --> 00:08:02.332
+Es lo que hace un buen
+agente con un fichero grande.
+
+123
+00:08:02.372 --> 00:08:08.453
+Y fíjate en un desliz: en la nota final
+dice dos de los pedidos y luego enumera
+
+124
+00:08:08.493 --> 00:08:11.120
+nueve. Lo guardamos,
+porque luego reaparece.
+
+125
+00:08:11.992 --> 00:08:14.910
+El tercer turno, el del
+test, también razona.
+
+126
+00:08:14.950 --> 00:08:18.531
+Ve que ya había una comprobación de
+cuarenta euros dentro de otra prueba,
+
+127
+00:08:18.571 --> 00:08:22.987
+crea el caso dedicado, quita la
+duplicada y ejecuta los tests:
+
+128
+00:08:23.027 --> 00:08:27.820
+dieciséis de dieciséis. Barra context:
+ahora Messages ocupa trece mil tokens,
+
+129
+00:08:27.860 --> 00:08:29.560
+de un total de veinte mil.
+
+130
+00:08:30.557 --> 00:08:34.790
+Barra shake. Sin argumentos usa el
+modo elide, que quita los resultados de
+
+131
+00:08:34.830 --> 00:08:37.030
+herramientas y los bloques grandes.
+
+132
+00:08:37.070 --> 00:08:40.079
+No llama al modelo, así que
+es instantáneo y gratis.
+
+133
+00:08:40.119 --> 00:08:44.920
+Responde con una línea: ha sacudido once
+resultados de herramientas y ha liberado
+
+134
+00:08:44.960 --> 00:08:46.869
+unos cuatro mil ochocientos tokens.
+
+135
+00:08:46.909 --> 00:08:51.840
+Barra context lo confirma: Messages
+baja de trece mil a ocho mil cien.
+
+136
+00:08:52.874 --> 00:08:54.610
+Fíjate en que la pantalla no cambia.
+
+137
+00:08:54.650 --> 00:08:57.440
+Los diffs y la salida
+de los tests siguen ahí.
+
+138
+00:08:57.480 --> 00:09:00.180
+Lo que ha adelgazado es
+lo que recibe el modelo.
+
+139
+00:09:00.220 --> 00:09:03.851
+Cada resultado quitado se sustituye
+por una referencia artifact,
+
+140
+00:09:03.891 --> 00:09:06.510
+que apunta a una copia
+guardada junto a la sesión.
+
+141
+00:09:06.550 --> 00:09:08.958
+Si el modelo vuelve a
+necesitarlo, puede leerla.
+
+142
+00:09:08.998 --> 00:09:11.240
+Y el fichero de sesión
+sigue teniendo todo.
+
+143
+00:09:12.155 --> 00:09:15.790
+Lo comprobamos: cuántas líneas
+de error había en el registro.
+
+144
+00:09:15.830 --> 00:09:18.685
+Responde catorce, sin volver a leer nada.
+
+145
+00:09:18.725 --> 00:09:22.047
+No le hacía falta: el dato
+estaba en su propia respuesta,
+
+146
+00:09:22.087 --> 00:09:26.080
+y shake quita los resultados de las
+herramientas, no lo que el modelo concluyó
+
+147
+00:09:26.120 --> 00:09:30.320
+a partir de ellos. Esa es la idea:
+lo que ya se digirió puede irse.
+
+148
+00:09:31.280 --> 00:09:35.330
+Hay otros dos modos. Barra
+shake images quita las imágenes,
+
+149
+00:09:35.370 --> 00:09:38.005
+útil si has pegado capturas
+que ya no hacen falta.
+
+150
+00:09:38.045 --> 00:09:41.745
+Y barra shake thinking quita los
+bloques de razonamiento del modelo,
+
+151
+00:09:41.785 --> 00:09:45.190
+que en sesiones largas pueden
+ocupar más que las respuestas.
+
+152
+00:09:45.230 --> 00:09:46.760
+Ninguno de los tres llama al modelo.
+
+153
+00:09:47.570 --> 00:09:52.419
+Un matiz. Shake también está en la
+lista automática, pero allí es prudente:
+
+154
+00:09:52.459 --> 00:09:56.990
+protege una ventana de tokens recientes
+y solo actúa si el ahorro merece la pena.
+
+155
+00:09:57.030 --> 00:09:59.308
+El barra shake manual es más agresivo.
+
+156
+00:09:59.348 --> 00:10:02.950
+Por eso conviene lanzarlo cuando
+sabes qué sobra, no por costumbre.
+
+157
+00:10:08.721 --> 00:10:11.480
+Shake quita peso, pero no resume.
+
+158
+00:10:11.570 --> 00:10:13.900
+Para eso está barra compact.
+
+159
+00:10:14.180 --> 00:10:18.020
+Igual que en el vídeo tres, en una
+sesión de juguete casi no habría nada que
+
+160
+00:10:18.060 --> 00:10:22.010
+compactar, porque se conservan
+siempre veinte mil tokens recientes.
+
+161
+00:10:22.050 --> 00:10:25.601
+Así que en el perfil demo hemos
+bajado ese margen, keep recent tokens,
+
+162
+00:10:25.641 --> 00:10:28.620
+a tres mil. En tu trabajo
+real no lo toques.
+
+163
+00:10:29.436 --> 00:10:33.200
+Barra compact admite un modo
+y unas instrucciones de foco.
+
+164
+00:10:33.240 --> 00:10:35.470
+Sin modo, recorre la lista de métodos.
+
+165
+00:10:35.510 --> 00:10:40.870
+Con modo, lo fuerza. Hay tres:
+soft, remote y snapcompact.
+
+166
+00:10:40.910 --> 00:10:45.850
+Y un aviso: barra snapcompact, barra
+remote y barra soft no existen como
+
+167
+00:10:45.890 --> 00:10:50.180
+comandos. Son modos de barra compact,
+aunque alguna guía los presente sueltos.
+
+168
+00:10:51.068 --> 00:10:56.037
+Soft es el más parecido a Pi: un resumen
+local que escribe el modelo activo.
+
+169
+00:10:56.077 --> 00:11:01.840
+Lo lanzamos con foco: barra compact soft,
+conserva la decisión sobre el caso de
+
+170
+00:11:01.880 --> 00:11:04.120
+cuarenta euros y el estado de los tests.
+
+171
+00:11:04.160 --> 00:11:05.060
+Esto gasta
+
+172
+00:11:05.517 --> 00:11:08.822
+modelo. Abajo aparece compacting
+context, con escape para cancelar,
+
+173
+00:11:08.862 --> 00:11:10.460
+y en unos segundos termina.
+
+174
+00:11:11.109 --> 00:11:13.166
+En el transcript aparece una línea fina:
+
+175
+00:11:13.206 --> 00:11:18.618
+soft compacted, de quince mil a
+nueve mil trescientos, con control o.
+
+176
+00:11:18.658 --> 00:11:23.610
+Aquí control o activa la expansión, y
+subiendo con la rueda aparece el resumen
+
+177
+00:11:23.650 --> 00:11:28.074
+entero: compactado de quince mil ciento
+cincuenta y uno a nueve mil trescientos
+
+178
+00:11:28.114 --> 00:11:32.280
+cuarenta y cuatro tokens. Las rutas
+que ves difuminadas llevan el nombre de
+
+179
+00:11:32.320 --> 00:11:33.220
+usuario.
+
+180
+00:11:33.685 --> 00:11:35.527
+Léelo, como en el vídeo tres.
+
+181
+00:11:35.567 --> 00:11:40.410
+Tiene secciones fijas: el objetivo,
+las restricciones y preferencias,
+
+182
+00:11:40.450 --> 00:11:43.910
+el progreso con lo hecho, lo que
+está en curso y lo bloqueado,
+
+183
+00:11:43.950 --> 00:11:48.443
+las decisiones clave, los siguientes
+pasos y el contexto crítico.
+
+184
+00:11:48.483 --> 00:11:52.787
+Y una sorpresa buena: el resumen
+detecta el desliz del registro.
+
+185
+00:11:52.827 --> 00:11:56.647
+Escribe que el texto decía dos
+pedidos pero listaba nueve,
+
+186
+00:11:56.687 --> 00:11:58.660
+y que conviene reverificar esa cifra.
+
+187
+00:11:59.466 --> 00:12:02.337
+Más abajo, dos cosas
+que merece la pena ver.
+
+188
+00:12:02.377 --> 00:12:05.129
+El turno del test aparece
+como un turno partido:
+
+189
+00:12:05.169 --> 00:12:08.909
+la petición original, lo que se
+había hecho y lo que quedaba.
+
+190
+00:12:08.949 --> 00:12:13.390
+Y al final, la lista de ficheros de la
+sesión, agrupados por carpeta y marcados
+
+191
+00:12:13.430 --> 00:12:17.930
+como leídos o escritos. Además, una nota
+dice que las salidas de herramientas se
+
+192
+00:12:17.970 --> 00:12:20.373
+entregaron como referencias artifact.
+
+193
+00:12:20.413 --> 00:12:21.950
+Es la huella de barra shake.
+
+194
+00:12:23.057 --> 00:12:28.990
+Barra context lo remata: Messages baja
+de ocho mil cien a dos mil seiscientos.
+
+195
+00:12:29.030 --> 00:12:30.420
+¿Qué recibe ahora el modelo?
+
+196
+00:12:30.460 --> 00:12:34.740
+Lo mismo que en Pi: el prompt de
+sistema, el resumen como un mensaje más,
+
+197
+00:12:34.780 --> 00:12:39.660
+y los mensajes recientes. Si vuelves a
+compactar, oh my pi le pasa al modelo el
+
+198
+00:12:39.700 --> 00:12:43.370
+resumen anterior junto con lo
+nuevo para que lo actualice.
+
+199
+00:12:43.410 --> 00:12:46.620
+Cada pasada es otra oportunidad
+de perder un detalle.
+
+200
+00:12:47.386 --> 00:12:51.097
+Lo probamos con una pregunta: qué
+casos límite cubren ya los tests,
+
+201
+00:12:51.137 --> 00:12:55.925
+sin ejecutar nada. Responde con los del
+resumen, treinta y nueve con noventa y
+
+202
+00:12:55.965 --> 00:12:59.989
+nueve, cuarenta, cincuenta, y
+añade la validación de la entrada,
+
+203
+00:13:00.029 --> 00:13:02.575
+pero marcada como
+inferencia, no reverificada.
+
+204
+00:13:02.615 --> 00:13:07.180
+Es la actitud correcta: distingue lo que
+sabe por el resumen de lo que supone.
+
+205
+00:13:08.285 --> 00:13:12.360
+Remote usa la compactación del propio
+proveedor, cuando la ruta del modelo la
+
+206
+00:13:12.400 --> 00:13:16.630
+ofrece: la de OpenAI en su API
+de Responses, la de Anthropic,
+
+207
+00:13:16.670 --> 00:13:21.361
+o un servidor propio. Si
+falla, cae a un resumen local.
+
+208
+00:13:21.401 --> 00:13:24.680
+Tiene una contrapartida honesta:
+con los carriles de OpenAI,
+
+209
+00:13:24.720 --> 00:13:28.655
+lo que se guarda en tu fichero es
+un marcador, no un resumen legible.
+
+210
+00:13:28.695 --> 00:13:32.220
+DeepSeek usa la API de completions,
+así que aquí no aplica.
+
+211
+00:13:33.175 --> 00:13:36.373
+Snapcompact es la idea
+más rara de oh my pi.
+
+212
+00:13:36.413 --> 00:13:39.855
+No resume: imprime la historia
+antigua, en texto apretado,
+
+213
+00:13:39.895 --> 00:13:43.820
+sobre imágenes con una fuente de
+píxeles, y el modelo las lee de vuelta.
+
+214
+00:13:44.238 --> 00:13:47.400
+No llama a ningún modelo,
+no necesita clave ni red.
+
+215
+00:13:47.720 --> 00:13:52.030
+Solo funciona con modelos que aceptan
+imágenes, y DeepSeek Flash las acepta,
+
+216
+00:13:52.070 --> 00:13:53.180
+así que lo probamos.
+
+217
+00:13:54.242 --> 00:13:58.639
+Barra compact snapcompact. Y la
+respuesta es un aviso y un error:
+
+218
+00:13:58.679 --> 00:14:01.559
+snapcompact no reduciría el contexto.
+
+219
+00:14:01.599 --> 00:14:05.454
+Tiene razón. Acabamos de compactar con
+soft, la historia antigua es diminuta,
+
+220
+00:14:05.494 --> 00:14:09.091
+y convertirla en imágenes costaría
+más que dejarla como texto.
+
+221
+00:14:09.131 --> 00:14:12.447
+Es una herramienta para historias largas,
+no para sesiones recién compactadas.
+
+222
+00:14:12.487 --> 00:14:15.380
+No admite foco, porque no
+hay resumen que orientar.
+
+223
+00:14:16.054 --> 00:14:19.116
+Y el coste que comparten
+todos, también shake:
+
+224
+00:14:19.156 --> 00:14:21.530
+cambian el principio de la conversación.
+
+225
+00:14:21.570 --> 00:14:25.520
+Recuerda el vídeo cuatro. La caché del
+proveedor sirve mientras el principio de
+
+226
+00:14:25.560 --> 00:14:30.030
+la petición no cambia. Después de
+adelgazar, la siguiente petición se paga
+
+227
+00:14:30.070 --> 00:14:34.020
+casi entera. Adelgaza cuando
+compense, no a cada rato.
+
+228
+00:14:39.462 --> 00:14:43.969
+Seguimos trabajando. El caso que el
+modelo había marcado como inferencia,
+
+229
+00:14:44.009 --> 00:14:49.609
+la validación, se lo pedimos: un test que
+compruebe que un subtotal negativo lanza
+
+230
+00:14:49.649 --> 00:14:51.480
+TypeError. Lo añade,
+
+231
+00:14:51.990 --> 00:14:56.370
+quita los valores negativos de la
+prueba genérica para no duplicar,
+
+232
+00:14:56.410 --> 00:14:59.840
+y diecisiete de diecisiete. Antes
+del traspaso, barra session:
+
+233
+00:14:59.880 --> 00:15:01.240
+apuntamos el identificador.
+
+234
+00:15:02.255 --> 00:15:05.900
+Barra handoff resume la sesión
+en un documento de traspaso.
+
+235
+00:15:05.960 --> 00:15:09.850
+No es un resumen cualquiera: está pensado
+para que otra instancia del agente retome
+
+236
+00:15:09.890 --> 00:15:13.920
+el trabajo, con el estado, las
+decisiones y los siguientes
+
+237
+00:15:14.391 --> 00:15:18.640
+pasos. Admite foco, así que escribimos:
+barra handoff, céntrate en el estado de
+
+238
+00:15:18.680 --> 00:15:20.840
+los tests y en lo que falta por hacer.
+
+239
+00:15:20.880 --> 00:15:22.000
+Gasta modelo.
+
+240
+00:15:22.622 --> 00:15:26.714
+Abajo aparece generating handoff,
+con escape para cancelar.
+
+241
+00:15:26.754 --> 00:15:29.720
+El documento no se escribe en
+pantalla mientras se genera.
+
+242
+00:15:29.760 --> 00:15:33.534
+Al terminar, el transcript se
+reconstruye con un divisor nuevo,
+
+243
+00:15:33.574 --> 00:15:37.725
+handed off, de catorce mil a nueve
+mil cuatrocientos, y dos avisos:
+
+244
+00:15:37.765 --> 00:15:42.940
+la sesión se ha compactado dos veces, y
+context handed off and compacted in place.
+
+245
+00:15:44.061 --> 00:15:48.583
+Fíjate en lo de in place. Barra
+handoff no abre una sesión nueva.
+
+246
+00:15:48.623 --> 00:15:52.701
+Guarda el documento como una
+compactación más, en el mismo fichero.
+
+247
+00:15:52.741 --> 00:15:57.180
+Barra session lo confirma: el mismo
+identificador y la misma ruta.
+
+248
+00:15:57.220 --> 00:16:00.357
+Lo que sí cambia son los
+recuentos: mensajes y tokens bajan,
+
+249
+00:16:00.397 --> 00:16:03.332
+porque reflejan lo que queda
+vivo después del traspaso.
+
+250
+00:16:03.372 --> 00:16:06.180
+Versiones anteriores sí
+abrían sesión aparte;
+
+251
+00:16:06.220 --> 00:16:07.840
+puede que lo leas en guías antiguas.
+
+252
+00:16:08.732 --> 00:16:11.400
+¿Qué gana entonces frente a barra compact?
+
+253
+00:16:11.440 --> 00:16:14.830
+El documento está escrito como un
+traspaso, y el modelo lo recibe marcado
+
+254
+00:16:14.870 --> 00:16:19.368
+como el contexto de trabajo de una
+instancia anterior, no como instrucciones
+
+255
+00:16:19.408 --> 00:16:22.820
+nuevas. Y la petición se hace con la
+misma clave de caché que tus turnos,
+
+256
+00:16:22.860 --> 00:16:26.760
+así que aprovecha la caché. No funciona
+mientras el agente está respondiendo,
+
+257
+00:16:26.800 --> 00:16:28.470
+y si cancelas no se guarda nada.
+
+258
+00:16:29.399 --> 00:16:32.968
+Handoff también está en la lista
+automática, en tercer lugar.
+
+259
+00:16:33.008 --> 00:16:38.190
+Con el ajuste handoff save to disk, los
+traspasos automáticos se guardan además
+
+260
+00:16:38.230 --> 00:16:41.750
+como un fichero markdown entre
+los artefactos de la sesión;
+
+261
+00:16:41.790 --> 00:16:43.800
+los manuales, como el nuestro, no.
+
+262
+00:16:44.437 --> 00:16:48.414
+Y la pregunta de siempre: ¿esto
+sustituye a dejar las cosas escritas?
+
+263
+00:16:48.454 --> 00:16:52.750
+No. Un traspaso es un resumen de un
+modelo, con los mismos riesgos que vimos
+
+264
+00:16:52.790 --> 00:16:56.480
+en el vídeo tres. Lo que de verdad
+tiene que sobrevivir, el código,
+
+265
+00:16:56.520 --> 00:16:59.503
+los tests, las decisiones,
+va al repositorio.
+
+266
+00:16:59.543 --> 00:17:01.680
+De eso trata entero el vídeo veintitrés.
+
+267
+00:17:07.189 --> 00:17:11.221
+A veces quieres preguntar algo sin
+que la pregunta se quede en la sesión.
+
+268
+00:17:11.261 --> 00:17:13.820
+Para eso está barra by the way.
+
+269
+00:17:13.900 --> 00:17:18.860
+Lanzamos un turno, que ejecute los tests
+y explique cada resultado en una línea,
+
+270
+00:17:18.900 --> 00:17:22.830
+y con el turno en marcha preguntamos:
+qué ficheros hemos modificado hoy.
+
+271
+00:17:23.781 --> 00:17:27.170
+El turno termina con su tabla
+de diecisiete tests, y debajo,
+
+272
+00:17:27.210 --> 00:17:29.740
+aparte, el panel de la pregunta lateral:
+
+273
+00:17:29.780 --> 00:17:33.970
+solo test barra envio punto
+test punto js, sin commitear,
+
+274
+00:17:34.010 --> 00:17:38.787
+con los casos de cuarenta euros y
+del subtotal negativo, y src intacto.
+
+275
+00:17:38.827 --> 00:17:43.260
+Abajo, las teclas: ce para copiar, efe
+para una pregunta de seguimiento y escape
+
+276
+00:17:43.300 --> 00:17:44.540
+para cerrar.
+
+277
+00:17:45.191 --> 00:17:49.690
+Pulsamos efe y preguntamos qué
+caso límite falta por probar.
+
+278
+00:17:49.880 --> 00:17:53.330
+Se abre la hoja del historial: a la
+izquierda, el tema, y a la derecha,
+
+279
+00:17:53.370 --> 00:17:55.745
+las dos preguntas con sus respuestas.
+
+280
+00:17:55.785 --> 00:18:00.811
+Y la respuesta es buena: falta el subtotal
+cero, que es válido y paga cuatro noventa
+
+281
+00:18:00.851 --> 00:18:03.950
+y cinco, y el caso de menos
+cero, que no lanza error.
+
+282
+00:18:03.990 --> 00:18:05.740
+Material para el próximo test.
+
+283
+00:18:06.356 --> 00:18:09.320
+Ni la pregunta ni la respuesta
+entran en la conversación.
+
+284
+00:18:09.360 --> 00:18:14.381
+Barra context lo confirma: Messages
+ha crecido por el turno de los tests,
+
+285
+00:18:14.421 --> 00:18:16.417
+no por las preguntas laterales.
+
+286
+00:18:16.457 --> 00:18:20.530
+El historial se guarda en una carpeta
+propia junto a la sesión y sobrevive si la
+
+287
+00:18:20.570 --> 00:18:23.140
+retomas, pero no entra
+en las exportaciones.
+
+288
+00:18:24.016 --> 00:18:27.312
+Que no se quede en la sesión
+no significa que sea gratis.
+
+289
+00:18:27.352 --> 00:18:30.379
+Cada pregunta lateral envía el
+contexto actual al proveedor,
+
+290
+00:18:30.419 --> 00:18:35.545
+y la respuesta se paga. Úsala para
+dudas de verdad, no como chat paralelo.
+
+291
+00:18:35.585 --> 00:18:39.208
+Y si la pregunta necesita trabajo
+de verdad, eso es barra tan,
+
+292
+00:18:39.248 --> 00:18:41.160
+que veremos en el vídeo dieciséis.
+
+293
+00:18:41.825 --> 00:18:44.082
+El contexto extendido es otra cosa.
+
+294
+00:18:44.122 --> 00:18:48.454
+Algunos modelos ofrecen dos ventanas,
+una estándar y otra mucho mayor,
+
+295
+00:18:48.494 --> 00:18:49.840
+a veces con otro
+
+296
+00:18:50.386 --> 00:18:55.770
+precio. Barra extended context on activa
+la grande, off vuelve a la estándar,
+
+297
+00:18:55.810 --> 00:18:59.743
+y status te dice cómo está. En
+cámara solo lanzamos status,
+
+298
+00:18:59.783 --> 00:19:02.460
+y responde: extended context is off.
+
+299
+00:19:03.473 --> 00:19:08.500
+Dos avisos. Primero, on y off guardan
+el ajuste en tu configuración,
+
+300
+00:19:08.540 --> 00:19:12.650
+no solo en esta sesión. Segundo, una
+ventana mayor no es gratis aunque el
+
+301
+00:19:12.690 --> 00:19:16.310
+modelo no cobre recargo: el umbral
+de compactación sube con ella,
+
+302
+00:19:16.350 --> 00:19:19.690
+y cada petición puede
+llevar muchos más tokens.
+
+303
+00:19:20.016 --> 00:19:22.560
+Antes de activarlo, pregúntate
+si no te bastaría con adelgazar.
+
+304
+00:19:28.586 --> 00:19:31.220
+Hasta ahora, todo vivía
+dentro de una sesión.
+
+305
+00:19:31.260 --> 00:19:35.323
+Cuando abres otra, el modelo empieza de
+cero, salvo por tus ficheros de contexto.
+
+306
+00:19:35.363 --> 00:19:40.130
+La memoria cambia eso: guarda lo aprendido
+y lo inyecta en sesiones futuras.
+
+307
+00:19:40.172 --> 00:19:44.563
+Viene apagada. Se elige un backend en
+barra settings, o con el ajuste memory
+
+308
+00:19:44.603 --> 00:19:45.503
+backend.
+
+309
+00:19:46.485 --> 00:19:50.230
+Hay tres principales. Local resume
+tus sesiones antiguas del proyecto al
+
+310
+00:19:50.270 --> 00:19:54.674
+arrancar. Mnemopi guarda recuerdos
+en una base SQLite en tu máquina.
+
+311
+00:19:54.714 --> 00:19:57.620
+Y Hindsight usa un servidor
+de memoria externo.
+
+312
+00:19:57.660 --> 00:20:01.140
+Hay un cuarto, sharpshooter, que la
+documentación nombra sin explicar,
+
+313
+00:20:01.180 --> 00:20:02.680
+así que no lo contamos.
+
+314
+00:20:03.563 --> 00:20:07.220
+Local trabaja en dos fases,
+en segundo plano, al arrancar.
+
+315
+00:20:07.260 --> 00:20:11.530
+Primero, un modelo lee cada
+sesión pasada y extrae decisiones,
+
+316
+00:20:11.570 --> 00:20:15.980
+restricciones, fallos resueltos
+y flujos que se repiten.
+
+317
+00:20:16.020 --> 00:20:20.480
+Después, otra pasada lo consolida en un
+documento de memoria y un resumen corto
+
+318
+00:20:20.520 --> 00:20:23.260
+que se inyecta al empezar cada sesión.
+
+319
+00:20:23.300 --> 00:20:27.700
+Fíjate en el coste: todo eso usa modelo
+al arrancar, sin que escribas nada.
+
+320
+00:20:28.640 --> 00:20:33.610
+Para la demo usamos mnemopi, configurado
+fuera de cámara en el perfil demo con dos
+
+321
+00:20:33.650 --> 00:20:38.680
+ajustes: no embeddings, para que busque
+solo por texto y no descargue un modelo de
+
+322
+00:20:38.720 --> 00:20:42.780
+embeddings, y llm mode none, para
+que no llame a ningún modelo.
+
+323
+00:20:43.116 --> 00:20:45.640
+Así, la memoria de hoy no cuesta nada.
+
+324
+00:20:46.391 --> 00:20:49.757
+Abrimos una sesión y
+miramos barra memory stats:
+
+325
+00:20:49.797 --> 00:20:53.760
+un banco para la tienda, con cero
+memorias, y la base de datos dentro de la
+
+326
+00:20:53.800 --> 00:20:57.610
+carpeta del perfil demo, no
+en tu configuración real.
+
+327
+00:20:57.650 --> 00:21:00.970
+Le pedimos que use la herramienta
+retain para guardar un hecho:
+
+328
+00:21:01.010 --> 00:21:05.600
+el límite de envío gratis es cuarenta
+euros y el caso exacto ya tiene test.
+
+329
+00:21:06.506 --> 00:21:09.335
+El modelo primero lee la
+documentación de la herramienta,
+
+330
+00:21:09.375 --> 00:21:14.120
+en la dirección xd barra barra retain,
+porque es una de las herramientas que se
+
+331
+00:21:14.160 --> 00:21:16.809
+descubren al usarlas.
+Luego llama a retain:
+
+332
+00:21:16.849 --> 00:21:21.600
+una memoria guardada. Barra memory
+stats ya cuenta una memoria,
+
+333
+00:21:21.640 --> 00:21:22.720
+con la fecha de la última.
+
+334
+00:21:23.649 --> 00:21:26.116
+Cerramos y abrimos otra sesión.
+
+335
+00:21:26.156 --> 00:21:30.220
+Preguntamos cuál es el límite de envío
+gratis y si el caso de cuarenta euros
+
+336
+00:21:30.260 --> 00:21:32.590
+tiene test, sin leer ficheros.
+
+337
+00:21:33.100 --> 00:21:36.375
+Responde cuarenta euros
+y que sí tiene test.
+
+338
+00:21:36.415 --> 00:21:40.741
+Y añade algo importante: que lo sabe
+por la memoria de una sesión anterior,
+
+339
+00:21:40.781 --> 00:21:45.400
+que no es una verificación fresca, y que
+si queremos lo comprueba con npm test.
+
+340
+00:21:46.950 --> 00:21:50.105
+Barra memory view enseña
+exactamente lo que se ha inyectado.
+
+341
+00:21:50.145 --> 00:21:52.670
+Arriba, las instrucciones
+que recibe el modelo:
+
+342
+00:21:52.710 --> 00:21:56.846
+los recuerdos son conocimiento de
+fondo, no instrucciones del usuario,
+
+343
+00:21:56.886 --> 00:22:00.914
+y el mensaje actual y la salida de
+las herramientas mandan sobre ellos.
+
+344
+00:22:00.954 --> 00:22:02.760
+Debajo, el bloque memories.
+
+345
+00:22:03.631 --> 00:22:07.293
+Y aquí hay una sorpresa.
+Hay dos recuerdos, no uno.
+
+346
+00:22:07.333 --> 00:22:11.480
+El nuestro, el de retain. Y otro
+que mnemopi guardó por su cuenta:
+
+347
+00:22:11.520 --> 00:22:15.570
+el turno entero, con nuestra
+petición y la respuesta tal cual,
+
+348
+00:22:15.610 --> 00:22:17.897
+incluida una errata del modelo.
+
+349
+00:22:17.937 --> 00:22:20.391
+Es la retención automática,
+que viene activada.
+
+350
+00:22:20.431 --> 00:22:24.640
+Guarda lo que pasa, no solo lo que
+le pides, y lo guarda sin corregir.
+
+351
+00:22:25.726 --> 00:22:29.183
+Si quieres búsqueda por
+significado, activa los embeddings;
+
+352
+00:22:29.223 --> 00:22:33.780
+la variante de fábrica está pensada para
+inglés, y para recuerdos en castellano
+
+353
+00:22:33.820 --> 00:22:38.820
+existe la multilingüe. Si dejas que
+mnemopi use modelo, gastará en cada
+
+354
+00:22:38.860 --> 00:22:43.610
+consolidación. Hindsight, la opción de
+equipo, necesita un servidor y a veces un
+
+355
+00:22:43.650 --> 00:22:46.620
+token, así que solo lo ves en diapositiva.
+
+356
+00:22:47.449 --> 00:22:49.354
+Barra memory tiene más subcomandos.
+
+357
+00:22:49.394 --> 00:22:52.454
+Queue enseña lo pendiente de consolidar.
+
+358
+00:22:52.494 --> 00:22:56.600
+Sync pide consolidar. Y clear,
+o reset, borra la memoria;
+
+359
+00:22:56.640 --> 00:22:59.780
+con Hindsight no borra
+el banco del servidor.
+
+360
+00:22:59.820 --> 00:23:01.440
+Clear nunca lo lanzamos en cámara.
+
+361
+00:23:02.411 --> 00:23:05.787
+Y el límite honesto, que la
+propia documentación subraya.
+
+362
+00:23:05.827 --> 00:23:10.500
+La memoria es contexto heurístico,
+no la verdad del repositorio.
+
+363
+00:23:10.540 --> 00:23:14.920
+Puede estar desfasada, y como acabas de
+ver, puede guardar cosas que no querías.
+
+364
+00:23:14.960 --> 00:23:19.320
+Si contradice al código o a lo que
+tú dices, gana el código y ganas tú.
+
+365
+00:23:19.360 --> 00:23:22.040
+Por eso nos gusta que el modelo
+ofreciera comprobarlo con los tests.
+
+366
+00:23:27.880 --> 00:23:35.035
+Repasemos. Barra context mide: categorías,
+espacio libre y la reserva para compactar.
+
+367
+00:23:35.075 --> 00:23:38.964
+Las herramientas cuestan contexto en
+cada petición, y ahora sabes medirlo:
+
+368
+00:23:39.004 --> 00:23:42.464
+de tres mil setecientos a mil
+cien con cuatro herramientas.
+
+369
+00:23:42.504 --> 00:23:47.413
+oh my pi compacta solo con un umbral
+y recorriendo una lista de métodos.
+
+370
+00:23:47.453 --> 00:23:51.540
+Barra shake adelgaza sin modelo
+y deja lo quitado recuperable.
+
+371
+00:23:54.150 --> 00:23:56.629
+Barra compact resume, con soft
+para un resumen local legible,
+
+372
+00:23:56.669 --> 00:24:00.630
+remote para el del proveedor y
+snapcompact para archivar en imágenes,
+
+373
+00:24:00.670 --> 00:24:02.618
+cuando hay historia que archivar.
+
+374
+00:24:02.658 --> 00:24:06.723
+Barra handoff escribe un
+traspaso y compacta en el sitio,
+
+375
+00:24:06.763 --> 00:24:10.790
+con el mismo identificador. Las preguntas
+laterales no ensucian la sesión,
+
+376
+00:24:10.830 --> 00:24:14.756
+pero se pagan. Y la memoria lleva
+lo aprendido a la siguiente sesión,
+
+377
+00:24:14.796 --> 00:24:16.340
+como pista, no como verdad.
+
+378
+00:24:17.437 --> 00:24:22.090
+La práctica: en tu perfil de pruebas, abre
+una sesión en un repositorio pequeño y
+
+379
+00:24:22.130 --> 00:24:25.530
+mide con barra context
+antes de escribir nada.
+
+380
+00:24:25.570 --> 00:24:29.350
+Trabaja unos turnos, mide
+otra vez y lanza barra shake.
+
+381
+00:24:29.420 --> 00:24:34.022
+Compacta con soft y un foco concreto,
+y lee el resumen buscando un error.
+
+382
+00:24:34.062 --> 00:24:37.490
+Termina con barra handoff y
+compara los dos documentos:
+
+383
+00:24:37.530 --> 00:24:38.700
+qué conserva cada uno.
+
+384
+00:24:39.743 --> 00:24:43.690
+En el próximo vídeo, modelos,
+roles y razonamiento:
+
+385
+00:24:43.730 --> 00:24:47.840
+cambiar de modelo a mitad de tarea,
+los roles como smol, slow o advisor,
+
+386
+00:24:47.880 --> 00:24:53.430
+el esfuerzo de razonamiento, y cómo
+repartir el trabajo entre DeepSeek Flash,
+
+387
+00:24:53.470 --> 00:24:57.090
+el barato, y DeepSeek V
+cuatro Pro, el que revisa.
+
+388
+00:24:57.130 --> 00:24:58.030
+Nos vemos allí.

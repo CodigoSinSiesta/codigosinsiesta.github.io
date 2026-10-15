@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 6
 duracion: "21 min"
 video: "06-personalizar-sin-codigo.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/06-personalizar-sin-codigo.es.vtt"
 ---
 
 cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear plantillas de prompts y skills para que el agente trabaje a tu manera.

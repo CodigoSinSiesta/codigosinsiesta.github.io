@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 16
 duracion: "23 min"
 video: "16-subagentes-y-paralelo.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/16-subagentes-y-paralelo.es.vtt"
 ---
 
 repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agentes propios para tu proyecto.

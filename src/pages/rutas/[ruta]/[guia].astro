@@ -58,6 +58,9 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
                   aria-label={`Vídeo: ${guia.data.title}`}
                   src={`${VIDEOS_BASE_URL}/${guia.data.video}`}
                 >
+                  {guia.data.subtitulos && (
+                    <track kind="subtitles" srclang="es" label="Español" src={guia.data.subtitulos} />
+                  )}
                   <p>
                     Tu navegador no reproduce vídeo.{' '}
                     <a href={`${VIDEOS_BASE_URL}/${guia.data.video}`}>Descárgalo</a>.

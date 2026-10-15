@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 3
 duracion: "23 min"
 video: "03-pi-por-dentro.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/03-pi-por-dentro.es.vtt"
 ---
 
 qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un árbol que se puede rebobinar, bifurcar y compactar sin perder nada.

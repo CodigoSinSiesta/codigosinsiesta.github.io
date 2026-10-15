@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 18
 duracion: "25 min"
 video: "18-git-calidad-y-entrega.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/18-git-calidad-y-entrega.es.vtt"
 ---
 
 revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el código por revisión automática antes de entregarlo.

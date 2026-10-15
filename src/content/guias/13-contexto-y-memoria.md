@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 13
 duracion: "25 min"
 video: "13-contexto-y-memoria.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/13-contexto-y-memoria.es.vtt"
 ---
 
 medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación.

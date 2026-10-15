@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 20
 duracion: "23 min"
 video: "20-extender-omp.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/20-extender-omp.es.vtt"
 ---
 
 extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto es compatible con lo que ya hicimos para Pi.

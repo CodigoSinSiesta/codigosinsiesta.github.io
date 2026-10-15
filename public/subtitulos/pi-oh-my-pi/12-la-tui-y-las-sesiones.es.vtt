@@ -1,0 +1,1861 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.512 --> 00:00:14.150
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.190 --> 00:00:17.480
+Vídeo doce: la interfaz y las sesiones.
+
+3
+00:00:23.588 --> 00:00:27.950
+En el vídeo tres abrimos Pi por dentro y
+vimos que una sesión no es una lista de
+
+4
+00:00:27.990 --> 00:00:31.650
+mensajes, sino un árbol
+guardado en un fichero JSONL.
+
+5
+00:00:31.690 --> 00:00:36.666
+Cada entrada apunta a su padre, y la hoja
+en la que estás decide qué rama ve el
+
+6
+00:00:36.706 --> 00:00:40.609
+modelo. Con barra tree saltábamos a un
+punto anterior, con barra fork y barra
+
+7
+00:00:40.649 --> 00:00:44.620
+clone sacábamos una alternativa a
+un fichero nuevo, y con barra resume
+
+8
+00:00:44.660 --> 00:00:46.420
+cambiábamos de sesión.
+
+9
+00:00:47.916 --> 00:00:51.820
+oh my pi hereda ese árbol,
+con el mismo formato de fondo.
+
+10
+00:00:51.860 --> 00:00:54.850
+Lo que cambia es la
+forma de moverse por él.
+
+11
+00:00:54.890 --> 00:00:59.210
+Hay un comando nuevo para rebobinar, barra
+branch, que en el menú aparece como barra
+
+12
+00:00:59.250 --> 00:01:03.660
+rewind. Barra tree sigue ahí, pero
+con otro comportamiento por defecto.
+
+13
+00:01:03.700 --> 00:01:06.760
+Y barra fork se parece a
+la de Pi solo en el nombre.
+
+14
+00:01:06.800 --> 00:01:08.820
+Esa es la parte central de este vídeo.
+
+15
+00:01:09.455 --> 00:01:12.320
+Antes de llegar ahí, dos
+cosas más de la interfaz.
+
+16
+00:01:12.360 --> 00:01:16.523
+Unos cuantos atajos que no vimos en el
+vídeo once, y el selector de comandos,
+
+17
+00:01:16.563 --> 00:01:20.490
+que con ochenta y cinco comandos
+integrados merece que sepas leerlo.
+
+18
+00:01:20.591 --> 00:01:25.682
+Después, los comandos de sesión: los de
+mirar y nombrar, los de volver atrás,
+
+19
+00:01:25.722 --> 00:01:29.540
+los de cambiar de sesión, los de
+empezar de cero y tres de mantenimiento.
+
+20
+00:01:30.467 --> 00:01:34.693
+Trabajamos como en el vídeo anterior: en
+la tienda, con el perfil demo y DeepSeek V
+
+21
+00:01:34.733 --> 00:01:38.530
+cuatro punto uno Flash. Hoy no
+vamos a editar ningún fichero.
+
+22
+00:01:38.570 --> 00:01:41.346
+Todas las peticiones piden
+el código en la respuesta.
+
+23
+00:01:41.386 --> 00:01:44.430
+Así, cuando rebobinemos, el disco no
+se quedará desfasado respecto a la
+
+24
+00:01:44.470 --> 00:01:47.950
+conversación, que es el problema
+que vimos en el vídeo tres.
+
+25
+00:01:47.990 --> 00:01:50.340
+Y cuando algo gaste modelo, te lo diremos.
+
+26
+00:01:55.886 --> 00:01:58.640
+En el vídeo once recorrimos barra hotkeys:
+
+27
+00:01:58.680 --> 00:02:04.006
+escape para parar, control q para
+encolar, alt m para el modelo,
+
+28
+00:02:04.046 --> 00:02:09.445
+mayúsculas tab para el thinking,
+control o para desplegar herramientas.
+
+29
+00:02:09.485 --> 00:02:12.913
+Hoy añadimos los que más se
+usan cuando una sesión crece.
+
+30
+00:02:12.953 --> 00:02:14.640
+Ninguno llama al modelo.
+
+31
+00:02:15.371 --> 00:02:17.125
+El primero salva borradores.
+
+32
+00:02:17.165 --> 00:02:21.711
+Escribes un mensaje largo, cambias
+de idea y pulsas control c:
+
+33
+00:02:21.751 --> 00:02:25.839
+el editor se vacía. Si te arrepientes,
+la flecha arriba lo recupera,
+
+34
+00:02:25.879 --> 00:02:27.718
+con sus imágenes y sus pegados.
+
+35
+00:02:27.758 --> 00:02:31.293
+Guarda hasta cien borradores
+mientras oh my pi está abierto,
+
+36
+00:02:31.333 --> 00:02:33.759
+y no los escribe en el
+historial permanente.
+
+37
+00:02:33.799 --> 00:02:37.690
+Si no te gusta, se desactiva en barra
+settings, en la parte de entrada de la
+
+38
+00:02:37.730 --> 00:02:39.360
+pestaña de interacción.
+
+39
+00:02:40.129 --> 00:02:44.744
+Para mensajes largos de verdad, control
+g abre el borrador en tu editor de texto,
+
+40
+00:02:44.784 --> 00:02:49.336
+el de la variable EDITOR, y al
+cerrarlo vuelve al editor de oh my pi.
+
+41
+00:02:49.376 --> 00:02:53.230
+Control t oculta o muestra los bloques
+de thinking, útil cuando el razonamiento
+
+42
+00:02:53.270 --> 00:02:55.370
+ocupa más que la respuesta.
+
+43
+00:02:55.965 --> 00:03:00.360
+Y control mayúsculas o esconde
+la actividad de las herramientas.
+
+44
+00:03:00.413 --> 00:03:02.937
+Control erre busca en
+el historial de prompts;
+
+45
+00:03:02.977 --> 00:03:06.230
+el perfil demo tiene el suyo propio, así
+que ahí no se cuela nada de tu trabajo
+
+46
+00:03:06.270 --> 00:03:07.170
+real.
+
+47
+00:03:08.310 --> 00:03:10.090
+Dos más que vienen con su comando.
+
+48
+00:03:10.130 --> 00:03:14.079
+Efe cinco, o alt erre, reintenta
+el último turno que falló:
+
+49
+00:03:14.119 --> 00:03:16.588
+es barra retry, y lo veremos al final.
+
+50
+00:03:16.628 --> 00:03:21.350
+Y alt flecha arriba saca de la cola un
+mensaje que habías encolado y lo devuelve
+
+51
+00:03:21.390 --> 00:03:26.432
+al editor. Las acciones de sesión, como
+abrir el árbol, bifurcar o retomar,
+
+52
+00:03:26.472 --> 00:03:30.788
+no tienen tecla de fábrica. Si las
+usas mucho, puedes asignarles una en
+
+53
+00:03:30.828 --> 00:03:33.880
+keybindings punto yml,
+con su nombre de acción.
+
+54
+00:03:34.526 --> 00:03:38.422
+Y si vienes de Vim, hay un modo de
+edición al estilo Vim para el editor,
+
+55
+00:03:38.462 --> 00:03:43.270
+apagado de fábrica. Se activa en barra
+settings, en la parte de entrada.
+
+56
+00:03:43.310 --> 00:03:47.630
+Escape pasa al modo normal y el borde
+del editor cambia de color para que sepas
+
+57
+00:03:47.670 --> 00:03:52.220
+dónde estás. No es Vim completo, pero
+cubre movimientos, borrados y objetos de
+
+58
+00:03:52.260 --> 00:03:54.720
+texto, y nunca roba
+los atajos con control.
+
+59
+00:03:55.770 --> 00:03:57.883
+Ahora el selector de comandos.
+
+60
+00:03:57.923 --> 00:04:00.588
+Escribes una barra y aparece el menú.
+
+61
+00:04:00.628 --> 00:04:03.675
+Fíjate en las descripciones:
+muchas no explican el comando,
+
+62
+00:04:03.715 --> 00:04:05.681
+sino que te dicen su estado.
+
+63
+00:04:05.721 --> 00:04:09.380
+Barra tools dice cuántas herramientas
+tienes activas, doce de veinte
+
+64
+00:04:09.420 --> 00:04:14.671
+disponibles. Barra plan dice
+off, y barra vibe, también off.
+
+65
+00:04:14.711 --> 00:04:17.400
+Es una forma rápida de ver cómo
+está la sesión sin abrir nada.
+
+66
+00:04:18.495 --> 00:04:20.970
+Si sigues escribiendo, el menú se filtra.
+
+67
+00:04:21.010 --> 00:04:26.963
+Con barra r e aparecen rewind,
+resume, retry, rename y restart,
+
+68
+00:04:27.003 --> 00:04:32.100
+entre otros. Rewind rebobina a un mensaje
+anterior conservando el camino viejo como
+
+69
+00:04:32.140 --> 00:04:36.121
+rama. Rename avisa de que,
+sin título, lo genera.
+
+70
+00:04:36.161 --> 00:04:40.240
+Y restart reinicia con los mismos
+flags y retoma esta sesión.
+
+71
+00:04:40.414 --> 00:04:44.490
+Un detalle más: los comandos integrados
+se reservan su nombre antes que los de tus
+
+72
+00:04:44.530 --> 00:04:48.280
+ficheros, así que un comando
+propio no puede tapar a barra tree.
+
+73
+00:04:53.772 --> 00:04:55.800
+Hacemos tres peticiones baratas.
+
+74
+00:04:55.840 --> 00:05:02.440
+Primera: lee src barra envio punto js y
+resume en tres líneas cómo se calculan
+
+75
+00:05:02.480 --> 00:05:05.200
+los gastos de envío, sin editar nada.
+
+76
+00:05:05.240 --> 00:05:10.010
+Segunda: escribe en la respuesta una
+versión de gastos envío con envío gratis
+
+77
+00:05:10.050 --> 00:05:14.890
+desde cincuenta euros. Tercera: añádele
+un recargo de tres euros para pedidos
+
+78
+00:05:14.930 --> 00:05:16.960
+urgentes. Ninguna toca el disco.
+
+79
+00:05:18.240 --> 00:05:23.660
+DeepSeek contesta con el código, una tabla
+con los cuatro casos y una nota honesta:
+
+80
+00:05:23.770 --> 00:05:27.540
+los tests actuales fijan el umbral en
+cuarenta euros, así que esta versión los
+
+81
+00:05:27.580 --> 00:05:32.080
+rompería si se aplicara. Por eso pedimos
+las respuestas en pantalla y no en el
+
+82
+00:05:32.250 --> 00:05:33.146
+disco.
+
+83
+00:05:33.166 --> 00:05:36.184
+Fíjate en la esquina derecha,
+encima de la línea de estado.
+
+84
+00:05:36.224 --> 00:05:39.914
+Tras la primera respuesta, la sesión
+ya tiene nombre sin que lo pidamos:
+
+85
+00:05:39.954 --> 00:05:42.457
+resumir cálculo de gastos de envío.
+
+86
+00:05:42.497 --> 00:05:46.507
+oh my pi genera un título
+automático con el primer mensaje.
+
+87
+00:05:46.547 --> 00:05:50.020
+Es cómodo, pero conviene saber que
+es una llamada extra al modelo,
+
+88
+00:05:50.060 --> 00:05:52.366
+con un rol pensado para tareas pequeñas.
+
+89
+00:05:52.406 --> 00:05:55.820
+Si no la quieres, existe
+guion guion no title.
+
+90
+00:05:56.403 --> 00:05:59.291
+Barra session nos enseña
+la ficha de la sesión.
+
+91
+00:05:59.331 --> 00:06:02.321
+Arriba, la ruta del
+fichero y el identificador;
+
+92
+00:06:02.361 --> 00:06:05.984
+la ruta la difuminamos porque
+incluye la carpeta personal.
+
+93
+00:06:06.024 --> 00:06:11.020
+Después, el proveedor: deepseek, el
+modelo, la API compatible con OpenAI,
+
+94
+00:06:11.060 --> 00:06:13.993
+y de dónde sale la clave:
+una variable de entorno.
+
+95
+00:06:14.033 --> 00:06:18.870
+Si tu proveedor enseñara aquí una cuenta,
+esta pantalla no se compartiría tal cual.
+
+96
+00:06:19.678 --> 00:06:23.842
+Luego el recuento de mensajes:
+tres tuyos, cuatro del asistente,
+
+97
+00:06:23.882 --> 00:06:27.580
+que son más porque leer el fichero
+cuenta, y una llamada a herramienta con su
+
+98
+00:06:27.620 --> 00:06:30.941
+resultado. Ocho en total.
+Al final, los tokens:
+
+99
+00:06:30.981 --> 00:06:36.079
+setecientos setenta y dos de entrada, unos
+mil trescientos de salida y más de treinta
+
+100
+00:06:36.119 --> 00:06:38.050
+y cuatro mil leídos de caché.
+
+101
+00:06:38.090 --> 00:06:40.312
+Coste total, una décima de céntimo.
+
+102
+00:06:40.352 --> 00:06:43.420
+Es la versión ampliada del barra
+session de Pi del vídeo tres.
+
+103
+00:06:44.259 --> 00:06:47.810
+Barra session tiene dos
+subcomandos que no vas a ver aquí.
+
+104
+00:06:47.879 --> 00:06:52.430
+Delete borra la sesión. Y pin, con una
+cuenta, fija el proveedor a una cuenta
+
+105
+00:06:52.470 --> 00:06:56.650
+concreta de las que tengas
+guardadas, así que enseña cuentas.
+
+106
+00:06:56.690 --> 00:07:00.320
+No lo confundas con barra pin, a secas,
+que veremos enseguida y no tiene nada que
+
+107
+00:07:00.360 --> 00:07:01.260
+ver.
+
+108
+00:07:01.786 --> 00:07:05.987
+En Pi, el nombre se ponía con barra name.
+
+109
+00:07:06.027 --> 00:07:07.850
+Aquí es barra rename.
+
+110
+00:07:08.550 --> 00:07:13.607
+Con un título, lo fija sin gastar nada:
+barra rename envio guion umbrales,
+
+111
+00:07:13.647 --> 00:07:16.850
+y la línea de estado
+confirma session renamed.
+
+112
+00:07:16.970 --> 00:07:21.540
+Sin título, genera uno a partir de la
+conversación, y eso sí llama al modelo.
+
+113
+00:07:21.580 --> 00:07:23.190
+Un nombre puesto por ti tiene prioridad:
+
+114
+00:07:23.230 --> 00:07:25.380
+el título automático ya no lo sobrescribe.
+
+115
+00:07:26.299 --> 00:07:30.330
+¿Para qué tanto nombre? Porque en un par
+de minutos vamos a tener varias ramas y
+
+116
+00:07:30.370 --> 00:07:34.760
+varios ficheros, y el selector de
+barra resume enseña los títulos.
+
+117
+00:07:34.870 --> 00:07:38.169
+Una sesión llamada envío
+umbrales se encuentra sola.
+
+118
+00:07:38.209 --> 00:07:41.010
+Una sesión sin nombre es
+una línea más con la fecha.
+
+119
+00:07:46.845 --> 00:07:49.776
+Ahora, la situación que motiva todo esto.
+
+120
+00:07:49.816 --> 00:07:52.832
+La versión con envío gratis
+desde cincuenta euros está bien,
+
+121
+00:07:52.872 --> 00:07:56.021
+pero queremos probar otra
+idea desde ese mismo punto:
+
+122
+00:07:56.061 --> 00:07:59.670
+un envío reducido entre
+veinticinco y cuarenta euros.
+
+123
+00:07:59.710 --> 00:08:02.007
+No queremos pedirle que
+deshaga lo anterior.
+
+124
+00:08:02.047 --> 00:08:05.840
+Queremos volver al momento de la segunda
+petición y escribirla de otra forma.
+
+125
+00:08:06.863 --> 00:08:09.917
+Barra branch, o barra
+rewind, que es lo mismo.
+
+126
+00:08:09.957 --> 00:08:12.660
+La pantalla cambia entera.
+Arriba dice rewind:
+
+127
+00:08:12.700 --> 00:08:15.557
+elige el punto desde el que continuar.
+
+128
+00:08:15.597 --> 00:08:20.570
+Debajo aparece la conversación tal como la
+ves, con un contorno punteado sobre uno de
+
+129
+00:08:20.610 --> 00:08:25.483
+sus bloques. No es una lista aparte de
+mensajes sueltos, como el barra fork de
+
+130
+00:08:25.523 --> 00:08:28.770
+Pi; es la propia conversación,
+y eliges el punto mirándola.
+
+131
+00:08:29.662 --> 00:08:31.570
+Abajo tienes la barra de teclas.
+
+132
+00:08:31.610 --> 00:08:33.738
+Arriba y abajo avanzan paso a paso.
+
+133
+00:08:33.778 --> 00:08:36.339
+Izquierda y derecha
+saltan entre tus mensajes.
+
+134
+00:08:36.379 --> 00:08:39.470
+Efe filtra por texto,
+útil en sesiones largas.
+
+135
+00:08:39.510 --> 00:08:42.196
+Control o despliega lo que está plegado.
+
+136
+00:08:42.236 --> 00:08:46.430
+Escape cancela. Y Enter rebobina
+hasta el bloque marcado.
+
+137
+00:08:46.470 --> 00:08:50.268
+Subimos hasta nuestra segunda
+petición, la del umbral de cincuenta,
+
+138
+00:08:50.308 --> 00:08:51.208
+y pulsamos Enter.
+
+139
+00:08:51.706 --> 00:08:57.870
+Vuelve la pantalla normal, la conversación
+termina justo antes de esa petición,
+
+140
+00:08:57.910 --> 00:09:02.260
+y la línea de estado dice
+rewound to selected point.
+
+141
+00:09:02.300 --> 00:09:06.191
+El texto de la petición está otra vez
+en el editor, listo para cambiarlo.
+
+142
+00:09:06.231 --> 00:09:10.936
+Lo sustituimos: un envío de dos euros
+con noventa y cinco entre veinticinco y
+
+143
+00:09:10.976 --> 00:09:13.491
+cuarenta euros, sin editar ficheros.
+
+144
+00:09:13.531 --> 00:09:14.760
+Y lo enviamos.
+
+145
+00:09:15.661 --> 00:09:17.290
+¿Qué ha pasado en el fichero?
+
+146
+00:09:17.330 --> 00:09:20.504
+Nada se ha borrado. La rama del
+umbral de cincuenta sigue ahí,
+
+147
+00:09:20.544 --> 00:09:24.990
+con su recargo de urgencia, y nuestra
+nueva petición cuelga del mismo punto como
+
+148
+00:09:25.030 --> 00:09:28.801
+una hermana. Es exactamente lo
+que dice la descripción del menú:
+
+149
+00:09:28.841 --> 00:09:31.460
+rebobinar conservando el
+camino viejo como rama.
+
+150
+00:09:31.500 --> 00:09:33.520
+Todo dentro del mismo fichero de sesión.
+
+151
+00:09:34.147 --> 00:09:37.698
+Si eliges una respuesta del
+asistente en lugar de un mensaje
+
+152
+00:09:39.450 --> 00:09:42.347
+tuyo, el comportamiento cambia un poco.
+
+153
+00:09:42.387 --> 00:09:46.094
+Te quedas justo después de esa
+respuesta, con el editor vacío,
+
+154
+00:09:46.134 --> 00:09:49.150
+y lo siguiente que escribas
+abre la rama desde ahí.
+
+155
+00:09:49.219 --> 00:09:52.440
+Sirve cuando la respuesta era buena y
+lo que quieres cambiar es la siguiente
+
+156
+00:09:52.480 --> 00:09:53.650
+pregunta.
+
+157
+00:09:54.518 --> 00:09:57.202
+Dos diferencias con Pi
+que conviene tener claras.
+
+158
+00:09:57.242 --> 00:10:00.590
+Rebobinar nunca hace un
+resumen de la rama que dejas:
+
+159
+00:10:00.630 --> 00:10:06.120
+es inmediato y no gasta. Y el atajo de
+escape dos veces, con el editor vacío,
+
+160
+00:10:06.423 --> 00:10:09.290
+abre este selector, no
+el árbol como en Pi.
+
+161
+00:10:09.330 --> 00:10:13.776
+Si lo prefieres a la antigua, el ajuste
+double escape action admite rewind,
+
+162
+00:10:13.816 --> 00:10:14.830
+tree o none.
+
+163
+00:10:15.971 --> 00:10:20.202
+Probamos el atajo. Escape,
+escape, y el mismo selector.
+
+164
+00:10:20.242 --> 00:10:23.912
+Al subir hasta el punto donde se
+separan las ramas pasa algo nuevo:
+
+165
+00:10:23.952 --> 00:10:26.618
+la pantalla se divide en dos columnas.
+
+166
+00:10:26.658 --> 00:10:30.838
+A la izquierda, uno de dos, la
+rama actual, con el envío reducido.
+
+167
+00:10:30.878 --> 00:10:34.536
+A la derecha, dos de dos,
+la del umbral de cincuenta.
+
+168
+00:10:34.576 --> 00:10:38.950
+Con izquierda y derecha cambias de rama
+y comparas las dos versiones lado a lado,
+
+169
+00:10:38.990 --> 00:10:41.800
+sin salir. Escape, y seguimos.
+
+170
+00:10:47.265 --> 00:10:49.345
+Barra branch es la herramienta rápida.
+
+171
+00:10:49.385 --> 00:10:53.550
+Barra tree es el mapa. Abre
+el árbol de la sesión entera,
+
+172
+00:10:53.590 --> 00:10:57.210
+con todas las ramas, y la entrada
+en la que estás resaltada.
+
+173
+00:10:57.250 --> 00:11:02.060
+El funcionamiento lo conoces del vídeo
+tres, así que vamos a lo que cambia en oh
+
+174
+00:11:02.100 --> 00:11:05.220
+my pi. Arriba tienes la línea de
+ayuda, y conviene leerla entera.
+
+175
+00:11:06.129 --> 00:11:09.854
+Lo primero, los filtros.
+Control o los recorre en orden:
+
+176
+00:11:09.894 --> 00:11:14.050
+el modo por defecto, sin resultados
+de herramientas, solo tus mensajes,
+
+177
+00:11:14.090 --> 00:11:16.449
+solo las entradas etiquetadas, y todo.
+
+178
+00:11:16.489 --> 00:11:20.547
+Y con alt más una letra
+saltas directo a uno:
+
+179
+00:11:20.587 --> 00:11:24.790
+de, te, u, ele o a. Ojo, porque
+control o, fuera del árbol,
+
+180
+00:11:24.830 --> 00:11:28.930
+despliega herramientas. Dentro del
+árbol, las teclas significan otra cosa.
+
+181
+00:11:29.866 --> 00:11:32.080
+Las etiquetas funcionan como en Pi.
+
+182
+00:11:32.165 --> 00:11:35.875
+Nos situamos en la última respuesta
+de la rama del umbral de cincuenta,
+
+183
+00:11:35.915 --> 00:11:41.200
+pulsamos mayúsculas ele, y en el campo
+de etiqueta escribimos umbral guion
+
+184
+00:11:41.240 --> 00:11:45.460
+cincuenta. La etiqueta aparece entre
+corchetes delante de la respuesta.
+
+185
+00:11:45.500 --> 00:11:49.460
+Desde ahora, el filtro de etiquetadas
+nos lleva a ella en un segundo.
+
+186
+00:11:50.050 --> 00:11:52.338
+Y lo segundo, el cambio que más se nota.
+
+187
+00:11:52.378 --> 00:11:56.896
+Pulsamos Enter sobre esa respuesta
+y saltamos, sin ninguna pregunta.
+
+188
+00:11:56.936 --> 00:12:00.580
+La línea de estado dice
+navigated to selected point.
+
+189
+00:12:00.620 --> 00:12:04.091
+En Pi, cada salto te ofrecía
+resumir la rama que abandonabas.
+
+190
+00:12:04.131 --> 00:12:07.303
+En oh my pi, esa pregunta
+viene desactivada.
+
+191
+00:12:07.343 --> 00:12:09.758
+Si quieres el resumen, la ayuda lo dice:
+
+192
+00:12:09.798 --> 00:12:12.510
+mayúsculas Enter resume y salta.
+
+193
+00:12:12.572 --> 00:12:17.165
+Y si activas el ajuste branch summary
+enabled, vuelve la pregunta del vídeo
+
+194
+00:12:17.205 --> 00:12:18.105
+tres.
+
+195
+00:12:18.476 --> 00:12:22.610
+¿Por qué desactivarlo? Porque un
+resumen es una llamada al modelo,
+
+196
+00:12:22.650 --> 00:12:26.562
+y la mayoría de los saltos son para
+mirar o para probar algo rápido.
+
+197
+00:12:26.602 --> 00:12:30.290
+Así, moverse por el árbol no
+cuesta nada salvo que lo pidas.
+
+198
+00:12:30.330 --> 00:12:34.239
+La contrapartida: la rama nueva
+no sabrá que la otra existió.
+
+199
+00:12:34.279 --> 00:12:36.850
+El modelo solo recibe el camino
+desde la raíz hasta la hoja,
+
+200
+00:12:36.890 --> 00:12:38.500
+sin resúmenes de por medio.
+
+201
+00:12:39.454 --> 00:12:44.670
+Lo comprobamos. Volvemos con barra tree a
+la última respuesta de la rama de dos con
+
+202
+00:12:44.710 --> 00:12:48.800
+noventa y cinco y le pedimos que resuma
+en una línea la diferencia entre las dos
+
+203
+00:12:48.840 --> 00:12:50.960
+versiones que hemos escrito.
+
+204
+00:12:52.060 --> 00:12:56.509
+Contesta que la nueva añade un tramo
+intermedio, de veinticinco a cuarenta
+
+205
+00:12:56.549 --> 00:13:00.340
+euros, que pasa de pagar cuatro
+noventa y cinco a dos noventa y cinco.
+
+206
+00:13:00.380 --> 00:13:02.070
+Compara con el código original.
+
+207
+00:13:02.110 --> 00:13:05.040
+De la versión del umbral de
+cincuenta, ni una palabra.
+
+208
+00:13:05.941 --> 00:13:08.310
+Y tiene razón desde lo que ve.
+
+209
+00:13:08.350 --> 00:13:11.380
+Para él solo hemos escrito
+una versión: la de esta rama.
+
+210
+00:13:11.420 --> 00:13:14.531
+La otra está en el fichero,
+etiquetada y a un Enter de distancia,
+
+211
+00:13:14.571 --> 00:13:16.546
+pero no viaja en la petición.
+
+212
+00:13:16.586 --> 00:13:21.605
+Es la idea del vídeo tres: lo que está en
+el fichero y lo que ve el modelo no son lo
+
+213
+00:13:21.645 --> 00:13:24.684
+mismo. Si quieres que una rama sepa
+de la otra, tienes que contárselo,
+
+214
+00:13:24.724 --> 00:13:26.300
+o pedir el resumen al saltar.
+
+215
+00:13:27.263 --> 00:13:31.640
+Ese mensaje tiene además una función
+práctica, y es un apunte honesto.
+
+216
+00:13:31.704 --> 00:13:33.846
+El fichero no guarda en qué hoja estás.
+
+217
+00:13:33.886 --> 00:13:38.338
+Al cargar una sesión, oh my pi coloca
+la hoja en la última entrada escrita.
+
+218
+00:13:38.378 --> 00:13:42.760
+Si rebobinas o saltas y cierras sin
+escribir nada, al volver estarás donde
+
+219
+00:13:42.800 --> 00:13:47.587
+estabas antes del salto. Por eso, después
+de moverte, envía algo antes de cerrar,
+
+220
+00:13:47.627 --> 00:13:49.510
+de retomar o de bifurcar.
+
+221
+00:13:50.325 --> 00:13:54.150
+Y lo que tampoco cambia respecto a Pi:
+barra branch y barra tree mueven la
+
+222
+00:13:54.190 --> 00:13:56.790
+conversación, no tus ficheros.
+
+223
+00:13:56.830 --> 00:13:58.670
+Por eso hoy no editamos nada.
+
+224
+00:13:58.710 --> 00:14:01.608
+Con ediciones de por medio, la
+receta es la del vídeo tres:
+
+225
+00:14:01.648 --> 00:14:04.900
+git para el código y el
+árbol para la conversación.
+
+226
+00:14:04.940 --> 00:14:09.140
+Un último aviso para no confundirte: oh my
+pi tiene también una herramienta llamada
+
+227
+00:14:09.180 --> 00:14:11.590
+rewind, para puntos de
+control, que viene apagada.
+
+228
+00:14:11.630 --> 00:14:13.540
+No tiene relación con el comando.
+
+229
+00:14:19.313 --> 00:14:22.348
+Hasta aquí, todo ha pasado
+en un único fichero.
+
+230
+00:14:22.388 --> 00:14:24.448
+En la otra pestaña lo comprobamos.
+
+231
+00:14:24.488 --> 00:14:27.660
+En la carpeta de sesiones de
+la tienda hay dos ficheros:
+
+232
+00:14:27.786 --> 00:14:31.859
+el del vídeo once y el de hoy, uno
+solo, aunque ya tenga dos ramas.
+
+233
+00:14:31.899 --> 00:14:34.320
+Barra fork es la que crea ficheros.
+
+234
+00:14:35.277 --> 00:14:37.470
+Antes, miremos dentro del de hoy.
+
+235
+00:14:37.510 --> 00:14:42.170
+Con jq sacamos de cada línea el
+tipo, el identificador y el padre.
+
+236
+00:14:42.210 --> 00:14:46.539
+Los mensajes se encadenan: cada uno
+apunta al anterior por su parent id.
+
+237
+00:14:46.579 --> 00:14:50.590
+Ahí se ve la bifurcación: un mensaje
+cuyo padre no es la línea anterior,
+
+238
+00:14:50.630 --> 00:14:54.241
+sino una respuesta muy de
+atrás, la del primer turno.
+
+239
+00:14:54.281 --> 00:14:58.800
+Y la etiqueta es una entrada propia, de
+tipo label, con un target id que apunta a
+
+240
+00:14:58.840 --> 00:15:01.995
+la respuesta etiquetada.
+El fichero solo crece;
+
+241
+00:15:02.035 --> 00:15:03.230
+nunca se reescribe.
+
+242
+00:15:04.540 --> 00:15:10.080
+Volvemos a oh my pi y lanzamos barra fork,
+justo después de nuestro último mensaje.
+
+243
+00:15:10.166 --> 00:15:12.310
+Y aquí está la sorpresa
+para quien viene de Pi:
+
+244
+00:15:12.350 --> 00:15:17.090
+no aparece ningún selector. En Pi, barra
+fork te pedía elegir un mensaje y copiaba
+
+245
+00:15:17.130 --> 00:15:22.021
+el camino hasta él. En oh my pi,
+barra fork duplica la sesión entera,
+
+246
+00:15:22.061 --> 00:15:25.040
+con todas sus ramas, en un
+fichero nuevo, y te cambia a él.
+
+247
+00:15:26.067 --> 00:15:31.676
+La respuesta dice session forked, y te
+da dos formas de volver a la original:
+
+248
+00:15:31.716 --> 00:15:36.054
+el comando completo para la terminal,
+que ya incluye guion guion profile demo,
+
+249
+00:15:36.094 --> 00:15:39.190
+y un barra resume con su identificador.
+
+250
+00:15:39.230 --> 00:15:43.640
+Es un detalle cuidado: sin el perfil, oh
+my pi buscaría la sesión en el directorio
+
+251
+00:15:43.680 --> 00:15:45.680
+por defecto y no la encontraría.
+
+252
+00:15:46.693 --> 00:15:51.350
+En la otra pestaña contamos
+las líneas de cada fichero.
+
+253
+00:15:51.729 --> 00:15:53.900
+La sesión original tiene veinte.
+
+254
+00:15:53.940 --> 00:15:58.480
+El fork, también veinte. Es una copia
+completa, con la rama abandonada,
+
+255
+00:15:58.520 --> 00:16:01.400
+la etiqueta y los títulos, no
+un recorte desde un mensaje.
+
+256
+00:16:01.440 --> 00:16:02.340
+La
+
+257
+00:16:02.563 --> 00:16:06.680
+descripción del menú habla de un mensaje
+anterior, pero lo que hace es copiar todo.
+
+258
+00:16:07.496 --> 00:16:13.068
+Entonces, ¿cómo saco solo una rama a un
+fichero aparte, como hacía barra clone en
+
+259
+00:16:13.108 --> 00:16:15.760
+Pi? oh my pi no tiene barra clone.
+
+260
+00:16:15.800 --> 00:16:20.275
+La forma natural es esta: haces fork, y
+en la copia te mueves con barra tree a la
+
+261
+00:16:20.315 --> 00:16:23.310
+rama que quieres y sigues desde ella.
+
+262
+00:16:23.350 --> 00:16:26.540
+Las otras siguen en el fichero,
+pero no viajan al modelo.
+
+263
+00:16:26.580 --> 00:16:30.950
+Bifurcar desde una entrada concreta sí
+existe, pero en el modo RPC y en el SDK,
+
+264
+00:16:30.990 --> 00:16:32.880
+que son terreno del vídeo veintiuno.
+
+265
+00:16:33.761 --> 00:16:36.856
+En resumen, tres operaciones
+con tres alcances.
+
+266
+00:16:36.896 --> 00:16:41.413
+Barra branch rebobina dentro del
+fichero, sin resumen y sin coste.
+
+267
+00:16:41.453 --> 00:16:45.640
+Barra tree navega el árbol
+dentro del fichero, con filtros,
+
+268
+00:16:45.680 --> 00:16:48.525
+etiquetas y un resumen solo si lo pides.
+
+269
+00:16:48.565 --> 00:16:52.354
+Y barra fork duplica el fichero
+entero para que sigas por tu cuenta.
+
+270
+00:16:52.394 --> 00:16:55.240
+Tienes la tabla en pantalla,
+con la columna de Pi al lado.
+
+271
+00:17:00.780 --> 00:17:06.860
+Con dos sesiones de hoy y la del vídeo
+once, ya tiene sentido barra pin.
+
+272
+00:17:06.948 --> 00:17:09.765
+Fija una sesión arriba de
+la lista de barra resume.
+
+273
+00:17:09.805 --> 00:17:13.900
+Sin argumentos, fija la actual; con
+un identificador, cualquier otra.
+
+274
+00:17:14.151 --> 00:17:18.880
+La lanzamos en el fork y nos responde que
+la sesión queda fijada arriba de la lista.
+
+275
+00:17:18.920 --> 00:17:20.700
+Volver a lanzarla la desfija.
+
+276
+00:17:21.487 --> 00:17:25.370
+Barra resume abre el selector a pantalla
+completa, con las sesiones de esta
+
+277
+00:17:25.410 --> 00:17:28.930
+carpeta. Arriba, con
+una chincheta, el fork:
+
+278
+00:17:28.970 --> 00:17:33.306
+envío umbrales, su primer mensaje, hace
+un momento, quince kilobytes y medio,
+
+279
+00:17:33.346 --> 00:17:36.840
+y tres marcas, current, done y fork.
+
+280
+00:17:36.880 --> 00:17:39.234
+Debajo, la original, con el mismo título.
+
+281
+00:17:39.274 --> 00:17:42.560
+Y al final, la del vídeo once, con
+el título que le puso el modelo.
+
+282
+00:17:43.542 --> 00:17:48.610
+Abajo, las teclas del selector, y tres que
+en una grabación no vas a ver pulsadas.
+
+283
+00:17:48.660 --> 00:17:53.580
+Tab cambia a las sesiones de todos los
+proyectos, y eso enseñaría trabajo de
+otras
+
+284
+00:17:54.076 --> 00:17:57.025
+carpetas. La búsqueda también
+consulta el historial de prompts.
+
+285
+00:17:57.065 --> 00:18:01.383
+Y suprimir, o borrar con la búsqueda
+vacía, elimina la sesión seleccionada,
+
+286
+00:18:01.423 --> 00:18:03.358
+después de pedir confirmación.
+
+287
+00:18:03.398 --> 00:18:04.420
+Salimos con escape.
+
+288
+00:18:05.262 --> 00:18:09.187
+Con argumento, barra resume
+salta directo, sin selector.
+
+289
+00:18:09.227 --> 00:18:12.811
+Le damos el identificador de la
+original, el que nos dio barra fork,
+
+290
+00:18:12.851 --> 00:18:16.060
+y la línea de estado dice resumed session.
+
+291
+00:18:16.151 --> 00:18:20.060
+La conversación se reconstruye desde su
+fichero y quedamos en la última entrada
+
+292
+00:18:20.100 --> 00:18:23.211
+escrita: la respuesta sobre
+la diferencia entre versiones.
+
+293
+00:18:23.251 --> 00:18:25.340
+Lo que te decíamos de la hoja, en directo.
+
+294
+00:18:26.267 --> 00:18:28.415
+¿Dónde viven todas estas sesiones?
+
+295
+00:18:28.455 --> 00:18:32.500
+En la carpeta del perfil, dentro de
+sessions, con una subcarpeta por cada
+
+296
+00:18:32.540 --> 00:18:37.729
+directorio de trabajo y un fichero JSONL
+por sesión, cuyo nombre empieza por la
+
+297
+00:18:37.769 --> 00:18:42.143
+fecha. Por eso barra resume enseña
+primero las de la carpeta actual.
+
+298
+00:18:42.183 --> 00:18:46.120
+Y si quieres que oh my pi retome por su
+cuenta la última sesión de la carpeta al
+
+299
+00:18:46.160 --> 00:18:50.100
+arrancar, existe el ajuste
+auto resume, que viene apagado.
+
+300
+00:18:50.725 --> 00:18:53.150
+Desde la terminal tienes
+lo mismo que en Pi:
+
+301
+00:18:53.190 --> 00:18:58.180
+guion c continúa la última sesión, y guion
+erre abre el selector o retoma la que le
+
+302
+00:18:58.220 --> 00:19:03.020
+indiques. Y arroba claude y arroba codex
+importan sesiones de esas herramientas,
+
+303
+00:19:03.060 --> 00:19:05.040
+como vimos en el vídeo once.
+
+304
+00:19:05.080 --> 00:19:08.360
+Eso solo lo enseñamos en diapositiva,
+porque lista tus sesiones reales.
+
+305
+00:19:14.282 --> 00:19:18.226
+A veces no quieres volver atrás, sino
+quitarte de encima lo que llevas.
+
+306
+00:19:18.266 --> 00:19:22.650
+oh my pi tiene cuatro comandos para
+eso, y se parecen lo bastante como para
+
+307
+00:19:22.690 --> 00:19:25.790
+confundirlos. La diferencia
+está en qué conservan:
+
+308
+00:19:25.830 --> 00:19:29.020
+el fichero, lo que ve el modelo
+o lo que guarda el proveedor.
+
+309
+00:19:30.247 --> 00:19:34.479
+Barra fresh es el más raro de los
+cuatro, y el más útil cuando algo falla.
+
+310
+00:19:34.519 --> 00:19:37.670
+No toca ni la pantalla, ni el
+fichero, ni lo que ve el modelo.
+
+311
+00:19:37.710 --> 00:19:40.619
+Lo que reinicia es el estado
+del lado del proveedor.
+
+312
+00:19:40.659 --> 00:19:43.590
+Lo lanzamos en el fork y
+la respuesta es escueta:
+
+313
+00:19:43.630 --> 00:19:46.755
+sesión del proveedor nueva,
+un estado descartado.
+
+314
+00:19:46.795 --> 00:19:48.667
+La conversación sigue igual.
+
+315
+00:19:48.707 --> 00:19:52.450
+Úsalo cuando el proveedor parece atascado
+o da errores que no se explican por tu
+
+316
+00:19:52.490 --> 00:19:53.390
+conversación.
+
+317
+00:19:54.289 --> 00:19:58.192
+Barra clear vacía el contexto
+del modelo sin cambiar de sesión.
+
+318
+00:19:58.232 --> 00:20:03.190
+Lo lanzamos en la original. La pantalla se
+limpia y la línea de estado lo resume muy
+
+319
+00:20:03.230 --> 00:20:08.530
+bien: contexto reiniciado, ocho mensajes
+descartados, la sesión continúa.
+
+320
+00:20:08.572 --> 00:20:11.468
+El fichero es el mismo, con el mismo
+nombre, que sigue en la esquina.
+
+321
+00:20:11.508 --> 00:20:16.950
+oh my pi añade una entrada que marca la
+frontera, y desde ahí reconstruye lo que
+
+322
+00:20:16.990 --> 00:20:18.160
+ve el modelo.
+
+323
+00:20:18.769 --> 00:20:23.138
+Lo comprobamos. Preguntamos qué umbral
+de envío gratis habíamos propuesto antes,
+
+324
+00:20:23.178 --> 00:20:25.629
+en una línea y sin leer ficheros.
+
+325
+00:20:25.669 --> 00:20:30.370
+La respuesta: no tiene constancia, para él
+la sesión empieza ahora y no puede citar
+
+326
+00:20:30.410 --> 00:20:35.637
+un umbral sin inventarlo. Y se ofrece a
+mirarlo en el código o en el historial de
+
+327
+00:20:35.677 --> 00:20:39.920
+git. Exactamente lo que queríamos ver:
+honesto y sin memoria de lo anterior.
+
+328
+00:20:40.789 --> 00:20:42.700
+Pero la historia no se ha ido.
+
+329
+00:20:42.740 --> 00:20:47.570
+Abrimos barra tree y pulsamos alt
+a, para ver todas las entradas.
+
+330
+00:20:47.709 --> 00:20:51.900
+Ahí está todo: el modelo y el
+nivel de thinking, los títulos,
+
+331
+00:20:51.940 --> 00:20:56.083
+la lectura del fichero, las dos
+ramas, la etiqueta umbral cincuenta,
+
+332
+00:20:56.123 --> 00:20:59.410
+y en medio, una entrada
+que dice reset boundary.
+
+333
+00:20:59.450 --> 00:21:01.612
+Debajo, nuestra pregunta nueva.
+
+334
+00:21:01.652 --> 00:21:05.960
+Barra clear sirve para cambiar de tema en
+la misma sesión sin arrastrar el contexto.
+
+335
+00:21:07.082 --> 00:21:11.756
+Barra new es el más simple: una
+sesión nueva, en un fichero nuevo,
+
+336
+00:21:11.796 --> 00:21:14.690
+con el mismo modelo y los mismos ajustes.
+
+337
+00:21:14.730 --> 00:21:18.210
+La línea de estado dice
+new session started.
+
+338
+00:21:18.263 --> 00:21:21.500
+La anterior queda intacta
+en la lista de barra resume.
+
+339
+00:21:22.044 --> 00:21:23.680
+Es lo que harías al cambiar de tarea.
+
+340
+00:21:24.576 --> 00:21:29.070
+Y el cuarto, barra delete, borra la sesión
+actual, su fichero y sus artefactos,
+
+341
+00:21:29.110 --> 00:21:33.490
+y abre una nueva. No se puede deshacer,
+así que en este curso solo lo ves en
+
+342
+00:21:33.530 --> 00:21:38.810
+diapositiva, y en tu día a día úsalo solo
+sobre sesiones que de verdad no quieras.
+
+343
+00:21:38.850 --> 00:21:42.320
+Desde el selector de barra resume se
+puede borrar igual, con confirmación.
+
+344
+00:21:43.202 --> 00:21:45.606
+Ninguno de los cuatro
+gasta modelo por sí mismo.
+
+345
+00:21:45.646 --> 00:21:50.210
+Y una pista para elegir: si quieres seguir
+el mismo trabajo con la mente despejada,
+
+346
+00:21:50.250 --> 00:21:53.374
+barra clear; si cambias
+de trabajo, barra new;
+
+347
+00:21:53.414 --> 00:21:56.029
+si el problema es el
+proveedor, barra fresh.
+
+348
+00:21:56.069 --> 00:21:59.110
+La compactación y el traspaso,
+que resumen en lugar de vaciar,
+
+349
+00:21:59.150 --> 00:22:00.200
+son del próximo vídeo.
+
+350
+00:22:05.984 --> 00:22:08.017
+Quedan tres comandos de mantenimiento.
+
+351
+00:22:08.057 --> 00:22:11.671
+Barra retry reintenta el
+último turno que falló.
+
+352
+00:22:11.711 --> 00:22:15.690
+oh my pi ya reintenta por su
+cuenta los errores pasajeros,
+
+353
+00:22:15.730 --> 00:22:19.414
+como límites de peticiones,
+servidores saturados o cortes de red:
+
+354
+00:22:19.454 --> 00:22:23.883
+hasta diez veces, con esperas que
+empiezan en medio segundo y se duplican.
+
+355
+00:22:23.923 --> 00:22:29.020
+Barra retry, o efe cinco, es para
+cuando se agotan esos intentos.
+
+356
+00:22:29.060 --> 00:22:32.169
+En la sesión nueva no ha
+fallado nada, y nos lo dice:
+
+357
+00:22:32.209 --> 00:22:33.280
+nothing to retry.
+
+358
+00:22:34.646 --> 00:22:38.840
+Barra restart cierra oh my pi y lo
+vuelve a abrir con los mismos flags,
+
+359
+00:22:38.880 --> 00:22:42.430
+incluido guion guion
+profile demo, y retoma esta
+
+360
+00:22:43.134 --> 00:22:47.060
+sesión. Sirve tras actualizar o cambiar
+algo que solo se lee al arrancar.
+
+361
+00:22:47.100 --> 00:22:51.760
+Lo lanzamos sobre la sesión vacía de barra
+new, y vuelve el logotipo con un consejo
+
+362
+00:22:51.800 --> 00:22:54.926
+distinto y la misma sesión, todavía vacía.
+
+363
+00:22:54.966 --> 00:22:58.800
+Al salir con barra exit, oh my pi
+nos deja el comando para retomarla.
+
+364
+00:22:59.811 --> 00:23:04.130
+Barra move traslada la sesión
+actual a otra carpeta de trabajo.
+
+365
+00:23:04.170 --> 00:23:06.860
+Sin argumentos abre un buscador de rutas;
+
+366
+00:23:06.900 --> 00:23:10.970
+con una ruta, la usa, y si no
+existe te pregunta si la crea.
+
+367
+00:23:11.010 --> 00:23:14.390
+Mueve el fichero de sesión y sus
+artefactos a la subcarpeta de la nueva
+
+368
+00:23:14.430 --> 00:23:19.588
+carpeta de trabajo, y recarga los ajustes,
+las skills y los comandos de ese proyecto.
+
+369
+00:23:19.628 --> 00:23:22.690
+Útil cuando empezaste en
+el directorio equivocado.
+
+370
+00:23:22.730 --> 00:23:25.100
+Hoy no lo grabamos: te lo contamos.
+
+371
+00:23:25.939 --> 00:23:29.814
+Repasemos. La interfaz tiene
+atajos para no perder borradores,
+
+372
+00:23:29.854 --> 00:23:34.050
+editar fuera y limpiar la pantalla, y
+un selector de comandos que te enseña el
+
+373
+00:23:34.090 --> 00:23:39.309
+estado de la sesión. Barra session te da
+la ficha, barra rename le pone nombre,
+
+374
+00:23:39.349 --> 00:23:41.630
+y el título automático gasta una llamada.
+
+375
+00:23:41.670 --> 00:23:47.870
+Barra branch rebobina en el mismo fichero,
+barra tree navega el árbol sin resumir por
+
+376
+00:23:47.979 --> 00:23:50.420
+defecto, y barra fork
+duplica la sesión entera.
+
+377
+00:23:51.161 --> 00:23:55.828
+Barra resume y barra pin
+te mueven entre sesiones.
+
+378
+00:23:55.868 --> 00:24:01.430
+Barra fresh reinicia el proveedor,
+barra clear vacía el contexto,
+
+379
+00:24:01.470 --> 00:24:04.730
+barra new empieza otra, y barra delete
+
+380
+00:24:05.565 --> 00:24:09.506
+borra. Barra retry, barra
+restart y barra move cierran
+
+381
+00:24:10.188 --> 00:24:13.940
+la lista. Y dos límites honestos:
+el árbol no deshace tus ficheros,
+
+382
+00:24:13.980 --> 00:24:16.780
+y un salto no se guarda
+hasta que escribes algo.
+
+383
+00:24:17.766 --> 00:24:22.560
+La práctica: abre una sesión con tu perfil
+de pruebas y haz tres peticiones que no
+
+384
+00:24:22.600 --> 00:24:27.590
+editen nada. Rebobina con escape escape,
+reescribe la segunda y compara las dos
+
+385
+00:24:27.630 --> 00:24:32.050
+ramas en las columnas. Etiqueta una en
+barra tree y pregunta por la diferencia
+
+386
+00:24:32.090 --> 00:24:37.650
+entre las dos. Después haz barra fork y
+cuenta las líneas de los dos ficheros.
+
+387
+00:24:37.720 --> 00:24:40.420
+Termina con barra clear
+y pregunta algo de antes.
+
+388
+00:24:41.145 --> 00:24:44.060
+En el próximo vídeo, contexto y memoria:
+
+389
+00:24:44.100 --> 00:24:49.330
+barra context para medir, barra compact y
+sus modos, barra shake para adelgazar sin
+
+390
+00:24:49.370 --> 00:24:53.500
+modelo, barra handoff para
+traspasar, el contexto extendido,
+
+391
+00:24:53.540 --> 00:24:58.180
+la memoria entre sesiones y barra
+btw para preguntas laterales.
+
+392
+00:24:58.220 --> 00:24:59.120
+Nos vemos allí.

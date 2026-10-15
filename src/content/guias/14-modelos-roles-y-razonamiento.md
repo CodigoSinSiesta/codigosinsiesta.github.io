@@ -5,6 +5,7 @@ ruta: "pi-oh-my-pi"
 orden: 14
 duracion: "23 min"
 video: "14-modelos-roles-y-razonamiento.mp4"
+subtitulos: "/subtitulos/pi-oh-my-pi/14-modelos-roles-y-razonamiento.es.vtt"
 ---
 
 asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advisor» que revisa el trabajo de un modelo más barato.
