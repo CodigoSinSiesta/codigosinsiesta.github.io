@@ -569,7 +569,7 @@ button.tag:hover {
 .guia__head { max-width: 760px; }
 
 /* Vídeo de la guía */
-.guia__video { margin: 0 0 1.75rem; }
+.guia__video { margin: 0; flex: none; }
 .guia__video video {
   display: block;
   width: 100%;
@@ -691,6 +691,102 @@ button.tag:hover {
 
 @media (prefers-reduced-motion: reduce) {
   .reading-progress span { transition: none; }
+}
+
+/* ═══ guía con vídeo («cuaderno»): vídeo fijo a la izquierda, apuntes a la derecha ═══ */
+
+.container--ancho { max-width: 1360px; }
+
+.guia--video {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-areas: "player head" "player body";
+  grid-template-rows: auto 1fr;
+  column-gap: 2.5rem;
+  align-items: start;
+}
+.guia--video .guia__head { grid-area: head; }
+.guia--video .guia__layout { grid-area: body; grid-template-columns: minmax(0, 1fr); margin-top: 1.25rem; }
+.guia--video .prose h2,
+.guia--video .prose h3 { scroll-margin-top: 6rem; }
+
+.guia__player {
+  grid-area: player;
+  position: sticky;
+  top: 5.5rem;
+  max-height: calc(100vh - 7rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* línea de tiempo: un segmento por capítulo, ancho proporcional a lo que dura */
+.linea-tiempo { display: flex; gap: 3px; height: 8px; flex: none; }
+.linea-tiempo__seg {
+  flex-basis: 0;
+  border-radius: 3px;
+  background: var(--color-borde);
+  transition: background-color var(--transition-fast);
+}
+.linea-tiempo__seg.is-pasado { background: var(--color-electric-strong); }
+.linea-tiempo__seg.is-activo { background: var(--color-cielo); }
+
+.capitulos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.4rem;
+  min-height: 0;
+  overflow-y: auto;
+}
+.capitulos__item {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-tinta2);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.capitulos__item:hover { border-color: var(--color-borde2); color: var(--color-tinta); }
+.capitulos__item:focus-visible { outline: 2px solid var(--color-cielo); outline-offset: 2px; }
+.capitulos__item[aria-current] {
+  border-color: var(--color-electrico);
+  background: var(--color-accent-soft);
+  color: var(--color-tinta);
+}
+.capitulos__t { font-family: var(--font-mono); font-size: 0.78rem; color: var(--color-cielo); min-width: 2.75rem; }
+
+.guia__secciones { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: 0.85rem; flex: none; }
+.guia__secciones a { color: var(--color-tinta3); }
+.guia__secciones a:hover { color: var(--color-tinta); }
+
+/* el capítulo que suena, resaltado en los apuntes */
+.prose h3.is-activa { color: var(--color-cielo); }
+
+@media (max-width: 1079px) {
+  .guia--video {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "player" "body";
+    grid-template-rows: none;
+  }
+  .guia__player { position: static; max-height: none; margin-top: 1.5rem; }
+  .capitulos { overflow: visible; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .linea-tiempo__seg, .capitulos__item { transition: none; }
 }
 
 /* ═══ portada de ruta: lead + contrato (qué te llevas / requisitos / qué no) ═══ */

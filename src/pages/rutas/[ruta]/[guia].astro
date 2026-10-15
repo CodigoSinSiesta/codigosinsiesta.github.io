@@ -29,12 +29,31 @@ const siguiente = idx < hermanas.length - 1 ? hermanas[idx + 1] : null;
 // Quita el emoji inicial del texto; en el contenido se sustituye por un icono SVG.
 const limpiarEmoji = (t: string) => t.replace(/^\p{Extended_Pictographic}️?\s*/u, '');
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+// Guías con vídeo: los capítulos salen del resumen, cada «### título» seguido de su botón «Ir a» (data-t).
+// `peso` es lo que dura cada capítulo (el último, hasta la duración aproximada del frontmatter;
+// el script lo corrige cuando el vídeo carga su duración real).
+const mmss = (t: number) => `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
+const capitulos = guia.data.video
+  ? [...(guia.body ?? '').matchAll(/^###\s+(.+?)\s*\n+<p><button[^>]*data-t="(\d+)"/gm)].map(([, titulo, t]) => ({
+      titulo,
+      t: Number(t),
+      etiqueta: mmss(Number(t)),
+      slug: headings.find((h) => h.depth === 3 && h.text === titulo)?.slug,
+    }))
+  : [];
+const totalAprox = (parseFloat(guia.data.duracion) || 0) * 60;
+const pesos = capitulos.map((c, i) =>
+  Math.max(1, (capitulos[i + 1]?.t ?? Math.max(totalAprox, c.t + 60)) - (i === 0 ? 0 : c.t))
+);
+// Enlaces a las demás secciones (código, fuentes, transcripción): en la variante con vídeo sustituyen al TOC.
+const secciones = headings.filter((h) => h.depth === 2 && h.text !== 'Resumen por capítulos');
 ---
 
 <Base title={guia.data.title} description={guia.data.description} activeHref="/rutas">
   <div class="reading-progress" aria-hidden="true"><span></span></div>
-  <div class="container">
-    <article class="section guia" data-guia>
+  <div class:list={['container', guia.data.video && 'container--ancho']}>
+    <article class:list={['section', 'guia', guia.data.video && 'guia--video']} data-guia>
       <header class="guia__head">
         <p class="eyebrow">
           <a href={`/rutas/${guia.data.ruta}`} style="color: inherit;">
@@ -46,29 +65,60 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
         <h1 style="font-size: clamp(1.9rem, 4.5vw, 2.8rem);">{guia.data.title}</h1>
       </header>
 
+      {
+        guia.data.video && (
+          <aside class="guia__player" aria-label="Vídeo y capítulos">
+            <figure class="guia__video">
+              <video
+                controls
+                preload="metadata"
+                playsinline
+                aria-label={`Vídeo: ${guia.data.title}`}
+                src={`${VIDEOS_BASE_URL}/${guia.data.video}`}
+              >
+                {guia.data.subtitulos && (
+                  <track kind="subtitles" srclang="es" label="Español" src={guia.data.subtitulos} />
+                )}
+                <p>
+                  Tu navegador no reproduce vídeo.{' '}
+                  <a href={`${VIDEOS_BASE_URL}/${guia.data.video}`}>Descárgalo</a>.
+                </p>
+              </video>
+            </figure>
+
+            {capitulos.length > 0 && (
+              <>
+                <div class="linea-tiempo" aria-hidden="true">
+                  {capitulos.map((_, i) => (
+                    <span class="linea-tiempo__seg" style={`flex-grow: ${pesos[i]}`} />
+                  ))}
+                </div>
+                <ol class="capitulos" aria-label="Capítulos del vídeo">
+                  {capitulos.map((c) => (
+                    <li>
+                      <button type="button" class="capitulos__item" data-t={c.t} data-nota={c.slug}>
+                        <span class="capitulos__t">{c.etiqueta}</span>
+                        <span>{c.titulo}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              </>
+            )}
+
+            {secciones.length > 0 && (
+              <nav class="guia__secciones" aria-label="Más de este vídeo">
+                {secciones.map((h) => (
+                  <a href={`#${h.slug}`}>{limpiarEmoji(h.text)}</a>
+                ))}
+              </nav>
+            )}
+          </aside>
+        )
+      }
+
       <div class="guia__layout">
         <div class="prose">
-          {
-            guia.data.video && (
-              <figure class="guia__video">
-                <video
-                  controls
-                  preload="metadata"
-                  playsinline
-                  aria-label={`Vídeo: ${guia.data.title}`}
-                  src={`${VIDEOS_BASE_URL}/${guia.data.video}`}
-                >
-                  {guia.data.subtitulos && (
-                    <track kind="subtitles" srclang="es" label="Español" src={guia.data.subtitulos} />
-                  )}
-                  <p>
-                    Tu navegador no reproduce vídeo.{' '}
-                    <a href={`${VIDEOS_BASE_URL}/${guia.data.video}`}>Descárgalo</a>.
-                  </p>
-                </video>
-              </figure>
-            )
-          }
           <Content />
 
           <footer class="guia__footer">
@@ -82,7 +132,7 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
         </div>
 
         {
-          toc.length > 0 && (
+          toc.length > 0 && !guia.data.video && (
             <aside class="toc">
               <details class="toc__box" open>
                 <summary class="toc__summary">En este módulo</summary>
@@ -103,16 +153,62 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 </Base>
 
 <script>
-  // Botones «Ir a m:ss» de los capítulos: saltan a ese punto del vídeo.
+  // Vídeo de la guía: los capítulos (lista junto al vídeo y botones «Ir a m:ss» del texto) saltan a su
+  // punto, y el capítulo que suena se resalta en la línea de tiempo, en la lista y en los apuntes.
   const reproductor = document.querySelector<HTMLVideoElement>('.guia__video video');
-  document.querySelectorAll<HTMLButtonElement>('button[data-t]').forEach((b) => {
-    b.addEventListener('click', () => {
-      if (!reproductor) return;
-      reproductor.currentTime = Number(b.dataset.t);
-      reproductor.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      void reproductor.play().catch(() => {});
+
+  if (reproductor) {
+    // En escritorio el vídeo queda fijo a la vista; en móvil hay que volver a él al saltar.
+    const escritorio = window.matchMedia('(min-width: 1080px)');
+    const suave: ScrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth';
+
+    const items = [...document.querySelectorAll<HTMLButtonElement>('.capitulos__item')];
+    const segmentos = [...document.querySelectorAll<HTMLElement>('.linea-tiempo__seg')];
+    const notas = items.map((b) => (b.dataset.nota ? document.getElementById(b.dataset.nota) : null));
+    const inicios = items.map((b) => Number(b.dataset.t));
+
+    document.querySelectorAll<HTMLButtonElement>('button[data-t]').forEach((b) => {
+      b.addEventListener('click', () => {
+        reproductor.currentTime = Number(b.dataset.t);
+        void reproductor.play().catch(() => {});
+        const nota = b.dataset.nota ? document.getElementById(b.dataset.nota) : null;
+        if (!escritorio.matches) reproductor.scrollIntoView({ behavior: suave, block: 'center' });
+        else nota?.scrollIntoView({ behavior: suave, block: 'start' });
+      });
     });
-  });
+
+    let activo = -1;
+    const marcar = () => {
+      const t = reproductor.currentTime;
+      let i = 0;
+      while (i + 1 < inicios.length && t >= inicios[i + 1]) i++;
+      if (i === activo || inicios.length === 0) return;
+      activo = i;
+      items.forEach((b, k) => (k === i ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
+      segmentos.forEach((s, k) => {
+        s.classList.toggle('is-activo', k === i);
+        s.classList.toggle('is-pasado', k < i);
+      });
+      notas.forEach((n, k) => n?.classList.toggle('is-activa', k === i));
+    };
+
+    // El último segmento se calcula con la duración aproximada; con la real, se ajusta.
+    const ajustarUltimo = () => {
+      const ultimo = segmentos.at(-1);
+      const inicio = inicios.at(-1);
+      if (ultimo && inicio !== undefined && Number.isFinite(reproductor.duration)) {
+        ultimo.style.flexGrow = String(Math.max(1, reproductor.duration - inicio));
+      }
+    };
+
+    reproductor.addEventListener('timeupdate', marcar);
+    reproductor.addEventListener('seeked', marcar);
+    reproductor.addEventListener('loadedmetadata', ajustarUltimo);
+    if (reproductor.readyState >= 1) ajustarUltimo();
+    marcar();
+  }
 </script>
 
 <script>
