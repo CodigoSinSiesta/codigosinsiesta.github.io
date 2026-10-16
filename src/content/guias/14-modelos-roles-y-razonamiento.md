@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 14 · Modelos, roles y razonamiento"
-description: "asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advisor» que revisa el trabajo de un modelo más barato."
+description: "Asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advisor» que revisa el trabajo de un modelo más barato."
 ruta: "pi-oh-my-pi"
 orden: 14
 duracion: "23 min"
@@ -8,7 +8,7 @@ video: "14-modelos-roles-y-razonamiento.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/14-modelos-roles-y-razonamiento.es.vtt"
 ---
 
-asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advisor» que revisa el trabajo de un modelo más barato.
+Asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advisor» que revisa el trabajo de un modelo más barato.
 
 <p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,37 +18,17 @@ asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advi
 
 <p><button type="button" class="ir-a" data-t="19">▶ Ir a 0:19</button></p>
 
-- **Pi, vídeo 04:** /model (elegir) → /scoped-models (rotación) → Ctrl+P (recorrer) → ⇧Tab (razonamiento)
-- **Otra pregunta**
-  - `Pi` · ¿Qué modelo está activo?
-  - `oh my pi` · ¿Qué modelo hace cada trabajo?: roles
+- **La estrategia del vídeo 04:** Uno hace, otro más capaz revisa — Funcionó, pero a mano: cambiando de modelo y pagando la caché en cada cambio.
 - **Hoy:** Roles (qué y cómo) → Cambiar (/model · /switch · Ctrl+P) → Effort (y presets) → Prewalk (y advisor) → Coste (y /usage)
-- **Dos modelos de DeepSeek**
-  - `Flash` · El rápido: DeepSeek V4.1 Flash
-  - `V4 Pro` · El capaz: razona más, más lento
-- **El precio, según el catálogo**
-  - `×4` · Tarifa de lista de Pro: 1,32 / 3,96 $ por millón
-  - `= Flash` · Desde el 14 de septiembre: 0,30 / 1,20 $ por millón
 
 ### 2 · Qué es un rol
 
 <p><button type="button" class="ir-a" data-t="141">▶ Ir a 2:21</button></p>
 
 - *En terminal:* config.yml del perfil (más abajo, en «Código y comandos»)
-- **Roles de chat (1/2)**
-  - `default` · Conversa
-  - `smol` · Rápido
-  - `slow` · Profundo
-  - `plan` · Modo plan: vídeo 15
-  - `vision` · Imágenes
-- **Roles de chat (2/2)**
-  - `commit` · Commits
-  - `tiny` · Títulos
-  - `memory` · Memoria
-  - `task` · Subagentes
-  - `advisor` · Revisor
 - **Roles por tipo de modelo:** judge, imagen, web, voz… — No conversan, pero también hacen llamadas.
 - **Herencia:** smol · slow (→ default) → tiny (→ smol) → memory (→ tiny)
+- **smol en otro proveedor:** Los títulos de sesión también se van allí — Un rol mal pensado mueve trabajo de fondo sin que lo veas en pantalla.
 - **Advisor sin asignar:** slow, o una cadena potente — No hereda el modelo de la conversación. Asígnalo a mano y compruébalo.
 - *En terminal:* Selectores (más abajo, en «Código y comandos»)
 
@@ -71,33 +51,15 @@ asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advi
 
 <p><button type="button" class="ir-a" data-t="484">▶ Ir a 8:04</button></p>
 
-- **Razonamiento**
-  - `/effort` · Selector: niveles del modelo
-  - `⇧Tab` · Recorre: como en Pi
-  - `high` · De fábrica: defaultThinkingLevel
 - *En la demo:* /effort medium
-- **auto**
-  - `judge` · Un clasificador elige: también es una llamada
-  - `ultrathink` · Al máximo: en ese turno
-- **Cómo se aplica**
-  - `presupuesto` · Anthropic · Gemini: tokens por nivel
-  - `esfuerzo` · DeepSeek · OpenAI: se envía el nivel
-- **El esfuerzo viaja con el rol**
-  - `smol:low` · Mecánico: Flash
-  - `slow:high` · Pensar: Pro
-  - `advisor:high` · Revisar: Pro
+- **auto, que Pi no tiene:** Tu petición (antes del turno) → judge (estima la dificultad · otra llamada) → Esfuerzo (elegido para el turno)
+- **Con auto activo:** ultrathink — Escrito en tu mensaje, ese turno sube al tope del modelo.
 
 ### 5 · Presets y nivel de servicio
 
 <p><button type="button" class="ir-a" data-t="600">▶ Ir a 10:00</button></p>
 
 - *En la demo:* /modelpreset save · list
-- **Ojo**
-  - `save` · Configuración del perfil
-  - `switch` · Reescribe los roles: y cambia el modelo activo
-- **Dos presets**
-  - `día a día` · El rápido hace casi todo
-  - `profundo` · Modelos capaces: diseño, depuración
 - *En la demo:* /fast status · /slow status
 - *En la demo:* Tarifa valle: flecha ↓
 
@@ -107,18 +69,11 @@ asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advi
 
 - **Prewalk:** Explora (el activo) → Todo (lista de tareas) → 1.ª edición (traspaso) → smol (ejecuta)
 - *En la demo:* /switch @slow · /prewalk
-- **Requisitos**
-  - `smol ≠ activo` · Otro modelo o esfuerzo
-  - `clave` · Credenciales: si no, se niega
 - *En la demo:* El plan de Pro para el traspaso
 - *En la demo:* Todo · 5 tareas
 - *En la demo:* Prewalk: switched to deepseek-flash
 - *En la demo:* Flash comprueba
 - *En la demo:* Flash termina
-- **El disparador**
-  - `todo` · Abre la puerta
-  - `edit · write` · Dispara: leer o buscar no
-  - `restart` · Un solo uso: /prewalk restart
 - **Riesgo:** Un plan malo se ejecuta con disciplina — Lee la lista de tareas antes de dejarle seguir.
 
 ### 7 · /advisor: un segundo modelo que revisa
@@ -129,45 +84,26 @@ asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advi
 - *En terminal:* ~/.omp/profiles/demo/agent/WATCHDOG.md (más abajo, en «Código y comandos»)
 - *En la demo:* /advisor status
 - *En la demo:* /advisor on · status
-- **Qué ve**
-  - `lo nuevo` · Desde la última revisión
-  - `secretos` · Ofuscados
-  - `compactar` · Se reinicia: vídeo 13
 - *En la demo:* Flash trabaja con el advisor encendido
 - *En la demo:* Revisó y no encontró nada
 - *En la demo:* Flash avisa; el advisor calla
-- **Cuando habla**
-  - `nit` · Sugerencia menor: sin interrumpir
-  - `concern` · Riesgo serio: puede interrumpir
-  - `blocker` · Parar
+- **El advisor no garantiza notas:** Pensado para no hacer ruido — Un filtro descarta las notas vacías y no repite lo ya dicho.
 - *En la demo:* Un gasto aparte
-- **Ajustes**
-  - `reviewMode` · Cada turno o al final
-  - `WATCHDOG.yml` · Varios revisores: /advisor configure
-  - `-p --advisor` · Una ejecución: vídeo 21
 - **Límites:** No es una frontera de seguridad — Una segunda opinión, no la verdad. Con permisos extra, actúa como tú.
 
 ### 8 · Lo que cuesta, los fallos y /usage
 
 <p><button type="button" class="ir-a" data-t="1166">▶ Ir a 19:26</button></p>
 
-- **Qué gasta cada pieza**
-  - `cambio` · Paga la caché: switch · Ctrl+P · prewalk
-  - `effort` · Tokens de razonamiento
-  - `advisor` · Otra conversación: en cada turno
-  - `fondo` · tiny · judge: llamadas que no ves
 - *En la demo:* Sesión + advisor en el pie
 - *En la demo:* Cadenas de reserva
-- **/usage · solo diapositiva:** Enseña cuentas — Ventanas de 5 h, semanales y créditos. /usage reset gasta un reinicio guardado.
 - *En terminal:* Uso de cuentas, fuera de la TUI (más abajo, en «Código y comandos»)
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1280">▶ Ir a 21:20</button></p>
 
-- **Repaso:** Roles (con esfuerzo) → /model (guarda) → /switch (sesión) → /effort (niveles) → Presets (y carriles)
-- **Repartir el trabajo:** /prewalk (plan → ejecución) → /advisor (revisor aparte) → /usage (diapositiva)
-- **Práctica:** Roles (smol y advisor) → Comprobar (/advisor status) → WATCHDOG.md (dos reglas) → /prewalk (y compara)
+- **/usage:** Enseña cuentas — Por eso se queda en la diapositiva.
 - **Próximo vídeo:** Planificar y dirigir — /plan, /goal, /loop, la cola y la lista de tareas.
 
 ## Código y comandos

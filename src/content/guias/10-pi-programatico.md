@@ -18,22 +18,8 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 
 <p><button type="button" class="ir-a" data-t="21">▶ Ir a 0:21</button></p>
 
-- **Ya lo asomamos**
-  - `04` · pi -p: una pregunta de una línea
-  - `07` · --mode json: medir el contexto con jq
-  - `08` · Permisos: bloquea sin interfaz
 - **Mismo agente:** Cambia cómo entra, cómo sale y cuánto vive — Mismas sesiones, recursos y herramientas en todos los modos.
-- **Cuatro modos**
-  - `tui` · Interactivo: el que conoces
-  - `-p` · Print: texto final y sale
-  - `json` · JSON: eventos, uno por línea
-  - `rpc` · RPC: se queda escuchando
 - **Y una quinta vía:** El SDK — Pi como librería dentro de tu programa de Node o de Bun.
-- **Cuál elegir**
-  - `print` · Respuesta final
-  - `json` · Qué pasó: herramientas y coste
-  - `rpc` · Conversar: y contestar diálogos
-  - `sdk` · TypeScript: acceso a todo
 
 ### 2 · Pi guion p en scripts
 
@@ -44,10 +30,6 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 - *En la demo:* git diff master | pi -p
 - *En la demo:* Solo herramientas de lectura
 - *En terminal:* Más formas de dar entrada a pi -p (más abajo, en «Código y comandos»)
-- **Tres opciones para scripts**
-  - `--tools` · Solo lectura: read, grep, find, ls
-  - `--no-session` · Sin rastro: no guarda sesión
-  - `--model` · Fijado: no depende de nadie
 - *En la demo:* Código de salida: 0
 - **Cuidado:** Cero = ha terminado de hablar — No que sea correcto, ni que haya podido hacer lo que pediste.
 
@@ -58,12 +40,6 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 - *En la demo:* --mode json
 - *En la demo:* jq sobre eventos.jsonl
 - *En la demo:* Los mismos eventos que las extensiones
-- **message_update y message_end**
-  - `update` · Solo el delta: para pintar en directo
-  - `end` · El definitivo: con uso y coste
-- **¿Cuándo ha terminado?**
-  - `agent_end` · No siempre: reintentos, compactación, cola
-  - `agent_settled` · El final: ya no hará nada más
 - **Leer JSONL desde código:** Corta solo por \n — readline también corta en U+2028 y U+2029. Y lee sin parar.
 - *En la demo:* stopReason: toolUse, stop
 
@@ -90,13 +66,7 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 - *En la demo:* secrets.DEEPSEEK_API_KEY
 - *En la demo:* Arranque limpio y solo lectura
 - *En la demo:* upload-artifact, if: always()
-- **Variables de ida y vuelta**
-  - `shellCommandPrefix` · export CI=1: antes de cada bash
-  - `AI_AGENT=pi` · Lo ve el proceso: que lanza Pi
-- **El apunte honesto**
-  - `lectura` · Solo leer: --tools de lectura
-  - `docker` · Contenedor: como en el vídeo 05
-  - `secretos` · Forks: revisa tu plataforma
+- **Un pull request es texto de otra persona:** Aprobar no es aislar — --no-approve no carga extensiones del proyecto, pero el texto puede darle instrucciones.
 
 ### 6 · RPC: Pi como proceso de larga vida
 
@@ -107,23 +77,10 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 - **La clave del protocolo:** El identificador — Las órdenes se atienden de forma asíncrona: empareja por id, no por orden.
 - *En terminal:* Una petición por RPC (más abajo, en «Código y comandos»)
 - *En la demo:* Eventos hasta agent_settled
-- **Órdenes RPC**
-  - `steer` · Encolar: steer y follow_up
-  - `abort` · Parar
-  - `set_model` · Cambiar: modelo, compact, fork
-  - `Ctrl+D` · Cerrar: cerrar stdin
-- **En RPC:** has UI = true — No hay terminal, pero hay un cliente que puede contestar.
 - *En terminal:* Diálogos de extensión por RPC (más abajo, en «Código y comandos»)
 - *En la demo:* aprobador.mjs
 - *En la demo:* node aprobador.mjs
 - *En la demo:* «n»
-- **La misma extensión**
-  - `tui` · Pregunta: en la interfaz
-  - `print` · Bloquea: en un script
-  - `rpc` · Pregunta: por cualquier cliente
-- **Dos avisos**
-  - `RpcClient` · No contesta diálogos: los atiendes tú
-  - `ctx.mode` · No todo viaja: componentes, temas…
 
 ### 7 · El SDK: Pi dentro de tu programa
 
@@ -133,14 +90,6 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 - *En la demo:* resumen.ts
 - *En la demo:* subscribe · prompt · dispose
 - *En la demo:* node resumen.ts ~/csn/tienda
-- **Sin opciones:** Como la línea de comandos — Extensiones, skills, AGENTS.md, ajustes, credenciales y modelo por defecto. Mira examples/sdk/.
-- **Tres diferencias**
-  - `builtin` · Sin integradas: codemode, MCP… las añades tú
-  - `hasUI` · Falso: permisos bloquea
-  - `AI_AGENT` · Sin marcar: no se ponen las variables
-- **¿SDK o RPC?**
-  - `SDK` · Node o Bun: acceso completo
-  - `RPC` · Otro lenguaje: proceso aparte
 
 ### 8 · Fuera del escritorio: tmux, Termux y Windows
 
@@ -148,29 +97,11 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 
 - **Fuera del escritorio:** tmux · Termux · Windows — La documentación de Pi dedica una guía a cada uno.
 - *En terminal:* ~/.tmux.conf (tmux 3.5 o posterior) (más abajo, en «Código y comandos»)
-- **Termux**
-  - `pkg` · Node y git: y Pi con npm
-  - `storage` · Almacenamiento: termux-setup-storage
-  - `AGENTS.md` · Cuéntaselo: en tu AGENTS.md global
-- **Windows**
-  - `Git Bash` · bash nativo: shellPath si usas otro
-  - `powershell` · Herramienta opcional: solo en Windows nativo
-  - `Ctrl+Q` · follow up: en Windows y WSL
 
 ### 9 · Cierre
 
 <p><button type="button" class="ir-a" data-t="1461">▶ Ir a 24:21</button></p>
 
-- **Repaso**
-  - `-p` · Print: respuesta final
-  - `json` · JSON: agent_settled
-  - `rpc` · RPC: ids y diálogos
-  - `sdk` · SDK: createAgentSession
-- **Tres ideas**
-  - `1` · Sin modelo: lo comprueba el script
-  - `2` · Los eventos: no el código de salida
-  - `3` · En CI: lectura, secreto, contenedor
-- **La práctica:** revisar.sh (tests + Pi en JSON) → Una rama rota (que falle un test) → Pide arreglarlo (y detecta el bloqueo)
 - **Bloque C:** De Pi a oh my pi — Un fork sobre Bun, núcleo en Rust y las baterías incluidas.
 
 ## Código y comandos
@@ -340,7 +271,7 @@ Y aquí está la lección del capítulo: para Pi, todo ha ido bien. El último s
 
 Llevar este script a integración continua es casi trivial, y por eso conviene hacerlo con cuidado. En la ventana de código tienes un workflow de GitHub Actions. No lo ejecutamos contra GitHub, pero se entiende paso a paso.
 
-Se dispara en cada pull request, con permisos de solo lectura sobre el repositorio y un tiempo máximo de diez minutos, para que un agente atascado no se quede gastando. Descarga el código con todo el historial, porque el script necesita la rama base para el diff. Prepara Node veintidós e instala Pi con npm, con guion guion ignore scripts y la versión fijada, uno punto cero punto cuatro. En integración continua no quieres que una versión nueva te cambie el comportamiento sin avisar.
+Se dispara en cada pull request, con permisos de solo lectura sobre el repositorio y un tiempo máximo de diez minutos, para que un agente atascado no se quede gastando. Descarga el código con todo el historial, porque el script necesita la rama base para el diff. Prepara Node veintidós e instala Pi con npm, con guion guion ignore scripts y la versión fijada. En integración continua no quieres que una versión nueva te cambie el comportamiento sin avisar.
 
 Después, dos pasos que parecen detalles y no lo son. El primero copia el script y la extensión de permisos desde la rama base, no desde el pull request. Lo que protege el pipeline no puede venir de la rama que se revisa, o cualquiera podría quitar la red en el mismo cambio. El segundo ejecuta los tests aparte, sin la clave en el entorno, porque los tests también son código de la rama.
 

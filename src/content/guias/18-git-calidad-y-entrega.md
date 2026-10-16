@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 18 · Git, calidad y entrega"
-description: "revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el código por revisión automática antes de entregarlo."
+description: "Revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el código por revisión automática antes de entregarlo."
 ruta: "pi-oh-my-pi"
 orden: 18
 duracion: "25 min"
@@ -8,7 +8,7 @@ video: "18-git-calidad-y-entrega.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/18-git-calidad-y-entrega.es.vtt"
 ---
 
-revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el código por revisión automática antes de entregarlo.
+Revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el código por revisión automática antes de entregarlo.
 
 <p class="guia__nota">Dura 25 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,17 +18,6 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Un cambio está terminado cuando…**
-  - `revisión` · Alguien lo ha revisado
-  - `staging` · Sabes qué entra
-  - `mensaje` · Cuenta lo que pasó
-- **De serie en oh my pi**
-  - `/review` · Revisión con método
-  - `/git` · Diff, staging, commit
-  - `omp commit` · Genera el mensaje
-  - `/wt` · Sesión a un worktree
-  - `Auto-QA` · omp grievances
-  - `/security` · Solo explicado
 - **La idea del vídeo:** Las herramientas proponen; tú decides — Y algunas hacen más de lo que su nombre sugiere.
 - **El montaje**
   - `V4 Pro` · Conversación
@@ -44,27 +33,16 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 <p><button type="button" class="ir-a" data-t="176">▶ Ir a 2:56</button></p>
 
-- **Dos barra review**
-  - `Pi · vídeo 06` · Template Markdown: lo sigue el modelo
-  - `oh my pi` · Comando TypeScript: incluido
 - *En la demo:* Review Mode
 - *En la demo:* 4: con gh y tu cuenta · 2: sin commitear
 - **El diff congelado:** Lee (el diff) → Lo congela (en el mensaje) → Tabla (de ficheros) → Sin ruido (locks, generado)
 - *En la demo:* task · 1 agente
 - *En la demo:* El encargo al reviewer
-- **Las reglas del reviewer**
-  - `impacto` · Demostrable
-  - `arreglo` · Concreto
-  - `intención` · No parece querido
-  - `parche` · Lo introduce él
 - *En la demo:* ReviewTiendaChanges · 38,2 s · $0.01
 - *En la demo:* Pro comprueba antes de contarlo
 - *En la demo:* Bloqueante: el umbral con IVA
 - *En la demo:* Menores · y pregunta
 - **Vídeo 16:** El reviewer tiene bash — «Solo lectura» es una instrucción, no un permiso. Con yolo nada lo para.
-- **Si vienes de Pi**
-  - `review.md` · Queda tapado: ponle otro nombre
-  - `incluido` · Más pesado: con forma y método
 
 ### 3 · Arreglar y mirar el diff con /git
 
@@ -90,10 +68,6 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 - *En la demo:* Presente → pasado
 - *En terminal:* Conventional commits (validado) (más abajo, en «Código y comandos»)
 - *En la demo:* Generated commit message
-- **Quién gana**
-  - `AGENTS.md` · tienda: … en español: lo ha leído
-  - `validador` · feat(…): added …: gana
-- **Trampa:** Dry run no es solo lectura — Con el índice vacío, prepara todos los cambios antes de generar.
 - *En terminal:* omp commit (sin --dry-run, diapositiva) (más abajo, en «Código y comandos»)
 
 ### 5 · El commit desde /git
@@ -118,10 +92,6 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 - *En la demo:* Stage all & commit
 - *En la demo:* En la carpeta original
 - **Cuidado:** worktree.cleanSource — Limpia el origen con reset --hard y clean. Déjalo apagado.
-- **/wt**
-  - `sí` · Seguir en otra rama: con el contexto
-  - `no` · Mientras responde: ni en vibe
-  - `/move` · Solo cambiar de carpeta: vídeo 12
 
 ### 7 · Auto-QA y omp grievances
 
@@ -129,62 +99,30 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 - **Auto-QA:** No revisa tu código — Es un buzón de quejas del modelo sobre las herramientas.
 - *En terminal:* Auto-QA (lo escribe el modelo) (más abajo, en «Código y comandos»)
-- **El consentimiento**
-  - `No` · Se apaga
-  - `Sí` · Local y envío: cada queja, sola
-- **Qué viaja**
-  - `queja` · Herramienta y texto
-  - `metadatos` · Modelo, versión, sistema: id de instalación
-  - `texto libre` · Rutas, comandos
+- **Texto libre:** La queja la escribe el modelo — Puede citar una ruta o un comando. En el perfil demo, denegado de antemano.
 - *En la demo:* config get dev.autoqa · dev.autoqaConsent
 - *En la demo:* omp grievances --help
 - *En la demo:* omp --profile demo grievances
-- **Para qué te sirve**
-  - `fallos` · ¿Lo notó el modelo?
-  - `privacidad` · Qué sale
-  - `apagar` · PI_AUTO_QA=0: o consentimiento denegado
 
 ### 8 · /security y los límites
 
 <p><button type="button" class="ir-a" data-t="1218">▶ Ir a 20:18</button></p>
 
-- **/security (activado):** plan (alcance) → scan (en segundo plano) → status (show) → SARIF (importar, exportar)
 - **Por qué no lo activamos**
   - `OAuth` · Exige cuenta: o Bedrock
   - `coste` · Mucho modelo
   - `cloud` · Codex Security: fuera de tu máquina
 - **Diseño:** Un plan inmutable — Lo revisado es exactamente lo que pediste. Como el diff congelado.
-- **Límites · 1**
-  - `dry run` · Puede preparar: con el índice vacío
-  - `espacio` · Mira el cursor
-- **Límites · 2**
-  - `omp commit` · Convencional en inglés
-  - `uso` · Como borrador
-- **Límites · 3: lo que publica**
-  - `--push` · Sube commits
-  - `PR · Auto-QA` · Con tu cuenta
-  - `el diff` · Al proveedor: redacción apagada
-- **Límites · 4 y 5**
-  - `x · Supr` · Borran trabajo: y cleanSource
-  - `bash` · Sin barrera: con yolo
+- **Límite 5 · el de siempre:** Solo lectura no es una barrera — El reviewer tiene bash y el modo yolo no pregunta.
 - *En la demo:* Revisión y arreglo: $0.01
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1380">▶ Ir a 23:00</button></p>
 
-- **/review**
-  - `congela` · El diff que elijas
-  - `reparte` · 1 a 16 reviewers
-  - `slow` · Hereda default
-- **Git**
-  - `/git` · Ver, preparar, commitear
-  - `omp commit` · Convencional: dry run puede preparar
-  - `/wt` · Rama y worktree: con copia
 - **Lo demás**
   - `Auto-QA` · Quejas sobre herramientas: con consentimiento
   - `/security` · Apagado: exige OAuth
-- **La práctica:** Cambio (mezclado) → /review → /git (prepara uno) → dry run (compara) → Commit (tu mensaje) → status (worktree list)
 - **Vídeo 19:** De instrucciones a límites — Aprobaciones, patrones de bash, TTSR, hooks y secretos.
 
 ## Código y comandos

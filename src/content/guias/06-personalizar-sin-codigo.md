@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 06 · Personalizar Pi sin código"
-description: "cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear plantillas de prompts y skills para que el agente trabaje a tu manera."
+description: "Cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear plantillas de prompts y skills para que el agente trabaje a tu manera."
 ruta: "pi-oh-my-pi"
 orden: 6
 duracion: "21 min"
@@ -8,7 +8,7 @@ video: "06-personalizar-sin-codigo.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/06-personalizar-sin-codigo.es.vtt"
 ---
 
-cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear plantillas de prompts y skills para que el agente trabaje a tu manera.
+Cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear plantillas de prompts y skills para que el agente trabaje a tu manera.
 
 <p class="guia__nota">Dura 21 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -19,27 +19,13 @@ cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
 - **Personalizar sin código:** Mínimo, pero no rígido — Qué sabe del proyecto, cómo se comporta, qué repites y qué carga cuando hace falta.
-- **Las piezas**
-  - `AGENTS.md` · Contexto: describe el proyecto
-  - `SYSTEM` · System prompt: instrucciones de base
-  - `/review` · Templates: prompts como comandos
-  - `SKILL.md` · Skills: se cargan si hacen falta
-  - `settings` · Entorno: ajustes, atajos, temas
 - *En terminal:* Dónde viven las piezas (más abajo, en «Código y comandos»)
-- **La confianza, otra vez**
-  - `.pi/` · Requiere confianza: ajustes, prompts, skills, temas…
-  - `AGENTS.md` · Se carga siempre: los ficheros de contexto son la excepción
 - **Antes de empezar:** Personalizar no es acumular — Cada pieza entra de una forma u otra en el contexto, y el contexto cuesta dinero y atención.
 
 ### 2 · Un AGENTS punto md que funcione
 
 <p><button type="button" class="ir-a" data-t="114">▶ Ir a 1:54</button></p>
 
-- **Dónde busca Pi los ficheros de contexto**
-  - `agent dir` · Tuyo: en todos tus proyectos
-  - `.` · Carpeta de trabajo: y todas las superiores
-  - `override` · AGENTS.override.md: sustituye al de su carpeta
-- **Se cargan todos:** ~/.pi/agent (AGENTS.md personal) → repo/ (AGENTS.md general) → repo/api/ (AGENTS.md de la API)
 - **La prueba de la sesión nueva (Learn Harness Engineering)**
   - `1` · Qué es: el proyecto
   - `2` · Organización: el mapa
@@ -51,11 +37,6 @@ cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
   - `50–200` · Líneas: el fichero de entrada
   - `≤ 15` · Reglas duras: pocas y claras
   - `→ docs/` · Enlaces: el detalle, fuera
-- **Cada regla, con tres datos**
-  - `origen` · De dónde sale: el incidente o la decisión
-  - `ámbito` · Cuándo aplica: en qué tareas o carpetas
-  - `caduca` · Cuándo caduca: para poder borrarla
-- **Lost in the Middle (Liu et al., 2023):** Lo importante, arriba — Los modelos aprovechan peor lo que queda en medio de un contexto largo.
 - **Lo que sobra**
   - `README` · Copiado entero: el agente puede leerlo
   - `estilo` · Lo que ya mira el linter: mejor ejecutarlo
@@ -63,11 +44,6 @@ cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
   - `+1` · Una regla por fallo: sin pensar si es general
 - *En la demo:* El AGENTS.md de la tienda (adaptado de WalkingLab, MIT)
 - *En la demo:* «Hecho significa…»
-- **Rutina de salida (plantilla de WalkingLab)**
-  - `progreso` · Actualizar: el fichero de progreso
-  - `riesgos` · Anotar: riesgos y bloqueos
-  - `commit` · Commit: en un estado seguro
-  - `limpio` · Repo listo: para la siguiente sesión
 - *En terminal:* La sesión de la tarea: llamadas a herramientas (más abajo, en «Código y comandos»)
 - *En la demo:* Responde con la definición de hecho
 - *En la demo:* tienda: añade contarUnidades al carrito
@@ -81,20 +57,9 @@ cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
 <p><button type="button" class="ir-a" data-t="452">▶ Ir a 7:32</button></p>
 
 - **El system prompt:** SYSTEM.md y APPEND_SYSTEM.md — Cambiar cómo se comporta Pi en todos tus proyectos.
-- **Sustituir o añadir**
-  - `SYSTEM.md` · Sustituye: tú explicas también cómo usar las herramientas
-  - `APPEND_SYSTEM.md` · Añade al final: sin quitar nada: casi siempre, este
-- **Qué lleva cada petición:** Base de Pi (o tu SYSTEM.md) → + APPEND (tus instrucciones) → + contexto (AGENTS.md…) → + tools (y descripciones de skills)
-- **Dónde viven**
-  - `agent dir` · Personal: en todos tus proyectos
-  - `.pi/` · Del proyecto: gana si hay confianza
-  - `≠` · No se combinan: o uno u otro
 - **¿Cuándo SYSTEM.md?:** Para algo muy distinto de programar — Escritura, análisis de datos o experimentos con prompts. En un proyecto de software, casi nunca.
 - *En terminal:* ~/.pi/agent/APPEND_SYSTEM.md (demo) (más abajo, en «Código y comandos»)
 - *En la demo:* APPEND_SYSTEM.md: «Verificado: …»
-- **Qué va en cada sitio**
-  - `AGENTS.md` · Lo del proyecto: mapa, pruebas, reglas
-  - `APPEND_SYSTEM.md` · Lo tuyo: idioma, tono, forma de cerrar
 
 ### 4 · Prompt templates
 
@@ -112,11 +77,6 @@ cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
   - `texto` · Solo texto: no ejecuta ni añade herramientas
   - `/reload` · Recarga: en una sesión abierta
   - `.pi/prompts` · Del proyecto: con confianza
-- **Templates que suelen rendir**
-  - `/commit` · Mensaje: desde el diff
-  - `/explica` · Onboarding: un fichero a quien llega
-  - `/plan` · Planificar: sin tocar código
-  - `/pr` · Pull request: la descripción
 
 ### 5 · Skills
 
@@ -126,32 +86,17 @@ cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
 - **Carga progresiva:** Arranque (nombre + descripción) → Tarea (encaja con la descripción) → read (SKILL.md completo) → Sigue (las instrucciones)
 - *En terminal:* ~/.pi/agent/skills/notas-de-version/SKILL.md (más abajo, en «Código y comandos»)
 - *En terminal:* ~/.pi/agent/skills/notas-de-version/SKILL.md (más abajo, en «Código y comandos»)
-- **Reglas de forma (Agent Skills)**
-  - `a-z 0-9 -` · Nombre: ≤ 64 caracteres, sin guiones dobles
-  - `≤ 1024` · Descripción: caracteres
-  - `✕` · Sin descripción: no se carga
 - *En la demo:* pi --skill …/notas-de-version
 - *En terminal:* La sesión de las notas: llamadas a herramientas (más abajo, en «Código y comandos»)
 - *En la demo:* Notas de versión con el formato de la skill
 - *En la demo:* /skill:notas-de-version
 - **Skills con ficheros:** Instrucciones y scripts juntos — Rutas relativas a la carpeta de la skill; Pi le dice al modelo dónde está.
-- **Dónde se ponen**
-  - `skills/` · Pi: agent dir o .pi del proyecto
-  - `.agents/skills` · Agent Skills: personal o del proyecto
-  - `!` · Revísalas: pueden ejecutar scripts
-- **¿Skill o AGENTS.md?**
-  - `AGENTS.md` · Casi siempre: se carga en cada petición
-  - `skill` · De vez en cuando: una línea hasta que se usa
 
 ### 6 · Ajustes, atajos y temas
 
 <p><button type="button" class="ir-a" data-t="1010">▶ Ir a 16:50</button></p>
 
 - *En la demo:* /settings
-- **settings.json**
-  - `agent dir` · Usuario: por defecto
-  - `.pi/` · Proyecto: manda sobre el del usuario
-  - `[ … ]` · Listas: los recursos se combinan
 - *En terminal:* settings.json: algunos ajustes útiles (más abajo, en «Código y comandos»)
 - *En la demo:* Theme: system, automatic, dark, light
 - *En terminal:* ~/.pi/agent/keybindings.json (más abajo, en «Código y comandos»)
@@ -161,21 +106,8 @@ cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
 
 <p><button type="button" class="ir-a" data-t="1140">▶ Ir a 19:00</button></p>
 
-- **Qué pieza para cada cosa**
-  - `AGENTS.md` · Proyecto, siempre: mapa, pruebas, hecho
-  - `APPEND` · Tuyo, siempre: preferencias personales
-  - `SYSTEM` · Reescribir la base: rara vez
-- **Qué pieza para cada cosa**
-  - `/template` · Prompt que repites: texto con argumentos
-  - `skill` · Procedimiento: solo cuando hace falta
-  - `extensión` · Comportamiento nuevo: vídeos 08 y 09
-- **Mide lo que añades:** El contexto desde el primer mensaje — El pie enseña el porcentaje ocupado; /session, los tokens de la sesión.
 - **Compartir:** pi install — Un paquete de Pi puede llevar templates, skills, temas y extensiones (vídeo 09).
-- **Desde este vídeo**
-  - `AGENTS.md` · En la tienda: saldrá en todas las demos
-  - `✕` · Lo demás, retirado: template, skill y atajos
-- **Práctica:** Sesión nueva (las cinco preguntas) → AGENTS.md (< 100 líneas) → Tarea de prueba (¿cambia algo?) → Template y skill (lo que repites)
-- **Próximo vídeo:** MCP y codemode — Lo nuevo de Pi 1.0.
+- **Próximo vídeo:** MCP y codemode — Lo nuevo de Pi. Nos vemos allí.
 
 ## Código y comandos
 
@@ -450,7 +382,7 @@ Dónde se ponen: en la carpeta skills del directorio del agente o del proyecto, 
 
 **6 · Ajustes, atajos y temas**
 
-La última capa es la del entorno de trabajo. Barra settings abre el panel de ajustes, con treinta y dos opciones en esta versión: compactación automática, bloqueo de imágenes, comandos de skills, márgenes, el número de sugerencias del autocompletado y más. Se puede buscar escribiendo, y cada cambio se guarda en settings punto json.
+La última capa es la del entorno de trabajo. Barra settings abre el panel de ajustes, con treinta y dos opciones: compactación automática, bloqueo de imágenes, comandos de skills, márgenes, el número de sugerencias del autocompletado y más. Se puede buscar escribiendo, y cada cambio se guarda en settings punto json.
 
 Ese fichero existe en el directorio del agente y en la carpeta punto pi del proyecto. Los ajustes del proyecto mandan sobre los del usuario, y las listas de recursos, como extensiones, skills, prompts y temas, se combinan. Algunos ajustes, como default project trust o cache warming, solo se pueden poner en el del usuario.
 
@@ -476,7 +408,7 @@ Antes de cerrar, un aviso sobre la demo. A partir de este vídeo, nuestra tienda
 
 La práctica: haz la prueba de la sesión nueva con un proyecto tuyo y escribe un AGENTS punto md de menos de cien líneas con la rutina de entrada, el mapa, pocas reglas y la definición de hecho. Ponlo a prueba con una tarea pequeña. Después crea un template para el prompt que más repites, y una skill para un procedimiento que haces de vez en cuando.
 
-En el próximo vídeo, lo nuevo de la uno punto cero: MCP y codemode. Nos vemos allí.
+En el próximo vídeo, MCP y codemode. Nos vemos allí.
 
 </details>
 

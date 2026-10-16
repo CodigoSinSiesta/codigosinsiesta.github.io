@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 02 · Instalar Pi y primera tarea"
-description: "instalación, inicio de sesión y elección de modelo. Primera tarea real: referenciar ficheros, ejecutar comandos, corregir el rumbo a mitad de trabajo y leer el pie (contexto, caché y coste)."
+description: "Instalación, inicio de sesión y elección de modelo. Primera tarea real: referenciar ficheros, ejecutar comandos, corregir el rumbo a mitad de trabajo y leer el pie (contexto, caché y coste)."
 ruta: "pi-oh-my-pi"
 orden: 2
 duracion: "23 min"
@@ -8,7 +8,7 @@ video: "02-instalar-pi-primera-tarea.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/02-instalar-pi-primera-tarea.es.vtt"
 ---
 
-instalación, inicio de sesión y elección de modelo. Primera tarea real: referenciar ficheros, ejecutar comandos, corregir el rumbo a mitad de trabajo y leer el pie (contexto, caché y coste).
+Instalación, inicio de sesión y elección de modelo. Primera tarea real: referenciar ficheros, ejecutar comandos, corregir el rumbo a mitad de trabajo y leer el pie (contexto, caché y coste).
 
 <p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,16 +18,8 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
-- **Bloque B · Pi 1.0.1:** De la teoría a la terminal — Empezamos por Pi: el más pequeño, el más fácil de seguir.
+- **Bloque B · Pi:** De la teoría a la terminal — Empezamos por Pi: el más pequeño, el más fácil de seguir.
 - **El plan de hoy:** Instalar (y comprobar) → Modelo (proveedor y selector) → Tarea (en un repo de juguete) → Dirigir (mientras trabaja) → Retomar (la sesión)
-- **Lo que necesitas**
-  - `01` · Una terminal: macOS, Linux, Windows o WSL
-  - `02` · Node.js ≥ 22.19: el instalador lo pone si falta
-  - `03` · Un modelo: suscripción, clave o local
-- **Tres formas de llegar a un modelo**
-  - `/login` · Suscripción: ChatGPT, Claude, Copilot
-  - `KEY` · Clave de API: OpenRouter, Anthropic, OpenAI, Google
-  - `local` · Modelo local: Ollama o llama.cpp, sin cuenta
 - **El modelo de las demos:** Qwen 3.8 27B gratuito, vía OpenRouter — Un modelo modesto deja ver mejor lo que aporta el harness.
 - **Para grabar (y para experimentar):** Configuración aparte, repositorio de juguete — Ni claves, ni sesiones, ni skills personales en pantalla.
 
@@ -37,8 +29,8 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 - *En terminal:* Instalador oficial (más abajo, en «Código y comandos»)
 - *En terminal:* Con npm (más abajo, en «Código y comandos»)
-- *En terminal:* Con Nix (nuevo en 1.0.1) (más abajo, en «Código y comandos»)
-- *En la demo:* pi --version: 1.0.1
+- *En terminal:* Con Nix (más abajo, en «Código y comandos»)
+- *En la demo:* pi --version: si responde, está instalado
 - *En la demo:* pi --help: cuatro herramientas y los subcomandos
 - *En la demo:* Tres opciones para hoy
 - *En terminal:* ~/.pi/agent · el directorio del agente (más abajo, en «Código y comandos»)
@@ -60,10 +52,6 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 - *En la demo:* El menú «/»: la referencia exacta de tu instalación
 - *En la demo:* /model: filtrar, elegir y guardar
 - *En la demo:* Modelo y nivel de razonamiento
-- **Atajos de modelo**
-  - `Ctrl+P` · Rotar: entre tus modelos favoritos
-  - `Ctrl+L` · Selector: abre /model directamente
-  - `⇧Tab` · Razonamiento: rota el nivel de thinking
 
 ### 4 · La primera tarea
 
@@ -74,17 +62,8 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 - *En la demo:* El razonamiento visible del modelo, en inglés
 - *En la demo:* Primera herramienta: read
 - *En la demo:* Segunda herramienta: bash para explorar
-- **Plegar y desplegar**
-  - `Ctrl+O` · Salidas de herramientas: lo que ve el modelo, completo
-  - `Ctrl+T` · Razonamiento: los bloques del modelo
 - *En la demo:* Detecta un posible redondeo y no se pierde en él
 - *En la demo:* La respuesta, en español
-- **El turno, pieza a pieza**
-  - `01` · Instrucciones: prompt de Pi + @
-  - `02` · Herramientas: 2 read + 1 bash
-  - `03` · Entorno: tu máquina
-  - `04` · Estado: la sesión
-  - `05` · Feedback: aún no hacía falta
 
 ### 5 · Tú también tienes terminal
 
@@ -104,25 +83,14 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 - *En terminal:* La tarea, con feedback incluido (más abajo, en «Código y comandos»)
 - **Steering · Enter mientras trabaja:** Escribes (la corrección) → Enter (queda en espera) → Fin del turno (el modelo la lee)
-- **Lo que pasó de verdad:** El modelo fue más rápido que nosotros — En seis segundos: dos ficheros, pruebas y «5 pass». El cambio entró como mensaje normal.
 - *En la demo:* El diff: de 50 a 40 €
 - *En terminal:* Steering de verdad, a mitad de turno (más abajo, en «Código y comandos»)
 - *En la demo:* Un 429 del proveedor gratuito
 - **También es harness:** Los reintentos los decide Pi, no el modelo — Cuántos y con qué espera: ajustes retry.*
-- **Steering frente a follow-up**
-  - `Enter` · Steering: cambia lo que está haciendo
-  - `Alt+Enter` · Follow-up: trabajo para cuando acabe
 - *En la demo:* Follow-up en cola: se entregará al terminar
 - *En la demo:* Decisión de diseño explicada · 7/7
 - *En la demo:* Y después, el follow-up: la línea del README
-- **La cola**
-  - `Alt+↑` · Recuperar: los mensajes vuelven al editor
-  - `⚙` · Entrega: de uno en uno, o todos juntos
 - *En la demo:* Escape: para en el acto
-- **Tres gestos para dirigir**
-  - `Enter` · Corrige: al acabar el turno
-  - `Alt+Enter` · Encola: para cuando termine todo
-  - `Esc` · Para: y devuelve la cola
 
 ### 7 · Leer el pie y retomar la sesión
 
@@ -131,10 +99,6 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 - *En la demo:* El pie, después de las tareas
 - *En terminal:* El pie de Pi (más abajo, en «Código y comandos»)
 - **CH · acierto de caché:** 95 % ya estaba cacheado: más barato y más rápido — Cambiar el prompt de sistema o las herramientas puede invalidar la caché.
-- **Uso de contexto**
-  - `2,6 %` · De 262k: la ventana del modelo
-  - `70 / 90` · Amarillo y rojo: avisos de llenado
-  - `auto` · Compactación: resume lo antiguo al acercarse al límite
 - **El coste:** Con un modelo de pago, el pie suma lo gastado — Con el gratuito no aparece: es cero.
 - *En la demo:* /session: el detalle de la sesión
 - **La sesión es un fichero JSONL:** Una línea (una entrada) → id y parentId (forman un árbol) → Vídeo 03 (tree, fork y clone)
@@ -145,7 +109,6 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
   - `2` · Configurar: agent dir · /login · /model
   - `3` · Pedir: @ ficheros · ! y !!
   - `4` · Dirigir: Enter · Alt+Enter · Esc
-- **Práctica:** Repo pequeño (una función y sus pruebas) → Una mejora (con verificación) → Steering y follow-up (mientras trabaja) → pi -c (y /session)
 - **Próximo vídeo:** Pi por dentro — Cómo monta cada petición y por qué la sesión es un árbol.
 
 ## Código y comandos
@@ -169,13 +132,13 @@ pi update
 
 ```text
 npm install -g --ignore-scripts @earendil-works/pi-coding-agent
-# desde 1.0.1 ya no se publica npm-shrinkwrap.json
+# ya no se publica npm-shrinkwrap.json
 ```
 
 - `--ignore-scripts`: Ninguna dependencia ejecuta código
 - `npm-shrinkwrap`: Dependencias sin fijar
 
-### Con Nix (nuevo en 1.0.1)
+### Con Nix
 
 ```text
 nix profile add github:earendil-works/pi/stable
@@ -309,11 +272,11 @@ Una última recomendación antes de empezar. Para grabar este curso usamos un di
 
 Pi se puede instalar de cuatro formas. La recomendada en macOS y Linux es el instalador oficial: una línea con curl que descarga un script de pi punto dev y lo ejecuta. En Windows hay una línea equivalente para PowerShell. El instalador fija todas las dependencias, y después Pi se actualiza solo con pi update.
 
-La segunda forma es npm: npm install, guion g, el paquete arroba earendil guion works barra pi guion coding guion agent. La documentación recomienda añadir la opción ignore scripts, para que ninguna dependencia ejecute código durante la instalación. Hay un matiz importante desde la versión uno punto cero punto uno: por npm ya no se fijan las dependencias transitivas, así que el instalador oficial es más reproducible.
+La segunda forma es npm: npm install, guion g, el paquete arroba earendil guion works barra pi guion coding guion agent. La documentación recomienda añadir la opción ignore scripts, para que ninguna dependencia ejecute código durante la instalación. Hay un matiz importante: por npm ya no se fijan las dependencias transitivas, así que el instalador oficial es más reproducible.
 
-La tercera forma es Nix, que llegó con la versión uno punto cero punto uno: nix profile add, y el repositorio de Earendil en su rama estable. Con Nix se actualiza con nix profile upgrade, no con pi update, y puedes fijar una versión concreta o ejecutarlo sin instalar con nix run. Y la cuarta es Android, a través de Termux, que tiene su propia guía.
+La tercera forma es Nix: nix profile add, y el repositorio de Earendil en su rama estable. Con Nix se actualiza con nix profile upgrade, no con pi update, y puedes fijar una versión concreta o ejecutarlo sin instalar con nix run. Y la cuarta es Android, a través de Termux, que tiene su propia guía.
 
-En nuestro equipo Pi ya estaba instalado por npm, así que no vamos a ejecutar el instalador delante de la cámara. Lo que sí hacemos siempre después de instalar es comprobarlo. Pi guion guion version responde uno punto cero punto uno. Si ves ese número, la instalación está bien.
+En nuestro equipo Pi ya estaba instalado por npm, así que no vamos a ejecutar el instalador delante de la cámara. Lo que sí hacemos siempre después de instalar es comprobarlo. Pi guion guion version responde con su número de versión. Si lo ves, la instalación está bien.
 
 El segundo comando que merece la pena ejecutar es pi guion guion help. La primera línea ya resume la filosofía: un asistente de programación con cuatro herramientas, read, bash, edit y write. Debajo están los subcomandos, para instalar extensiones, actualizar, gestionar credenciales o servidores MCP, y después las opciones de arranque.
 

@@ -1,0 +1,1902 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.602 --> 00:00:14.113
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.153 --> 00:00:16.890
+Vídeo veintidós: diseñar tu harness.
+
+3
+00:00:22.744 --> 00:00:25.430
+Hasta aquí has aprendido
+a usar dos harnesses.
+
+4
+00:00:25.470 --> 00:00:30.284
+En el bloque de Pi, un núcleo pequeño
+que moldeas con ficheros y extensiones.
+
+5
+00:00:30.324 --> 00:00:35.030
+En el de oh my pi, un taller completo
+con aprobaciones, subagentes,
+
+6
+00:00:35.070 --> 00:00:39.390
+reglas y métricas. Con este
+vídeo empieza el último bloque,
+
+7
+00:00:39.430 --> 00:00:43.880
+y cambia la pregunta. Ya no es qué hace
+este comando, sino qué decides tú y por
+
+8
+00:00:43.920 --> 00:00:44.820
+qué.
+
+9
+00:00:45.383 --> 00:00:49.231
+Recuerda el vídeo uno. La palabra
+harness tiene dos sentidos:
+
+10
+00:00:49.271 --> 00:00:54.520
+el programa que ejecuta el bucle, como Pi
+u oh my pi, y el andamiaje que pones en tu
+
+11
+00:00:54.560 --> 00:00:58.140
+repositorio. Y usamos cinco
+piezas para describir los dos:
+
+12
+00:00:58.180 --> 00:01:02.951
+instrucciones, herramientas,
+entorno, estado y feedback.
+
+13
+00:01:02.991 --> 00:01:06.040
+No vamos a repetirlo. Vamos
+a usarlo para decidir.
+
+14
+00:01:06.862 --> 00:01:11.550
+Hoy empezamos por los mapas: dos formas de
+pensar un harness que vienen de sitios muy
+
+15
+00:01:11.590 --> 00:01:15.420
+distintos. Lo que veas te
+sirve con cualquier agente.
+
+16
+00:01:15.460 --> 00:01:19.727
+Después tomaremos tres decisiones
+concretas que salen de esos mapas.
+
+17
+00:01:19.767 --> 00:01:21.593
+Cuántas herramientas ve el modelo.
+
+18
+00:01:21.633 --> 00:01:25.380
+Dónde viven los límites, como el
+truncado de la salida, los tiempos o las
+
+19
+00:01:25.420 --> 00:01:30.190
+aprobaciones. Y quién decide y quién
+ejecuta, que es la separación entre el
+
+20
+00:01:30.230 --> 00:01:34.840
+anfitrión y el sandbox. La primera la
+vamos a medir, porque un diseño que no se
+
+21
+00:01:34.880 --> 00:01:36.760
+mide es solo una opinión.
+
+22
+00:01:42.209 --> 00:01:45.540
+Buena parte de este bloque se
+apoya en Learn Harness Engineering,
+
+23
+00:01:45.580 --> 00:01:49.830
+el curso abierto de WalkingLab, con
+copyright de dos mil veinticinco y
+
+24
+00:01:49.870 --> 00:01:54.412
+licencia MIT. Reutilizamos sus ideas y
+su estructura, con nuestras palabras,
+
+25
+00:01:54.452 --> 00:01:56.230
+y lo citamos en los créditos.
+
+26
+00:01:56.678 --> 00:02:01.430
+Lo curioso es que el propio curso
+no trae una taxonomía, sino tres,
+
+27
+00:02:01.470 --> 00:02:03.940
+y cada una responde a
+una pregunta distinta.
+
+28
+00:02:04.564 --> 00:02:08.700
+La primera ya la conoces:
+instrucciones, herramientas, entorno,
+
+29
+00:02:08.740 --> 00:02:12.770
+estado y feedback. Es la que usa
+para analizar productos reales,
+
+30
+00:02:12.810 --> 00:02:15.325
+como Pi, Claude Code o Codex.
+
+31
+00:02:15.365 --> 00:02:18.610
+Sirve para describir qué trae
+un agente y qué pones tú.
+
+32
+00:02:18.650 --> 00:02:21.220
+Es un mapa del runtime y de su entorno.
+
+33
+00:02:21.895 --> 00:02:25.560
+La segunda está en la portada del
+curso, y es otra lista de cinco:
+
+34
+00:02:25.600 --> 00:02:31.940
+instrucciones, estado, verificación,
+alcance y ciclo de vida de la sesión.
+
+35
+00:02:32.037 --> 00:02:35.116
+Fíjate en lo que falta:
+herramientas y entorno.
+
+36
+00:02:35.156 --> 00:02:39.530
+Es un mapa del repositorio. Cada
+pieza es un fichero o una costumbre:
+
+37
+00:02:39.570 --> 00:02:44.021
+el AGENTS punto md, el fichero de
+progreso, la batería de pruebas,
+
+38
+00:02:44.061 --> 00:02:48.160
+una sola funcionalidad cada vez, un script
+de arranque y una nota de traspaso al
+
+39
+00:02:48.200 --> 00:02:51.060
+terminar. Ese mapa es
+el del próximo vídeo.
+
+40
+00:02:51.844 --> 00:02:55.640
+La tercera es una herramienta de
+diagnóstico, de la primera lección:
+
+41
+00:02:55.680 --> 00:02:57.973
+cinco capas donde puede estar el fallo.
+
+42
+00:02:58.013 --> 00:03:03.550
+La especificación de la tarea, el
+contexto, el entorno, la verificación y el
+
+43
+00:03:03.885 --> 00:03:08.140
+estado. Es lo que hicimos en el vídeo
+uno al preguntar qué pieza había fallado.
+
+44
+00:03:08.180 --> 00:03:11.487
+Antes de cambiar de modelo,
+atribuye el fallo a una capa.
+
+45
+00:03:11.527 --> 00:03:13.600
+Hoy la usaremos con un
+resultado de la demo.
+
+46
+00:03:14.505 --> 00:03:17.693
+¿Por qué tres? Porque responden
+a preguntas distintas.
+
+47
+00:03:17.733 --> 00:03:20.445
+Qué tiene mi agente. Qué
+tiene mi repositorio.
+
+48
+00:03:20.485 --> 00:03:22.784
+Dónde se ha roto. No compiten.
+
+49
+00:03:22.824 --> 00:03:25.274
+Pero todas están escritas
+desde el mismo asiento:
+
+50
+00:03:25.314 --> 00:03:29.433
+el de alguien que usa un agente que
+ya existe y quiere que trabaje mejor.
+
+51
+00:03:29.473 --> 00:03:32.420
+Hay otro asiento, y desde él
+las cosas se ven distintas.
+
+52
+00:03:37.913 --> 00:03:40.800
+Ese otro asiento es el de
+quien construye el runtime.
+
+53
+00:03:40.840 --> 00:03:44.142
+El texto más claro escrito desde
+ahí es The Harness Playbook,
+
+54
+00:03:44.182 --> 00:03:47.340
+publicado en septiembre de dos
+mil veintiséis por Can Bölük,
+
+55
+00:03:47.380 --> 00:03:52.280
+el autor de oh my pi. Su empresa, Stencil,
+es la que está detrás de oh my pi.
+
+56
+00:03:52.320 --> 00:03:54.867
+Tenlo en cuenta al leerlo: es
+un punto de vista influyente,
+
+57
+00:03:54.907 --> 00:03:57.320
+con opinión, no una metodología neutral.
+
+58
+00:03:58.254 --> 00:04:01.960
+Su tesis cabe en una frase: un
+harness es software de sistemas,
+
+59
+00:04:02.000 --> 00:04:04.346
+no un bucle alrededor de una petición.
+
+60
+00:04:04.386 --> 00:04:07.560
+Y su analogía central es
+un motor de videojuego.
+
+61
+00:04:07.600 --> 00:04:11.170
+Un motor mantiene un mundo con
+autoridad, registra cada cambio,
+
+62
+00:04:11.210 --> 00:04:15.280
+ejecuta acciones de código que no es
+de fiar, replica el estado en varias
+
+63
+00:04:15.320 --> 00:04:17.940
+pantallas y adapta
+protocolos incompatibles.
+
+64
+00:04:17.980 --> 00:04:20.940
+Según el autor, un harness
+hace exactamente eso.
+
+65
+00:04:21.755 --> 00:04:25.734
+Para diseñar, propone pensar
+en cuatro escenarios extremos.
+
+66
+00:04:25.774 --> 00:04:28.662
+Varios agentes trabajando
+en la misma carpeta.
+
+67
+00:04:28.702 --> 00:04:31.668
+Un agente remoto que
+manejas desde el móvil.
+
+68
+00:04:31.708 --> 00:04:34.979
+Un espectador que mira desde
+una web en la que no confías.
+
+69
+00:04:35.019 --> 00:04:38.510
+Y una fábrica de software automática,
+alimentada por un programa,
+
+70
+00:04:38.550 --> 00:04:43.760
+con entradas hostiles. Si el diseño
+aguanta esos cuatro, aguanta tu día a día.
+
+71
+00:04:44.409 --> 00:04:46.790
+De ahí salen sus cinco principios.
+
+72
+00:04:46.830 --> 00:04:50.800
+Una sola sesión con autoridad, derivada
+del registro, para que rebobinar,
+
+73
+00:04:50.840 --> 00:04:53.140
+bifurcar y retomar no mientan.
+
+74
+00:04:53.313 --> 00:04:57.850
+Un plano de control de confianza: la
+política vive en el anfitrión y el sandbox
+
+75
+00:04:57.890 --> 00:05:00.542
+solo ejecuta peticiones acotadas.
+
+76
+00:05:00.582 --> 00:05:05.110
+Trabajo acotado: herramientas, subagentes
+y procesos en segundo plano son flujos
+
+77
+00:05:05.150 --> 00:05:07.110
+cancelables con límites
+
+78
+00:05:07.808 --> 00:05:10.563
+centrales. Compatibilidad
+explícita con cada modelo.
+
+79
+00:05:10.603 --> 00:05:13.240
+Y vistas que son proyecciones
+del mismo estado.
+
+80
+00:05:13.864 --> 00:05:15.772
+Dos avisos para leerlo bien.
+
+81
+00:05:15.812 --> 00:05:19.987
+El primero: buena parte del texto
+describe la próxima arquitectura,
+
+82
+00:05:20.027 --> 00:05:23.850
+que el autor llama omp al cuadrado
+y que aún se está construyendo.
+
+83
+00:05:23.890 --> 00:05:28.346
+No es la oh my pi que tienes instalada,
+y no la enseñamos como disponible.
+
+84
+00:05:28.386 --> 00:05:31.213
+El segundo: critica abiertamente a Pi.
+
+85
+00:05:31.253 --> 00:05:34.610
+Por ejemplo, dice que de diecisiete
+extensiones de ejemplo con estado,
+
+86
+00:05:34.650 --> 00:05:38.486
+solo dos lo guardaban bien, algo
+que vimos en el vídeo nueve.
+
+87
+00:05:38.526 --> 00:05:42.727
+Y la ficha de Pi de WalkingLab
+elogia justo esas extensiones.
+
+88
+00:05:42.767 --> 00:05:45.720
+Las dos lecturas son útiles;
+ninguna es la verdad.
+
+89
+00:05:46.883 --> 00:05:50.500
+Y aunque miren desde asientos distintos,
+los dos textos coinciden más de lo que
+
+90
+00:05:50.540 --> 00:05:54.900
+chocan. Los dos piden definir
+antes qué significa terminado,
+
+91
+00:05:54.940 --> 00:05:58.380
+porque sin eso el agente se inventa
+pruebas que no prueban nada.
+
+92
+00:05:58.420 --> 00:06:01.595
+Los dos tratan el contexto como
+un presupuesto que se gasta.
+
+93
+00:06:01.635 --> 00:06:04.488
+Y los dos quieren el estado
+fuera de la cabeza del modelo:
+
+94
+00:06:04.528 --> 00:06:07.730
+uno en el repositorio, el otro
+en el registro de la sesión.
+
+95
+00:06:08.665 --> 00:06:12.470
+Hoy nos quedamos con tres de sus ideas,
+porque son las que más afectan a lo que tú
+
+96
+00:06:12.510 --> 00:06:17.390
+configuras: un roster pequeño de
+herramientas, límites centralizados,
+
+97
+00:06:17.430 --> 00:06:20.858
+y el anfitrión que decide
+frente al sandbox que ejecuta.
+
+98
+00:06:20.898 --> 00:06:24.530
+Las otras, como el estado en el registro
+o la verificación definida de antemano,
+
+99
+00:06:24.570 --> 00:06:26.640
+vuelven en los próximos vídeos.
+
+100
+00:06:32.487 --> 00:06:34.552
+Empecemos por las herramientas.
+
+101
+00:06:34.592 --> 00:06:37.354
+En el vídeo uno citamos
+la frase del Playbook:
+
+102
+00:06:37.394 --> 00:06:39.674
+cada esquema cobra un impuesto.
+
+103
+00:06:39.714 --> 00:06:43.550
+Hoy vamos a ver de qué está hecho ese
+impuesto, porque no es solo de tokens.
+
+104
+00:06:43.590 --> 00:06:44.500
+Tiene tres partes.
+
+105
+00:06:45.514 --> 00:06:49.808
+La primera es el prefijo. Cada herramienta
+viaja en cada petición con su nombre,
+
+106
+00:06:49.848 --> 00:06:54.270
+su descripción y sus parámetros, y además
+suele llevar alguna línea en el prompt de
+
+107
+00:06:54.310 --> 00:06:56.850
+sistema que explica cuándo usarla.
+
+108
+00:06:56.890 --> 00:07:00.130
+La caché de prompts lo
+abarata, pero no lo regala.
+
+109
+00:07:00.170 --> 00:07:04.410
+La segunda es la elección: cada
+herramienta es una opción más entre las
+
+110
+00:07:04.450 --> 00:07:07.600
+que el modelo duda, y a
+veces elige la que no toca.
+
+111
+00:07:07.640 --> 00:07:12.180
+La tercera es la menos visible: una
+herramienta cambia cómo trabaja el modelo,
+
+112
+00:07:12.220 --> 00:07:13.120
+para bien o para mal.
+
+113
+00:07:14.167 --> 00:07:19.050
+El Playbook mide tiempos. Con unas cinco
+herramientas, oh my pi hizo su tarea de
+
+114
+00:07:19.090 --> 00:07:23.687
+prueba en treinta y seis segundos y medio,
+frente a treinta y siete de Pi y cuarenta
+
+115
+00:07:23.727 --> 00:07:28.820
+y dos de Codex. Y la misma oh my pi, con
+sus veintitrés definiciones de serie,
+
+116
+00:07:28.860 --> 00:07:32.680
+tardaba ochenta y seis. Son
+cifras de su autor, con su prueba,
+
+117
+00:07:32.720 --> 00:07:37.720
+que no hemos reproducido. La lección no
+es quién gana, sino que el roster se mide.
+
+118
+00:07:38.787 --> 00:07:43.330
+¿Cómo lo resuelve cada uno? Pi parte de
+cuatro herramientas y te deja quitar y
+
+119
+00:07:43.370 --> 00:07:48.500
+poner. Guion guion tools acepta una lista
+cerrada, o un más o un menos delante de
+
+120
+00:07:48.540 --> 00:07:54.206
+cada nombre: más codemode añade codemode
+a las de serie, y menos write quita write.
+
+121
+00:07:54.246 --> 00:07:58.664
+Guion guion exclude tools quita
+por nombre o con asterisco,
+
+122
+00:07:58.704 --> 00:08:02.420
+y guion guion no mcp apaga
+MCP para una ejecución.
+
+123
+00:08:03.768 --> 00:08:05.871
+Y el roster se puede versionar.
+
+124
+00:08:05.911 --> 00:08:09.898
+En los ajustes de Pi, default
+tools acepta la misma sintaxis.
+
+125
+00:08:09.938 --> 00:08:13.750
+Si lo pones en los ajustes del proyecto,
+todo el equipo arranca con el mismo
+
+126
+00:08:13.790 --> 00:08:18.426
+roster, igual que en el vídeo diecinueve
+compartimos las aprobaciones de oh my pi
+
+127
+00:08:18.466 --> 00:08:20.401
+en un fichero del repositorio.
+
+128
+00:08:20.441 --> 00:08:24.498
+Lo que no cabe en el roster se esconde
+detrás de codemode o de tool search,
+
+129
+00:08:24.538 --> 00:08:26.180
+como vimos en el vídeo siete.
+
+130
+00:08:26.862 --> 00:08:30.890
+oh my pi trae muchas más herramientas,
+pero no las declara todas.
+
+131
+00:08:30.980 --> 00:08:34.410
+Las poco usadas se montan como
+dispositivos descubribles,
+
+132
+00:08:34.450 --> 00:08:38.785
+con direcciones que empiezan por equis
+de, como vimos con barra tools en el vídeo
+
+133
+00:08:38.825 --> 00:08:43.340
+once: el modelo sabe que existen y lee
+su documentación cuando las necesita.
+
+134
+00:08:43.380 --> 00:08:48.010
+Es lo que el Playbook llama dejar la cola
+larga detrás de superficies estables.
+
+135
+00:08:48.050 --> 00:08:51.420
+El ajuste se llama tools
+punto xdev, y viene encendido.
+
+136
+00:08:52.443 --> 00:08:55.412
+Learn Harness Engineering dice
+lo mismo con otras palabras:
+
+137
+00:08:55.452 --> 00:08:59.960
+divulgación progresiva. Lo barato
+y necesario, siempre presente.
+
+138
+00:09:00.000 --> 00:09:02.590
+Lo demás, cargado cuando hace falta.
+
+139
+00:09:02.630 --> 00:09:04.080
+Pero ojo con el extremo contrario.
+
+140
+00:09:04.120 --> 00:09:07.490
+Si le quitas al modelo una
+herramienta que necesita, no se para:
+
+141
+00:09:07.530 --> 00:09:12.100
+improvisa con otra. Sin herramienta
+de edición, edita con bash.
+
+142
+00:09:12.140 --> 00:09:13.991
+Por eso hay que medir dos cosas a la vez:
+
+143
+00:09:14.031 --> 00:09:16.820
+lo que cuesta el roster y lo
+que cambia en el resultado.
+
+144
+00:09:17.833 --> 00:09:22.220
+Un apunte antes de medir. Las herramientas
+van al principio de cada petición,
+
+145
+00:09:22.260 --> 00:09:24.570
+que es justo lo que aprovecha la caché.
+
+146
+00:09:24.610 --> 00:09:27.110
+Algunos proveedores ya aceptan
+herramientas nuevas a mitad de
+
+147
+00:09:27.150 --> 00:09:30.350
+conversación sin perder
+la caché, pero no todos.
+
+148
+00:09:30.390 --> 00:09:33.710
+La regla práctica: decide el
+roster al empezar, no a mitad.
+
+149
+00:09:39.656 --> 00:09:43.792
+Vamos a la demo. Primero, una precaución
+que vale para cualquier medida.
+
+150
+00:09:43.832 --> 00:09:47.610
+Comprobamos que no queda nada de vídeos
+anteriores que cambie lo que medimos:
+
+151
+00:09:47.650 --> 00:09:52.610
+ninguna extensión en el directorio del
+agente de Pi, ningún servidor MCP y
+
+152
+00:09:52.650 --> 00:09:55.360
+ninguna configuración de
+oh my pi en la tienda.
+
+153
+00:09:55.400 --> 00:09:58.640
+Y los dos agentes usan el
+mismo modelo, DeepSeek Flash.
+
+154
+00:09:59.792 --> 00:10:03.230
+El primer script es prefijo punto sh.
+
+155
+00:10:03.270 --> 00:10:08.260
+Hace lo mismo que en el vídeo siete: en
+modo print, con guion guion mode json,
+
+156
+00:10:08.300 --> 00:10:13.070
+la petición di solo hola, y de la
+respuesta saca los tokens de entrada,
+
+157
+00:10:13.110 --> 00:10:15.490
+contando los que vienen de la caché.
+
+158
+00:10:15.530 --> 00:10:18.930
+Son lo que pesa el roster antes
+de que el modelo haga nada.
+
+159
+00:10:18.970 --> 00:10:21.560
+Cinco filas para Pi y tres para oh my pi.
+
+160
+00:10:22.410 --> 00:10:26.850
+La tabla de Pi. Sin ninguna herramienta,
+setecientos noventa y cuatro tokens:
+
+161
+00:10:26.890 --> 00:10:29.120
+es el suelo, el agente sin manos.
+
+162
+00:10:29.410 --> 00:10:32.636
+Con read y bash, mil
+cuatrocientos veintiocho.
+
+163
+00:10:32.676 --> 00:10:37.370
+Con las cuatro de serie, mil novecientos
+setenta y uno, exactamente la cifra del
+
+164
+00:10:37.989 --> 00:10:41.000
+vídeo siete. Con las siete integradas,
+dos mil quinientos treinta y nueve.
+
+165
+00:10:41.933 --> 00:10:45.670
+Lo interesante no es el total,
+sino la diferencia entre filas.
+
+166
+00:10:45.710 --> 00:10:48.346
+Read y bash suman unos seiscientos tokens.
+
+167
+00:10:48.386 --> 00:10:50.434
+Edit y write, unos quinientos cincuenta.
+
+168
+00:10:50.474 --> 00:10:53.675
+Grep, find y ls juntos,
+otros quinientos setenta.
+
+169
+00:10:53.715 --> 00:10:58.721
+Y la quinta fila, las de serie más
+codemode, da dos mil quinientos cuarenta y
+
+170
+00:10:58.761 --> 00:11:01.844
+dos: codemode sola pesa lo mismo
+que esas tres herramientas,
+
+171
+00:11:01.884 --> 00:11:05.120
+porque su descripción explica
+cómo escribir scripts.
+
+172
+00:11:05.160 --> 00:11:08.310
+Esa diferencia incluye el esquema y las
+líneas del prompt que hablan de cada
+
+173
+00:11:08.350 --> 00:11:10.910
+herramienta, que es justo lo que pagas.
+
+174
+00:11:11.550 --> 00:11:14.310
+Ahora oh my pi, con tres configuraciones.
+
+175
+00:11:14.350 --> 00:11:19.010
+Con read, bash, edit y write, cuatro
+mil cuatrocientos veintiocho tokens.
+
+176
+00:11:19.192 --> 00:11:23.450
+Con todo lo de serie y el catálogo
+de descubribles, casi ocho mil.
+
+177
+00:11:23.490 --> 00:11:27.520
+Y con todo pero sin catálogo,
+más de diez mil seiscientos.
+
+178
+00:11:27.560 --> 00:11:31.190
+Para quitar el catálogo usamos guion guion
+config con un fichero de una línea que
+
+179
+00:11:31.230 --> 00:11:34.520
+apaga tools punto xdev,
+solo para esa ejecución.
+
+180
+00:11:35.500 --> 00:11:40.450
+Dos lecturas. La primera: el catálogo te
+ahorra unos dos mil seiscientos tokens en
+
+181
+00:11:40.490 --> 00:11:43.920
+cada petición, porque las
+descubribles no se declaran enteras.
+
+182
+00:11:44.108 --> 00:11:47.010
+No es gratis del todo: cuando el
+modelo necesita una, primero lee su
+
+183
+00:11:47.050 --> 00:11:50.665
+documentación, como pasaba con
+codemode en el vídeo siete.
+
+184
+00:11:50.705 --> 00:11:55.430
+La segunda: con las mismas cuatro
+herramientas, oh my pi pesa más del doble
+
+185
+00:11:55.470 --> 00:11:58.218
+que Pi. Su prompt de
+sistema trae mucho más.
+
+186
+00:11:58.258 --> 00:12:02.240
+Ni bueno ni malo: es una decisión de
+diseño, y ahora sabes cuánto cuesta.
+
+187
+00:12:08.010 --> 00:12:09.870
+El prefijo es solo la mitad.
+
+188
+00:12:09.910 --> 00:12:13.739
+La pregunta importante es qué
+cambia en una tarea de verdad.
+
+189
+00:12:13.779 --> 00:12:19.050
+El encargo es pequeño y verificable:
+añadir a envío punto js una función que
+
+190
+00:12:19.090 --> 00:12:23.050
+diga cuántos euros faltan para el
+envío gratis, redondeados a céntimos,
+
+191
+00:12:23.090 --> 00:12:27.130
+y cero si ya lo tiene, con la
+misma validación que gastos envío,
+
+192
+00:12:27.170 --> 00:12:30.180
+con sus pruebas, y ejecutar npm test.
+
+193
+00:12:30.941 --> 00:12:34.680
+Para no hacerlo a mano, está en
+un script corto, medir punto sh.
+
+194
+00:12:34.720 --> 00:12:39.830
+Para cada configuración y cada repetición
+crea un worktree de git propio desde
+
+195
+00:12:40.295 --> 00:12:44.130
+master. Recuerda el vídeo uno: dos
+agentes en la misma carpeta se pisan.
+
+196
+00:12:44.170 --> 00:12:47.070
+Learn Harness Engineering lo
+dice en su primer proyecto:
+
+197
+00:12:47.110 --> 00:12:51.010
+para comparar, directorios
+aislados, nunca ramas en la misma
+
+198
+00:12:51.477 --> 00:12:55.350
+carpeta. Un detalle práctico: el
+worktree se crea con guion guion detach,
+
+199
+00:12:55.390 --> 00:12:57.220
+porque master ya está
+abierta en la tienda.
+
+200
+00:12:58.135 --> 00:13:02.360
+Después lanza el agente en
+modo JSON y guarda los eventos.
+
+201
+00:13:02.540 --> 00:13:06.970
+Al terminar, entra en la carpeta y juzga
+desde fuera, nunca desde lo que cuenta el
+
+202
+00:13:07.392 --> 00:13:10.885
+agente: si npm test pasa y
+cuántos ficheros cambiaron.
+
+203
+00:13:10.925 --> 00:13:16.310
+Y el script lleva set guion e: si un paso
+falla, se para antes de lanzar el agente.
+
+204
+00:13:16.350 --> 00:13:20.050
+Lo aprendimos preparando el vídeo: un
+worktree que no se creó y un agente que
+
+205
+00:13:20.090 --> 00:13:22.060
+trabajó en la carpeta equivocada.
+
+206
+00:13:23.030 --> 00:13:26.720
+Seis configuraciones. En Pi:
+read y bash, las cuatro de serie,
+
+207
+00:13:26.760 --> 00:13:30.260
+y las siete integradas. En oh
+my pi: cuatro herramientas,
+
+208
+00:13:30.300 --> 00:13:32.537
+todo con catálogo y todo sin catálogo.
+
+209
+00:13:32.577 --> 00:13:36.253
+Tres repeticiones de cada,
+dieciocho ejecuciones en total.
+
+210
+00:13:36.293 --> 00:13:40.030
+Una sola ejecución es una anécdota:
+el mismo modelo, con el mismo encargo,
+
+211
+00:13:40.070 --> 00:13:43.900
+no hace siempre lo mismo. Lo vimos con
+barra ratchet en el vídeo veintiuno.
+
+212
+00:13:44.758 --> 00:13:50.120
+Tardó cinco minutos y cuarenta y ocho
+segundos, y las dieciocho pasan npm test.
+
+213
+00:13:50.992 --> 00:13:55.890
+El tercer script, resumen punto sh, saca
+de cada fichero de eventos las llamadas
+
+214
+00:13:55.930 --> 00:13:59.610
+por herramienta, los tokens y el
+coste, y debajo pone la media de cada
+
+215
+00:13:59.650 --> 00:14:04.040
+configuración. Todo el experimento
+costó menos de siete céntimos de dólar.
+
+216
+00:14:05.038 --> 00:14:08.810
+Empecemos por oh my pi,
+porque ahí el prefijo se nota.
+
+217
+00:14:08.912 --> 00:14:12.270
+De media, unos setenta mil
+tokens con cuatro herramientas,
+
+218
+00:14:12.310 --> 00:14:17.333
+casi cien mil con catálogo y ciento
+cuarenta y dos mil sin catálogo.
+
+219
+00:14:17.373 --> 00:14:21.390
+El prefijo viaja en cada vuelta
+del bucle, así que crece con él.
+
+220
+00:14:21.430 --> 00:14:26.730
+Pero mira el coste: tres décimas de
+céntimo, tres décimas y cuatro décimas.
+
+221
+00:14:26.942 --> 00:14:29.660
+Con catálogo sale incluso más
+barato que con cuatro herramientas.
+
+222
+00:14:30.838 --> 00:14:35.790
+¿Por qué? Por la caché. En oh my pi, en
+conjunto, más del noventa por ciento de
+
+223
+00:14:35.830 --> 00:14:40.540
+esos tokens se leen de la caché, y
+leer de la caché cuesta muy poco.
+
+224
+00:14:40.580 --> 00:14:44.984
+Lo que pagas de verdad es lo que el modelo
+escribe y lo que no estaba en caché.
+
+225
+00:14:45.024 --> 00:14:48.140
+Y mira la dispersión dentro
+de una misma configuración:
+
+226
+00:14:48.180 --> 00:14:52.840
+sin catálogo, una ejecución costó dos
+décimas de céntimo y otra casi ocho
+
+227
+00:14:52.880 --> 00:14:58.060
+décimas. La diferencia de coste entre
+configuraciones cabe dentro de ese ruido.
+
+228
+00:14:58.100 --> 00:15:01.140
+Con tres repeticiones, no has
+demostrado nada sobre el coste.
+
+229
+00:15:01.990 --> 00:15:06.100
+Ahora Pi. Read y bash
+solos no salen más baratos:
+
+230
+00:15:06.158 --> 00:15:10.130
+unos veintiocho mil tokens, frente a
+veintitrés mil con las cuatro de serie.
+
+231
+00:15:10.170 --> 00:15:13.550
+Hacen más llamadas a bash y necesitan
+más vueltas, de seis a ocho,
+
+232
+00:15:13.590 --> 00:15:16.970
+frente a cinco. Y mira cómo
+editó en la primera repetición.
+
+233
+00:15:17.010 --> 00:15:21.842
+Sin edit ni write, escribió el fichero
+entero en una carpeta temporal con un
+
+234
+00:15:21.882 --> 00:15:25.291
+heredoc y lo copió encima.
+Añadió las pruebas con cat.
+
+235
+00:15:25.331 --> 00:15:29.180
+Intentó cambiar el import con
+sed, falló, y lo arregló con perl.
+
+236
+00:15:30.100 --> 00:15:34.331
+Funcionó, y npm test pasa. Pero
+pierdes la edición precisa:
+
+237
+00:15:34.371 --> 00:15:38.450
+en lugar de un cambio pequeño que puedes
+revisar, una reescritura completa del
+
+238
+00:15:38.490 --> 00:15:41.610
+fichero. Y en el diff aparece algo más.
+
+239
+00:15:41.650 --> 00:15:45.345
+El agente sacó la validación de
+gastos envío a una función nueva,
+
+240
+00:15:45.385 --> 00:15:48.035
+validar subtotal, y la usó en las dos.
+
+241
+00:15:48.075 --> 00:15:49.030
+Nadie se lo pidió.
+
+242
+00:15:50.175 --> 00:15:52.450
+Aquí entra el diagnóstico por capas.
+
+243
+00:15:52.490 --> 00:15:58.047
+¿Lo causó el roster mínimo? Contamos: esa
+refactorización aparece en diez de las
+
+244
+00:15:58.087 --> 00:16:02.702
+dieciocho ejecuciones, con todos
+los rosters y en los dos agentes.
+
+245
+00:16:02.742 --> 00:16:06.216
+No es la capa de herramientas,
+es la de especificación:
+
+246
+00:16:06.256 --> 00:16:11.170
+el encargo dice con la misma validación,
+y el modelo lo lee como reutilízala.
+
+247
+00:16:11.330 --> 00:16:13.379
+Si no la quieres, dilo en el encargo.
+
+248
+00:16:13.419 --> 00:16:16.560
+Y fíjate en que npm test
+pasa en las dieciocho:
+
+249
+00:16:16.600 --> 00:16:18.790
+el juez externo no ve un cambio de más.
+
+250
+00:16:18.830 --> 00:16:21.720
+Para eso sigue haciendo
+falta mirar el diff.
+
+251
+00:16:22.652 --> 00:16:25.669
+Lo que te llevas no es
+nuestra tabla, sino el método.
+
+252
+00:16:25.709 --> 00:16:30.335
+Un encargo pequeño y verificable,
+rosters que solo cambian en una cosa,
+
+253
+00:16:30.375 --> 00:16:34.251
+carpetas aisladas,
+repeticiones y un juez externo.
+
+254
+00:16:34.291 --> 00:16:38.904
+Es la ablación del vídeo uno, aplicada
+a las herramientas y con números.
+
+255
+00:16:38.944 --> 00:16:42.871
+Y el resultado depende del modelo:
+con otro modelo, otra tabla.
+
+256
+00:16:42.911 --> 00:16:45.580
+Por eso conviene repetir la
+medida cuando cambies de modelo.
+
+257
+00:16:51.383 --> 00:16:54.950
+Segunda decisión: dónde viven los límites.
+
+258
+00:16:54.990 --> 00:16:58.270
+Hablamos de cuánto texto de una
+herramienta llega al modelo,
+
+259
+00:16:58.310 --> 00:17:01.760
+cuánto puede tardar un
+comando, y qué se aprueba solo.
+
+260
+00:17:01.800 --> 00:17:05.760
+El principio del Playbook es
+acotar la salida una sola vez,
+
+261
+00:17:05.800 --> 00:17:09.980
+en el centro. Si cada herramienta trunca
+por su cuenta, cada una pone su propio
+
+262
+00:17:10.020 --> 00:17:12.400
+aviso, y alguna se olvida de truncar.
+
+263
+00:17:13.319 --> 00:17:17.445
+Mira cómo lo hace Pi. Las herramientas
+integradas cortan lo que ve el modelo en
+
+264
+00:17:17.485 --> 00:17:22.530
+dos mil líneas o cincuenta kilobytes, como
+enseña el grep del fichero de truncado.
+
+265
+00:17:22.570 --> 00:17:26.550
+Pero ese límite es una utilidad que
+cada herramienta tiene que llamar.
+
+266
+00:17:26.590 --> 00:17:29.230
+El ejemplo de la documentación
+lo dice en mayúsculas:
+
+267
+00:17:29.270 --> 00:17:32.730
+las herramientas propias
+deben truncar su salida.
+
+268
+00:17:32.770 --> 00:17:36.316
+Los resultados MCP tienen su propio
+corte, a los veinte kilobytes,
+
+269
+00:17:36.356 --> 00:17:39.240
+y la salida de codemode el
+suyo, de diez mil tokens.
+
+270
+00:17:40.162 --> 00:17:43.117
+Son tres sitios, y cada
+uno tiene su motivo.
+
+271
+00:17:43.157 --> 00:17:47.680
+El Playbook avisa de que truncar dentro
+de una herramienta rompe el codemode,
+
+272
+00:17:47.720 --> 00:17:49.803
+porque el aviso se mezcla con los datos.
+
+273
+00:17:49.843 --> 00:17:54.563
+Pi lo evita así: dentro de un script,
+bash devuelve hasta un mega de salida,
+
+274
+00:17:54.603 --> 00:17:58.550
+no los cincuenta kilobytes que ve el
+modelo, para que el script la filtre.
+
+275
+00:17:58.590 --> 00:18:02.820
+Pero si escribes una extensión con una
+herramienta, el truncado es cosa tuya.
+
+276
+00:18:03.590 --> 00:18:07.069
+Para la política, en cambio,
+Pi sí tiene un punto central:
+
+277
+00:18:07.109 --> 00:18:08.980
+el evento tool call.
+
+278
+00:18:09.545 --> 00:18:13.910
+Toda llamada pasa por él, también las de
+MCP y las que hace una herramienta desde
+
+279
+00:18:13.950 --> 00:18:16.797
+dentro de otra, como
+un script de codemode.
+
+280
+00:18:16.837 --> 00:18:21.625
+Por eso la extensión de permisos del vídeo
+ocho vigilaba todas las herramientas a la
+
+281
+00:18:21.665 --> 00:18:23.560
+vez. Un solo sitio para decidir.
+
+282
+00:18:24.400 --> 00:18:26.930
+oh my pi va más lejos en los límites.
+
+283
+00:18:27.040 --> 00:18:30.770
+La salida de bash y la de eval
+pasan por el mismo recolector,
+
+284
+00:18:30.810 --> 00:18:35.020
+con un presupuesto de cincuenta
+kilobytes entre el principio y el final,
+
+285
+00:18:35.060 --> 00:18:37.820
+y el resto se guarda en un artefacto.
+
+286
+00:18:37.860 --> 00:18:41.800
+Todo se ajusta en un único grupo
+de la configuración, tools.
+
+287
+00:18:41.840 --> 00:18:46.270
+En pantalla, con config get: el
+umbral del artefacto, cincuenta;
+
+288
+00:18:46.310 --> 00:18:50.812
+la cabeza, veinte; y el tope de
+tiempo, tools punto max timeout,
+
+289
+00:18:50.852 --> 00:18:52.920
+a cero, que significa sin tope.
+
+290
+00:18:53.802 --> 00:18:56.638
+Y aquí hay letra pequeña,
+que comprobamos en el código.
+
+291
+00:18:56.678 --> 00:19:00.911
+Si pones un tope, se aplica al tiempo
+que pida el modelo y al de por defecto,
+
+292
+00:19:00.951 --> 00:19:05.131
+que son cinco minutos. Pero si el
+modelo pide un timeout de cero,
+
+293
+00:19:05.171 --> 00:19:08.480
+el comando se queda sin límite
+de tiempo, con tope o sin él.
+
+294
+00:19:08.520 --> 00:19:12.572
+Si de verdad necesitas un límite
+duro, ponlo fuera del modelo:
+
+295
+00:19:12.612 --> 00:19:18.810
+guion guion max time para toda la
+sesión, como en medir punto sh,
+
+296
+00:19:18.850 --> 00:19:19.760
+o el límite de tu sistema
+de integración continua.
+
+297
+00:19:20.439 --> 00:19:24.559
+Y la política también es central:
+cada herramienta declara su nivel,
+
+298
+00:19:24.599 --> 00:19:28.430
+y el modo de aprobación decide,
+como vimos en el vídeo diecinueve.
+
+299
+00:19:28.470 --> 00:19:30.940
+Pero allí apareció el
+hueco que demuestra el
+
+300
+00:19:31.452 --> 00:19:36.280
+principio: los patrones de bash no cubren
+eval, que puede lanzar una shell por su
+
+301
+00:19:36.433 --> 00:19:40.421
+cuenta. Una regla que vive en una
+herramienta concreta no protege de las
+
+302
+00:19:40.461 --> 00:19:43.892
+demás. Learn Harness Engineering
+lo llama fallar cerrado:
+
+303
+00:19:43.932 --> 00:19:46.828
+lo que no está clasificado
+se trata como peligroso.
+
+304
+00:19:46.868 --> 00:19:49.930
+Y hay rutas que nunca se aprueban
+solas, pase lo que pase con el modo,
+
+305
+00:19:49.970 --> 00:19:54.349
+como la carpeta punto git: es lo que hacía
+el hook de rutas protegidas del vídeo
+
+306
+00:19:54.389 --> 00:19:55.289
+diecinueve.
+
+307
+00:19:55.913 --> 00:19:59.180
+La lección práctica: cuando
+añadas una pieza a tu harness,
+
+308
+00:19:59.220 --> 00:20:01.680
+pregúntate dónde vive su límite.
+
+309
+00:20:01.800 --> 00:20:05.170
+Si la respuesta es dentro de la propia
+pieza, apúntalo, porque tendrás que
+
+310
+00:20:05.210 --> 00:20:06.918
+repetirlo en cada pieza nueva.
+
+311
+00:20:06.958 --> 00:20:11.874
+Si vive en un sitio común, como el evento
+tool call de Pi o el grupo tools de oh my
+
+312
+00:20:11.914 --> 00:20:14.880
+pi, escríbelo ahí y
+versiónalo con el repositorio.
+
+313
+00:20:20.584 --> 00:20:23.881
+Tercera decisión. El
+Playbook la formula así:
+
+314
+00:20:23.921 --> 00:20:28.173
+el anfitrión es dueño de la
+sesión, del modelo, de la política,
+
+315
+00:20:28.213 --> 00:20:30.851
+de las aprobaciones y de los límites.
+
+316
+00:20:30.891 --> 00:20:35.110
+El sandbox solo ejecuta lo que le
+piden, y devuelve una salida acotada.
+
+317
+00:20:35.150 --> 00:20:38.725
+Quien decide no es quien ejecuta,
+como ya dijimos en el vídeo uno.
+
+318
+00:20:38.765 --> 00:20:40.580
+Hoy vemos qué significa en la práctica.
+
+319
+00:20:41.805 --> 00:20:46.070
+En el vídeo cinco vimos las formas de
+ejecutar Pi que propone su documentación:
+
+320
+00:20:46.110 --> 00:20:50.769
+directamente con tu usuario, entero dentro
+de un contenedor o una máquina virtual,
+
+321
+00:20:50.809 --> 00:20:53.705
+o fuera con solo sus herramientas dentro.
+
+322
+00:20:53.745 --> 00:20:55.806
+Léelas ahora con este principio.
+
+323
+00:20:55.846 --> 00:21:00.110
+Con Pi entero en un contenedor, el que
+decide y el que ejecuta están en la misma
+
+324
+00:21:00.150 --> 00:21:04.110
+caja: aíslas bien tu máquina, pero la
+política y las credenciales que metas
+
+325
+00:21:04.150 --> 00:21:05.140
+viven dentro.
+
+326
+00:21:06.037 --> 00:21:09.552
+La tercera forma, la de Gondolin,
+es la separación del Playbook:
+
+327
+00:21:09.592 --> 00:21:13.880
+Pi y sus decisiones en el anfitrión, y
+las herramientas integradas en una micro
+
+328
+00:21:13.920 --> 00:21:18.070
+máquina virtual. Con su letra pequeña: las
+herramientas de otras extensiones siguen
+
+329
+00:21:18.110 --> 00:21:22.660
+ejecutándose en el anfitrión, salvo que
+deleguen, y los comandos heredan las
+
+330
+00:21:22.700 --> 00:21:24.922
+variables de entorno del anfitrión.
+
+331
+00:21:24.962 --> 00:21:27.880
+Y Docker Sandboxes aplica
+la idea a las credenciales:
+
+332
+00:21:27.920 --> 00:21:32.360
+la clave real se queda en el anfitrión,
+y dentro solo hay un valor de relleno.
+
+333
+00:21:33.524 --> 00:21:35.763
+Ojo con sacar una conclusión equivocada.
+
+334
+00:21:35.803 --> 00:21:39.680
+La documentación de Pi dice que meter Pi
+entero en un entorno aislado suele ser la
+
+335
+00:21:39.720 --> 00:21:44.400
+opción práctica más fuerte, y que aislar
+solo las herramientas es una frontera más
+
+336
+00:21:45.084 --> 00:21:48.670
+estrecha. Separar anfitrión y sandbox deja
+la política y las claves fuera del alcance
+
+337
+00:21:48.710 --> 00:21:51.937
+de lo que se ejecuta, pero
+protege menos superficie.
+
+338
+00:21:51.977 --> 00:21:54.650
+Son dos decisiones distintas,
+y a veces se combinan.
+
+339
+00:21:55.529 --> 00:21:57.725
+Hay un tercer ejemplo, más sutil.
+
+340
+00:21:57.765 --> 00:22:02.110
+Cuando Pi integró MCP, sus autores
+explicaron que codemode se ejecuta del
+
+341
+00:22:02.150 --> 00:22:06.260
+lado del harness, que es el lado de
+confianza, y no donde corre bash.
+
+342
+00:22:06.300 --> 00:22:09.724
+El script no toca el sistema: solo
+pide cosas a las herramientas,
+
+343
+00:22:09.764 --> 00:22:12.835
+y esas peticiones pasan por
+el mismo punto de control.
+
+344
+00:22:12.875 --> 00:22:14.460
+Es la misma idea a pequeña escala.
+
+345
+00:22:15.476 --> 00:22:20.180
+En oh my pi, si activas task
+punto isolation punto enabled,
+
+346
+00:22:20.220 --> 00:22:24.190
+los subagentes pueden trabajar en un
+espacio aislado, con la opción isolated de
+
+347
+00:22:24.230 --> 00:22:27.998
+la herramienta task, y sus
+cambios vuelven como un parche.
+
+348
+00:22:28.038 --> 00:22:29.856
+Ayuda mucho a que no se pisen.
+
+349
+00:22:29.896 --> 00:22:33.760
+Pero es aislamiento del espacio de
+trabajo, no una frontera de seguridad:
+
+350
+00:22:33.800 --> 00:22:36.980
+el subagente sigue siendo un proceso
+en tu máquina, con tus permisos.
+
+351
+00:22:37.781 --> 00:22:41.270
+Para tu diseño, la pregunta
+es qué va a cada lado.
+
+352
+00:22:41.310 --> 00:22:45.277
+Del lado del anfitrión: la
+sesión, las claves del modelo,
+
+353
+00:22:45.317 --> 00:22:48.160
+la política de aprobaciones y los límites.
+
+354
+00:22:48.200 --> 00:22:53.617
+Del lado del sandbox: la carpeta del
+proyecto, las dependencias y los comandos.
+
+355
+00:22:53.657 --> 00:22:56.900
+Y lo que cruza la frontera,
+lo más estrecho posible:
+
+356
+00:22:56.940 --> 00:23:01.350
+solo la carpeta que la tarea necesita,
+credenciales de poco alcance y de corta
+
+357
+00:23:01.390 --> 00:23:03.580
+vida, y red solo si hace falta.
+
+358
+00:23:04.509 --> 00:23:08.359
+Y un apunte honesto, que repetimos
+porque es lo más importante del vídeo.
+
+359
+00:23:08.399 --> 00:23:12.703
+Aprobar no es aislar. La
+documentación de oh my pi lo dice:
+
+360
+00:23:12.743 --> 00:23:17.524
+un patrón aprobado no confina nada, el
+comando tiene todo el acceso de tu shell.
+
+361
+00:23:17.564 --> 00:23:21.760
+Y la de Pi, que mirar la conversación
+o revisar los cambios no crea ninguna
+
+362
+00:23:21.800 --> 00:23:25.389
+frontera. Las aprobaciones
+deciden qué se ejecuta;
+
+363
+00:23:25.429 --> 00:23:29.600
+solo una frontera del sistema operativo
+o una máquina virtual decide qué puede
+
+364
+00:23:29.640 --> 00:23:30.540
+tocar.
+
+365
+00:23:35.918 --> 00:23:40.062
+Repasemos. Learn Harness
+Engineering nos da tres mapas:
+
+366
+00:23:40.102 --> 00:23:44.320
+las cinco piezas para describir un agente,
+cinco subsistemas para tu repositorio y
+
+367
+00:23:44.360 --> 00:23:47.045
+cinco capas para diagnosticar.
+
+368
+00:23:47.085 --> 00:23:50.976
+El Harness Playbook mira desde el
+motor y propone cinco principios.
+
+369
+00:23:51.016 --> 00:23:55.162
+Es la opinión del autor de oh
+my pi, valiosa y discutible,
+
+370
+00:23:55.202 --> 00:23:58.080
+y parte describe una
+arquitectura que aún no existe.
+
+371
+00:23:59.040 --> 00:24:01.137
+De ahí salen tres decisiones.
+
+372
+00:24:01.177 --> 00:24:05.470
+Un roster pequeño, con la cola larga
+detrás de codemode, tool search o el
+
+373
+00:24:05.510 --> 00:24:10.910
+catálogo de oh my pi, y medido: el
+prefijo, y el resultado de una tarea con
+
+374
+00:24:10.950 --> 00:24:13.310
+repeticiones y carpetas aisladas.
+
+375
+00:24:13.350 --> 00:24:18.546
+Recuerda lo que vimos: los tokens siguen
+al prefijo, el coste lo suaviza la caché,
+
+376
+00:24:18.586 --> 00:24:21.870
+y quitar herramientas cambia
+cómo trabaja el modelo.
+
+377
+00:24:21.910 --> 00:24:26.780
+Límites en un solo sitio, sabiendo cuáles
+dependen de cada herramienta y cuáles se
+
+378
+00:24:26.820 --> 00:24:30.810
+pueden saltar. Y el anfitrión que
+decide frente al sandbox que ejecuta,
+
+379
+00:24:30.850 --> 00:24:33.120
+recordando que aprobar no es aislar.
+
+380
+00:24:34.042 --> 00:24:36.082
+La práctica tiene dos partes.
+
+381
+00:24:36.122 --> 00:24:39.271
+Primero, escribe en una
+página la ficha de tu harness:
+
+382
+00:24:39.311 --> 00:24:42.900
+qué herramientas ve el modelo y
+por qué, dónde vive cada límite,
+
+383
+00:24:42.940 --> 00:24:47.115
+y qué se ejecuta dentro de
+una frontera y qué fuera.
+
+384
+00:24:47.155 --> 00:24:50.785
+Segundo, elige una tarea pequeña de tu
+proyecto, con una prueba que la juzgue,
+
+385
+00:24:50.825 --> 00:24:55.040
+y lánzala con dos rosters, tres veces
+cada uno, en worktrees separados.
+
+386
+00:24:55.080 --> 00:24:59.690
+Compara tokens, coste, llamadas, si
+la prueba pasa y qué hay en el diff.
+
+387
+00:25:00.718 --> 00:25:04.478
+Si la diferencia es ruido, quédate
+con el roster que entiendes mejor.
+
+388
+00:25:04.518 --> 00:25:08.149
+Si no lo es, ya tienes un dato
+para tu diseño, y no una intuición.
+
+389
+00:25:08.189 --> 00:25:12.488
+Y apunta la fecha: el harness se degrada
+como el código, y cuando cambie el modelo,
+
+390
+00:25:12.528 --> 00:25:13.860
+conviene repetir la medida.
+
+391
+00:25:14.835 --> 00:25:18.535
+En el próximo vídeo bajamos
+del runtime al repositorio:
+
+392
+00:25:18.575 --> 00:25:20.680
+el repo como sistema de registro.
+
+393
+00:25:20.720 --> 00:25:26.070
+El estado fuera de la conversación: AGENTS
+punto md, la lista de funcionalidades,
+
+394
+00:25:26.110 --> 00:25:29.903
+el progreso, el script de arranque
+y el documento de traspaso,
+
+395
+00:25:29.943 --> 00:25:33.380
+para que una sesión nueva retome
+el trabajo sin perder el hilo.
+
+396
+00:25:33.420 --> 00:25:34.320
+Nos vemos allí.

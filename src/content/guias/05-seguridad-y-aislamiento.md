@@ -3,14 +3,14 @@ title: "Vídeo 05 · Seguridad y aislamiento en Pi"
 description: "Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una superficie de ataque, qué protege la confianza de proyecto y cómo meter Pi entero en un contenedor."
 ruta: "pi-oh-my-pi"
 orden: 5
-duracion: "24 min"
+duracion: "23 min"
 video: "05-seguridad-y-aislamiento.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/05-seguridad-y-aislamiento.es.vtt"
 ---
 
 Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una superficie de ataque, qué protege la confianza de proyecto y cómo meter Pi entero en un contenedor.
 
-<p class="guia__nota">Dura 24 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
+<p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
 ## Resumen por capítulos
 
@@ -19,38 +19,18 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
 - **Seguridad y aislamiento:** Qué protege Pi y qué no — El repositorio como superficie de ataque, la confianza de proyecto y Pi dentro de un contenedor.
-- **Lo que Pi no hace**
-  - `✕` · Sin aprobaciones: no pregunta antes de cada herramienta
-  - `✕` · Sin sandbox: no trae aislamiento de serie
-  - `!` · Código no fiable: así trata lo que genera el modelo
-- **Todo corre con tus permisos**
-  - `tools` · Herramientas: read, bash, edit, write
-  - `ext` · Extensiones: dentro del proceso de Pi
-  - `npm` · Instaladores: paquetes y sus scripts
-  - `LSP` · Procesos hijo: servidores de lenguaje y demás
 - **Dos filosofías**
   - `Pi` · Mínimo: la decisión es tuya: límites fuera del agente
   - `omp` · Con aprobaciones: modos de aprobación (vídeo 19)
 - **No es una frontera:** Mirar el transcript no te protege — Cuando ves el comando en pantalla, normalmente ya se ha ejecutado.
 - *En la demo:* Una ruta que sale de la carpeta de trabajo
 - *En la demo:* Lo lee sin preguntar
-- **Lo que tu usuario puede leer**
-  - `~/.ssh` · Claves SSH: acceso a servidores y repos
-  - `~/.aws` · Nube: credenciales de tus cuentas
-  - `.env` · Otros proyectos: secretos de aplicaciones
-  - `→ modelo` · Al contexto: lo leído viaja al proveedor
 
 ### 2 · El repositorio como superficie de ataque
 
 <p><button type="button" class="ir-a" data-t="175">▶ Ir a 2:55</button></p>
 
 - **Inyección de prompts:** El contenido que lee también da órdenes — Ficheros, comentarios, salidas de comandos y respuestas del modelo pueden dirigir al modelo.
-- **Lo que entra en el contexto**
-  - `AGENTS` · Instrucciones: del proyecto
-  - `read` · Ficheros: y comentarios
-  - `bash` · Salidas: npm install, tests
-  - `web` · Páginas: que consulta
-  - `#123` · Issues: y descripciones
 - **La tríada letal (Simon Willison)**
   - `1` · Datos privados: Pi lee tus ficheros
   - `2` · Contenido no fiable: lo que trae el repositorio
@@ -60,10 +40,6 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
   - `texto` · Hablar con tu agente: instrucciones en lo que lee
   - `.pi/` · Ejecutar código: extensiones o servidores MCP al arrancar
 - *En terminal:* repo-ajeno/AGENTS.md (más abajo, en «Código y comandos»)
-- **La forma de un ataque real**
-  - `👁` · Oculto: invisible al renderizar
-  - `⚙` · Acción no pedida: que tú no has solicitado
-  - `🤫` · Pide silencio: «no hace falta mencionarlo»
 - *En la demo:* DeepSeek detecta la instrucción y no la ejecuta
 - **Cuidado con la conclusión:** Nos protegió el modelo, no Pi — Y AGENTS.md llegó al contexto aunque no habíamos concedido confianza.
 
@@ -72,13 +48,6 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 <p><button type="button" class="ir-a" data-t="362">▶ Ir a 6:02</button></p>
 
 - *En la demo:* La pregunta al arrancar en repo-ajeno
-- **Qué activa la pregunta**
-  - `settings` · Ajustes: .pi/settings.json
-  - `mcp` · Servidores MCP: .pi/mcp.json
-  - `ext…` · Recursos: extensiones, skills, prompts, temas
-  - `SYSTEM` · System prompt: .pi/SYSTEM.md, APPEND_SYSTEM.md
-  - `skills` · .agents/skills: aquí o en una carpeta superior
-  - *Una carpeta .pi vacía no la activa.*
 - *En la demo:* Cinco opciones; tres guardan la decisión
 - *En la demo:* Sin confianza… pero AGENTS.md se carga
 - **Primera lección:** La confianza no filtra lo que el modelo lee — Para no cargar AGENTS.md: --no-context-files (-nc).
@@ -87,10 +56,6 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 - **Cómo decide Pi:** -a / -na (línea de comandos) → extensión (evento project_trust) → trust.json (decisión guardada) → ajuste (defaultProjectTrust: ask)
 - *En terminal:* Sin interfaz: print, JSON y RPC (más abajo, en «Código y comandos»)
 - **En integración continua:** Ramas ajenas: --no-approve — Que una rama no cuele una extensión con las credenciales del pipeline.
-- **Lo que la confianza no hace**
-  - `tools` · No limita herramientas: read, bash, edit y write siguen igual
-  - `sessionDir` · No lo cubre todo: se lee antes de decidir
-  - `≠` · No es una frontera: es un filtro de arranque
 
 ### 4 · Reducir el alcance sin aislar
 
@@ -104,11 +69,6 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
   - `protected-paths` · Rutas sensibles: bloquea escrituras
   - `confirm-destructive` · Sesión: confirma acciones destructivas
 - *En terminal:* Ejemplo sandbox/ de Pi: .pi/sandbox.json (más abajo, en «Código y comandos»)
-- **Higiene: menos daño, recuperación fácil**
-  - `git` · Commit antes: o un snapshot
-  - `⏳` · Credenciales cortas: alcance reducido
-  - `ext` · Revisa paquetes: se ejecutan en Pi
-  - `🖼` · Sin imágenes: images.blockImages
 - **Dos ajustes más**
   - `usuario` · Usuario dedicado: solo ve las carpetas de tus proyectos
   - `defaultTools` · Solo lectura por defecto: sin escribir --tools cada vez
@@ -118,12 +78,8 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 
 <p><button type="button" class="ir-a" data-t="791">▶ Ir a 13:11</button></p>
 
-- **Tres formas de ejecutar Pi**
-  - `host` · Directamente: protege lo que tu usuario no puede tocar
-  - `contenedor` · Pi entero dentro: protege el host que no expongas
-  - `tools` · Solo herramientas: aislamiento más estrecho
 - **La documentación de Pi:** Pi entero en un contenedor — «Usually the strongest practical option».
-- *En la demo:* Dockerfile.pi (Pi fijado a la 1.0.1)
+- *En la demo:* Dockerfile.pi (versión fijada)
 - *En la demo:* La imagen pi-sandbox
 - *En terminal:* Pi dentro de Docker (más abajo, en «Código y comandos»)
 - *En terminal:* Los dos volúmenes (más abajo, en «Código y comandos»)
@@ -139,11 +95,6 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 - *En la demo:* Dentro del contenedor: write en /workspace
 - *En la demo:* En el host: el fichero está
 - *En la demo:* Montaje :ro: nada llega al host
-- **Lo que expone un contenedor**
-  - `-v rw` · Montajes: se pueden modificar
-  - `~/.pi` · Agent dir: tus credenciales
-  - `-e` · Variables: visibles dentro
-  - `red` · Salida: código y datos pueden salir
 - **La red:** Sin red, sin modelo — Para cortar el resto de salidas: un proxy de salida o un entorno con políticas de red.
 
 ### 6 · Otras formas de aislar
@@ -161,31 +112,13 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 - **Gondolin: la letra pequeña**
   - `env` · Hereda el entorno: una clave en variable puede verse dentro
   - `ext` · Otras herramientas: siguen en el host si no delegan
-- **En una frase**
-  - `Docker` · La más sencilla: las credenciales entran contigo
-  - `sbx` · Proxy: la clave se queda fuera
-  - `OpenShell` · Políticas: finas y remotas
-  - `Gondolin` · Herramientas: tu interfaz de siempre
 - **La opción clásica:** Una máquina virtual o un equipo dedicado — Más pesada, pero separa también el núcleo del sistema operativo.
 
 ### 7 · Una receta para empezar
 
 <p><button type="button" class="ir-a" data-t="1279">▶ Ir a 21:19</button></p>
 
-- **Receta, de menos a más esfuerzo**
-  - `1` · Control de versiones: commit antes de cambios grandes
-  - `2` · Repo ajeno: mira AGENTS.md y .pi; arranca con -na
-- **Receta, de menos a más esfuerzo**
-  - `3` · Solo lectura: --tools read,grep,find,ls
-  - `4` · Contenedor: solo la carpeta, sin tu agent dir
-  - `5` · Clave fuera: Docker Sandboxes u OpenShell
 - **Si encuentras un fallo:** Canal de seguridad, no un issue público — Inyección, falta de sandbox o tus extensiones: en general, fuera del perímetro.
-- **Práctica:** Token falso (Pi lo lee desde tu proyecto) → Contenedor (ya no lo ve) → Solo lectura (nada se escribe en el host)
-- **Cómo grabamos este curso**
-  - `agent dir` · Aparte: credenciales y sesiones propias
-  - `repo` · De juguete: nada real en juego
-  - `claves` · Fuera de cámara: nunca en pantalla
-  - `rutas` · Difuminadas: sin datos personales
 - **Próximo vídeo:** Personalizar Pi sin escribir código — AGENTS.md, system prompt, prompt templates, skills y ajustes.
 
 ## Código y comandos
@@ -410,7 +343,7 @@ Ahora sí, el aislamiento. La documentación compara tres formas de ejecutar Pi.
 
 De las tres, la documentación dice que meter Pi entero en un contenedor suele ser la opción práctica más fuerte. Y es la que vamos a montar, con Docker y el Dockerfile de la propia documentación.
 
-El Dockerfile parte de node veinticuatro en Debian bookworm, versión slim. Instala bash, los certificados, git y ripgrep, e instala Pi con npm de forma global, con ignore scripts para que ningún paquete ejecute código durante la instalación. Nosotros hemos fijado la versión uno punto cero punto uno, la del curso; la documentación instala la última. El directorio de trabajo es barra workspace, y el punto de entrada es pi.
+El Dockerfile parte de node veinticuatro en Debian bookworm, versión slim. Instala bash, los certificados, git y ripgrep, e instala Pi con npm de forma global, con ignore scripts para que ningún paquete ejecute código durante la instalación. Nosotros fijamos una versión concreta; la documentación instala la última. El directorio de trabajo es barra workspace, y el punto de entrada es pi.
 
 Construimos la imagen con docker build, con la etiqueta pi sandbox y el Dockerfile punto pi. En nuestro caso ya estaba en caché, así que el build fue inmediato. La imagen ocupa unos ochocientos megas en disco.
 

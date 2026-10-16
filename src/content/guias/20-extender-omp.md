@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 20 · Extender oh my pi"
-description: "extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto es compatible con lo que ya hicimos para Pi."
+description: "Extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto es compatible con lo que ya hicimos para Pi."
 ruta: "pi-oh-my-pi"
 orden: 20
 duracion: "23 min"
@@ -8,7 +8,7 @@ video: "20-extender-omp.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/20-extender-omp.es.vtt"
 ---
 
-extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto es compatible con lo que ya hicimos para Pi.
+Extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto es compatible con lo que ya hicimos para Pi.
 
 <p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -19,18 +19,10 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
 - **Extender Pi, bloque B:** 06 (sin código) → 07 (MCP) → 08 (extensiones) → 09 (paquetes)
-- **Las mismas piezas, otros sitios**
-  - `comandos` · Del proyecto
-  - `skills` · Con Pi y registro
-  - `extensiones` · Casi sin cambios
-  - `plugins` · Y marketplaces: como Claude Code
+- **Hoy no repetimos nada de eso:** ¿Qué cambia en oh my pi? — Si ya sabes extender Pi.
 - **De lo ligero a lo potente:** Comando (texto) → Skill (Pi y omp) → Registro → Extensiones (de Pi) → Panel (plugins) → MCP (SSH)
 - *En terminal:* Dónde vive cada cosa (más abajo, en «Código y comandos»)
 - **Vídeo 11:** Sin /trust — ¿Qué se carga al abrir una carpeta? Lo cerramos al final.
-- **El montaje**
-  - `demo` · Perfil demo
-  - `V4 Pro` · El modelo
-  - `demo-20` · Límite 40 → 50: sin commitear
 
 ### 2 · Comandos de proyecto
 
@@ -43,23 +35,11 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 - *En la demo:* /reload-plugins y /rep
 - *En la demo:* /repaso las pruebas del envío
 - *En la demo:* Tres viñetas, sin editar
-- **Comando frente a template**
-  - `template (06)` · En tu máquina: directorio del agente
-  - `.omp/commands` · En el repositorio: todo el equipo
-  - `choque` · Gana el proyecto: los incluidos, antes
-- **También lee**
-  - `.claude/commands` · Claude Code
-  - `.codex` · Codex: y OpenCode
-  - `.agents` · Agent Skills
 
 ### 3 · Skills que comparten Pi y oh my pi
 
 <p><button type="button" class="ir-a" data-t="329">▶ Ir a 5:29</button></p>
 
-- **Dónde busca skills oh my pi**
-  - `.omp/skills` · Proyecto y perfil
-  - `registro` · Y plugins
-  - `.agents/skills` · Agent Skills: también Pi
 - **.agents/skills:** Una skill, dos agentes — La de notas de versión del vídeo 06, sin cambiar una coma.
 - *En la demo:* /skill:
 - *En la demo:* read SKILL.md · git log
@@ -76,27 +56,13 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 <p><button type="button" class="ir-a" data-t="500">▶ Ir a 8:20</button></p>
 
 - *En terminal:* skills.omp.sh (diapositiva) (más abajo, en «Código y comandos»)
-- **Instalar (diapositiva)**
-  - `@scope/nombre` · Como en npm
-  - `skills.json` · Y su lock: en el proyecto
-  - `-g` · Para tu usuario
-- **Lo que hace bien**
-  - `huella` · Se comprueba: antes de desempaquetar
-  - `scripts` · Pregunta: «Install skill with scripts?»
 - **Lo que no hace:** Revisar el contenido — La huella garantiza que recibes lo publicado, no que sea inofensivo.
-- **Publicar (solo explicado)**
-  - `omp skill publish` · Con cuenta
-  - `credenciales` · Avisa: hay que forzarlo
 
 ### 5 · Tus extensiones de Pi en oh my pi
 
 <p><button type="button" class="ir-a" data-t="615">▶ Ir a 10:15</button></p>
 
 - **Vídeo 11:** La promesa — ¿Funcionan en oh my pi las extensiones de Pi de los vídeos 08 y 09?
-- **Por qué pueden funcionar**
-  - `imports` · Reescritos: hacia las copias de omp
-  - `TypeBox` · Compatible
-  - `pi.extensions` · Se acepta: vídeo 09
 - *En la demo:* omp --profile demo -e ~/csn/extensiones
 - *En la demo:* /hola Ana
 - *En la demo:* permisos.ts no conoce glob
@@ -104,13 +70,6 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 - *En la demo:* Rutas protegidas del vídeo 08
 - **Límite 1:** Conoce las herramientas de Pi — glob, lsp, ast_grep, task… acaban en el diálogo. Revisa las listas.
 - **Límite 2:** Varias rutas en un edit — oh my pi entrega una lista; la extensión solo mira una.
-- **Límite 3 · el estado del 09**
-  - `session_start` · Escucha
-  - `session_tree` · Escucha
-  - `session_branch` · No escucha: /branch
-- **Límites 4 y 5**
-  - `exec` · Sin nivel: pide aprobación en write
-  - `/restart` · No hay /reload: mismos flags, misma sesión
 - *En terminal:* Una extensión pensando en oh my pi (más abajo, en «Código y comandos»)
 
 ### 6 · El panel y los plugins
@@ -121,13 +80,6 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 - *En la demo:* notas-de-version
 - *En la demo:* repaso
 - **Lo que no sale:** Los módulos de -e — El panel enseña lo que omp descubre en sus carpetas.
-- **Lo que sí sale**
-  - `~/.claude` · Skills personales: desactivadas, con ruta
-  - `~/.agents` · Dos activas: aunque apagamos esa fuente
-- **Plugins**
-  - `install` · npm o git
-  - `link` · Carpeta local: el pi install del 09
-  - `!` · Instalar es ejecutar
 - *En la demo:* /plugins
 - *En la demo:* /marketplace list
 
@@ -136,10 +88,6 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 <p><button type="button" class="ir-a" data-t="992">▶ Ir a 16:32</button></p>
 
 - *En la demo:* /mcp help
-- **De dónde lee MCP**
-  - `.omp/mcp.json` · Proyecto y perfil
-  - `otras` · Claude, Codex, Cursor…
-  - `.pi/mcp.json` · No lo lee: cópialo
 - **Vídeo 07 y 11:** codemode → xd:// — Las herramientas MCP como dispositivos que el modelo descubre.
 - *En terminal:* .omp/mcp.json del proyecto (diapositiva) (más abajo, en «Código y comandos»)
 - *En la demo:* /ssh help
@@ -149,14 +97,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 <p><button type="button" class="ir-a" data-t="1120">▶ Ir a 18:40</button></p>
 
 - **oh my pi:** isProjectTrusted() → true — No pide confianza por carpeta antes de cargar lo que trae el proyecto.
-- **Al abrir un repositorio se carga**
-  - `texto` · Comandos y skills: y reglas
-  - `agentes` · Vídeo 16
-  - `config` · Puede poner yolo: vídeo 19
-  - `código` · Hooks y extensiones
-  - `programas` · Servidores MCP
-  - `plugins` · Del proyecto
-- **Un caso concreto:** Ya ha pasado — Un hook que lee tu entorno y un MCP local, antes de escribir un prompt.
+- **No has escrito ni un prompt:** Ya ha pasado — En Pi, con la confianza de fábrica, no se habría cargado hasta que dijeras que sí.
 - *En terminal:* Antes de abrir un repositorio ajeno (más abajo, en «Código y comandos»)
 - **Vídeos 5 y 19:** Extender no es aislar — Para código que no conoces: un contenedor.
 
@@ -164,16 +105,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 <p><button type="button" class="ir-a" data-t="1246">▶ Ir a 20:46</button></p>
 
-- **Repaso · 1**
-  - `.omp/commands` · $ARGUMENTS: /reload-plugins
-  - `.agents/skills` · Pi y omp: /skill: · /skillful
-  - `registro` · Huella y aviso
-- **Repaso · 2**
-  - `-e` · Extensiones de Pi: con límites
-  - `/extensions` · Qué y de dónde
-  - `plugins` · Marketplaces
 - **Lo que no cambia:** Sin /trust — Todo lo que extiende oh my pi desde una carpeta se carga al abrirla.
-- **La práctica:** Comando ($ARGUMENTS) → Skill (.agents) → -e (tu extensión) → /extensions (qué se carga)
 - **Vídeo 21:** oh my pi fuera de la terminal — omp -p, JSON, RPC, SDK y ACP.
 
 ## Código y comandos

@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 01 · Qué es un harness de agente"
-description: "los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas, entorno, estado y feedback. Vemos la misma tarea con Pi y con oh my pi para comparar dos filosofías."
+description: "Los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas, entorno, estado y feedback. Vemos la misma tarea con Pi y con oh my pi para comparar dos filosofías."
 ruta: "pi-oh-my-pi"
 orden: 1
 duracion: "22 min"
@@ -8,7 +8,7 @@ video: "01-que-es-un-harness.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/01-que-es-un-harness.es.vtt"
 ---
 
-los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas, entorno, estado y feedback. Vemos la misma tarea con Pi y con oh my pi para comparar dos filosofías.
+Los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas, entorno, estado y feedback. Vemos la misma tarea con Pi y con oh my pi para comparar dos filosofías.
 
 <p class="guia__nota">Dura 22 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -19,13 +19,9 @@ los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas,
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
 - **El punto de partida:** El modelo recibe texto y devuelve texto — No lee tu repositorio, no ejecuta pruebas, no recuerda.
-- **El harness: todo lo que no son los pesos:** Instrucciones (lo que lee) → Herramientas (lo que puede hacer) → Entorno (dónde se ejecuta) → Estado (lo que conserva) → Feedback (cómo se comprueba)
 - **En una frase:** El modelo decide qué . El harness, cuándo, dónde y cómo. — Un buen harness no vuelve más listo al modelo: vuelve fiable lo que produce.
 - **Por eso:** Mismo modelo, resultados distintos — Cambia lo que ve, lo que puede hacer y cuándo se da por terminado.
 - **Primer sentido:** El harness como programa — Ejecuta el bucle: sesión, herramientas, permisos y compactación. Pi y oh my pi.
-- **Dos sentidos de «harness»**
-  - `1` · El programa: Pi, oh my pi: ejecutan el bucle del agente
-  - `2` · El andamiaje del repo: AGENTS.md, scripts, tareas, traspasos, rúbricas: portable
 - **Cómo los recorre el curso**
   - `B·C` · Pi y oh my pi: el harness como programa
   - `D` · Método: el harness de tu proyecto
@@ -34,43 +30,22 @@ los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas,
 
 <p><button type="button" class="ir-a" data-t="151">▶ Ir a 2:31</button></p>
 
-- **Las cinco piezas · Learn Harness Engineering**
-  - `01` · Instrucciones: qué y cómo
-  - `02` · Herramientas: y sus políticas
-  - `03` · Entorno: dónde se ejecuta
-  - `04` · Estado: lo que se recuerda
-  - `05` · Feedback: cómo se verifica
 - **01 · Instrucciones:** Un mapa, no un manual — Prompt de sistema · AGENTS.md · skills · plantillas de prompt
 - *En terminal:* AGENTS.md · instrucciones del proyecto (más abajo, en «Código y comandos»)
 - **02 · Herramientas:** Las manos del agente, con mínimo privilegio — Qué hace sin preguntar · qué necesita aprobación · qué está prohibido
 - *En la demo:* Cada herramienta viaja, descrita, en cada petición
-- **Dos extremos**
-  - `4` · Pi: herramientas activas de serie
-  - `12/24` · oh my pi: activas / disponibles en la demo
 - **03 · Entorno:** Quien decide no debería ser quien ejecuta — Tu máquina · un contenedor · una máquina virtual · un servidor remoto
-- **npm install, en dos entornos**
-  - `✕` · En tu máquina: los scripts corren con tus permisos
-  - `✓` · En un contenedor: solo ve lo que tú le montas
 - **Cuando se llena el contexto:** Resumir (Pi compacta solo) → Podar (fuera resultados pesados) → Traspasar (documento y sesión limpia)
 - **Estado fuera de la conversación:** Lo que no está en ficheros, no existe — Repositorio · lista de tareas · documento de traspaso
 - **05 · Feedback:** Una forma objetiva de saber que ha terminado — Pruebas · linters · revisiones · criterios de aceptación
 - *En terminal:* harness-demo · el feedback es una orden (más abajo, en «Código y comandos»)
 - **Separa a quien hace de quien revisa:** Hace (el agente) → Revisa (persona, otro agente o pruebas)
-- **Y una sexta: las vistas**
-  - `TUI` · Terminal: interactiva
-  - `-p` · Scripts: texto y JSON
-  - `RPC` · Editores: por protocolo
-  - `SDK` · Tu programa: embebido
 
 ### 3 · Un turno por dentro
 
 <p><button type="button" class="ir-a" data-t="446">▶ Ir a 7:26</button></p>
 
 - **Un turno, paso a paso:** Tu mensaje (a la rama activa) → La petición (prompt · rama · herramientas) → El proveedor (el modelo responde)
-- **Intervenir mientras trabaja**
-  - `↵` · Steering: entra al acabar el turno
-  - `⇥` · Follow-up: espera a que termine todo
-  - `Esc` · Abortar: para la ejecución
 - **Sesiones:** La sesión es un árbol — Rebobina y prueba otro camino sin perder el anterior.
 - **Lo que guarda la compactación:** Objetivo → Restricciones → Progreso → Decisiones → Siguientes pasos
 - **Todo esto es harness:** El modelo solo ve lo que el harness le envía — Lo que entra · lo que puede hacer · cuándo se para
@@ -79,28 +54,15 @@ los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas,
 
 <p><button type="button" class="ir-a" data-t="568">▶ Ir a 9:28</button></p>
 
-- **Pi · cuatro herramientas de serie**
-  - `read` · Leer: ficheros
-  - `write` · Escribir: ficheros nuevos
-  - `edit` · Editar: reemplazo exacto
-  - `bash` · Ejecutar: comandos
 - **La escalera: el mecanismo más pequeño:** AGENTS.md → Plantilla → Skill → Extensión → Paquete
 - **Pi:** No pide permiso: te enseña cada paso — Aprobaciones y sandbox: con extensiones o con un contenedor.
 - **oh my pi · fork de Pi, 2026:** Baterías incluidas — Unas treinta herramientas y ochenta y cinco comandos de serie.
-- **Lo que trae de serie**
-  - `⇉` · Subagentes: trabajo en paralelo
-  - `◎` · Plan y objetivos: con presupuesto
-  - `◷` · Memoria: entre sesiones
-  - `` · IDE: LSP · depurador · git
 - **Ingeniería pensada para el modelo**
   - `#` · Hashline: edición anclada
   - `TTSR` · Reglas: en mitad de la respuesta
   - `◉` · Asesor: revisa cada turno
   - `⇅` · Roles: barato o potente
 - **Seguridad:** Ninguno pide permiso por defecto — oh my pi: tools.approvalMode = yolo. La seguridad la decides tú.
-- **Dos filosofías**
-  - `pi` · Pi: un núcleo pequeño que entiendes y moldeas
-  - `omp` · oh my pi: un taller completo desde el primer día
 - **Las mismas piezas, otros agentes**
   - `CC` · Claude Code: memoria por capas, permisos, hooks, subagentes
   - `CX` · Codex: repo como registro, AGENTS.md, worktrees
@@ -138,12 +100,6 @@ los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas,
 <p><button type="button" class="ir-a" data-t="1017">▶ Ir a 16:57</button></p>
 
 - **Diagnóstico:** Antes de cambiar de modelo, arregla el harness — Cambiar de modelo a menudo solo esconde el problema.
-- **Las preguntas, en orden**
-  - `?` · Instrucciones: ¿claras y a la vista?
-  - `?` · Herramientas: ¿las justas?
-  - `?` · Entorno: ¿el correcto?
-  - `?` · Estado: ¿se conservó?
-  - `?` · Feedback: ¿sabía cuándo acabar?
 - **Caso 1 · «Ya está arreglado» y no lo está:** Síntoma (falsa victoria) → Pieza (feedback) → Solución (criterio comprobable)
 - **Caso 2 · Olvida una restricción:** Síntoma (sesión larga) → Pieza (estado) → Solución (a las instrucciones)
 - **Caso 3 · Lento y elige mal:** Síntoma (cuarenta herramientas) → Pieza (herramientas) → Solución (menos, o bajo demanda)
@@ -156,11 +112,6 @@ los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas,
 
 <p><button type="button" class="ir-a" data-t="1183">▶ Ir a 19:43</button></p>
 
-- **26 vídeos · 4 bloques**
-  - `A` · Marco: 1 vídeo
-  - `B` · Pi: 9 vídeos
-  - `C` · oh my pi: 11 vídeos
-  - `D` · Método: 5 vídeos
 - **Bloque Pi · 9 vídeos**
   - `02` · Empezar: instalar, por dentro, modelos
   - `05` · Seguridad: y aislamiento
@@ -177,12 +128,6 @@ los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas,
   - `24` · Verificar: de verdad
   - `25` · Orquestar: cuándo compensa
   - `26` · Proyecto: de principio a fin
-- **Práctica · analiza una tarea tuya**
-  - `?` · Instrucciones: ¿qué tenía?
-  - `?` · Herramientas: ¿qué usó?
-  - `?` · Entorno: ¿dónde corrió?
-  - `?` · Estado: ¿qué olvidó?
-  - `?` · Feedback: ¿cómo supiste?
 - **Próximo vídeo:** Instalar Pi y primera tarea — El modelo pone la inteligencia; el harness, todo lo demás.
 
 ## Código y comandos
@@ -399,7 +344,7 @@ Y una advertencia: el harness se degrada como el código. Las instrucciones se q
 
 Con este vocabulario ya podemos recorrer el curso. Son veintiséis vídeos en cuatro bloques. Este es el primero, el marco común.
 
-El bloque de Pi tiene nueve vídeos. Empezamos instalando Pi y haciendo una primera tarea, vemos cómo funciona por dentro, cómo elegir modelos y proveedores, y cómo trabajar con seguridad. Después aprendemos a personalizarlo sin código, conocemos MCP y codemode, que son la gran novedad de la versión uno, escribimos extensiones propias y lo usamos desde scripts.
+El bloque de Pi tiene nueve vídeos. Empezamos instalando Pi y haciendo una primera tarea, vemos cómo funciona por dentro, cómo elegir modelos y proveedores, y cómo trabajar con seguridad. Después aprendemos a personalizarlo sin código, conocemos MCP y codemode, dos de sus piezas más recientes, escribimos extensiones propias y lo usamos desde scripts.
 
 El bloque de oh my pi tiene once vídeos: qué cambia respecto a Pi, la interfaz y las sesiones, el contexto y la memoria, los modelos y roles, la planificación, los subagentes, el entorno de desarrollo integrado, git y calidad, las aprobaciones y reglas, cómo extenderlo y cómo usarlo en equipo.
 

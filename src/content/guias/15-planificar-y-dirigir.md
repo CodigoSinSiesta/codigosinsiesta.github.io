@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 15 · Planificar y dirigir"
-description: "planes revisables, objetivos con presupuesto, bucles con condición de parada y colas de tareas. Cuándo usar cada modo y por qué no se combinan."
+description: "Planes revisables, objetivos con presupuesto, bucles con condición de parada y colas de tareas. Cuándo usar cada modo y por qué no se combinan."
 ruta: "pi-oh-my-pi"
 orden: 15
 duracion: "23 min"
@@ -8,7 +8,7 @@ video: "15-planificar-y-dirigir.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/15-planificar-y-dirigir.es.vtt"
 ---
 
-planes revisables, objetivos con presupuesto, bucles con condición de parada y colas de tareas. Cuándo usar cada modo y por qué no se combinan.
+Planes revisables, objetivos con presupuesto, bucles con condición de parada y colas de tareas. Cuándo usar cada modo y por qué no se combinan.
 
 <p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,19 +18,12 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
+- **Pero la forma de trabajar era la misma:** Tú escribes → El agente trabaja (hasta que cree que ha terminado) → Te devuelve el control
 - **Hoy decidimos**
   - `aprobar` · Quién aprueba
   - `parar` · Cuándo para
   - `gastar` · Cuánto gasta
-- **Cuatro modos**
-  - `plan` · Investiga y propone
-  - `goal` · Objetivo con presupuesto
-  - `loop` · Repite hasta una señal
-  - `vibe` · Dirige a otros
 - **La regla:** Plan, goal y vibe no se combinan — Se encadenan: primero un plan, después un objetivo que lo ejecuta.
-- **Hoy**
-  - `V4 Pro` · El capaz: rol plan
-  - `Flash` · El rápido: ejecuta
 - *En la demo:* /pl
 - *En la demo:* /go
 
@@ -38,16 +31,10 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 <p><button type="button" class="ir-a" data-t="123">▶ Ir a 2:03</button></p>
 
-- **Separar pensar de hacer:** Explora (sin tocar) → Plan (escrito) → Tú apruebas → Ejecuta
+- **El error más caro:** Código correcto para el problema equivocado — Editar a la vez que piensa convierte cada malentendido en cambios que hay que deshacer.
+- **El modo plan separa las dos cosas:** Explora (sin tocar el proyecto) → Escribe un plan → Tú lo apruebas (antes, nada se ejecuta)
 - *En la demo:* plan = DeepSeek V4 Pro :high
 - *En la demo:* /plan · Alt+Shift+P
-- **Mientras dura**
-  - `write · edit` · Solo lectura: el plan va a local://
-  - `rename · delete` · Tampoco
-  - `ask` · Sin temporizador: espera tu respuesta
-- **Cómo termina cada turno**
-  - `ask` · Pregunta
-  - `xd://propose` · Propone el plan: …-plan.md en local
 - **La petición:** Códigos de cupón — BIENVENIDA10 resta un 10 % antes del envío; un código desconocido da un error claro.
 - **Límite:** Planificar no es aislar — Aislamiento: vídeo 05. Permisos: vídeo 19.
 
@@ -64,10 +51,6 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 - *En la demo:* El plan corregido
 - *En la demo:* Cinco salidas
 - *En la demo:* ¿Qué rol ejecuta el plan?
-- **Más**
-  - `título` · La sesión toma el del plan
-  - `plan.autosave` · .omp/plans/: apagado
-  - `--plan-yolo` · Sin revisión: → smol
 - *En la demo:* Save and quit
 - *En la demo:* El plan, en un fichero del repo
 
@@ -75,23 +58,13 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 <p><button type="button" class="ir-a" data-t="523">▶ Ir a 8:43</button></p>
 
-- **Modo goal:** Objetivo → Turno → Cede (oh my pi le recuerda) → goal complete (lo decide el modelo)
 - *En terminal:* /goal (más abajo, en «Código y comandos»)
-- **Ojo:** /goal &lt;objetivo&gt; no lleva presupuesto — Empieza en el acto. Y Esc lo pausa.
-- **/guided-goal busca cinco cosas**
-  - `éxito` · Comprobable
-  - `verificar` · Cómo
-  - `intentos` · Cuántos
-  - `alcance` · Qué toca
-  - `parar` · Cuándo
 - *En la demo:* /guided-goal · pregunta 1
 - *En la demo:* Preguntas 2 y 3
 - *En la demo:* Presupuesto desde el primer momento
 - *En la demo:* Goal: complete
-- **El presupuesto**
-  - `cuenta` · Entrada, escritura de caché, salida: no las lecturas de caché
-  - `límite` · budget limited: avisa y deja de continuar
-  - `final` · Lo decide el modelo
+- **Al llegar al límite, no corta en seco:** budget limited (el estado del objetivo) → Un aviso (para que cierre) → Sin continuar (oh my pi deja de pedírselo)
+- **Recuerda:** El final lo decide el modelo — Y puede declarar cumplido algo que no lo está.
 
 ### 5 · Dirigir mientras trabaja
 
@@ -104,9 +77,6 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
   - `sesión` · Se guarda
 - *En la demo:* /todo append
 - *En la demo:* /queue
-- **Parar sin perder nada**
-  - `/pause` · Congela: agente, subagentes y advisor
-  - `Esc` · Interrumpe: y pausa el objetivo
 - *En la demo:* Objetivo cumplido
 - *En la demo:* La cola, al ceder el turno
 
@@ -116,10 +86,6 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 - *En la demo:* /plan con un objetivo activo
 - *En la demo:* Bloqueado
-- **Quién bloquea a quién**
-  - `plan` · Bloquea goal y vibe
-  - `goal` · Bloquea plan y vibe: también en pausa
-  - `vibe` · Bloquea los dos
 - **Cada modo cambia dos cosas**
   - `plan` · Solo lectura: para en tu aprobación
   - `goal` · Herramienta goal: para al cumplir o con el presupuesto
@@ -130,35 +96,16 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 <p><button type="button" class="ir-a" data-t="968">▶ Ir a 16:08</button></p>
 
-- **goal frente a loop**
-  - `goal` · El modelo decide
-  - `loop` · Algo de fuera lo para
 - *En terminal:* /loop (más abajo, en «Código y comandos»)
-- **La condición**
-  - `después` · Tras cada vuelta: la primera siempre ocurre
-  - `30 s` · Si falla raro: el bucle se apaga
 - *En la demo:* Un test que falla, a mano
 - *En la demo:* /loop 3 --until 'node --test'
 - *En la demo:* Una sola vuelta
-- **loop.mode**
-  - `prompt` · Reenvía: de fábrica
-  - `compact` · Compacta antes: gasta modelo
-  - `reset` · De cero: no en vibe
 - *En la demo:* git diff
 
 ### 8 · /vibe
 
 <p><button type="button" class="ir-a" data-t="1171">▶ Ir a 19:31</button></p>
 
-- **/vibe: la sesión dirige**
-  - `spawn` · Crear
-  - `send` · Mensaje
-  - `wait` · Esperar
-  - `kill` · Parar
-  - `list` · Ver
-- **Trabajadores**
-  - `fast` · Modelo de smol: mecánico, borradores
-  - `good` · Rol task: decidir y revisar
 - **La documentación:** Terminar no es acertar — La directora verifica leyendo los ficheros que tocaron.
 - **Solo diapositiva:** Varios agentes, varios contextos — El gasto se multiplica. Subagentes y paralelo: vídeo 16.
 
@@ -167,8 +114,6 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 <p><button type="button" class="ir-a" data-t="1255">▶ Ir a 20:55</button></p>
 
 - **Repaso: plan:** /plan (solo lectura) → Revisión (anotar, refinar) → continue with (qué rol) → Save and quit (o aprobar)
-- **Repaso: dirigir:** /guided-goal (con presupuesto) → todo · queue (sin interrumpir) → /loop (acotado) → /vibe (dirige)
-- **Práctica:** Rol plan → Anotar (y refinar) → Save and quit → /guided-goal (con presupuesto) → Comparar (tokens y diff)
 - **Próximo vídeo:** Subagentes y trabajo en paralelo — task, el Agent Hub, tus agentes, /tan y /jobs.
 
 ## Código y comandos

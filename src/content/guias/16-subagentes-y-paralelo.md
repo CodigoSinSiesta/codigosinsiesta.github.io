@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 16 · Subagentes y trabajo en paralelo"
-description: "repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agentes propios para tu proyecto."
+description: "Repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agentes propios para tu proyecto."
 ruta: "pi-oh-my-pi"
 orden: 16
 duracion: "23 min"
@@ -8,7 +8,7 @@ video: "16-subagentes-y-paralelo.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/16-subagentes-y-paralelo.es.vtt"
 ---
 
-repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agentes propios para tu proyecto.
+Repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agentes propios para tu proyecto.
 
 <p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -22,11 +22,8 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 - **Repartir no es gratis**
   - `contexto` · Cada uno el suyo: relee lo que necesita
   - `tiempo` · Antes: pero no más barato
-  - `verificar` · Terminar ≠ acertar
+- **Terminar no es acertar:** Qué encargar, a quién y cómo comprobarlo — Que diga que ha terminado no demuestra que lo haya hecho bien.
 - **Hoy:** task (y sus agentes) → /agents (y los tuyos) → Agent Hub (seguir) → /tan · /jobs → /cleanse
-- **Hoy**
-  - `V4 Pro` · Reparte y revisa: la conversación
-  - `Flash` · Hace los encargos: los subagentes
 - *En la demo:* /ag
 - *En la demo:* /j
 
@@ -34,25 +31,10 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 <p><button type="button" class="ir-a" data-t="127">▶ Ir a 2:07</button></p>
 
-- **task:** El modelo llama (task) → Sesión hija (modelo, herramientas) → Trabaja sola → yield (resumen al principal)
 - *En terminal:* Una llamada a task (más abajo, en «Código y comandos»)
-- **En segundo plano**
-  - `async` · Devuelve el control
-  - `agent://` · La salida: por nombre
-  - `history://` · Lo que hizo: aunque esté aparcado
-- **Importante:** No hereda la conversación — Recibe el árbol de trabajo, AGENTS.md y el contexto común. Nada más.
-- **Cinco agentes de serie**
-  - `task` · Generalista: rol task
-  - `sonic` · Mecánico: smol
-  - `scout` · Explora: smol · solo lectura
-  - `reviewer` · Revisa: slow
-  - `security` · Seguridad
 - **Dos detalles**
   - `reviewer` · Tiene bash: no es solo lectura
   - `task` · Sin rol task: usa el modelo activo: Pro
-- **Cómo pedir que reparta**
-  - `explícito` · Pídelo: task, cuántos y qué
-  - `orchestrate` · Palabra mágica: decide él cuántos
 
 ### 3 · /agents y tus propios agentes
 
@@ -69,48 +51,24 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
   - `New agent` · Un arquitecto lo redacta: sin modelo: hereda
 - *En terminal:* Dónde viven los agentes (más abajo, en «Código y comandos»)
 - *En la demo:* .omp/agents/revisor-tests.md
-- **Más campos**
-  - `spawns` · A quién lanza
-  - `output` · Esquema
-  - `blocking` · Se espera
-  - `prewalk` · advisor
-  - `unpack` · Copiar incluidos
 - **Trampa:** «Solo lectura» con bash es una instrucción — Si no debe escribir, no le des bash ni edición.
 
 ### 4 · Repartir y seguir en el Agent Hub
 
 <p><button type="button" class="ir-a" data-t="536">▶ Ir a 8:56</button></p>
 
-- **El reparto**
-  - `scout` · Localizar: subtotal, envío, sin test
-  - `revisor-tests` · Revisar tests: carrito
-  - `sonic` · JSDoc: envío, sin cambiar código
 - *En la demo:* Una llamada, tres agentes
 - *En la demo:* En segundo plano
 - *En la demo:* Alt+A · Agent Hub
 - *En la demo:* El inspector
 - *En la demo:* Teclas del Hub
-- **Al Hub**
-  - `Alt+A` · El más corto
-  - `Ctrl+S` · Compatibilidad
-  - `/hub` · Comando
 - *En la demo:* Actividad de los tres
-- **Al terminar**
-  - `idle` · Sigue vivo: con su contexto
-  - `parked` · A los 7 min: r revive
-  - `mensaje` · Corrige el mismo: no lances otro
 - *En la demo:* Quien reparte, verifica
 
 ### 5 · /tan y /jobs
 
 <p><button type="button" class="ir-a" data-t="779">▶ Ir a 12:59</button></p>
 
-- **Preguntas y encargos laterales**
-  - `/btw` · Pregunta: vídeo 13
-  - `/tan` · Trabajo: un agente completo
-- **task frente a /tan**
-  - `task` · Sin historial
-  - `/tan` · Clona tu sesión: mismo modelo
 - *En la demo:* /tan · /jobs
 - *En la demo:* Nadie lo ha verificado todavía
 - *En la demo:* Seguimos en la sesión principal
@@ -137,31 +95,16 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 <p><button type="button" class="ir-a" data-t="1125">▶ Ir a 18:45</button></p>
 
 - **Permisos:** Los subagentes van en yolo — No pueden preguntarte. Su barrera: las herramientas que les das. Vídeo 19.
-- **Espacio de trabajo**
-  - `compartido` · Por defecto: encargos que no se pisen
-  - `isolation` · Una copia por agente: parche o rama · apagado
-- **En modo plan:** Explorar sí, cambiar no — Solo lectura y búsqueda; no lanzan a otros.
-- **Frenos de serie**
-  - `32` · A la vez
-  - `2` · Profundidad
-  - `peticiones` · Presupuesto blando
-- **Contener el gasto**
+- **El coste:** Tres agentes leen tres veces — El Hub te enseña lo que gasta cada uno: míralo.
+- **Hoy, tres reglas**
   - `pequeños` · Encargos separados
-  - `barato` · Modelo de smol
-  - `uno` · Verifica uno
+  - `barato` · Modelo de smol: para los subagentes
+  - `uno` · Verifica uno solo
 
 ### 8 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1235">▶ Ir a 20:35</button></p>
 
-- **Repaso:** task (lotes) → Sin historial (encargo autónomo) → 5 agentes (de serie) → Verifica (quien reparte)
-- **Y además:** /agents (@smol) → .omp/agents (los tuyos) → Agent Hub (Alt+A) → /tan · /jobs → /cleanse
-- **Cuál usar**
-  - `task` · Partes separadas
-  - `/tan` · Encargo lateral
-  - `/cleanse` · Errores de checker
-  - `ninguno` · Tarea pequeña
-- **Práctica:** Agente propio (barato) → Reparto (tres encargos) → Hub (actividad) → Gasto y diff
 - **Próximo vídeo:** El entorno de desarrollo integrado — read, LSP, depurador, ast grep, hashline, eval y el navegador.
 
 ## Código y comandos

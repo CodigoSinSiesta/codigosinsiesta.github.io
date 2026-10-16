@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 08 · Extensiones I: comandos, herramientas y eventos"
-description: "la API de extensiones (comandos, herramientas propias y eventos). Construimos en directo el modo de aprobación que Pi no trae de serie."
+description: "La API de extensiones (comandos, herramientas propias y eventos). Construimos en directo el modo de aprobación que Pi no trae de serie."
 ruta: "pi-oh-my-pi"
 orden: 8
 duracion: "21 min"
@@ -8,7 +8,7 @@ video: "08-extensiones-i.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/08-extensiones-i.es.vtt"
 ---
 
-la API de extensiones (comandos, herramientas propias y eventos). Construimos en directo el modo de aprobación que Pi no trae de serie.
+La API de extensiones (comandos, herramientas propias y eventos). Construimos en directo el modo de aprobación que Pi no trae de serie.
 
 <p class="guia__nota">Dura 21 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,14 +18,7 @@ la API de extensiones (comandos, herramientas propias y eventos). Construimos en
 
 <p><button type="button" class="ir-a" data-t="20">▶ Ir a 0:20</button></p>
 
-- **Personalizar Pi**
-  - `texto` · Sin código: contexto, prompts, skills, ajustes, MCP
-  - `código` · Extensiones: lo que ninguna instrucción garantiza
 - *En terminal:* Una extensión (más abajo, en «Código y comandos»)
-- **Dónde se cargan**
-  - `pi -e` · Para desarrollar: un fichero, solo esta ejecución
-  - `usuario` · Siempre: ~/.pi/agent/extensions/
-  - `proyecto` · .pi/extensions/: solo si confías en él
 - **Cuidado:** Código con tus permisos — Puede leer prompts, ficheros, credenciales e historial, y ejecutar lo que quiera.
 - **Tres extensiones:** hola.ts (un comando) → tests.ts (una herramienta) → permisos.ts (un modo de aprobación)
 
@@ -38,25 +31,11 @@ la API de extensiones (comandos, herramientas propias y eventos). Construimos en
 - *En la demo:* pi -e ~/csn/extensiones/hola.ts
 - *En la demo:* /ho → hola
 - *En la demo:* /hola Ana
-- **ctx.ui**
-  - `select` · Elegir: entre opciones
-  - `confirm` · Sí o no: una confirmación
-  - `input` · Un texto: una línea
-  - `editor` · Texto largo: un editor
-  - `setStatus` · Pie: texto fijo
-  - `await` · Asíncronas: esperan la respuesta
-- **¿Quién lo ejecuta?**
-  - `/comando` · Tú: el modelo no puede llamarlo
-  - `herramienta` · El modelo: lo que necesitas para darle algo
 
 ### 3 · Herramientas propias con TypeBox
 
 <p><button type="button" class="ir-a" data-t="244">▶ Ir a 4:04</button></p>
 
-- **¿Por qué no bash?**
-  - `=` · Siempre igual: mismo comando, mismo formato
-  - `↓` · Solo lo que importa: no páginas de salida
-  - `✓` · Permisos: se trata distinto
 - *En la demo:* tests.ts: definición
 - *En la demo:* Type.Optional(Type.String(…))
 - *En la demo:* execute()
@@ -71,22 +50,6 @@ la API de extensiones (comandos, herramientas propias y eventos). Construimos en
 
 <p><button type="button" class="ir-a" data-t="400">▶ Ir a 6:40</button></p>
 
-- **pi.on(evento, handler):** 41 eventos — Comandos y herramientas añaden cosas; los eventos intervienen en lo que Pi ya hace.
-- **Una petición de principio a fin**
-  - `1` · session_start: al arrancar: preparar
-  - `2` · input: lo que escribes
-  - `3` · before_agent_start: system prompt
-  - `4` · turn_start / end: cada vuelta
-  - `5` · tool_call / result: herramientas
-  - `6` · session_shutdown: al cerrar: liberar
-- **Y más**
-  - `session_before_*` · Sesión: compactar, bifurcar… cancelables
-  - `provider` · Proveedor: peticiones y respuestas
-  - `context` · Mensajes: reescribir lo que se envía
-- **Lo que hace tu valor de retorno**
-  - `avisan` · Se ignora: notificación
-  - `transforman` · Sustituye: al original
-  - `cancelan` · Detiene: la operación
 - *En terminal:* tool_call: tres respuestas posibles (más abajo, en «Código y comandos»)
 - **Fallo seguro:** Si tu handler falla, la herramienta no se ejecuta — Un error en tool_call bloquea la llamada.
 
@@ -95,38 +58,15 @@ la API de extensiones (comandos, herramientas propias y eventos). Construimos en
 <p><button type="button" class="ir-a" data-t="522">▶ Ir a 8:42</button></p>
 
 - **Antes de construir más:** Cinco reglas — Una extensión vive dentro de Pi y comparte su ciclo de vida.
-- **1 · La factoría solo registra**
-  - `factoría` · Registrar: sin procesos ni timers
-  - `session_start` · Arrancar: lo que dure la sesión
-  - `session_shutdown` · Cerrar: idempotente
-- **2 · No todos los contextos son iguales**
-  - `comando` · Más poder: esperar, recargar, cambiar de sesión
-  - `evento / herramienta` · Sin esas operaciones: encola un mensaje con el comando
-- **3 · Herramientas en paralelo**
-  - `‖` · A la vez: varias llamadas por mensaje
-  - `estado` · En secuencia: si compartes memoria
-  - `ficheros` · Cola: que no se pisen las ediciones
-- **4 · Errores**
-  - `evento` · Pi sigue: informa y continúa
-  - `tool_call` · Bloquea: fallo seguro
-  - `salida` · Recorta: y di dónde está el resto
+- **1 · La factoría solo registra:** factoría (solo registra) → session_start (arranca lo que dure la sesión) → session_shutdown (ciérralo; que aguante dos veces)
 - **5 · Los modos**
   - `ctx.mode` · Qué modo: interactivo, print, JSON, RPC
   - `ctx.hasUI` · ¿Hay alguien?: para contestar un diálogo
-- **Importaciones**
-  - `Pi y TypeBox` · Sin instalar: Pi los resuelve
-  - `package.json` · Otras dependencias: o un paquete de Pi (vídeo 09)
-- **¿Hooks o plugin?**
-  - `hooks` · Un script aparte: Pi lo llama y lee su salida
-  - `extensión` · Dentro de Pi: estado e interfaz directos
 
 ### 6 · El modo aprobación
 
 <p><button type="button" class="ir-a" data-t="709">▶ Ir a 11:49</button></p>
 
-- **Modos de permiso**
-  - `Pi` · No tiene: ejecuta lo que el modelo decide
-  - `oh my pi` · Sí los trae: vídeo 19
 - *En la demo:* permisos.ts: las listas
 - *En la demo:* bashSeguro()
 - *En la demo:* El handler de tool_call
@@ -150,41 +90,24 @@ la API de extensiones (comandos, herramientas propias y eventos). Construimos en
 - **Ni siquiera preguntando:** AGENTS.md y .git/ — Rutas que el modelo nunca debería tocar.
 - *En la demo:* git diff permisos.ts
 - *En la demo:* /reload
-- **Reload recrea el entorno**
-  - `0` · Contadores a cero: y «permitir siempre» vacío
-  - `vídeo 09` · Para sobrevivir: hay que guardarlo
 - *En la demo:* «Añade a AGENTS.md una regla…»
 - *En la demo:* Intenta chmod u+w
 - *En la demo:* Bloquear
-- **Desarrollar una extensión:** Editar (el fichero .ts) → /reload (sin salir de Pi) → Probar (y repetir)
 
 ### 8 · Sin interfaz, y lo que no es
 
 <p><button type="button" class="ir-a" data-t="1081">▶ Ir a 18:01</button></p>
 
-- **Modos de Pi**
-  - `tui` · Interactivo: diálogos
-  - `pi -p` · Print: sin diálogos
-  - `json` · JSON: sin diálogos
-  - `rpc` · RPC: diálogos del cliente
 - *En la demo:* pi -p "Haz commit del cambio del README."
 - **Variantes**
   - `timeout` · Diálogo con tiempo: sin respuesta → bloquear
   - `annotations` · Como Codex: preguntar si no es solo lectura
   - `examples/` · Ejemplos instalados: permission-gate, protected-paths…
-- **Aprobación ≠ aislamiento**
-  - `permisos.ts` · Control y errores: regex: puede haber caminos
-  - `vídeo 05` · Contra ataques: contenedor o máquina aparte
 
 ### 9 · Cierre
 
 <p><button type="button" class="ir-a" data-t="1213">▶ Ir a 20:13</button></p>
 
-- **Repaso**
-  - `registerCommand` · Comandos: los ejecutas tú
-  - `registerTool` · Herramientas: TypeBox · content · details
-  - `pi.on` · Eventos: tool_call puede bloquear
-- **La práctica:** Copia permisos.ts (adapta la lista) → Úsalo una tarde (apunta lo que sobra y falta) → Una herramienta (tests, linter o despliegue)
 - **Próximo vídeo:** Extensiones II y paquetes — Estado que sobrevive a rebobinar, el fallo típico, y empaquetar, instalar y publicar.
 
 ## Código y comandos
@@ -295,7 +218,7 @@ Las herramientas propias aceptan también todo lo que vimos con MCP: la exposici
 
 **4 · Eventos: engancharse al ciclo de Pi**
 
-Comandos y herramientas añaden cosas. Los eventos te dejan intervenir en lo que Pi ya hace. Se escuchan con pi punto on, el nombre del evento y un handler, y en Pi uno punto cero hay cuarenta y uno.
+Comandos y herramientas añaden cosas. Los eventos te dejan intervenir en lo que Pi ya hace. Se escuchan con pi punto on, el nombre del evento y un handler, y Pi tiene cuarenta y uno.
 
 Para orientarte, piensa en una petición de principio a fin. Session start, cuando arranca la sesión, buen sitio para preparar recursos. Input, cuando escribes algo, y que puede transformarlo antes de que llegue al modelo. Before agent start, justo antes de empezar a trabajar, que puede cambiar el system prompt de esa petición. Turn start y turn end, cada vuelta del bucle del agente. Tool call, cuando el modelo pide ejecutar una herramienta, y tool result, cuando la herramienta ha terminado. Agent end, cuando el agente termina. Y session shutdown, al cerrar, para liberar lo que hayas abierto.
 
