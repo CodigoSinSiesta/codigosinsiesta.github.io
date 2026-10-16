@@ -31,7 +31,6 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
   - `/security` · Solo explicado
 - **La idea del vídeo:** Las herramientas proponen; tú decides — Y algunas hacen más de lo que su nombre sugiere.
 - **El montaje**
-  - `omp 18.8` · Perfil demo
   - `V4 Pro` · Conversación
   - `Flash` · Rol smol: mensajes de commit
   - `demo-18` · Rama de usar y tirar
@@ -43,7 +42,7 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 ### 2 · /review: una revisión con método
 
-<p><button type="button" class="ir-a" data-t="181">▶ Ir a 3:01</button></p>
+<p><button type="button" class="ir-a" data-t="176">▶ Ir a 2:56</button></p>
 
 - **Dos barra review**
   - `Pi · vídeo 06` · Template Markdown: lo sigue el modelo
@@ -69,7 +68,7 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 ### 3 · Arreglar y mirar el diff con /git
 
-<p><button type="button" class="ir-a" data-t="463">▶ Ir a 7:43</button></p>
+<p><button type="button" class="ir-a" data-t="457">▶ Ir a 7:37</button></p>
 
 - *En terminal:* La petición (más abajo, en «Código y comandos»)
 - *En la demo:* edit · edit · npm test
@@ -83,7 +82,7 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 ### 4 · omp commit en modo de prueba
 
-<p><button type="button" class="ir-a" data-t="614">▶ Ir a 10:14</button></p>
+<p><button type="button" class="ir-a" data-t="609">▶ Ir a 10:09</button></p>
 
 - *En la demo:* omp --profile demo commit --dry-run
 - *En la demo:* Modelo · changelogs · contexto
@@ -99,7 +98,7 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 ### 5 · El commit desde /git
 
-<p><button type="button" class="ir-a" data-t="784">▶ Ir a 13:04</button></p>
+<p><button type="button" class="ir-a" data-t="779">▶ Ir a 12:59</button></p>
 
 - *En la demo:* c · compositor
 - *En la demo:* «empty: generate one»
@@ -110,7 +109,7 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 ### 6 · /wt: la sesión a un worktree
 
-<p><button type="button" class="ir-a" data-t="894">▶ Ir a 14:54</button></p>
+<p><button type="button" class="ir-a" data-t="888">▶ Ir a 14:48</button></p>
 
 - **Nos queda:** El README — En otra rama, sin perder la conversación.
 - *En la demo:* /wt demo-18-wt
@@ -126,7 +125,7 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 ### 7 · Auto-QA y omp grievances
 
-<p><button type="button" class="ir-a" data-t="1060">▶ Ir a 17:40</button></p>
+<p><button type="button" class="ir-a" data-t="1055">▶ Ir a 17:35</button></p>
 
 - **Auto-QA:** No revisa tu código — Es un buzón de quejas del modelo sobre las herramientas.
 - *En terminal:* Auto-QA (lo escribe el modelo) (más abajo, en «Código y comandos»)
@@ -147,7 +146,7 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 ### 8 · /security y los límites
 
-<p><button type="button" class="ir-a" data-t="1223">▶ Ir a 20:23</button></p>
+<p><button type="button" class="ir-a" data-t="1218">▶ Ir a 20:18</button></p>
 
 - **/security (activado):** plan (alcance) → scan (en segundo plano) → status (show) → SARIF (importar, exportar)
 - **Por qué no lo activamos**
@@ -172,7 +171,7 @@ revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 ### 9 · Repaso, práctica y cierre
 
-<p><button type="button" class="ir-a" data-t="1385">▶ Ir a 23:05</button></p>
+<p><button type="button" class="ir-a" data-t="1380">▶ Ir a 23:00</button></p>
 
 - **/review**
   - `congela` · El diff que elijas
@@ -369,7 +368,7 @@ oh my pi trae de serie varias piezas para eso. Barra review, una revisión de c�
 
 Una idea va a atravesar el vídeo. Las herramientas proponen; tú decides qué entra en la historia del repositorio. Y algunas hacen más de lo que su nombre sugiere: un modo de prueba que puede preparar ficheros, un consentimiento que envía datos a un servidor, una opción que publica. Iremos señalando cada caso.
 
-Trabajamos en la tienda, con el perfil demo y oh my pi dieciocho punto ocho. DeepSeek V cuatro Pro lleva la conversación, y Flash vuelve al rol smol, que es el que usarán los mensajes de commit. Como en los dos vídeos anteriores, trabajamos en una rama de usar y tirar, demo dieciocho. La tienda no tiene remoto, así que nada de lo que hagamos hoy sale de la máquina.
+DeepSeek V cuatro Pro lleva la conversación, y Flash vuelve al rol smol, que es el que usarán los mensajes de commit. Como en los dos vídeos anteriores, trabajamos en una rama de usar y tirar, demo dieciocho. La tienda no tiene remoto, así que nada de lo que hagamos hoy sale de la máquina.
 
 En esa rama hemos dejado preparado, sin commitear, un cambio pequeño: un envío urgente que suma tres euros al envío normal, con una función en envio punto js, otra en carrito punto js y sus pruebas. Y un detalle, con toda la intención: hemos sembrado un fallo. La función del carrito calcula el envío sobre el total con IVA, al revés que el resto de la tienda. Los tests pasan igualmente. Veremos si la revisión lo encuentra.
 

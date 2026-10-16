@@ -106,1789 +106,1784 @@ una opción que publica.
 Iremos señalando cada caso.
 
 23
-00:01:27.897 --> 00:01:32.810
-Trabajamos en la tienda, con el perfil
-demo y oh my pi dieciocho punto ocho.
-
-24
-00:01:32.850 --> 00:01:37.770
+00:01:28.614 --> 00:01:32.730
 DeepSeek V cuatro Pro lleva la
 conversación, y Flash vuelve al rol smol,
 
-25
-00:01:37.810 --> 00:01:40.260
+24
+00:01:32.770 --> 00:01:35.280
 que es el que usarán
 los mensajes de commit.
 
-26
-00:01:40.300 --> 00:01:44.120
+25
+00:01:35.320 --> 00:01:39.060
 Como en los dos vídeos anteriores,
 trabajamos en una rama de usar y tirar,
 
-27
-00:01:44.160 --> 00:01:48.440
+26
+00:01:39.100 --> 00:01:43.630
 demo dieciocho. La tienda no tiene remoto,
 así que nada de lo que hagamos hoy sale de
 
-28
-00:01:48.480 --> 00:01:49.380
+27
+00:01:43.670 --> 00:01:44.620
 la máquina.
 
-29
-00:01:50.465 --> 00:01:54.665
+28
+00:01:45.295 --> 00:01:49.495
 En esa rama hemos dejado preparado,
 sin commitear, un cambio pequeño:
 
-30
-00:01:54.705 --> 00:01:59.881
+29
+00:01:49.535 --> 00:01:54.711
 un envío urgente que suma tres euros al
 envío normal, con una función en envio
 
-31
-00:01:59.921 --> 00:02:03.242
+30
+00:01:54.751 --> 00:01:58.072
 punto js, otra en carrito
 punto js y sus pruebas.
 
-32
-00:02:03.282 --> 00:02:07.220
+31
+00:01:58.112 --> 00:02:02.050
 Y un detalle, con toda la
 intención: hemos sembrado un fallo.
 
-33
-00:02:07.260 --> 00:02:10.330
+32
+00:02:02.090 --> 00:02:05.160
 La función del carrito calcula
 el envío sobre el total con IVA,
 
-34
-00:02:10.370 --> 00:02:12.260
+33
+00:02:05.200 --> 00:02:07.090
 al revés que el resto de la tienda.
 
-35
-00:02:12.300 --> 00:02:15.590
+34
+00:02:07.130 --> 00:02:10.420
 Los tests pasan igualmente. Veremos
 si la revisión lo encuentra.
 
-36
-00:02:16.537 --> 00:02:20.580
+35
+00:02:11.367 --> 00:02:15.410
 Además hay una línea nueva en el README,
 que dice que hace falta Node veinte o
 
-37
-00:02:20.620 --> 00:02:23.710
+36
+00:02:15.450 --> 00:02:18.540
 posterior, y que no tiene
 nada que ver con el envío.
 
-38
-00:02:23.750 --> 00:02:27.020
+37
+00:02:18.580 --> 00:02:21.850
 Es lo que pasa en la vida real:
 el árbol de trabajo mezcla cosas,
 
-39
-00:02:27.060 --> 00:02:30.030
+38
+00:02:21.890 --> 00:02:24.860
 y parte del oficio es separar
 lo que va en cada commit.
 
-40
-00:02:30.070 --> 00:02:32.670
+39
+00:02:24.900 --> 00:02:27.500
 En el otro panel, git status lo confirma:
 
-41
-00:02:32.710 --> 00:02:34.110
+40
+00:02:27.540 --> 00:02:28.940
 cinco ficheros modificados.
 
-42
-00:02:34.982 --> 00:02:37.105
+41
+00:02:29.812 --> 00:02:31.935
 Antes de empezar, un vistazo gratis.
 
-43
-00:02:37.145 --> 00:02:42.290
+42
+00:02:31.975 --> 00:02:37.120
 Ejecutamos barra security, y responde que
 la seguridad está desactivada y que hay
 
-44
-00:02:42.330 --> 00:02:45.220
+43
+00:02:37.160 --> 00:02:40.050
 que activar el ajuste
 security punto enabled.
 
-45
-00:02:45.260 --> 00:02:50.270
+44
+00:02:40.090 --> 00:02:45.100
 Volveremos a eso al final. Escribimos
 barra re, y en el menú aparece review,
 
-46
-00:02:50.320 --> 00:02:53.420
+45
+00:02:45.150 --> 00:02:48.250
 que lanza la revisión interactiva
 y lleva la etiqueta de incluido,
 
-47
-00:02:53.460 --> 00:02:55.390
+46
+00:02:48.290 --> 00:02:50.220
 porque viene con el programa.
 
-48
-00:02:55.430 --> 00:02:59.314
+47
+00:02:50.260 --> 00:02:54.144
 En la barra de estado, la rama demo
 dieciocho, con un asterisco y un cinco:
 
-49
-00:02:59.354 --> 00:03:00.910
+48
+00:02:54.184 --> 00:02:55.740
 cinco ficheros cambiados.
 
-50
-00:03:06.564 --> 00:03:09.407
+49
+00:03:01.394 --> 00:03:04.237
 Empezamos por revisar.
 Recuerda el vídeo seis:
 
-51
-00:03:09.447 --> 00:03:14.390
+50
+00:03:04.277 --> 00:03:09.220
 en Pi escribimos un template barra
 review, un fichero Markdown con unas pocas
 
-52
-00:03:14.430 --> 00:03:18.910
+51
+00:03:09.260 --> 00:03:13.740
 instrucciones, que el mismo modelo de la
 conversación seguía al pie de la letra.
 
-53
-00:03:18.966 --> 00:03:24.490
+52
+00:03:13.796 --> 00:03:19.320
 Funcionaba, y era nuestro. El barra
 review de oh my pi es otra cosa:
 
-54
-00:03:24.589 --> 00:03:28.410
+53
+00:03:19.419 --> 00:03:23.240
 un comando escrito en TypeScript que
 viene con el programa y que no se limita a
 
-55
-00:03:28.450 --> 00:03:29.570
+54
+00:03:23.280 --> 00:03:24.400
 enviar un prompt.
 
-56
-00:03:30.183 --> 00:03:34.800
+55
+00:03:25.013 --> 00:03:29.630
 Lo ejecutamos. Aparece un menú,
 review mode, con cinco opciones.
 
-57
-00:03:34.840 --> 00:03:37.820
+56
+00:03:29.670 --> 00:03:32.650
 Revisar contra una rama base,
 como en una pull request.
 
-58
-00:03:37.860 --> 00:03:39.780
+57
+00:03:32.690 --> 00:03:34.610
 Revisar los cambios sin commitear.
 
-59
-00:03:39.820 --> 00:03:43.537
+58
+00:03:34.650 --> 00:03:38.367
 Revisar un commit concreto.
 Revisar una pull request concreta.
 
-60
-00:03:43.577 --> 00:03:47.430
+59
+00:03:38.407 --> 00:03:42.260
 Y unas instrucciones a medida, para
 cuando quieres decir tú qué mirar.
 
-61
-00:03:48.196 --> 00:03:52.550
+60
+00:03:43.026 --> 00:03:47.380
 La opción de las pull requests usa el
 cliente gh con tu cuenta para listar las
 
-62
-00:03:52.590 --> 00:03:56.940
+61
+00:03:47.420 --> 00:03:51.770
 abiertas del repositorio. La tienda no
 tiene remoto y no vamos a enseñar cuentas,
 
-63
-00:03:56.980 --> 00:03:59.197
+62
+00:03:51.810 --> 00:03:54.027
 así que se queda en la diapositiva.
 
-64
-00:03:59.237 --> 00:04:02.240
+63
+00:03:54.067 --> 00:03:57.070
 Elegimos la segunda: revisar
 los cambios sin commitear.
 
-65
-00:04:03.258 --> 00:04:05.870
+64
+00:03:58.088 --> 00:04:00.700
 Aquí está la primera diferencia
 con nuestro template.
 
-66
-00:04:05.910 --> 00:04:10.154
+65
+00:04:00.740 --> 00:04:04.984
 Barra review lee el diff una vez
 y lo congela dentro del mensaje:
 
-67
-00:04:10.194 --> 00:04:13.325
+66
+00:04:05.024 --> 00:04:08.155
 una tabla con los ficheros,
 las líneas añadidas y quitadas,
 
-68
-00:04:13.365 --> 00:04:17.603
+67
+00:04:08.195 --> 00:04:12.433
 y el diff completo. El modelo no
 tiene que adivinar qué revisar,
 
-69
-00:04:17.643 --> 00:04:21.120
+68
+00:04:12.473 --> 00:04:15.950
 y si el árbol cambia mientras tanto, la
 revisión sigue siendo sobre lo que había
 
-70
-00:04:21.160 --> 00:04:25.200
+69
+00:04:15.990 --> 00:04:20.030
 al pedirla. Los ficheros que no aportan,
 como los de bloqueo de dependencias o el
 
-71
-00:04:25.240 --> 00:04:27.390
+70
+00:04:20.070 --> 00:04:22.220
 código generado, quedan fuera.
 
-72
-00:04:28.061 --> 00:04:32.398
+71
+00:04:22.891 --> 00:04:27.228
 La segunda diferencia: el mensaje
 le dice al modelo que no revise él.
 
-73
-00:04:32.438 --> 00:04:36.656
+72
+00:04:27.268 --> 00:04:31.486
 Le pide que reparta el trabajo con la
 herramienta task entre agentes reviewer,
 
-74
-00:04:36.696 --> 00:04:40.418
+73
+00:04:31.526 --> 00:04:35.248
 los del vídeo dieciséis. Cuántos
 depende del tamaño del diff:
 
-75
-00:04:40.458 --> 00:04:42.990
+74
+00:04:35.288 --> 00:04:37.820
 con uno pequeño, como
 el nuestro, uno solo;
 
-76
-00:04:43.030 --> 00:04:45.514
+75
+00:04:37.860 --> 00:04:40.344
 con diffs enormes, hasta
 dieciséis en paralelo.
 
-77
-00:04:45.554 --> 00:04:49.500
+76
+00:04:40.384 --> 00:04:44.330
 Pro lanza la tarea. El primer intento
 falla porque le falta un campo
 
-78
-00:04:49.540 --> 00:04:52.350
+77
+00:04:44.370 --> 00:04:47.180
 obligatorio, el contexto, y lo repite.
 
-79
-00:04:53.435 --> 00:04:55.379
+78
+00:04:48.265 --> 00:04:50.209
 Merece la pena leer el encargo.
 
-80
-00:04:55.419 --> 00:04:58.739
+79
+00:04:50.249 --> 00:04:53.569
 Un objetivo, revisar los
 cambios sin commitear.
 
-81
-00:04:58.779 --> 00:05:02.677
+80
+00:04:53.609 --> 00:04:57.507
 Unas restricciones: solo los cinco
 ficheros y el diff que ya tiene.
 
-82
-00:05:02.717 --> 00:05:06.014
+81
+00:04:57.547 --> 00:05:00.844
 Y el contrato del repositorio,
 sacado del AGENTS punto md,
 
-83
-00:05:06.054 --> 00:05:09.288
+82
+00:05:00.884 --> 00:05:04.118
 con los importes a céntimos
 y los commits en español.
 
-84
-00:05:09.328 --> 00:05:12.850
+83
+00:05:04.158 --> 00:05:07.680
 Es la regla del vídeo dieciséis:
 cada encargo se explica solo.
 
-85
-00:05:13.554 --> 00:05:16.270
+84
+00:05:08.384 --> 00:05:11.100
 El agente reviewer trae
 además sus propias reglas.
 
-86
-00:05:16.310 --> 00:05:20.280
+85
+00:05:11.140 --> 00:05:15.110
 Solo debe informar de fallos con impacto
 demostrable, que se puedan arreglar de
 
-87
-00:05:20.320 --> 00:05:24.150
+86
+00:05:15.150 --> 00:05:18.980
 forma concreta, que no parezcan
 intencionados y que haya introducido el
 
-88
-00:05:24.190 --> 00:05:26.010
+87
+00:05:19.020 --> 00:05:20.840
 parche, no los que ya estaban.
 
-89
-00:05:26.050 --> 00:05:29.250
+88
+00:05:20.880 --> 00:05:24.080
 Es una forma de evitar las revisiones
 que llenan la pantalla de sugerencias de
 
-90
-00:05:29.290 --> 00:05:30.190
+89
+00:05:24.120 --> 00:05:25.020
 estilo.
 
-91
-00:05:30.860 --> 00:05:35.740
+90
+00:05:25.690 --> 00:05:30.570
 ¿Con qué modelo revisa? El reviewer pide
 el rol slow, y como no lo hemos asignado,
 
-92
-00:05:35.780 --> 00:05:39.740
+91
+00:05:30.610 --> 00:05:34.570
 hereda el modelo por defecto, Pro,
 como vimos en el vídeo catorce.
 
-93
-00:05:39.780 --> 00:05:45.080
+92
+00:05:34.610 --> 00:05:39.910
 Tarda treinta y ocho segundos, cuesta un
 céntimo y devuelve su resultado con forma
 
-94
-00:05:45.120 --> 00:05:47.650
+93
+00:05:39.950 --> 00:05:42.480
 fija: unos hallazgos y un veredicto.
 
-95
-00:05:47.836 --> 00:05:50.850
+94
+00:05:42.666 --> 00:05:45.680
 Aquí, changes requested: hay que
 cambiar algo antes de entregarlo.
 
-96
-00:05:51.834 --> 00:05:53.750
+95
+00:05:46.664 --> 00:05:48.580
 Lo interesante viene después.
 
-97
-00:05:53.790 --> 00:05:55.620
+96
+00:05:48.620 --> 00:05:50.450
 Pro no se fía sin más:
 
-98
-00:05:56.217 --> 00:05:58.321
+97
+00:05:51.047 --> 00:05:53.151
 lee carrito
 
-99
-00:05:59.499 --> 00:06:00.399
+98
+00:05:54.329 --> 00:05:55.229
 punto
 
-100
-00:06:01.140 --> 00:06:04.510
+99
+00:05:55.970 --> 00:05:59.340
 js y envio punto js para
 comprobar el hallazgo principal,
 
-101
-00:06:04.550 --> 00:06:08.660
+100
+00:05:59.380 --> 00:06:03.490
 y lo confirma. Total urgente evalúa
 el umbral del envío gratis con IVA,
 
-102
-00:06:08.700 --> 00:06:13.667
+101
+00:06:03.530 --> 00:06:08.497
 mientras que total con envío lo hace
 sin IVA, como dice su propio comentario.
 
-103
-00:06:13.707 --> 00:06:15.810
+102
+00:06:08.537 --> 00:06:10.640
 Es justo el fallo que habíamos sembrado.
 
-104
-00:06:16.643 --> 00:06:18.880
+103
+00:06:11.473 --> 00:06:13.710
 Y lo explica con un
 ejemplo que se entiende.
 
-105
-00:06:18.920 --> 00:06:22.900
+104
+00:06:13.750 --> 00:06:17.730
 Un carrito de treinta y cinco euros sin
 IVA pasa a cuarenta y dos con treinta y
 
-106
-00:06:22.940 --> 00:06:27.180
+105
+00:06:17.770 --> 00:06:22.010
 cinco con IVA, supera el umbral de
 cuarenta, y el envío urgente cobra solo
 
-107
-00:06:27.220 --> 00:06:29.290
+106
+00:06:22.050 --> 00:06:24.120
 los tres euros del suplemento.
 
-108
-00:06:29.330 --> 00:06:32.570
+107
+00:06:24.160 --> 00:06:27.400
 Lo coherente sería cuatro
 con noventa y cinco más tres:
 
-109
-00:06:32.610 --> 00:06:35.730
+108
+00:06:27.440 --> 00:06:30.560
 siete con noventa y cinco. Incluso
 propone el código corregido.
 
-110
-00:06:36.674 --> 00:06:39.530
+109
+00:06:31.504 --> 00:06:34.360
 Después vienen tres hallazgos menores.
 
-111
-00:06:39.570 --> 00:06:42.020
+110
+00:06:34.400 --> 00:06:36.850
 Que aplicar IVA se calcula dos veces.
 
-112
-00:06:42.060 --> 00:06:45.459
+111
+00:06:36.890 --> 00:06:40.289
 Que falta una prueba en el límite,
 precisamente con ese carrito de treinta y
 
-113
-00:06:45.499 --> 00:06:50.100
+112
+00:06:40.329 --> 00:06:44.930
 cinco euros. Y que la línea del README
 sobre Node veinte no está respaldada por
 
-114
-00:06:50.140 --> 00:06:55.301
+113
+00:06:44.970 --> 00:06:50.131
 nada del repositorio. Fíjate: la revisión
 mira todos los cambios sin commitear,
 
-115
-00:06:55.341 --> 00:06:56.801
+114
+00:06:50.171 --> 00:06:51.631
 también los que no tienen que ver.
 
-116
-00:06:56.841 --> 00:06:58.889
+115
+00:06:51.671 --> 00:06:53.719
 Y al final pregunta si aplica el arreglo;
 
-117
-00:06:58.929 --> 00:07:00.860
+116
+00:06:53.759 --> 00:06:55.690
 no toca nada sin permiso.
 
-118
-00:07:01.657 --> 00:07:03.487
+117
+00:06:56.487 --> 00:06:58.317
 Un apunte honesto sobre el reviewer.
 
-119
-00:07:03.527 --> 00:07:07.429
+118
+00:06:58.357 --> 00:07:02.259
 Entre sus herramientas está bash,
 como ya dijimos en el vídeo dieciséis.
 
-120
-00:07:07.469 --> 00:07:11.560
+119
+00:07:02.299 --> 00:07:06.390
 Sus instrucciones le dicen que
 solo ejecute comandos de lectura,
 
-121
-00:07:11.600 --> 00:07:14.779
+120
+00:07:06.430 --> 00:07:09.609
 como git diff o git log,
 y que no edite nada.
 
-122
-00:07:14.819 --> 00:07:17.620
+121
+00:07:09.649 --> 00:07:12.450
 Pero eso es una
 instrucción, no un permiso.
 
-123
-00:07:17.835 --> 00:07:20.301
+122
+00:07:12.665 --> 00:07:15.131
 Con el modo yolo, nada lo impediría.
 
-124
-00:07:20.341 --> 00:07:24.570
+123
+00:07:15.171 --> 00:07:19.400
 Cómo convertir instrucciones en límites
 reales es el tema del vídeo diecinueve.
 
-125
-00:07:25.264 --> 00:07:29.620
+124
+00:07:20.094 --> 00:07:24.450
 Y si vienes de Pi con tu template: si
 copias tu review punto md a los comandos
 
-126
-00:07:29.660 --> 00:07:34.370
+125
+00:07:24.490 --> 00:07:29.200
 de oh my pi, el incluido tiene
 prioridad y el tuyo quedará tapado.
 
-127
-00:07:34.410 --> 00:07:37.810
+126
+00:07:29.240 --> 00:07:32.640
 Ponle otro nombre. El template
 es ligero y lo controlas tú;
 
-128
-00:07:37.850 --> 00:07:42.210
+127
+00:07:32.680 --> 00:07:37.040
 el comando incluido es más pesado,
 pero da hallazgos con forma y método.
 
-129
-00:07:47.973 --> 00:07:51.157
+128
+00:07:42.803 --> 00:07:45.987
 Con el hallazgo delante, le
 pedimos a Pro que lo arregle:
 
-130
-00:07:51.197 --> 00:07:55.480
+129
+00:07:46.027 --> 00:07:50.310
 que calcule el envío sin IVA, como en
 total con envío, que añada la prueba del
 
-131
-00:07:55.520 --> 00:08:00.620
+130
+00:07:50.350 --> 00:07:55.450
 carrito de treinta y cinco euros, que
 ejecute npm test, y que no haga commit ni
 
-132
-00:08:00.660 --> 00:08:05.570
+131
+00:07:55.490 --> 00:08:00.400
 toque el README. Edita el carrito,
 con tres líneas nuevas y dos quitadas,
 
-133
-00:08:05.610 --> 00:08:08.590
+132
+00:08:00.440 --> 00:08:03.420
 añade la prueba, y los
 dieciocho tests pasan.
 
-134
-00:08:09.389 --> 00:08:13.207
+133
+00:08:04.219 --> 00:08:08.037
 Fíjate en lo que cuenta al final: con
 el código viejo, esa prueba habría dado
 
-135
-00:08:13.247 --> 00:08:17.201
+134
+00:08:08.077 --> 00:08:12.031
 cuarenta y cinco con treinta y cinco
 en lugar de cincuenta con treinta.
 
-136
-00:08:17.241 --> 00:08:20.880
+135
+00:08:12.071 --> 00:08:15.710
 La prueba nueva es la que habría hecho
 visible el fallo desde el principio.
 
-137
-00:08:21.184 --> 00:08:24.370
+136
+00:08:16.014 --> 00:08:19.200
 La revisión no sustituye
 a las pruebas; las señala.
 
-138
-00:08:24.804 --> 00:08:27.690
+137
+00:08:19.634 --> 00:08:22.520
 Volveremos a esta idea, con más
 calma, en el vídeo veinticuatro.
 
-139
-00:08:28.676 --> 00:08:31.830
+138
+00:08:23.506 --> 00:08:26.660
 Ahora toca mirar qué hemos
 cambiado antes de commitear.
 
-140
-00:08:31.870 --> 00:08:33.520
+139
+00:08:26.700 --> 00:08:28.350
 Escribimos barra git.
 
-141
-00:08:34.010 --> 00:08:38.020
+140
+00:08:28.840 --> 00:08:32.850
 Se abre una interfaz a pantalla completa,
 la misma que obtienes con o eme pe git
 
-142
-00:08:38.060 --> 00:08:42.090
+141
+00:08:32.890 --> 00:08:36.920
 desde la terminal. A la derecha,
 la barra lateral con dos secciones:
 
-143
-00:08:42.130 --> 00:08:45.151
+142
+00:08:36.960 --> 00:08:39.981
 los cambios sin preparar, que
 son cinco, y los preparados,
 
-144
-00:08:45.191 --> 00:08:49.410
+143
+00:08:40.021 --> 00:08:44.240
 que de momento no hay. A la izquierda,
 el diff, partido en dos columnas.
 
-145
-00:08:50.300 --> 00:08:54.570
+144
+00:08:45.130 --> 00:08:49.400
 Con las flechas nos movemos por los
 ficheros, y con Enter abrimos uno en
 
-146
-00:08:55.038 --> 00:08:57.666
+145
+00:08:49.868 --> 00:08:52.496
 el diff. Con las teclas del uno
 al cuatro cambiamos la vista:
 
-147
-00:08:57.706 --> 00:09:01.760
+146
+00:08:52.536 --> 00:08:56.590
 fichero completo, partida,
 en línea o por hunks.
 
-148
-00:09:01.951 --> 00:09:06.750
+147
+00:08:56.781 --> 00:09:01.580
 La tecla uve doble ajusta las líneas
 largas y la be ignora los espacios.
 
-149
-00:09:06.790 --> 00:09:09.750
+148
+00:09:01.620 --> 00:09:04.580
 Y con la interrogación aparece
 la hoja de atajos completa.
 
-150
-00:09:10.784 --> 00:09:12.510
+149
+00:09:05.614 --> 00:09:07.340
 Preparar es igual de directo.
 
-151
-00:09:12.550 --> 00:09:15.840
+150
+00:09:07.380 --> 00:09:10.670
 La barra espaciadora prepara o
 quita la fila en la que estás.
 
-152
-00:09:16.120 --> 00:09:20.491
+151
+00:09:10.950 --> 00:09:15.321
 Dentro del diff, la tecla ese prepara
 el hunk en el que estás y la tecla u lo
 
-153
-00:09:20.531 --> 00:09:23.980
+152
+00:09:15.361 --> 00:09:18.810
 quita, y con mayúsculas y las flechas
 puedes seleccionar líneas sueltas.
 
-154
-00:09:24.020 --> 00:09:27.950
+153
+00:09:18.850 --> 00:09:22.780
 Es el git add por partes de toda la vida,
 pero viendo exactamente lo que añades.
 
-155
-00:09:29.017 --> 00:09:31.240
+154
+00:09:23.847 --> 00:09:26.070
 Y aquí nos pasó algo que conviene contar.
 
-156
-00:09:31.424 --> 00:09:34.883
+155
+00:09:26.254 --> 00:09:29.713
 Pulsamos la barra espaciadora con el
 cursor sobre la cabecera de la sección,
 
-157
-00:09:34.923 --> 00:09:38.896
+156
+00:09:29.753 --> 00:09:33.726
 no sobre un fichero, y preparó
 los cinco, README incluido.
 
-158
-00:09:38.936 --> 00:09:42.063
+157
+00:09:33.766 --> 00:09:36.893
 Lo arreglamos sin salir: con
 el tabulador pasamos al diff,
 
-159
-00:09:42.103 --> 00:09:45.851
+158
+00:09:36.933 --> 00:09:40.681
 avanzamos hasta el README y, con
 la tecla u, quitamos su hunk.
 
-160
-00:09:45.891 --> 00:09:48.510
+159
+00:09:40.721 --> 00:09:43.340
 Aparece el aviso de que el
 README ya no está preparado.
 
-161
-00:09:48.550 --> 00:09:50.940
+160
+00:09:43.380 --> 00:09:45.770
 Quedan cuatro preparados
 y el README fuera.
 
-162
-00:09:51.893 --> 00:09:53.863
+161
+00:09:46.723 --> 00:09:48.693
 Cuidado con otras dos teclas.
 
-163
-00:09:53.903 --> 00:09:57.782
+162
+00:09:48.733 --> 00:09:52.612
 La tecla equis descarta el hunk
 o las líneas seleccionadas,
 
-164
-00:09:57.822 --> 00:10:01.220
+163
+00:09:52.652 --> 00:09:56.050
 y la tecla suprimir
 descarta el fichero entero.
 
-165
-00:10:01.260 --> 00:10:05.120
+164
+00:09:56.090 --> 00:09:59.950
 Las dos piden una segunda pulsación para
 confirmar, pero lo que descartan no estaba
 
-166
-00:10:05.160 --> 00:10:09.444
+165
+00:09:59.990 --> 00:10:04.274
 en ningún commit, así que
 no hay forma de recuperarlo.
 
-167
-00:10:09.484 --> 00:10:13.290
+166
+00:10:04.314 --> 00:10:08.120
 No las tocamos. Salimos con la
 tecla cu, sin commitear todavía.
 
-168
-00:10:19.348 --> 00:10:22.812
+167
+00:10:14.178 --> 00:10:17.642
 Antes de escribir el mensaje,
 veamos qué propone oh my pi.
 
-169
-00:10:22.852 --> 00:10:28.938
+168
+00:10:17.682 --> 00:10:23.768
 En el otro panel, ejecutamos o eme pe
 guion guion profile demo commit guion
 
-170
-00:10:28.978 --> 00:10:32.565
+169
+00:10:23.808 --> 00:10:27.395
 guion dry run. El perfil también
 se aplica a los subcomandos,
 
-171
-00:10:32.605 --> 00:10:35.990
+170
+00:10:27.435 --> 00:10:30.820
 así que este commit usa los
 modelos del perfil demo.
 
-172
-00:10:36.030 --> 00:10:38.852
+171
+00:10:30.860 --> 00:10:33.682
 Lo primero que enseña es
 el resumen de lo preparado:
 
-173
-00:10:38.892 --> 00:10:42.650
+172
+00:10:33.722 --> 00:10:37.480
 cuatro ficheros, treinta y cinco
 líneas añadidas y tres quitadas.
 
-174
-00:10:43.244 --> 00:10:46.723
+173
+00:10:38.074 --> 00:10:41.553
 La salida va por pasos.
 Primero resuelve el modelo:
 
-175
-00:10:46.763 --> 00:10:49.704
+174
+00:10:41.593 --> 00:10:44.534
 DeepSeek V cuatro punto uno Flash.
 
-176
-00:10:49.744 --> 00:10:54.596
+175
+00:10:44.574 --> 00:10:49.426
 Usa el rol commit y, como no
 está asignado, cae al rol smol.
 
-177
-00:10:54.660 --> 00:10:59.025
+176
+00:10:49.490 --> 00:10:53.855
 Después busca changelogs, y no encuentra
 ninguno, porque la tienda no tiene.
 
-178
-00:10:59.065 --> 00:11:04.173
+177
+00:10:53.895 --> 00:10:59.003
 Luego descubre los ficheros de contexto,
 y aparece nuestro AGENTS punto md.
 
-179
-00:11:04.213 --> 00:11:06.170
+178
+00:10:59.043 --> 00:11:01.000
 Y arranca un agente de commit.
 
-180
-00:11:06.801 --> 00:11:09.360
+179
+00:11:01.631 --> 00:11:04.190
 Ese agente tiene sus propias herramientas.
 
-181
-00:11:09.400 --> 00:11:13.893
+180
+00:11:04.230 --> 00:11:08.723
 Aquí usa tres: una vista general de lo
 preparado, el diff de los cuatro ficheros
 
-182
-00:11:13.933 --> 00:11:15.930
+181
+00:11:08.763 --> 00:11:10.760
 y una para proponer el commit.
 
-183
-00:11:15.970 --> 00:11:19.260
+182
+00:11:10.800 --> 00:11:14.090
 Si los cambios no tuvieran relación,
 podría proponer dividirlos en varios
 
-184
-00:11:19.300 --> 00:11:21.370
+183
+00:11:14.130 --> 00:11:16.200
 commits. Esta vez es un solo cambio.
 
-185
-00:11:22.339 --> 00:11:25.580
+184
+00:11:17.169 --> 00:11:20.410
 Y aquí está lo interesante:
 propone dos veces.
 
-186
-00:11:25.620 --> 00:11:30.900
+185
+00:11:20.450 --> 00:11:25.730
 La primera, feat, ámbito envio, add
 urgent shipping total calculation.
 
-187
-00:11:30.940 --> 00:11:34.160
+186
+00:11:25.770 --> 00:11:28.990
 La segunda, igual, pero
 con added, en pasado.
 
-188
-00:11:34.200 --> 00:11:36.610
+187
+00:11:29.030 --> 00:11:31.440
 El formato es el de conventional commits:
 
-189
-00:11:36.650 --> 00:11:41.400
+188
+00:11:31.480 --> 00:11:36.230
 un tipo, como feat o fix, un ámbito entre
 paréntesis y un resumen en inglés que
 
-190
-00:11:41.440 --> 00:11:43.070
+189
+00:11:36.270 --> 00:11:37.900
 empieza por un verbo en pasado.
 
-191
-00:11:43.110 --> 00:11:47.416
+190
+00:11:37.940 --> 00:11:42.246
 No es una sugerencia: un validador del
 código lo exige, y la segunda propuesta es
 
-192
-00:11:47.456 --> 00:11:48.410
+191
+00:11:42.286 --> 00:11:43.240
 la que lo pasa.
 
-193
-00:11:49.281 --> 00:11:54.570
+192
+00:11:44.111 --> 00:11:49.400
 El resultado final es feat, envio,
 added urgent shipping total calculation,
 
-194
-00:11:54.610 --> 00:11:57.737
+193
+00:11:49.440 --> 00:11:52.567
 con dos viñetas en inglés que
 explican las dos funciones.
 
-195
-00:11:57.777 --> 00:12:02.452
+194
+00:11:52.607 --> 00:11:57.282
 Nuestro AGENTS punto md dice
 otra cosa: mensajes en español,
 
-196
-00:12:02.492 --> 00:12:05.974
+195
+00:11:57.322 --> 00:12:00.804
 en imperativo y empezando
 por tienda dos puntos.
 
-197
-00:12:06.014 --> 00:12:09.872
+196
+00:12:00.844 --> 00:12:04.702
 El agente lo ha leído, pero el
 validador no le deja cumplirlo,
 
-198
-00:12:09.912 --> 00:12:14.079
+197
+00:12:04.742 --> 00:12:08.909
 y gana el validador. Cuando una
 herramienta trae sus propias convenciones,
 
-199
-00:12:14.119 --> 00:12:16.551
+198
+00:12:08.949 --> 00:12:11.381
 las reglas de tu repositorio
 no siempre ganan.
 
-200
-00:12:16.591 --> 00:12:18.690
+199
+00:12:11.421 --> 00:12:13.520
 Compruébalo antes de confiar en ella.
 
-201
-00:12:19.383 --> 00:12:23.200
+200
+00:12:14.213 --> 00:12:18.030
 El modo de prueba no ha commiteado
 nada, y como ya había cosas preparadas,
 
-202
-00:12:23.240 --> 00:12:27.080
+201
+00:12:18.070 --> 00:12:21.910
 no ha tocado el índice: el README
 sigue fuera, como veremos enseguida.
 
-203
-00:12:27.120 --> 00:12:29.295
+202
+00:12:21.950 --> 00:12:24.125
 Pero hay una trampa que conviene conocer.
 
-204
-00:12:29.335 --> 00:12:33.400
+203
+00:12:24.165 --> 00:12:28.230
 Si lo lanzas con nada preparado, o eme pe
 commit prepara todos los cambios antes de
 
-205
-00:12:33.440 --> 00:12:36.070
+204
+00:12:28.270 --> 00:12:30.900
 generar el mensaje, también en dry run.
 
-206
-00:12:36.110 --> 00:12:37.910
+205
+00:12:30.940 --> 00:12:32.740
 Por eso hemos pasado
 primero por barra git.
 
-207
-00:12:38.810 --> 00:12:42.190
+206
+00:12:33.640 --> 00:12:37.020
 Sin dry run, o eme pe
 commit crea el commit.
 
-208
-00:12:42.230 --> 00:12:46.110
+207
+00:12:37.060 --> 00:12:40.940
 Si encuentra un CHANGELOG, actualiza
 su sección de cambios sin publicar y lo
 
-209
-00:12:46.150 --> 00:12:48.420
+208
+00:12:40.980 --> 00:12:43.250
 prepara para que entre en el mismo commit;
 
-210
-00:12:48.460 --> 00:12:52.080
+209
+00:12:43.290 --> 00:12:46.910
 con guion guion no changelog, no lo toca.
 
-211
-00:12:52.257 --> 00:12:55.840
+210
+00:12:47.087 --> 00:12:50.670
 Si propone dividir el cambio en varios
 commits, te enseña el plan y te pide
 
-212
-00:12:55.880 --> 00:13:00.850
+211
+00:12:50.710 --> 00:12:55.680
 confirmación. Y con guion guion
 push, sube los commits al terminar.
 
-213
-00:13:00.890 --> 00:13:03.810
+212
+00:12:55.720 --> 00:12:58.640
 Eso publica, y en este curso
 se queda en la diapositiva.
 
-214
-00:13:09.773 --> 00:13:15.002
+213
+00:13:04.603 --> 00:13:09.832
 Volvemos a barra git. Los cuatro ficheros
 siguen preparados y el README fuera.
 
-215
-00:13:15.042 --> 00:13:18.416
+214
+00:13:09.872 --> 00:13:13.246
 Pulsamos la tecla ce para ir al
 compositor, abajo a la derecha,
 
-216
-00:13:18.456 --> 00:13:21.300
+215
+00:13:13.286 --> 00:13:16.130
 que tiene dos campos: el
 resumen y la descripción.
 
-217
-00:13:21.340 --> 00:13:24.230
+216
+00:13:16.170 --> 00:13:19.060
 Debajo, el botón para
 commitear lo preparado.
 
-218
-00:13:25.031 --> 00:13:29.239
+217
+00:13:19.861 --> 00:13:24.069
 La hoja de atajos lo dice: si dejas los
 campos vacíos, se genera un mensaje.
 
-219
-00:13:29.279 --> 00:13:33.090
+218
+00:13:24.109 --> 00:13:27.920
 Es la misma tubería que acabamos
 de ver, con Flash y en inglés,
 
-220
-00:13:33.130 --> 00:13:38.647
+219
+00:13:27.960 --> 00:13:33.477
 así que no lo repetimos. Dos avisos: si
 el mensaje generado no pasa la validación,
 
-221
-00:13:38.687 --> 00:13:41.166
+220
+00:13:33.517 --> 00:13:35.996
 la interfaz te dice que necesita revisión.
 
-222
-00:13:41.206 --> 00:13:45.510
+221
+00:13:36.036 --> 00:13:40.340
 Y si no hubiera nada preparado, generar
 el mensaje prepararía todos los cambios.
 
-223
-00:13:46.452 --> 00:13:52.890
+222
+00:13:41.282 --> 00:13:47.720
 Escribimos nosotros. En el resumen:
 tienda dos puntos añade el envío urgente.
 
-224
-00:13:53.216 --> 00:13:58.467
+223
+00:13:48.046 --> 00:13:53.297
 En la descripción, una línea: el envío
 urgente suma tres euros y se calcula sin
 
-225
-00:13:58.507 --> 00:13:59.407
+224
+00:13:53.337 --> 00:13:54.237
 IVA, como el
 
-226
-00:13:59.919 --> 00:14:03.710
+225
+00:13:54.749 --> 00:13:58.540
 normal. Pulsamos el botón, y
 arriba aparece el aviso de commit
 
-227
-00:14:04.289 --> 00:14:08.340
+226
+00:13:59.119 --> 00:14:03.170
 creado. La barra lateral se queda solo con
 el README, y el botón cambia a preparar
 
-228
-00:14:08.380 --> 00:14:09.870
+227
+00:14:03.210 --> 00:14:04.700
 todo y commitear.
 
-229
-00:14:10.489 --> 00:14:14.655
+228
+00:14:05.319 --> 00:14:09.485
 En el otro panel, git
 log guion guion oneline.
 
-230
-00:14:14.952 --> 00:14:19.300
+229
+00:14:09.782 --> 00:14:14.130
 Ahí está el commit, encima de master,
 con el mensaje que pide la tienda.
 
-231
-00:14:19.555 --> 00:14:23.420
+230
+00:14:14.385 --> 00:14:18.250
 El generador nos ha servido de borrador,
 pero el mensaje final lo hemos decidido
 
-232
-00:14:23.460 --> 00:14:26.350
+231
+00:14:18.290 --> 00:14:21.180
 nosotros, que somos quienes
 conocemos las reglas del equipo.
 
-233
-00:14:27.371 --> 00:14:29.365
+232
+00:14:22.201 --> 00:14:24.195
 Dos opciones más del compositor.
 
-234
-00:14:29.405 --> 00:14:33.920
+233
+00:14:24.235 --> 00:14:28.750
 Ese botón de preparar todo y commitear es
 útil, pero solo cuando de verdad quieres
 
-235
-00:14:33.960 --> 00:14:38.360
+234
+00:14:28.790 --> 00:14:33.190
 todo. Y la casilla de enmendar el commit
 anterior, que rellena el formulario con su
 
-236
-00:14:38.400 --> 00:14:43.260
+235
+00:14:33.230 --> 00:14:38.090
 mensaje. Es el amend de git: reescribe la
 historia, así que úsalo solo en commits
 
-237
-00:14:43.300 --> 00:14:47.780
+236
+00:14:38.130 --> 00:14:42.610
 que no hayas compartido. Hay también
 un botón para preparar por descripción,
 
-238
-00:14:47.820 --> 00:14:51.748
+237
+00:14:42.650 --> 00:14:46.578
 con un modelo que juzga cada hunk;
 usa el rol judge, que no tenemos,
 
-239
-00:14:51.788 --> 00:14:53.040
+238
+00:14:46.618 --> 00:14:47.870
 y queda en la diapositiva.
 
-240
-00:14:58.900 --> 00:15:03.000
+239
+00:14:53.730 --> 00:14:57.830
 Nos queda el README. Imagina que
 quieres seguir con él en otra rama,
 
-241
-00:15:03.040 --> 00:15:06.860
+240
+00:14:57.870 --> 00:15:01.690
 sin mezclarlo con el envío urgente,
 y sin perder la conversación.
 
-242
-00:15:06.944 --> 00:15:11.450
+241
+00:15:01.774 --> 00:15:06.280
 Para eso está barra uve doble te,
 que también se llama barra worktree.
 
-243
-00:15:12.104 --> 00:15:16.273
+242
+00:15:06.934 --> 00:15:11.103
 Un worktree es una segunda carpeta
 de trabajo del mismo repositorio,
 
-244
-00:15:16.313 --> 00:15:18.864
+243
+00:15:11.143 --> 00:15:13.694
 con otra rama, que comparte
 la historia con la primera.
 
-245
-00:15:18.904 --> 00:15:23.909
+244
+00:15:13.734 --> 00:15:18.739
 Puedes tener dos ramas abiertas a la
 vez sin hacer stash ni cambiar de rama.
 
-246
-00:15:23.949 --> 00:15:27.050
+245
+00:15:18.779 --> 00:15:21.880
 Barra uve doble te lo crea
 y te lleva la sesión allí.
 
-247
-00:15:28.164 --> 00:15:33.042
+246
+00:15:22.994 --> 00:15:27.872
 Escribimos barra uve doble te
 demo dieciocho uve doble te,
 
-248
-00:15:33.082 --> 00:15:37.470
+247
+00:15:27.912 --> 00:15:32.300
 el nombre de la rama nueva. Si no le das
 nombre, crea una rama con la fecha y la
 
-249
-00:15:37.655 --> 00:15:41.044
+248
+00:15:32.485 --> 00:15:35.874
 hora. Al momento aparece el
 mensaje: sesión movida al worktree,
 
-250
-00:15:41.084 --> 00:15:46.140
+249
+00:15:35.914 --> 00:15:40.970
 en la rama nueva, clonado con APFS y
 con los cambios sin commitear incluidos.
 
-251
-00:15:46.285 --> 00:15:50.190
+250
+00:15:41.115 --> 00:15:45.020
 La barra de estado cambia de carpeta y
 de rama, y ahora marca un solo fichero
 
-252
-00:15:50.230 --> 00:15:51.130
+251
+00:15:45.060 --> 00:15:45.960
 cambiado.
 
-253
-00:15:51.699 --> 00:15:56.771
+252
+00:15:46.529 --> 00:15:51.601
 ¿Dónde está esa carpeta? No junto a la
 tienda, sino en una carpeta que gestiona
 
-254
-00:15:56.811 --> 00:16:01.157
+253
+00:15:51.641 --> 00:15:55.987
 oh my pi. Como trabajamos con el
 perfil demo, dentro del perfil:
 
-255
-00:16:01.197 --> 00:16:07.885
+254
+00:15:56.027 --> 00:16:02.715
 punto o eme pe, profiles, demo, uve doble
 te, con el nombre de la rama y un sufijo.
 
-256
-00:16:07.925 --> 00:16:13.851
+255
+00:16:02.755 --> 00:16:08.681
 Y clonado con APFS significa que macOS ha
 hecho una copia instantánea de la carpeta,
 
-257
-00:16:13.891 --> 00:16:15.490
+256
+00:16:08.721 --> 00:16:10.320
 sin duplicar los datos en el disco.
 
-258
-00:16:16.467 --> 00:16:18.406
+257
+00:16:11.297 --> 00:16:13.236
 Abrimos barra git en el worktree.
 
-259
-00:16:18.446 --> 00:16:22.731
+258
+00:16:13.276 --> 00:16:17.561
 Un solo cambio, el README, en la
 rama demo dieciocho uve doble te.
 
-260
-00:16:22.771 --> 00:16:27.810
+259
+00:16:17.601 --> 00:16:22.640
 No hay nada preparado, así que escribimos
 el resumen, tienda dos puntos indica la
 
-261
-00:16:27.850 --> 00:16:32.280
+260
+00:16:22.680 --> 00:16:27.110
 versión de Node, y usamos el botón
 de preparar todo y commitear.
 
-262
-00:16:32.320 --> 00:16:35.309
+261
+00:16:27.150 --> 00:16:30.139
 Commit creado. La pantalla
 pasa a la ficha del commit:
 
-263
-00:16:35.349 --> 00:16:40.090
+262
+00:16:30.179 --> 00:16:34.920
 el autor, que difuminamos, la fecha y el
 commit padre, que es el del envío urgente.
 
-264
-00:16:41.065 --> 00:16:43.037
+263
+00:16:35.895 --> 00:16:37.867
 Ahora, un detalle importante.
 
-265
-00:16:43.077 --> 00:16:46.580
+264
+00:16:37.907 --> 00:16:41.410
 En el otro panel, que sigue en
 la carpeta original de la tienda,
 
-266
-00:16:46.759 --> 00:16:51.016
+265
+00:16:41.589 --> 00:16:45.846
 git status: el README sigue
 modificado también allí.
 
-267
-00:16:51.056 --> 00:16:55.955
+266
+00:16:45.886 --> 00:16:50.785
 Barra uve doble te se lleva una copia de
 los cambios, pero con la configuración por
 
-268
-00:16:55.995 --> 00:16:57.938
+267
+00:16:50.825 --> 00:16:52.768
 defecto no limpia el origen.
 
-269
-00:16:57.978 --> 00:17:02.474
+268
+00:16:52.808 --> 00:16:57.304
 Git worktree list enseña las dos
 carpetas, cada una con su rama.
 
-270
-00:17:02.514 --> 00:17:06.660
+269
+00:16:57.344 --> 00:17:01.490
 Y el último commit de demo dieciocho
 uve doble te es el del README.
 
-271
-00:17:07.817 --> 00:17:12.762
+270
+00:17:02.647 --> 00:17:07.592
 Existe un ajuste, worktree punto
 clean source, que sí limpia el origen,
 
-272
-00:17:12.802 --> 00:17:15.710
+271
+00:17:07.632 --> 00:17:10.540
 y lo hace con un reset hard y un clean.
 
-273
-00:17:15.960 --> 00:17:17.890
+272
+00:17:10.790 --> 00:17:12.720
 Eso borra lo que no esté commiteado.
 
-274
-00:17:17.930 --> 00:17:20.270
+273
+00:17:12.760 --> 00:17:15.100
 Déjalo apagado salvo
 que lo tengas muy claro.
 
-275
-00:17:21.284 --> 00:17:25.720
+274
+00:17:16.114 --> 00:17:20.550
 ¿Cuándo usarlo? Cuando la conversación ya
 tiene el contexto de un trabajo y quieres
 
-276
-00:17:25.760 --> 00:17:28.750
+275
+00:17:20.590 --> 00:17:23.580
 que siga en su propia rama
 mientras tú haces otra cosa.
 
-277
-00:17:29.120 --> 00:17:31.880
+276
+00:17:23.950 --> 00:17:26.710
 No funciona mientras el modelo
 responde, ni en vibe mode,
 
-278
-00:17:31.920 --> 00:17:33.971
+277
+00:17:26.750 --> 00:17:28.801
 como vimos en el vídeo quince.
 
-279
-00:17:34.011 --> 00:17:38.120
+278
+00:17:28.841 --> 00:17:32.950
 Y si solo quieres cambiar de carpeta,
 sin crear rama, eso es barra move,
 
-280
-00:17:38.445 --> 00:17:39.390
+279
+00:17:33.275 --> 00:17:34.220
 del vídeo doce.
 
-281
-00:17:45.265 --> 00:17:49.700
+280
+00:17:40.095 --> 00:17:44.530
 Pasamos a Auto QA, y aquí
 conviene deshacer una confusión,
 
-282
-00:17:49.740 --> 00:17:53.430
+281
+00:17:44.570 --> 00:17:48.260
 porque el nombre invita a pensar
 en control de calidad de tu código.
 
-283
-00:17:53.636 --> 00:17:58.777
+282
+00:17:48.466 --> 00:17:53.607
 No lo es. Auto QA es un buzón de quejas
 del modelo sobre las herramientas de oh my
 
-284
-00:17:58.817 --> 00:17:59.717
+283
+00:17:53.647 --> 00:17:54.547
 pi.
 
-285
-00:17:59.838 --> 00:18:04.130
+284
+00:17:54.668 --> 00:17:58.960
 Funciona así. Cuando está activo, el
 system prompt le pide al modelo que,
 
-286
-00:18:04.170 --> 00:18:07.985
+285
+00:17:59.000 --> 00:18:02.815
 si una herramienta devuelve algo que no
 encaja con lo que dice su descripción,
 
-287
-00:18:08.025 --> 00:18:11.171
+286
+00:18:02.855 --> 00:18:06.001
 lo apunte escribiendo una línea
 en un dispositivo virtual,
 
-288
-00:18:11.211 --> 00:18:13.120
+287
+00:18:06.041 --> 00:18:07.950
 equis de dos puntos
 barra barra report issue:
 
-289
-00:18:13.160 --> 00:18:18.085
+288
+00:18:07.990 --> 00:18:12.915
 el nombre de la herramienta
 y una frase con el problema.
 
-290
-00:18:18.125 --> 00:18:22.350
+289
+00:18:12.955 --> 00:18:17.180
 Es información para los desarrolladores de
 oh my pi, no para ti ni para tu proyecto.
 
-291
-00:18:23.253 --> 00:18:27.411
+290
+00:18:18.083 --> 00:18:22.241
 Viene activado de serie, pero nada se
 guarda hasta que das tu consentimiento.
 
-292
-00:18:27.451 --> 00:18:31.469
+291
+00:18:22.281 --> 00:18:26.299
 La primera vez que el modelo reporta
 algo, sale un diálogo con tono gracioso:
 
-293
-00:18:31.509 --> 00:18:33.910
+292
+00:18:26.339 --> 00:18:28.740
 tu agente ha escrito una carta
 enfadada a una herramienta,
 
-294
-00:18:33.950 --> 00:18:35.910
+293
+00:18:28.780 --> 00:18:30.740
 ¿se la mandamos a los desarrolladores?
 
-295
-00:18:35.950 --> 00:18:39.050
+294
+00:18:30.780 --> 00:18:33.880
 Si dices que no, Auto QA se apaga.
 
-296
-00:18:39.394 --> 00:18:44.040
+295
+00:18:34.224 --> 00:18:38.870
 Si dices que sí, cada queja se guarda en
 local y además se envía sola a un servidor
 
-297
-00:18:44.080 --> 00:18:44.980
+296
+00:18:38.910 --> 00:18:39.810
 de oh my pi.
 
-298
-00:18:45.585 --> 00:18:49.490
+297
+00:18:40.415 --> 00:18:44.320
 Según el diálogo, solo viaja
 la herramienta y la queja.
 
-299
-00:18:49.576 --> 00:18:53.680
+298
+00:18:44.406 --> 00:18:48.510
 En el código se ve que van
 también el modelo, la versión,
 
-300
-00:18:53.720 --> 00:18:57.114
+299
+00:18:48.550 --> 00:18:51.944
 el sistema y un
 identificador de instalación.
 
-301
-00:18:57.154 --> 00:19:01.297
+300
+00:18:51.984 --> 00:18:56.127
 Y la queja la escribe el modelo, que
 puede citar una ruta o un comando.
 
-302
-00:19:01.337 --> 00:19:04.170
+301
+00:18:56.167 --> 00:18:59.000
 Por eso, en el perfil demo lo
 dejamos denegado de antemano.
 
-303
-00:19:05.057 --> 00:19:07.250
+302
+00:18:59.887 --> 00:19:02.080
 Lo comprobamos en el otro panel.
 
-304
-00:19:07.290 --> 00:19:11.475
+303
+00:19:02.120 --> 00:19:06.305
 Config get dev punto
 auto QA responde true:
 
-305
-00:19:11.515 --> 00:19:13.576
+304
+00:19:06.345 --> 00:19:08.406
 activado, el valor de serie.
 
-306
-00:19:13.616 --> 00:19:16.764
+305
+00:19:08.446 --> 00:19:11.594
 Y el consentimiento, denied: denegado.
 
-307
-00:19:17.100 --> 00:19:21.150
+306
+00:19:11.930 --> 00:19:15.980
 Así, si el modelo se queja en cámara,
 no sale el diálogo y no se envía nada.
 
-308
-00:19:21.190 --> 00:19:24.440
+307
+00:19:16.020 --> 00:19:19.270
 Son dos ajustes distintos, y el
 que manda de verdad es el segundo.
 
-309
-00:19:25.403 --> 00:19:28.140
+308
+00:19:20.233 --> 00:19:22.970
 La ayuda de o eme pe grievances lo resume:
 
-310
-00:19:28.180 --> 00:19:31.210
+309
+00:19:23.010 --> 00:19:26.040
 ver, limpiar o enviar las quejas.
 
-311
-00:19:31.272 --> 00:19:35.516
+310
+00:19:26.102 --> 00:19:30.346
 Sin acción, lista las últimas, y
 se pueden filtrar por herramienta.
 
-312
-00:19:35.556 --> 00:19:39.070
+311
+00:19:30.386 --> 00:19:33.900
 Con clean se borran por identificador,
 por herramienta o todas.
 
-313
-00:19:39.110 --> 00:19:42.080
+312
+00:19:33.940 --> 00:19:36.910
 Y con push se envían las
 pendientes al servidor.
 
-314
-00:19:42.120 --> 00:19:45.350
+313
+00:19:36.950 --> 00:19:40.180
 Ese último, en la
 diapositiva, porque publica.
 
-315
-00:19:46.457 --> 00:19:48.590
+314
+00:19:41.287 --> 00:19:43.420
 Lo ejecutamos con el perfil demo, y
 
-316
-00:19:49.380 --> 00:19:52.340
+315
+00:19:44.210 --> 00:19:47.170
 responde que todavía no
 hay quejas registradas.
 
-317
-00:19:52.403 --> 00:19:57.438
+316
+00:19:47.233 --> 00:19:52.268
 Un detalle que vimos fuera de cámara: solo
 con listar, crea la base de datos vacía,
 
-318
-00:19:57.478 --> 00:20:01.367
+317
+00:19:52.308 --> 00:19:56.197
 y la crea dentro de la carpeta
 del perfil, como el worktree.
 
-319
-00:20:01.407 --> 00:20:05.070
+318
+00:19:56.237 --> 00:19:59.900
 Si usas perfiles para separar
 entornos, aquí también se separan.
 
-320
-00:20:05.704 --> 00:20:08.057
+319
+00:20:00.534 --> 00:20:02.887
 ¿Y para qué te sirve a ti? Para dos cosas.
 
-321
-00:20:08.097 --> 00:20:12.170
+320
+00:20:02.927 --> 00:20:07.000
 Si una herramienta te falla a menudo, ahí
 verás si el modelo también lo ha notado.
 
-322
-00:20:12.210 --> 00:20:14.440
+321
+00:20:07.040 --> 00:20:09.270
 Y para saber qué sale de tu máquina.
 
-323
-00:20:14.480 --> 00:20:18.687
+322
+00:20:09.310 --> 00:20:13.517
 Si no quieres que salga nada, deja el
 consentimiento denegado o apaga dev punto
 
-324
-00:20:18.727 --> 00:20:22.850
+323
+00:20:13.557 --> 00:20:17.680
 auto QA. Con la variable de entorno PI
 AUTO QA a cero también se desactiva.
 
-325
-00:20:28.592 --> 00:20:32.353
+324
+00:20:23.422 --> 00:20:27.183
 La última pieza, barra
 security, va solo explicada.
 
-326
-00:20:32.393 --> 00:20:36.550
+325
+00:20:27.223 --> 00:20:31.380
 Al principio vimos que responde que está
 desactivada, y viene así de fábrica.
 
-327
-00:20:36.590 --> 00:20:40.351
+326
+00:20:31.420 --> 00:20:35.181
 Cuando lo activas, oh my pi hace
 escaneos de seguridad propios:
 
-328
-00:20:40.391 --> 00:20:44.780
+327
+00:20:35.221 --> 00:20:39.610
 un plan con el alcance exacto, un escaneo
 en segundo plano con agentes security
 
-329
-00:20:44.820 --> 00:20:48.447
+328
+00:20:39.650 --> 00:20:43.277
 reviewer, y comandos para ver
 el estado, listar los escaneos,
 
-330
-00:20:48.487 --> 00:20:52.810
+329
+00:20:43.317 --> 00:20:47.640
 validar hallazgos, compararlos entre
 escaneos e importarlos o exportarlos en
 
-331
-00:20:52.850 --> 00:20:56.530
+330
+00:20:47.680 --> 00:20:51.360
 SARIF, el formato que entienden
 muchas herramientas de seguridad.
 
-332
-00:20:57.226 --> 00:21:01.050
+331
+00:20:52.056 --> 00:20:55.880
 ¿Por qué no lo activamos? Porque el
 escaneo exige una cuenta con OAuth
 
-333
-00:21:01.090 --> 00:21:05.181
+332
+00:20:55.920 --> 00:21:00.011
 guardada en oh my pi, o Amazon
 Bedrock, y aquí no enseñamos cuentas.
 
-334
-00:21:05.221 --> 00:21:08.340
+333
+00:21:00.051 --> 00:21:03.170
 Y porque escanear un repositorio
 entero gasta mucho modelo.
 
-335
-00:21:08.380 --> 00:21:11.970
+334
+00:21:03.210 --> 00:21:06.800
 Hay además una variante en la nube
 que envía el trabajo a Codex Security,
 
-336
-00:21:12.010 --> 00:21:14.750
+335
+00:21:06.840 --> 00:21:09.580
 de ChatGPT. Todo eso, en la diapositiva.
 
-337
-00:21:15.819 --> 00:21:20.207
+336
+00:21:10.649 --> 00:21:15.037
 Un detalle de diseño sí merece
 la pena: el plan es inmutable.
 
-338
-00:21:20.247 --> 00:21:24.491
+337
+00:21:15.077 --> 00:21:19.321
 Guarda una huella del código y del
 alcance, y si cambian antes del escaneo,
 
-339
-00:21:24.531 --> 00:21:28.801
+338
+00:21:19.361 --> 00:21:23.631
 se niega a empezar. Es la misma idea
 que el diff congelado de barra review:
 
-340
-00:21:28.841 --> 00:21:32.090
+339
+00:21:23.671 --> 00:21:26.920
 que lo revisado sea
 exactamente lo que pediste.
 
-341
-00:21:33.090 --> 00:21:35.553
+340
+00:21:27.920 --> 00:21:30.383
 Ahora, los límites del vídeo, juntos.
 
-342
-00:21:35.593 --> 00:21:38.638
+341
+00:21:30.423 --> 00:21:33.468
 El primero: dry run no es solo lectura.
 
-343
-00:21:38.678 --> 00:21:42.864
+342
+00:21:33.508 --> 00:21:37.694
 O eme pe commit en modo de prueba,
 y el mensaje generado en barra git,
 
-344
-00:21:42.904 --> 00:21:45.960
+343
+00:21:37.734 --> 00:21:40.790
 preparan todos los cambios
 si el índice está vacío.
 
-345
-00:21:46.000 --> 00:21:48.933
+344
+00:21:40.830 --> 00:21:43.763
 Prepara tú antes, y
 mira git status después.
 
-346
-00:21:48.973 --> 00:21:52.810
+345
+00:21:43.803 --> 00:21:47.640
 Y en barra git, mira dónde está el cursor
 antes de pulsar la barra espaciadora.
 
-347
-00:21:53.392 --> 00:21:55.155
+346
+00:21:48.222 --> 00:21:49.985
 El segundo: las convenciones.
 
-348
-00:21:55.195 --> 00:21:59.240
+347
+00:21:50.025 --> 00:21:54.070
 O eme pe commit escribe mensajes
 convencionales en inglés,
 
-349
-00:21:59.280 --> 00:22:01.694
+348
+00:21:54.110 --> 00:21:56.524
 aunque tu AGENTS punto md diga otra cosa;
 
-350
-00:22:01.734 --> 00:22:06.440
+349
+00:21:56.564 --> 00:22:01.270
 lo hemos visto en pantalla. Úsalo como
 borrador, o úsalo tal cual en repositorios
 
-351
-00:22:06.480 --> 00:22:07.890
+350
+00:22:01.310 --> 00:22:02.720
 que ya sigan ese estilo.
 
-352
-00:22:08.522 --> 00:22:13.860
+351
+00:22:03.352 --> 00:22:08.690
 El tercero: lo que publica. Guion guion
 push, la opción de pull requests de barra
 
-353
-00:22:13.900 --> 00:22:18.980
+352
+00:22:08.730 --> 00:22:13.810
 review, el envío de quejas de Auto QA y
 la variante en la nube de security mandan
 
-354
-00:22:19.020 --> 00:22:22.207
+353
+00:22:13.850 --> 00:22:17.037
 algo fuera de tu máquina,
 a veces con tu cuenta.
 
-355
-00:22:22.247 --> 00:22:26.310
+354
+00:22:17.077 --> 00:22:21.140
 Y otro punto que se olvida: el diff
 que revisa barra review viaja entero al
 
-356
-00:22:26.350 --> 00:22:30.614
+355
+00:22:21.180 --> 00:22:25.444
 proveedor del modelo. La redacción de
 secretos de oh my pi viene apagada;
 
-357
-00:22:30.654 --> 00:22:32.290
+356
+00:22:25.484 --> 00:22:27.120
 la veremos en el vídeo diecinueve.
 
-358
-00:22:33.260 --> 00:22:35.660
+357
+00:22:28.090 --> 00:22:30.490
 El cuarto: las teclas que borran.
 
-359
-00:22:35.700 --> 00:22:40.050
+358
+00:22:30.530 --> 00:22:34.880
 La equis y la tecla suprimir en barra git
 descartan trabajo que no está en ningún
 
-360
-00:22:40.090 --> 00:22:43.410
+359
+00:22:34.920 --> 00:22:38.240
 commit, y clean source
 limpia la carpeta original.
 
-361
-00:22:43.606 --> 00:22:48.620
+360
+00:22:38.436 --> 00:22:43.450
 Y el quinto, el de siempre: el reviewer
 tiene bash y el modo yolo no pregunta.
 
-362
-00:22:48.660 --> 00:22:51.250
+361
+00:22:43.490 --> 00:22:46.080
 Una instrucción de solo
 lectura no es una barrera.
 
-363
-00:22:52.113 --> 00:22:56.540
+362
+00:22:46.943 --> 00:22:51.370
 En cuanto al coste, la barra de estado
 marcaba un céntimo después de la revisión
 
-364
-00:22:56.580 --> 00:23:00.000
+363
+00:22:51.410 --> 00:22:54.830
 y el arreglo, y los mensajes
 de Flash cuestan todavía menos.
 
-365
-00:23:00.040 --> 00:23:04.670
+364
+00:22:54.870 --> 00:22:59.500
 Con diffs grandes, barra review lanza más
 revisores, y el coste crece con ellos.
 
-366
-00:23:10.391 --> 00:23:11.641
+365
+00:23:05.221 --> 00:23:06.471
 Repasemos.
 
-367
-00:23:12.450 --> 00:23:15.740
+366
+00:23:07.280 --> 00:23:10.570
 Barra review congela el diff que
 elijas, sin commitear, contra una rama,
 
-368
-00:23:15.780 --> 00:23:20.220
+367
+00:23:10.610 --> 00:23:15.050
 un commit o una pull request, y
 lo reparte entre agentes reviewer,
 
-369
-00:23:20.260 --> 00:23:22.860
+368
+00:23:15.090 --> 00:23:17.690
 de uno a dieciséis según el tamaño.
 
-370
-00:23:22.930 --> 00:23:27.210
+369
+00:23:17.760 --> 00:23:22.040
 Devuelve hallazgos y un veredicto, y el
 modelo de la conversación los comprueba y
 
-371
-00:23:27.250 --> 00:23:29.580
+370
+00:23:22.080 --> 00:23:24.410
 te pregunta antes de tocar nada.
 
-372
-00:23:29.620 --> 00:23:33.950
+371
+00:23:24.450 --> 00:23:28.780
 El reviewer usa el rol slow, que sin
 asignar hereda tu modelo por defecto.
 
-373
-00:23:34.821 --> 00:23:39.270
+372
+00:23:29.651 --> 00:23:34.100
 Barra git, igual que o eme pe git,
 enseña el diff en cuatro vistas,
 
-374
-00:23:39.310 --> 00:23:43.720
+373
+00:23:34.140 --> 00:23:38.550
 prepara por fichero, por hunk o por
 líneas, y commitea con tu mensaje o con
 
-375
-00:23:43.760 --> 00:23:48.290
+374
+00:23:38.590 --> 00:23:43.120
 uno generado. O eme pe commit genera
 mensajes convencionales con el rol commit
 
-376
-00:23:48.330 --> 00:23:53.390
+375
+00:23:43.160 --> 00:23:48.220
 o smol, actualiza changelogs, puede
 dividir commits, y en dry run no commitea,
 
-377
-00:23:53.430 --> 00:23:57.880
+376
+00:23:48.260 --> 00:23:52.710
 aunque puede preparar. Barra uve
 doble te crea una rama y un worktree,
 
-378
-00:23:57.920 --> 00:24:00.510
+377
+00:23:52.750 --> 00:23:55.340
 y se lleva la sesión con
 una copia de los cambios.
 
-379
-00:24:01.360 --> 00:24:05.853
+378
+00:23:56.190 --> 00:24:00.683
 Auto QA no revisa tu código: recoge
 quejas del modelo sobre las herramientas,
 
-380
-00:24:05.893 --> 00:24:08.915
+379
+00:24:00.723 --> 00:24:03.745
 y solo con tu consentimiento
 las guarda y las envía.
 
-381
-00:24:08.955 --> 00:24:12.688
+380
+00:24:03.785 --> 00:24:07.518
 O eme pe grievances las
 lista, las limpia y las envía.
 
-382
-00:24:12.728 --> 00:24:16.770
+381
+00:24:07.558 --> 00:24:11.600
 Y barra security viene apagado, exige
 OAuth y queda para cuando lo necesites de
 
-383
-00:24:16.810 --> 00:24:17.710
+382
+00:24:11.640 --> 00:24:12.540
 verdad.
 
-384
-00:24:18.511 --> 00:24:22.492
+383
+00:24:13.341 --> 00:24:17.322
 La práctica: en tu perfil de pruebas
 y en una rama de usar y tirar,
 
-385
-00:24:22.532 --> 00:24:25.670
+384
+00:24:17.362 --> 00:24:20.500
 haz un cambio pequeño que
 mezcle dos cosas sin relación.
 
-386
-00:24:25.710 --> 00:24:30.218
+385
+00:24:20.540 --> 00:24:25.048
 Lanza barra review sobre los cambios sin
 commitear y apunta qué ha encontrado.
 
-387
-00:24:30.258 --> 00:24:34.500
+386
+00:24:25.088 --> 00:24:29.330
 Después, en barra git, prepara
 solo una de las dos cosas,
 
-388
-00:24:34.540 --> 00:24:39.280
+387
+00:24:29.370 --> 00:24:34.110
 lanza o eme pe commit guion guion dry run,
 y compara su mensaje con las reglas de tu
 
-389
-00:24:39.320 --> 00:24:42.614
+388
+00:24:34.150 --> 00:24:37.444
 repositorio. Escribe tú el
 mensaje final y commitea.
 
-390
-00:24:42.654 --> 00:24:47.410
+389
+00:24:37.484 --> 00:24:42.240
 Y cuando termines, comprueba con git
 status y git worktree list que no queda
 
-391
-00:24:47.450 --> 00:24:48.350
+390
+00:24:42.280 --> 00:24:43.180
 nada suelto.
 
-392
-00:24:48.927 --> 00:24:52.800
+391
+00:24:43.757 --> 00:24:47.630
 En el próximo vídeo endurecemos oh
 my pi para un repositorio de equipo:
 
-393
-00:24:52.840 --> 00:24:57.150
+392
+00:24:47.670 --> 00:24:51.980
 el modo de aprobación, que hoy sigue
 en yolo, aprobaciones por herramienta y
 
-394
-00:24:57.190 --> 00:25:03.026
+393
+00:24:52.020 --> 00:24:57.856
 patrones de bash, las reglas TTSR
 y barra o eme efe ge, los hooks,
 
-395
-00:25:03.066 --> 00:25:05.150
+394
+00:24:57.896 --> 00:24:59.980
 y los secretos y su redacción.
 
-396
-00:25:05.190 --> 00:25:08.610
+395
+00:25:00.020 --> 00:25:03.440
 Lo que hoy han sido instrucciones,
 como el solo lectura del reviewer,
 
-397
-00:25:08.650 --> 00:25:11.090
+396
+00:25:03.480 --> 00:25:05.920
 pasarán a ser límites. Nos vemos allí.

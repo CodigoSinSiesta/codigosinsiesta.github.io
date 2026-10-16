@@ -28,13 +28,13 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 - *En terminal:* Dónde vive cada cosa (más abajo, en «Código y comandos»)
 - **Vídeo 11:** Sin /trust — ¿Qué se carga al abrir una carpeta? Lo cerramos al final.
 - **El montaje**
-  - `omp 18.11` · Perfil demo
+  - `demo` · Perfil demo
   - `V4 Pro` · El modelo
   - `demo-20` · Límite 40 → 50: sin commitear
 
 ### 2 · Comandos de proyecto
 
-<p><button type="button" class="ir-a" data-t="151">▶ Ir a 2:31</button></p>
+<p><button type="button" class="ir-a" data-t="148">▶ Ir a 2:28</button></p>
 
 - *En la demo:* .omp/commands/triage.md del repositorio de oh my pi
 - *En terminal:* .omp/commands/ .md (más abajo, en «Código y comandos»)
@@ -54,7 +54,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 ### 3 · Skills que comparten Pi y oh my pi
 
-<p><button type="button" class="ir-a" data-t="331">▶ Ir a 5:31</button></p>
+<p><button type="button" class="ir-a" data-t="329">▶ Ir a 5:29</button></p>
 
 - **Dónde busca skills oh my pi**
   - `.omp/skills` · Proyecto y perfil
@@ -73,7 +73,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 ### 4 · El registro de skills
 
-<p><button type="button" class="ir-a" data-t="502">▶ Ir a 8:22</button></p>
+<p><button type="button" class="ir-a" data-t="500">▶ Ir a 8:20</button></p>
 
 - *En terminal:* skills.omp.sh (diapositiva) (más abajo, en «Código y comandos»)
 - **Instalar (diapositiva)**
@@ -90,7 +90,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 ### 5 · Tus extensiones de Pi en oh my pi
 
-<p><button type="button" class="ir-a" data-t="617">▶ Ir a 10:17</button></p>
+<p><button type="button" class="ir-a" data-t="615">▶ Ir a 10:15</button></p>
 
 - **Vídeo 11:** La promesa — ¿Funcionan en oh my pi las extensiones de Pi de los vídeos 08 y 09?
 - **Por qué pueden funcionar**
@@ -115,7 +115,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 ### 6 · El panel y los plugins
 
-<p><button type="button" class="ir-a" data-t="845">▶ Ir a 14:05</button></p>
+<p><button type="button" class="ir-a" data-t="843">▶ Ir a 14:03</button></p>
 
 - *En la demo:* Extension Control Center
 - *En la demo:* notas-de-version
@@ -133,7 +133,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 ### 7 · MCP y SSH
 
-<p><button type="button" class="ir-a" data-t="995">▶ Ir a 16:35</button></p>
+<p><button type="button" class="ir-a" data-t="992">▶ Ir a 16:32</button></p>
 
 - *En la demo:* /mcp help
 - **De dónde lee MCP**
@@ -146,7 +146,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 ### 8 · Lo que carga una carpeta
 
-<p><button type="button" class="ir-a" data-t="1122">▶ Ir a 18:42</button></p>
+<p><button type="button" class="ir-a" data-t="1120">▶ Ir a 18:40</button></p>
 
 - **oh my pi:** isProjectTrusted() → true — No pide confianza por carpeta antes de cargar lo que trae el proyecto.
 - **Al abrir un repositorio se carga**
@@ -162,7 +162,7 @@ extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 ### 9 · Repaso, práctica y cierre
 
-<p><button type="button" class="ir-a" data-t="1248">▶ Ir a 20:48</button></p>
+<p><button type="button" class="ir-a" data-t="1246">▶ Ir a 20:46</button></p>
 
 - **Repaso · 1**
   - `.omp/commands` · $ARGUMENTS: /reload-plugins
@@ -183,7 +183,7 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 ### Dónde vive cada cosa
 
 ```text
-                Pi 1.0.4                       oh my pi 18.11
+                Pi                             oh my pi
 comandos        prompts/ · .pi/prompts         .omp/commands · .claude/commands · .agents/…
 skills          skills/ · .pi/skills · .agents  .omp/skills · registro · plugins · .claude · .agents
 extensiones     extensions/ · .pi/extensions   .omp/extensions · perfil · -e  (/restart)
@@ -391,7 +391,7 @@ En pantalla tienes la tabla que usaremos de mapa. A la izquierda, dónde vivía 
 
 Y un hilo que recorre todo el vídeo. En el vídeo once dijimos que oh my pi no tiene barra trust. Hoy veremos qué significa eso para cada pieza que extiende oh my pi desde un repositorio, y lo cerraremos con una lista concreta de lo que se carga al abrir una carpeta.
 
-Trabajamos como siempre: la tienda, el perfil demo, ahora con oh my pi dieciocho punto once y DeepSeek V cuatro Pro, en una rama de usar y tirar, demo veinte, con un cambio sin commitear para tener algo que revisar: el límite del envío gratis sube de cuarenta a cincuenta euros.
+Trabajamos como siempre: la tienda, el perfil demo y DeepSeek V cuatro Pro, en una rama de usar y tirar, demo veinte, con un cambio sin commitear para tener algo que revisar: el límite del envío gratis sube de cuarenta a cincuenta euros.
 
 **2 · Comandos de proyecto**
 

@@ -31,13 +31,12 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 - **Hoy**
   - `V4 Pro` · El capaz: rol plan
   - `Flash` · El rápido: ejecuta
-  - `18.6.3` · Recién actualizado: omp update
 - *En la demo:* /pl
 - *En la demo:* /go
 
 ### 2 · El modo plan
 
-<p><button type="button" class="ir-a" data-t="136">▶ Ir a 2:16</button></p>
+<p><button type="button" class="ir-a" data-t="123">▶ Ir a 2:03</button></p>
 
 - **Separar pensar de hacer:** Explora (sin tocar) → Plan (escrito) → Tú apruebas → Ejecuta
 - *En la demo:* plan = DeepSeek V4 Pro :high
@@ -54,7 +53,7 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 ### 3 · Revisar el plan
 
-<p><button type="button" class="ir-a" data-t="308">▶ Ir a 5:08</button></p>
+<p><button type="button" class="ir-a" data-t="295">▶ Ir a 4:55</button></p>
 
 - *En la demo:* La revisión del plan
 - *En la demo:* El plan quita la API de objeto
@@ -74,7 +73,7 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 ### 4 · Objetivos con presupuesto
 
-<p><button type="button" class="ir-a" data-t="536">▶ Ir a 8:56</button></p>
+<p><button type="button" class="ir-a" data-t="523">▶ Ir a 8:43</button></p>
 
 - **Modo goal:** Objetivo → Turno → Cede (oh my pi le recuerda) → goal complete (lo decide el modelo)
 - *En terminal:* /goal (más abajo, en «Código y comandos»)
@@ -96,7 +95,7 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 ### 5 · Dirigir mientras trabaja
 
-<p><button type="button" class="ir-a" data-t="757">▶ Ir a 12:37</button></p>
+<p><button type="button" class="ir-a" data-t="743">▶ Ir a 12:23</button></p>
 
 - *En la demo:* /goal sin presupuesto · /goal show
 - **La lista de tareas**
@@ -113,7 +112,7 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 ### 6 · Por qué son excluyentes
 
-<p><button type="button" class="ir-a" data-t="902">▶ Ir a 15:02</button></p>
+<p><button type="button" class="ir-a" data-t="888">▶ Ir a 14:48</button></p>
 
 - *En la demo:* /plan con un objetivo activo
 - *En la demo:* Bloqueado
@@ -129,7 +128,7 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 ### 7 · /loop
 
-<p><button type="button" class="ir-a" data-t="981">▶ Ir a 16:21</button></p>
+<p><button type="button" class="ir-a" data-t="968">▶ Ir a 16:08</button></p>
 
 - **goal frente a loop**
   - `goal` · El modelo decide
@@ -149,7 +148,7 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 ### 8 · /vibe
 
-<p><button type="button" class="ir-a" data-t="1184">▶ Ir a 19:44</button></p>
+<p><button type="button" class="ir-a" data-t="1171">▶ Ir a 19:31</button></p>
 
 - **/vibe: la sesión dirige**
   - `spawn` · Crear
@@ -165,7 +164,7 @@ planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 ### 9 · Repaso, práctica y cierre
 
-<p><button type="button" class="ir-a" data-t="1269">▶ Ir a 21:09</button></p>
+<p><button type="button" class="ir-a" data-t="1255">▶ Ir a 20:55</button></p>
 
 - **Repaso: plan:** /plan (solo lectura) → Revisión (anotar, refinar) → continue with (qué rol) → Save and quit (o aprobar)
 - **Repaso: dirigir:** /guided-goal (con presupuesto) → todo · queue (sin interrumpir) → /loop (acotado) → /vibe (dirige)
@@ -292,7 +291,7 @@ oh my pi trae para eso cuatro modos de trabajo. El modo plan, en el que el agent
 
 Junto a los modos hay dos herramientas que valen siempre: la cola de mensajes y la lista de tareas. Y una regla que atraviesa todo el vídeo: plan, goal y vibe no se pueden combinar. Al final entenderás por qué, y verás que la forma de usarlos juntos es encadenarlos: primero un plan, después un objetivo que lo ejecuta.
 
-Trabajamos en la tienda, con el perfil demo y los dos modelos del vídeo catorce: DeepSeek V cuatro Pro, el capaz, y DeepSeek Flash, el rápido. Y una novedad: oh my pi ha sacado la versión dieciocho punto seis punto tres mientras preparábamos el vídeo, así que actualizamos antes de grabar. Nada de lo de hoy cambia en ella, pero la regla del curso es grabar siempre con la última.
+Trabajamos en la tienda, con el perfil demo y los dos modelos del vídeo catorce: DeepSeek V cuatro Pro, el capaz, y DeepSeek Flash, el rápido.
 
 Antes de nada, un vistazo gratis. Escribimos barra p ele, y el menú dice plan off y plan review: el modo plan no está activo. Con barra g o aparecen los demás: goal off, guided goal con su descripción, vibe off y loop off. Guided goal enseña una descripción en lugar de un estado porque no es un modo, es una acción.
 
