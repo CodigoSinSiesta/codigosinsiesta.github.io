@@ -148,7 +148,7 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 
 ### 6 · Otras formas de aislar
 
-<p><button type="button" class="ir-a" data-t="1115">▶ Ir a 18:35</button></p>
+<p><button type="button" class="ir-a" data-t="1113">▶ Ir a 18:33</button></p>
 
 - **Otras opciones (sobre el papel)**
   - `sbx` · Docker Sandboxes: sandbox gestionado con proxy
@@ -170,7 +170,7 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 
 ### 7 · Una receta para empezar
 
-<p><button type="button" class="ir-a" data-t="1281">▶ Ir a 21:21</button></p>
+<p><button type="button" class="ir-a" data-t="1279">▶ Ir a 21:19</button></p>
 
 - **Receta, de menos a más esfuerzo**
   - `1` · Control de versiones: commit antes de cambios grandes

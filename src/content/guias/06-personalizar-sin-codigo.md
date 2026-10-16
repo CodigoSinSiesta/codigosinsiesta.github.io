@@ -159,7 +159,7 @@ cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
 
 ### 7 · Qué pieza para cada cosa
 
-<p><button type="button" class="ir-a" data-t="1135">▶ Ir a 18:55</button></p>
+<p><button type="button" class="ir-a" data-t="1140">▶ Ir a 19:00</button></p>
 
 - **Qué pieza para cada cosa**
   - `AGENTS.md` · Proyecto, siempre: mapa, pruebas, hecho

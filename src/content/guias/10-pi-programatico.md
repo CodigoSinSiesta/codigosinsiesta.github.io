@@ -100,7 +100,7 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 
 ### 6 · RPC: Pi como proceso de larga vida
 
-<p><button type="button" class="ir-a" data-t="880">▶ Ir a 14:40</button></p>
+<p><button type="button" class="ir-a" data-t="882">▶ Ir a 14:42</button></p>
 
 - **Modo RPC:** Pi como proceso de larga vida — Órdenes por la entrada estándar, respuestas y eventos por la salida.
 - *En terminal:* pi --mode rpc --no-session --tools read,grep,find,ls (más abajo, en «Código y comandos»)
@@ -127,7 +127,7 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 
 ### 7 · El SDK: Pi dentro de tu programa
 
-<p><button type="button" class="ir-a" data-t="1170">▶ Ir a 19:30</button></p>
+<p><button type="button" class="ir-a" data-t="1172">▶ Ir a 19:32</button></p>
 
 - **SDK:** createAgentSession — Sin otro proceso, sin JSON, sin protocolo: métodos de TypeScript.
 - *En la demo:* resumen.ts
@@ -144,7 +144,7 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 
 ### 8 · Fuera del escritorio: tmux, Termux y Windows
 
-<p><button type="button" class="ir-a" data-t="1345">▶ Ir a 22:25</button></p>
+<p><button type="button" class="ir-a" data-t="1347">▶ Ir a 22:27</button></p>
 
 - **Fuera del escritorio:** tmux · Termux · Windows — La documentación de Pi dedica una guía a cada uno.
 - *En terminal:* ~/.tmux.conf (tmux 3.5 o posterior) (más abajo, en «Código y comandos»)
@@ -159,7 +159,7 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 
 ### 9 · Cierre
 
-<p><button type="button" class="ir-a" data-t="1459">▶ Ir a 24:19</button></p>
+<p><button type="button" class="ir-a" data-t="1461">▶ Ir a 24:21</button></p>
 
 - **Repaso**
   - `-p` · Print: respuesta final

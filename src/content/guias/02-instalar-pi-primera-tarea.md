@@ -49,7 +49,7 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 ### 3 · Primer arranque
 
-<p><button type="button" class="ir-a" data-t="334">▶ Ir a 5:34</button></p>
+<p><button type="button" class="ir-a" data-t="326">▶ Ir a 5:26</button></p>
 
 - *En la demo:* pi, en la raíz del repositorio
 - *En la demo:* Historial, editor y pie
@@ -67,7 +67,7 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 ### 4 · La primera tarea
 
-<p><button type="button" class="ir-a" data-t="556">▶ Ir a 9:16</button></p>
+<p><button type="button" class="ir-a" data-t="548">▶ Ir a 9:08</button></p>
 
 - *En la demo:* @ busca ficheros; Tab completa
 - *En terminal:* @ · señalar ficheros (más abajo, en «Código y comandos»)
@@ -88,7 +88,7 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 ### 5 · Tú también tienes terminal
 
-<p><button type="button" class="ir-a" data-t="752">▶ Ir a 12:32</button></p>
+<p><button type="button" class="ir-a" data-t="743">▶ Ir a 12:23</button></p>
 
 - **La exclamación**
   - `!!` · Solo para ti: el modelo no ve la salida
@@ -100,7 +100,7 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 ### 6 · Cambiar el rumbo
 
-<p><button type="button" class="ir-a" data-t="856">▶ Ir a 14:16</button></p>
+<p><button type="button" class="ir-a" data-t="847">▶ Ir a 14:07</button></p>
 
 - *En terminal:* La tarea, con feedback incluido (más abajo, en «Código y comandos»)
 - **Steering · Enter mientras trabaja:** Escribes (la corrección) → Enter (queda en espera) → Fin del turno (el modelo la lee)
@@ -126,7 +126,7 @@ instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 ### 7 · Leer el pie y retomar la sesión
 
-<p><button type="button" class="ir-a" data-t="1123">▶ Ir a 18:43</button></p>
+<p><button type="button" class="ir-a" data-t="1115">▶ Ir a 18:35</button></p>
 
 - *En la demo:* El pie, después de las tareas
 - *En terminal:* El pie de Pi (más abajo, en «Código y comandos»)

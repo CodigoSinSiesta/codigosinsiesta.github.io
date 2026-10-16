@@ -34,7 +34,7 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 
 ### 2 · Varias carpetas en una sesión
 
-<p><button type="button" class="ir-a" data-t="159">▶ Ir a 2:39</button></p>
+<p><button type="button" class="ir-a" data-t="158">▶ Ir a 2:38</button></p>
 
 - *En terminal:* ~/csn/datos (fuera del repositorio) (más abajo, en «Código y comandos»)
 - *En la demo:* /dirs
@@ -67,7 +67,7 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 
 ### 4 · El servidor de lenguaje
 
-<p><button type="button" class="ir-a" data-t="452">▶ Ir a 7:32</button></p>
+<p><button type="button" class="ir-a" data-t="451">▶ Ir a 7:31</button></p>
 
 - **Un rename**
   - `grep` · Casi siempre: el casi es el problema
@@ -92,7 +92,7 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 
 ### 5 · Editar con precisión: hashline, ast_grep y ast_edit
 
-<p><button type="button" class="ir-a" data-t="647">▶ Ir a 10:47</button></p>
+<p><button type="button" class="ir-a" data-t="646">▶ Ir a 10:46</button></p>
 
 - **Edición anclada:** Etiqueta (de la lectura) → Líneas (por número) → ¿Cambió? (no aplica a ciegas)
 - *En terminal:* Hashline (diapositiva) (más abajo, en «Código y comandos»)
@@ -130,7 +130,7 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 
 ### 7 · Eval, el navegador y el escritorio
 
-<p><button type="button" class="ir-a" data-t="1041">▶ Ir a 17:21</button></p>
+<p><button type="button" class="ir-a" data-t="1040">▶ Ir a 17:20</button></p>
 
 - **eval:** Un proceso que sigue vivo — JavaScript o Python, con estado entre llamadas.
 - *En la demo:* Una celda JavaScript
@@ -146,7 +146,7 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 
 ### 8 · Límites, riesgos y coste
 
-<p><button type="button" class="ir-a" data-t="1203">▶ Ir a 20:03</button></p>
+<p><button type="button" class="ir-a" data-t="1202">▶ Ir a 20:02</button></p>
 
 - **Primero:** Todo se ejecuta en tu máquina — Lo que en tu editor decides con un clic, aquí lo decide el modelo.
 - **Aprobaciones**
@@ -163,7 +163,7 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 
 ### 9 · Repaso, práctica y cierre
 
-<p><button type="button" class="ir-a" data-t="1347">▶ Ir a 22:27</button></p>
+<p><button type="button" class="ir-a" data-t="1346">▶ Ir a 22:26</button></p>
 
 - **Repaso:** read (puerta única) → LSP (referencias y rename) → debug (DAP)
 - **Y además:** Hashline → ast_grep · ast_edit (con propuesta) → eval (browser · computer) → /add-dir (/dirs)

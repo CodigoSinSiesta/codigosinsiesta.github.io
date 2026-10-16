@@ -122,7 +122,7 @@ la API de extensiones (comandos, herramientas propias y eventos). Construimos en
 
 ### 6 · El modo aprobación
 
-<p><button type="button" class="ir-a" data-t="708">▶ Ir a 11:48</button></p>
+<p><button type="button" class="ir-a" data-t="709">▶ Ir a 11:49</button></p>
 
 - **Modos de permiso**
   - `Pi` · No tiene: ejecuta lo que el modelo decide
@@ -145,7 +145,7 @@ la API de extensiones (comandos, herramientas propias y eventos). Construimos en
 
 ### 7 · Barra reload y rutas protegidas
 
-<p><button type="button" class="ir-a" data-t="950">▶ Ir a 15:50</button></p>
+<p><button type="button" class="ir-a" data-t="951">▶ Ir a 15:51</button></p>
 
 - **Ni siquiera preguntando:** AGENTS.md y .git/ — Rutas que el modelo nunca debería tocar.
 - *En la demo:* git diff permisos.ts
@@ -178,7 +178,7 @@ la API de extensiones (comandos, herramientas propias y eventos). Construimos en
 
 ### 9 · Cierre
 
-<p><button type="button" class="ir-a" data-t="1212">▶ Ir a 20:12</button></p>
+<p><button type="button" class="ir-a" data-t="1213">▶ Ir a 20:13</button></p>
 
 - **Repaso**
   - `registerCommand` · Comandos: los ejecutas tú

@@ -16,7 +16,7 @@ la gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, d
 
 ### 1 · De «no MCP» a MCP de serie
 
-<p><button type="button" class="ir-a" data-t="19">▶ Ir a 0:19</button></p>
+<p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
 - **Model Context Protocol:** Agente (cliente MCP) → Servidor MCP (expone herramientas) → Programas y datos (repos, BD, docs…)
 - **El README antiguo de Pi:** «No MCP» — Cada herramienta declarada viaja en cada petición: nombre, descripción y parámetros.
@@ -28,7 +28,7 @@ la gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, d
 
 ### 2 · Conectar un servidor
 
-<p><button type="button" class="ir-a" data-t="104">▶ Ir a 1:44</button></p>
+<p><button type="button" class="ir-a" data-t="98">▶ Ir a 1:38</button></p>
 
 - **La demo:** Servidor de ficheros limitado a la tienda — @modelcontextprotocol/server-filesystem: sin credenciales y con catorce herramientas.
 - *En la demo:* pi mcp add · pi mcp list
@@ -52,7 +52,7 @@ la gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, d
 
 ### 3 · El coste de las herramientas en el contexto
 
-<p><button type="button" class="ir-a" data-t="288">▶ Ir a 4:48</button></p>
+<p><button type="button" class="ir-a" data-t="282">▶ Ir a 4:42</button></p>
 
 - **El problema:** Cada herramienta declarada viaja en cada petición — Nombre, descripción y esquema de parámetros, en cada turno.
 - *En terminal:* Tamaño del primer contexto («Di solo: hola», medido con pi -p --mode json) (más abajo, en «Código y comandos»)
@@ -64,7 +64,7 @@ la gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, d
 
 ### 4 · Cuatro formas de exponer un servidor
 
-<p><button type="button" class="ir-a" data-t="386">▶ Ir a 6:26</button></p>
+<p><button type="button" class="ir-a" data-t="380">▶ Ir a 6:20</button></p>
 
 - **Exposición de un servidor**
   - `codemode` · Por defecto: desde scripts, sin declarar
@@ -81,7 +81,7 @@ la gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, d
 
 ### 5 · Codemode por dentro
 
-<p><button type="button" class="ir-a" data-t="542">▶ Ir a 9:02</button></p>
+<p><button type="button" class="ir-a" data-t="536">▶ Ir a 8:56</button></p>
 
 - **Codemode**
   - `JS` · Un script: que llama a herramientas
@@ -104,7 +104,7 @@ la gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, d
 
 ### 6 · Tool search y el modo deferred
 
-<p><button type="button" class="ir-a" data-t="800">▶ Ir a 13:20</button></p>
+<p><button type="button" class="ir-a" data-t="794">▶ Ir a 13:14</button></p>
 
 - **exposure: deferred:** Tool search — «Usando solo el servidor MCP tienda-fs, lista el contenido de src con sus tamaños».
 - *En terminal:* La sesión en modo deferred: llamadas a herramientas (más abajo, en «Código y comandos»)
@@ -119,7 +119,7 @@ la gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, d
 
 ### 7 · Seguridad y buenas prácticas
 
-<p><button type="button" class="ir-a" data-t="872">▶ Ir a 14:32</button></p>
+<p><button type="button" class="ir-a" data-t="866">▶ Ir a 14:26</button></p>
 
 - **Seguridad · 1:** Misma tubería que las de serie — Las extensiones de permisos se aplican también a MCP y a las llamadas desde codemode.
 - **Anotaciones de las herramientas**

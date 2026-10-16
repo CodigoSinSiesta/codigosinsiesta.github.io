@@ -42,7 +42,7 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 3 · Cuándo compacta solo oh my pi
 
-<p><button type="button" class="ir-a" data-t="307">▶ Ir a 5:07</button></p>
+<p><button type="button" class="ir-a" data-t="306">▶ Ir a 5:06</button></p>
 
 - **La reserva para la respuesta**
   - `16 384` · Pi: siempre fija
@@ -60,7 +60,7 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 4 · Adelgazar sin modelo: /shake
 
-<p><button type="button" class="ir-a" data-t="438">▶ Ir a 7:18</button></p>
+<p><button type="button" class="ir-a" data-t="437">▶ Ir a 7:17</button></p>
 
 - **Tres turnos:** T1 (leer y testear) → T2 (registro de 2000 líneas) → T3 (test de 40 €)
 - *En la demo:* grep en vez de leer 2000 líneas
@@ -79,7 +79,7 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 5 · /compact y sus modos
 
-<p><button type="button" class="ir-a" data-t="603">▶ Ir a 10:03</button></p>
+<p><button type="button" class="ir-a" data-t="602">▶ Ir a 10:02</button></p>
 
 - **Perfil demo:** keepRecentTokens: 3000 — Solo para la demo. De fábrica, 20 000.
 - **/compact [modo] [foco]**
@@ -103,7 +103,7 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 6 · Traspasar con /handoff
 
-<p><button type="button" class="ir-a" data-t="874">▶ Ir a 14:34</button></p>
+<p><button type="button" class="ir-a" data-t="873">▶ Ir a 14:33</button></p>
 
 - *En la demo:* Antes: 17 mensajes
 - **Gasta modelo:** /handoff — céntrate en el estado de los tests y en lo que falta por hacer
@@ -118,7 +118,7 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 7 · Preguntas laterales y contexto extendido
 
-<p><button type="button" class="ir-a" data-t="1022">▶ Ir a 17:02</button></p>
+<p><button type="button" class="ir-a" data-t="1021">▶ Ir a 17:01</button></p>
 
 - **/btw:** Barra by the way — Una pregunta que no se queda en la sesión.
 - *En la demo:* /btw ¿qué ficheros hemos modificado hoy?
@@ -134,7 +134,7 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 8 · Memoria entre sesiones
 
-<p><button type="button" class="ir-a" data-t="1163">▶ Ir a 19:23</button></p>
+<p><button type="button" class="ir-a" data-t="1162">▶ Ir a 19:22</button></p>
 
 - **memory.backend: off:** Memoria entre sesiones — Guarda lo aprendido y lo inyecta en sesiones futuras.
 - **Backends**
@@ -161,7 +161,7 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 9 · Repaso, práctica y cierre
 
-<p><button type="button" class="ir-a" data-t="1403">▶ Ir a 23:23</button></p>
+<p><button type="button" class="ir-a" data-t="1402">▶ Ir a 23:22</button></p>
 
 - **Repaso:** /context (medir) → Herramientas (3,7K → 1,1K) → Umbral (y methodOrder) → /shake (sin modelo)
 - **Y además:** /compact (soft · remote · snap) → /handoff (en el sitio) → /btw (no ensucia) → Memoria (como pista)

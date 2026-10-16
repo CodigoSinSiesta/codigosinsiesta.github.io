@@ -88,7 +88,7 @@ qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 
 ### 5 · Dentro por primera vez
 
-<p><button type="button" class="ir-a" data-t="617">▶ Ir a 10:17</button></p>
+<p><button type="button" class="ir-a" data-t="609">▶ Ir a 10:09</button></p>
 
 - *En la demo:* Setup step 2 of 5
 - *En la demo:* Setup step 4 of 5
@@ -98,7 +98,7 @@ qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 
 ### 6 · Cuatro comandos para orientarte
 
-<p><button type="button" class="ir-a" data-t="713">▶ Ir a 11:53</button></p>
+<p><button type="button" class="ir-a" data-t="705">▶ Ir a 11:45</button></p>
 
 - **Cuatro comandos**
   - `/changelog` · Qué cambió
@@ -118,7 +118,7 @@ qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 
 ### 7 · La configuración en capas
 
-<p><button type="button" class="ir-a" data-t="926">▶ Ir a 15:26</button></p>
+<p><button type="button" class="ir-a" data-t="915">▶ Ir a 15:15</button></p>
 
 - **Dónde se escribe**
   - `global` · Tu perfil: /settings y config set
@@ -133,7 +133,7 @@ qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 
 ### 8 · Si vienes de Claude Code o de Codex
 
-<p><button type="button" class="ir-a" data-t="1053">▶ Ir a 17:33</button></p>
+<p><button type="button" class="ir-a" data-t="1042">▶ Ir a 17:22</button></p>
 
 - **Vídeo 01:** Lee Claude Code y Codex — Es verdad, con un matiz importante.
 - **Proyecto: se lee por defecto**
@@ -152,7 +152,7 @@ qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 
 ### 9 · Pi frente a oh my pi, y cierre
 
-<p><button type="button" class="ir-a" data-t="1232">▶ Ir a 20:32</button></p>
+<p><button type="button" class="ir-a" data-t="1221">▶ Ir a 20:21</button></p>
 
 - **La tabla:** Pi frente a oh my pi — Fila a fila.
 - **Pi frente a oh my pi**
