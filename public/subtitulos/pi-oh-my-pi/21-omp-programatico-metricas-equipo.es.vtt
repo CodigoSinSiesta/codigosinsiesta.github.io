@@ -1,0 +1,1608 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.461 --> 00:00:14.420
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.460 --> 00:00:18.450
+Vídeo veintiuno: oh my pi
+programático, métricas y equipo.
+
+3
+00:00:24.741 --> 00:00:27.529
+En el vídeo diez sacamos
+Pi de su interfaz.
+
+4
+00:00:27.569 --> 00:00:31.875
+Vimos el modo print para scripts,
+el modo JSON con todos los eventos,
+
+5
+00:00:31.915 --> 00:00:37.100
+RPC para controlarlo desde otro proceso
+y el SDK para meterlo en tu programa.
+
+6
+00:00:37.140 --> 00:00:41.658
+Montamos una revisión de rama en un script
+y la llevamos a integración continua.
+
+7
+00:00:41.698 --> 00:00:44.655
+Todo eso sigue valiendo en
+oh my pi, porque lo hereda.
+
+8
+00:00:44.695 --> 00:00:46.310
+Hoy no lo vamos a repetir.
+
+9
+00:00:47.262 --> 00:00:50.210
+La pregunta de este vídeo es
+la misma que la del veinte:
+
+10
+00:00:50.250 --> 00:00:54.073
+si ya sabes hacerlo con Pi,
+¿qué cambia en oh my pi?
+
+11
+00:00:54.113 --> 00:00:56.130
+La respuesta tiene tres partes.
+
+12
+00:00:56.170 --> 00:01:00.190
+Los modos son los mismos, pero con
+detalles que rompen un script si no los
+
+13
+00:01:00.230 --> 00:01:05.594
+conoces. Hay un quinto camino, ACP,
+para usar oh my pi dentro de un editor.
+
+14
+00:01:05.634 --> 00:01:08.750
+Y hay piezas que Pi no tiene:
+un panel local de estadísticas,
+
+15
+00:01:08.790 --> 00:01:12.750
+trazas por sesión y comandos
+pensados para trabajar en equipo.
+
+16
+00:01:13.723 --> 00:01:18.210
+Vamos por orden. Primero o
+eme pe guion p y el modo JSON.
+
+17
+00:01:18.509 --> 00:01:23.578
+Después, la revisión de rama, con una red
+de seguridad que oh my pi trae de serie.
+
+18
+00:01:23.618 --> 00:01:28.070
+Integración continua. RPC,
+con su protocolo versión dos.
+
+19
+00:01:28.110 --> 00:01:33.890
+El SDK y ACP. Las métricas, con barra
+trace, barra stats y barra export.
+
+20
+00:01:34.159 --> 00:01:36.997
+Y para terminar, lo que se
+explica pero no se enseña:
+
+21
+00:01:37.037 --> 00:01:39.470
+barra ratchet y los comandos que publican.
+
+22
+00:01:40.466 --> 00:01:45.342
+Trabajamos como siempre: la tienda,
+el perfil demo y DeepSeek Flash,
+
+23
+00:01:45.382 --> 00:01:48.913
+que para leer y revisar va
+sobrado y cuesta muy poco.
+
+24
+00:01:48.953 --> 00:01:55.165
+Un detalle nuevo en la terminal:
+exportamos OMP underscore PROFILE igual a
+
+25
+00:01:55.205 --> 00:02:01.540
+demo, solo en este panel. Así cada omp
+que lancemos, también los de dentro de un
+
+26
+00:02:01.580 --> 00:02:02.550
+script, usa el perfil demo.
+
+27
+00:02:08.046 --> 00:02:13.690
+Guion p funciona como en Pi: procesa la
+petición, escribe la respuesta y sale.
+
+28
+00:02:13.848 --> 00:02:17.533
+Si la entrada llega por una
+tubería, se usa como contexto.
+
+29
+00:02:17.573 --> 00:02:22.100
+Estamos en una rama de la tienda que sube
+el umbral del envío gratis de cuarenta a
+
+30
+00:02:22.140 --> 00:02:26.455
+cincuenta euros. Git diff contra
+la rama base, una tubería,
+
+31
+00:02:26.495 --> 00:02:31.110
+y o eme pe guion p con la petición
+de revisarlo en tres viñetas.
+
+32
+00:02:31.883 --> 00:02:36.650
+Primera diferencia. Mientras trabaja,
+en la salida de errores aparece Working,
+
+33
+00:02:36.970 --> 00:02:40.960
+y el texto no llega poco a
+poco: sale entero al terminar.
+
+34
+00:02:41.000 --> 00:02:42.800
+Para un script es lo cómodo.
+
+35
+00:02:42.960 --> 00:02:48.180
+Llegan tres viñetas: el cambio está
+incompleto, porque la documentación sigue
+
+36
+00:02:48.378 --> 00:02:50.806
+diciendo cuarenta; rompe cuatro
+aserciones en tres pruebas;
+
+37
+00:02:50.846 --> 00:02:55.490
+y una decisión antes de seguir: subir
+el umbral de verdad o revertirlo.
+
+38
+00:02:55.530 --> 00:02:56.850
+Salida, cero.
+
+39
+00:02:58.114 --> 00:03:01.409
+Segunda diferencia, y nos la
+encontramos al preparar este vídeo:
+
+40
+00:03:01.449 --> 00:03:06.670
+las herramientas. En Pi, una
+revisión de solo lectura usaba read,
+
+41
+00:03:06.710 --> 00:03:12.549
+grep, find y ls. En oh my pi, find
+ya no existe y nunca existió ls:
+
+42
+00:03:12.589 --> 00:03:15.360
+pedirlas hace que omp
+se niegue a arrancar.
+
+43
+00:03:15.400 --> 00:03:17.690
+Para leer, read, grep y glob.
+
+44
+00:03:17.730 --> 00:03:19.990
+Si reutilizas un script, revisa esa lista.
+
+45
+00:03:21.085 --> 00:03:23.286
+Y una promesa del vídeo catorce.
+
+46
+00:03:23.326 --> 00:03:27.830
+Con guion guion advisor activas el
+revisor solo para esa ejecución.
+
+47
+00:03:27.870 --> 00:03:32.410
+En modo print, al acabar la respuesta, oh
+my pi espera a que el advisor termine sus
+
+48
+00:03:32.450 --> 00:03:35.027
+revisiones finales, hasta diez minutos.
+
+49
+00:03:35.067 --> 00:03:38.650
+Tenlo en cuenta al poner el tiempo máximo
+de un trabajo de integración continua.
+
+50
+00:03:39.655 --> 00:03:44.320
+El modo JSON se pide con
+guion guion mode json.
+
+51
+00:03:44.360 --> 00:03:49.037
+Guardamos los eventos de una pregunta
+sencilla, qué ficheros hay en src usando
+
+52
+00:03:49.077 --> 00:03:51.905
+glob, y los miramos con jota cu.
+
+53
+00:03:51.945 --> 00:03:54.610
+La primera línea es la
+cabecera de la sesión:
+
+54
+00:03:54.650 --> 00:03:57.610
+tipo session, su
+identificador y la carpeta.
+
+55
+00:03:57.650 --> 00:04:01.360
+Después, el recuento: un inicio
+y un fin de agente, dos turnos,
+
+56
+00:04:01.400 --> 00:04:05.553
+mensajes, más de doscientas
+actualizaciones y dos herramientas,
+
+57
+00:04:05.593 --> 00:04:06.600
+glob y read.
+
+58
+00:04:07.537 --> 00:04:09.872
+Aquí viene la diferencia que más importa:
+
+59
+00:04:09.912 --> 00:04:13.350
+el evento agent settled de Pi no existe.
+
+60
+00:04:13.454 --> 00:04:17.070
+Para saber si la ejecución terminó
+de verdad, mira el agent end.
+
+61
+00:04:17.476 --> 00:04:21.640
+Trae dos campos: is terminal, que dice si
+es el final o si después viene algo más,
+
+62
+00:04:21.680 --> 00:04:26.040
+como un reintento, y yielded, que
+dice si el agente terminó su trabajo.
+
+63
+00:04:26.080 --> 00:04:31.322
+Aquí, los dos a true. Y cada mensaje
+del asistente cierra con su stop reason,
+
+64
+00:04:31.362 --> 00:04:34.770
+tool use o stop, y con su
+coste en el uso de tokens.
+
+65
+00:04:35.880 --> 00:04:40.110
+Según la documentación, en oh my pi una
+respuesta final que acaba en error o
+
+66
+00:04:40.150 --> 00:04:45.130
+abortada da un código de salida
+distinto de cero, también en JSON;
+
+67
+00:04:45.170 --> 00:04:49.787
+en Pi no era así. Si reutilizas
+un script del vídeo diez,
+
+68
+00:04:49.875 --> 00:04:51.880
+revísalo. Lo que no
+cambia es la otra lección:
+
+69
+00:04:51.920 --> 00:04:56.370
+un cero significa que oh my pi
+terminó, no que hiciera lo que querías.
+
+70
+00:05:02.038 --> 00:05:04.200
+Con eso montamos la revisión de rama.
+
+71
+00:05:04.240 --> 00:05:09.922
+Se llama revisar o eme pe punto sh y tiene
+las mismas tres partes que la del vídeo
+
+72
+00:05:09.962 --> 00:05:14.400
+diez. Primero ejecuta npm test y guarda
+el código, porque lo que se comprueba sin
+
+73
+00:05:14.440 --> 00:05:16.460
+modelo lo comprueba el script.
+
+74
+00:05:16.500 --> 00:05:19.560
+Después le pasa el diff
+a oh my pi en modo JSON.
+
+75
+00:05:19.600 --> 00:05:24.310
+Al final lee los eventos con jota cu: el
+stop reason, el informe en Markdown y las
+
+76
+00:05:24.350 --> 00:05:25.750
+herramientas que fallaron.
+
+77
+00:05:26.690 --> 00:05:29.188
+Lo que cambia está en
+la línea de oh my pi.
+
+78
+00:05:29.228 --> 00:05:32.390
+Sin sesión y sin título, para
+no gastar una llamada de más.
+
+79
+00:05:32.448 --> 00:05:36.100
+Guion guion max time, cinco minutos,
+para que un agente atascado no se quede
+
+80
+00:05:36.140 --> 00:05:40.100
+gastando. Sin extensiones ni skills
+descubiertas, para que la revisión no
+
+81
+00:05:40.140 --> 00:05:42.480
+dependa de lo que haya en cada máquina.
+
+82
+00:05:42.840 --> 00:05:44.040
+Las herramientas de lectura.
+
+83
+00:05:44.080 --> 00:05:48.470
+Y el modelo, solo si alguien lo fija desde
+fuera, como hará la integración continua.
+
+84
+00:05:49.593 --> 00:05:52.115
+Y una opción que es la clave del capítulo:
+
+85
+00:05:52.155 --> 00:05:55.138
+guion guion approval mode always ask.
+
+86
+00:05:55.178 --> 00:06:00.048
+En el vídeo diecinueve vimos que en modo
+always ask solo pasa sin preguntar lo que
+
+87
+00:06:00.088 --> 00:06:03.680
+lee, y que sin interfaz, lo
+que necesita aprobación falla.
+
+88
+00:06:03.720 --> 00:06:07.590
+Allí era un problema. Aquí lo
+convertimos en la red de seguridad.
+
+89
+00:06:07.630 --> 00:06:10.472
+En Pi tuvimos que cargar
+nuestra extensión de permisos.
+
+90
+00:06:10.512 --> 00:06:11.840
+En oh my pi basta un flag.
+
+91
+00:06:12.786 --> 00:06:15.240
+¿Cómo sabe el script que
+algo se ha bloqueado?
+
+92
+00:06:15.280 --> 00:06:19.240
+No lo adivina. Recorre los eventos de
+fin de herramienta y se queda con los que
+
+93
+00:06:19.280 --> 00:06:23.920
+traen is error a true. Si hay alguno,
+escribe el aviso, guarda el nombre de la
+
+94
+00:06:23.960 --> 00:06:27.500
+herramienta y el mensaje en
+un fichero aparte y sigue.
+
+95
+00:06:27.540 --> 00:06:31.214
+Así el informe del modelo y el
+diagnóstico del script quedan separados,
+
+96
+00:06:31.254 --> 00:06:33.080
+y cada uno se lee por su lado.
+
+97
+00:06:33.822 --> 00:06:36.032
+Lo ejecutamos contra la rama base.
+
+98
+00:06:36.072 --> 00:06:40.563
+El informe es largo y concreto:
+la documentación desincronizada,
+
+99
+00:06:40.603 --> 00:06:44.060
+el tramo de cuarenta a cincuenta
+euros que deja de tener envío gratis,
+
+100
+00:06:44.100 --> 00:06:49.167
+un caso de cupón que nadie prueba,
+pruebas con nombres que ya mienten,
+
+101
+00:06:49.207 --> 00:06:52.902
+y la última línea, veredicto, cambios.
+
+102
+00:06:52.991 --> 00:06:56.290
+El script sale con uno,
+el código de npm test.
+
+103
+00:06:56.613 --> 00:06:58.200
+Y git status, limpio.
+
+104
+00:06:59.603 --> 00:07:03.940
+Ahora la prueba de verdad. Cambiamos una
+frase de la petición por si encuentras un
+
+105
+00:07:03.980 --> 00:07:07.742
+fallo, corrígelo, y le
+damos también edit y write.
+
+106
+00:07:07.910 --> 00:07:10.655
+El modelo encuentra el
+fallo e intenta corregirlo.
+
+107
+00:07:10.695 --> 00:07:13.515
+Las dos herramientas fallan con
+el mensaje del vídeo diecinueve:
+
+108
+00:07:13.555 --> 00:07:15.780
+requiere aprobación y no hay interfaz.
+
+109
+00:07:15.856 --> 00:07:19.587
+El script avisa de herramientas
+bloqueadas, git status sigue limpio y el
+
+110
+00:07:19.627 --> 00:07:22.510
+fichero de errores enseña
+el motivo de cada una.
+
+111
+00:07:23.303 --> 00:07:26.230
+Fíjate en por qué el flag
+es imprescindible aquí.
+
+112
+00:07:26.270 --> 00:07:30.253
+Esta rama trae el punto o eme pe
+barra config punto yml del equipo,
+
+113
+00:07:30.293 --> 00:07:32.674
+el del vídeo diecinueve,
+con el modo write.
+
+114
+00:07:32.714 --> 00:07:34.980
+En modo write, una
+edición se aprueba sola.
+
+115
+00:07:35.020 --> 00:07:38.900
+Sin el flag, este mismo script habría
+cambiado el código sin que nadie se
+
+116
+00:07:38.940 --> 00:07:41.850
+enterase. El flag gana
+al modo del proyecto.
+
+117
+00:07:42.840 --> 00:07:46.910
+Pero ojo: las políticas por herramienta
+del proyecto se siguen aplicando,
+
+118
+00:07:46.950 --> 00:07:49.710
+y un allow para edit la aprobaría igual.
+
+119
+00:07:49.750 --> 00:07:53.270
+Por eso la barrera principal
+es la lista de herramientas:
+
+120
+00:07:53.310 --> 00:07:57.420
+una herramienta que no está activa
+no la aprueba ninguna política.
+
+121
+00:07:57.460 --> 00:07:59.220
+Always ask es la segunda red.
+
+122
+00:07:59.260 --> 00:08:03.440
+Y para oh my pi todo ha ido bien: el
+modelo entiende el rechazo y responde con
+
+123
+00:08:03.480 --> 00:08:07.270
+normalidad. Quien lo detecta es
+el script, leyendo los eventos.
+
+124
+00:08:13.085 --> 00:08:17.291
+El workflow de GitHub Actions no lo
+ejecutamos, y casi todo es lo del vídeo
+
+125
+00:08:17.332 --> 00:08:21.530
+diez: permisos de solo lectura, el
+historial completo para el diff,
+
+126
+00:08:21.570 --> 00:08:26.260
+el script copiado desde la rama base, los
+tests en un paso sin la clave y el informe
+
+127
+00:08:26.300 --> 00:08:28.950
+subido como artefacto aunque algo falle.
+
+128
+00:08:29.891 --> 00:08:31.611
+Lo que cambia es la instalación.
+
+129
+00:08:31.651 --> 00:08:36.415
+oh my pi necesita Bun, así que el workflow
+prepara Bun e instala el paquete de oh my
+
+130
+00:08:36.455 --> 00:08:41.930
+pi con la versión fijada. La clave
+del modelo llega desde un secreto del
+
+131
+00:08:41.970 --> 00:08:45.520
+repositorio, en DEEPSEEK underscore API
+underscore KEY, y el script recibe el
+
+132
+00:08:45.560 --> 00:08:48.640
+modelo por una variable. En
+un runner no hay perfiles:
+
+133
+00:08:48.680 --> 00:08:52.690
+una carpeta temporal como directorio
+del agente, y oh my pi arranca limpio.
+
+134
+00:08:53.886 --> 00:08:55.443
+Fíjate también en los tiempos.
+
+135
+00:08:55.483 --> 00:08:59.886
+El trabajo tiene un límite de quince
+minutos, y el script le da a oh my pi
+
+136
+00:08:59.926 --> 00:09:04.070
+cinco. La diferencia deja margen para
+instalar, ejecutar los tests y subir el
+
+137
+00:09:04.110 --> 00:09:08.998
+informe. Y oh my pi pone CI igual a
+true en los comandos que lanza su bash,
+
+138
+00:09:09.038 --> 00:09:12.560
+así que no hace falta ningún ajuste
+para que sepan que no hay nadie delante.
+
+139
+00:09:13.226 --> 00:09:16.095
+Y ahora el apunte honesto,
+que en oh my pi pesa más.
+
+140
+00:09:16.135 --> 00:09:20.418
+oh my pi no tiene barra trust,
+como vimos en el vídeo veinte.
+
+141
+00:09:20.458 --> 00:09:24.060
+Al arrancar dentro de un pull
+request, carga su punto o eme pe:
+
+142
+00:09:24.100 --> 00:09:27.720
+la configuración, con sus políticas
+por herramienta, las reglas,
+
+143
+00:09:27.760 --> 00:09:30.545
+los hooks y los servidores MCP.
+
+144
+00:09:30.585 --> 00:09:34.450
+Los hooks son código que se ejecuta en
+tu runner, con tu clave en el entorno.
+
+145
+00:09:35.229 --> 00:09:39.821
+Por eso, en integración continua: la
+clave solo en el paso que la necesita,
+
+146
+00:09:39.861 --> 00:09:43.840
+los flags en el script de la rama
+base, herramientas de lectura,
+
+147
+00:09:43.880 --> 00:09:47.455
+y oh my pi dentro de un
+contenedor, como en el vídeo cinco.
+
+148
+00:09:47.495 --> 00:09:51.130
+Aprobar no es aislar, y en oh
+my pi tampoco lo es un flag.
+
+149
+00:09:56.838 --> 00:10:00.250
+RPC es el modo para hablar con
+oh my pi desde otro programa,
+
+150
+00:10:00.290 --> 00:10:03.103
+línea a línea por la entrada
+y la salida estándar.
+
+151
+00:10:03.143 --> 00:10:05.935
+La idea es la del vídeo diez,
+pero el protocolo ha crecido.
+
+152
+00:10:05.975 --> 00:10:09.310
+Lo arrancamos a mano, sin sesión
+y con las herramientas de lectura.
+
+153
+00:10:10.177 --> 00:10:14.732
+Lo primero que llega, sin escribir
+nada, es una línea de tipo ready.
+
+154
+00:10:14.772 --> 00:10:19.870
+Anuncia que habla las versiones uno y dos
+del protocolo y el tamaño máximo de cada
+
+155
+00:10:20.051 --> 00:10:24.600
+línea, un megabyte. Le pedimos la
+versión dos con negotiate protocol,
+
+156
+00:10:24.640 --> 00:10:29.180
+y responde success true. Desde ese
+momento, un mensaje más grande que el
+
+157
+00:10:29.220 --> 00:10:33.043
+límite llega troceado en varias
+líneas que tu cliente vuelve a juntar,
+
+158
+00:10:33.083 --> 00:10:34.100
+en lugar de recortarse.
+
+159
+00:10:35.276 --> 00:10:37.461
+Mandamos un prompt con un identificador:
+
+160
+00:10:37.501 --> 00:10:40.726
+en una frase, qué hace carrito punto js.
+
+161
+00:10:40.766 --> 00:10:42.703
+Detrás, el chorro de eventos.
+
+162
+00:10:42.743 --> 00:10:44.725
+Y al final, dos líneas nuevas.
+
+163
+00:10:44.765 --> 00:10:48.730
+Prompt result, con el mismo identificador,
+dice cómo terminó esa petición:
+
+164
+00:10:48.770 --> 00:10:53.730
+completed. Y session settled dice
+que ya no queda nada pendiente.
+
+165
+00:10:53.770 --> 00:10:56.260
+Para enseñar la respuesta
+espera al primero.
+
+166
+00:10:56.300 --> 00:10:58.310
+Para cerrar o reciclar
+el proceso, al segundo.
+
+167
+00:10:59.360 --> 00:11:04.300
+Y pedimos get session stats:
+mensajes, llamadas a herramientas,
+
+168
+00:11:04.340 --> 00:11:06.650
+tokens y coste de la sesión.
+
+169
+00:11:06.936 --> 00:11:12.455
+Aquí, una lectura, unos ocho mil tokens
+y menos de una décima de céntimo.
+
+170
+00:11:12.880 --> 00:11:15.950
+Control d, y oh my pi se
+apaga de forma ordenada.
+
+171
+00:11:16.900 --> 00:11:21.140
+Ahora el cliente. En el vídeo diez
+escribimos uno que contestaba los diálogos
+
+172
+00:11:21.180 --> 00:11:23.138
+de nuestra extensión de permisos.
+
+173
+00:11:23.178 --> 00:11:27.786
+Este es el mismo esqueleto, pero contesta
+los diálogos de aprobación de oh my pi.
+
+174
+00:11:27.826 --> 00:11:32.333
+Espera a ready, manda la petición,
+escribe el texto y las herramientas,
+
+175
+00:11:32.373 --> 00:11:35.945
+y cuando llega una petición de tipo
+select, pregunta en la terminal y responde
+
+176
+00:11:35.985 --> 00:11:37.370
+Approve o Deny.
+
+177
+00:11:38.136 --> 00:11:40.950
+Al final pide las estadísticas
+y las escribe en una línea.
+
+178
+00:11:41.923 --> 00:11:44.876
+Lo lanzamos en la tienda, con la
+configuración del equipo del vídeo
+
+179
+00:11:44.916 --> 00:11:49.240
+diecinueve, y le pedimos lo
+mismo que allí falló con guion p:
+
+180
+00:11:49.280 --> 00:11:52.170
+ejecuta node guion guion version.
+
+181
+00:11:52.240 --> 00:11:55.490
+Bash pregunta, y esta vez la pregunta
+viaja por el protocolo hasta nuestro
+
+182
+00:11:55.530 --> 00:11:59.110
+programa: allow tool, bash,
+con el comando completo.
+
+183
+00:11:59.150 --> 00:12:04.315
+El modelo ha encadenado, además, git
+status y git log, como pide el AGENTS
+
+184
+00:12:04.355 --> 00:12:06.950
+punto md. Leemos y aprobamos.
+
+185
+00:12:07.844 --> 00:12:12.495
+Llega la respuesta: Node veinticinco,
+el árbol limpio y el último commit.
+
+186
+00:12:12.535 --> 00:12:16.940
+Debajo, nuestra línea: una herramienta,
+unos diecisiete mil tokens y un coste de
+
+187
+00:12:16.980 --> 00:12:18.860
+una décima de céntimo.
+
+188
+00:12:19.568 --> 00:12:22.620
+La decisión sigue siendo de oh
+my pi y de su configuración;
+
+189
+00:12:22.786 --> 00:12:27.390
+dónde se pregunta lo decide el cliente:
+una web, un bot del equipo o un editor.
+
+190
+00:12:28.313 --> 00:12:30.930
+Tres novedades más, en una diapositiva.
+
+191
+00:12:30.970 --> 00:12:35.510
+Tu cliente puede ofrecer herramientas
+propias al modelo con set host tools.
+
+192
+00:12:35.550 --> 00:12:39.571
+El título automático viene apagado
+en RPC, para no gastar una llamada.
+
+193
+00:12:39.611 --> 00:12:43.740
+Y no tienes que escribir el cliente:
+hay clientes oficiales en TypeScript,
+
+194
+00:12:43.780 --> 00:12:47.950
+Python, Rust y Go que negocian la
+versión dos y juntan los trozos por ti.
+
+195
+00:12:53.797 --> 00:12:59.220
+El SDK es la vía sin protocolo: importas
+create agent session y hablas con la
+
+196
+00:12:59.260 --> 00:13:02.520
+sesión desde tu código. En oh my
+pi hay una diferencia de base:
+
+197
+00:13:02.560 --> 00:13:08.810
+no es Node, es Bun. El paquete se instala
+con bun add, en la misma versión que tu
+
+198
+00:13:08.850 --> 00:13:09.750
+binario.
+
+199
+00:13:10.258 --> 00:13:14.594
+Este es resumen punto ts, el
+mismo del vídeo diez traducido.
+
+200
+00:13:14.634 --> 00:13:19.423
+Directorio de trabajo, sesión en memoria
+y una lista de herramientas de lectura.
+
+201
+00:13:19.463 --> 00:13:24.044
+Y aquí está la trampa: en oh my pi,
+tool names no es una lista blanca.
+
+202
+00:13:24.084 --> 00:13:27.140
+Pide esas herramientas,
+pero no quita las demás.
+
+203
+00:13:27.180 --> 00:13:31.770
+Para que sean las únicas hay que
+añadir restrict tool names a true.
+
+204
+00:13:31.896 --> 00:13:35.530
+Al final, dispose, con await,
+porque el cierre es asíncrono.
+
+205
+00:13:36.294 --> 00:13:38.836
+Lo ejecutamos con bun contra la tienda.
+
+206
+00:13:38.876 --> 00:13:41.990
+Por la salida de errores, el
+nombre de cada herramienta que usa:
+
+207
+00:13:42.030 --> 00:13:46.010
+glob y read. Por la estándar, la
+lista de funciones exportadas,
+
+208
+00:13:46.050 --> 00:13:48.573
+con su fichero. Y un
+detalle que nos sorprendió:
+
+209
+00:13:48.613 --> 00:13:51.558
+el modelo dice que su carpeta
+de trabajo es la del script,
+
+210
+00:13:51.598 --> 00:13:55.406
+no la tienda que le pasamos, y
+aun así encuentra los ficheros.
+
+211
+00:13:55.446 --> 00:13:58.970
+Si tu programa depende de la
+carpeta, compruébalo con tu versión.
+
+212
+00:13:59.741 --> 00:14:02.680
+El perfil importa aquí
+más que en ningún sitio:
+
+213
+00:14:02.720 --> 00:14:08.010
+el SDK lee OMP underscore PROFILE, y sin
+él usaría el directorio de tu agente de
+
+214
+00:14:08.050 --> 00:14:11.700
+verdad, con tus credenciales,
+tus ajustes y tus sesiones.
+
+215
+00:14:11.740 --> 00:14:13.190
+¿SDK o RPC?
+
+216
+00:14:13.647 --> 00:14:17.610
+Si tu programa ya corre en Bun
+y quieres acceso a todo, el SDK.
+
+217
+00:14:17.834 --> 00:14:21.540
+Si es de otro lenguaje, o prefieres
+que oh my pi viva en su propio proceso,
+
+218
+00:14:21.580 --> 00:14:22.480
+RPC.
+
+219
+00:14:23.130 --> 00:14:28.110
+Y el quinto camino, ACP,
+el Agent Client Protocol.
+
+220
+00:14:28.340 --> 00:14:33.040
+El editor lanza o eme pe acp
+como un proceso hijo y pone la
+
+221
+00:14:33.577 --> 00:14:36.213
+interfaz: hilos, ficheros,
+terminales y permisos.
+
+222
+00:14:36.253 --> 00:14:40.410
+oh my pi pone los modelos,
+las credenciales, los ajustes,
+
+223
+00:14:40.450 --> 00:14:42.910
+las skills y las extensiones.
+
+224
+00:14:42.950 --> 00:14:47.970
+En Zed se configura en una entrada de
+agent servers, con el comando omp y los
+
+225
+00:14:48.010 --> 00:14:49.370
+argumentos acp;
+
+226
+00:14:50.250 --> 00:14:52.527
+nosotros añadiríamos
+el perfil demo delante.
+
+227
+00:14:52.567 --> 00:14:56.530
+Y el editor añade su propia puerta de
+permisos antes de ejecutar comandos.
+
+228
+00:15:02.370 --> 00:15:05.800
+Hasta aquí, cuánto ha costado una
+ejecución lo sabíamos por el pie,
+
+229
+00:15:05.840 --> 00:15:10.510
+o leyendo los eventos. oh my pi tiene
+un panel para todas las sesiones.
+
+230
+00:15:11.020 --> 00:15:15.570
+Abrimos oh my pi en la tienda, con una
+sesión guardada, y le hacemos una pregunta
+
+231
+00:15:15.610 --> 00:15:21.270
+corta: qué cubre test barra envio
+punto test punto js, sin cambiar nada.
+
+232
+00:15:22.281 --> 00:15:26.250
+Un aviso antes de seguir: barra trace
+y barra stats abren tu navegador
+
+233
+00:15:26.290 --> 00:15:31.020
+predeterminado. Si grabas o compartes
+pantalla, ese navegador enseña tus cuentas
+
+234
+00:15:31.060 --> 00:15:34.020
+y tus pestañas. En este vídeo lo
+abrimos en un navegador limpio,
+
+235
+00:15:34.060 --> 00:15:36.310
+sin ninguna sesión iniciada.
+
+236
+00:15:36.962 --> 00:15:40.660
+Barra trace imprime el enlace
+y abre la traza de esta sesión.
+
+237
+00:15:40.767 --> 00:15:45.162
+Arriba, los números: casi ocho minutos
+de reloj, quince segundos de modelo,
+
+238
+00:15:45.202 --> 00:15:50.290
+más de diez minutos de herramientas, cinco
+peticiones y tres décimas de céntimo.
+
+239
+00:15:50.330 --> 00:15:54.091
+Debajo, la línea de tiempo,
+y en ella se ve por qué:
+
+240
+00:15:54.131 --> 00:15:55.830
+dos barras largas de bash.
+
+241
+00:15:56.745 --> 00:16:00.620
+Esas barras son el tiempo que
+bash esperó a que aprobáramos,
+
+242
+00:16:00.660 --> 00:16:04.510
+porque la tienda tiene la configuración
+del equipo con bash en prompt.
+
+243
+00:16:04.639 --> 00:16:08.038
+Es la pregunta que responde una
+traza: si una sesión se te hace lenta,
+
+244
+00:16:08.078 --> 00:16:12.520
+aquí sabes si el problema es el modelo,
+una herramienta que tarda o una aprobación
+
+245
+00:16:12.560 --> 00:16:17.210
+que nadie contestó. Debajo, la
+transcripción, con cada llamada al modelo
+
+246
+00:16:17.250 --> 00:16:18.830
+y cada herramienta en orden.
+
+247
+00:16:19.534 --> 00:16:22.981
+Barra stats abre el mismo panel
+completo, en un servidor local,
+
+248
+00:16:23.021 --> 00:16:25.910
+en el puerto tres mil
+ochocientos cuarenta y siete.
+
+249
+00:16:25.950 --> 00:16:28.360
+Lee las sesiones del perfil y las resume.
+
+250
+00:16:28.400 --> 00:16:32.580
+La portada da peticiones, coste,
+tokens y la tasa de caché,
+
+251
+00:16:32.620 --> 00:16:37.120
+aquí más del setenta por ciento, de la que
+hablamos en los vídeos cuatro y catorce.
+
+252
+00:16:37.160 --> 00:16:41.510
+Hay páginas para modelos, costes,
+peticiones, herramientas y proyectos.
+
+253
+00:16:42.405 --> 00:16:45.950
+En modelos, cuánto trabajó
+cada uno y a qué velocidad.
+
+254
+00:16:45.990 --> 00:16:50.504
+En peticiones, el registro de cada
+llamada, con su coste y su duración.
+
+255
+00:16:50.544 --> 00:16:54.876
+En herramientas, cuántas veces se
+usó cada una y cuántas fallaron.
+
+256
+00:16:54.916 --> 00:16:58.710
+Y un matiz sobre el coste: es
+una estimación a precio de API.
+
+257
+00:16:58.750 --> 00:17:02.490
+Si usas un modelo por suscripción, el
+panel calcula lo que costaría con su
+
+258
+00:17:02.530 --> 00:17:04.510
+tarifa pública. No es tu factura.
+
+259
+00:17:05.376 --> 00:17:08.078
+Ahora, por qué lo hacemos
+en el perfil demo.
+
+260
+00:17:08.118 --> 00:17:12.300
+El panel enseña rutas de proyectos,
+modelos, costes y la traza completa de
+
+261
+00:17:12.340 --> 00:17:15.750
+cada sesión. Con tu perfil de
+trabajo, eso es todo lo que has hecho,
+
+262
+00:17:15.790 --> 00:17:18.400
+incluidos los modelos que usas en local.
+
+263
+00:17:18.470 --> 00:17:20.859
+Con el perfil demo, solo la tienda.
+
+264
+00:17:20.899 --> 00:17:24.970
+Y si ya hay un panel abierto en
+ese puerto, oh my pi lo reutiliza:
+
+265
+00:17:25.010 --> 00:17:28.330
+antes de compartir pantalla, comprueba
+que no tienes abierto el de otro perfil.
+
+266
+00:17:29.264 --> 00:17:32.532
+Hay una página que no
+abrimos: frustración.
+
+267
+00:17:32.572 --> 00:17:36.620
+Busca en tus mensajes señales de enfado
+con el agente y, si se lo pides con un
+
+268
+00:17:36.660 --> 00:17:39.856
+botón, manda tus mensajes
+a un modelo juez.
+
+269
+00:17:39.896 --> 00:17:44.776
+Ese juicio gasta modelo. Abrir el panel
+no cuesta nada, pero ese botón sí.
+
+270
+00:17:44.816 --> 00:17:47.732
+Desde la terminal tienes
+lo mismo sin navegador:
+
+271
+00:17:47.772 --> 00:17:52.553
+o eme pe stats con guion guion summary,
+el resumen por modelo y por carpeta,
+
+272
+00:17:52.593 --> 00:17:55.510
+o con guion guion json para un script.
+
+273
+00:17:56.132 --> 00:17:57.928
+Lo probamos al final de la grabación.
+
+274
+00:17:57.968 --> 00:18:02.581
+O eme pe stats guion guion
+summary escribe una tabla corta:
+
+275
+00:18:02.621 --> 00:18:06.223
+por cada modelo, las peticiones,
+los tokens y el coste;
+
+276
+00:18:06.263 --> 00:18:08.251
+y por cada carpeta, lo mismo.
+
+277
+00:18:08.291 --> 00:18:12.219
+Sin navegador, sin puerto abierto
+y sin rutas de más en pantalla.
+
+278
+00:18:12.259 --> 00:18:15.449
+Para un informe semanal del
+equipo es justo lo que necesitas,
+
+279
+00:18:15.489 --> 00:18:18.190
+y con guion guion json
+lo lees desde un script.
+
+280
+00:18:19.120 --> 00:18:23.686
+Por último, barra export. Le damos
+una ruta en una carpeta temporal,
+
+281
+00:18:23.726 --> 00:18:27.600
+porque por defecto la deja en el
+directorio actual, dentro del repositorio,
+
+282
+00:18:27.640 --> 00:18:30.022
+y responde session exported.
+
+283
+00:18:30.062 --> 00:18:33.500
+Es una página con la conversación
+y las herramientas y, al principio,
+
+284
+00:18:33.540 --> 00:18:36.523
+el system prompt y la lista
+de herramientas disponibles.
+
+285
+00:18:36.563 --> 00:18:41.020
+La exportación no redacta secretos:
+ahí va tu AGENTS punto md,
+
+286
+00:18:41.060 --> 00:18:44.446
+tus rutas y todo lo que
+salió en la conversación.
+
+287
+00:18:44.486 --> 00:18:46.030
+Revísala antes de enviarla a nadie.
+
+288
+00:18:52.093 --> 00:18:55.402
+Queda una pieza que solo vamos
+a explicar, porque gasta mucho:
+
+289
+00:18:55.442 --> 00:18:59.306
+barra ratchet. Sirve para mejorar
+un flujo que usa un modelo,
+
+290
+00:18:59.346 --> 00:19:02.690
+por ejemplo el prompt que clasifica
+las incidencias de tu aplicación,
+
+291
+00:19:02.730 --> 00:19:04.580
+con datos en lugar de intuición.
+
+292
+00:19:05.324 --> 00:19:08.912
+Funciona en dos tiempos. Primero
+construye una evaluación:
+
+293
+00:19:08.952 --> 00:19:12.904
+lee tu código, te pregunta qué
+flujo, qué casos y qué objetivo,
+
+294
+00:19:12.944 --> 00:19:17.860
+y te pide tres aprobaciones: los
+casos, el evaluador y el plan.
+
+295
+00:19:17.900 --> 00:19:20.634
+Reparte los casos en dos
+grupos y congela el reparto.
+
+296
+00:19:20.674 --> 00:19:24.880
+Con uno trabaja; el otro queda
+reservado y el agente nunca lo ve.
+
+297
+00:19:24.920 --> 00:19:28.760
+Después, en cada ronda, propone un solo
+cambio y lo mantiene solo si mejora en los
+
+298
+00:19:28.800 --> 00:19:30.130
+casos reservados.
+
+299
+00:19:31.046 --> 00:19:35.060
+Dos ideas de barra ratchet
+valen aunque no lo uses nunca.
+
+300
+00:19:35.497 --> 00:19:38.270
+Antes de dar por buena una
+mejora, calcula el ruido:
+
+301
+00:19:38.568 --> 00:19:41.770
+con pocos casos, una diferencia de
+diez puntos puede ser casualidad.
+
+302
+00:19:41.810 --> 00:19:45.970
+Y un cambio solo cuenta si mejora
+en casos que el agente no ha visto.
+
+303
+00:19:46.010 --> 00:19:50.040
+Medir antes de cambiar es justo
+el espíritu del bloque que viene.
+
+304
+00:19:51.264 --> 00:19:52.998
+Y los comandos de equipo que publican.
+
+305
+00:19:53.038 --> 00:19:57.130
+Barra share sube una instantánea cifrada
+de la sesión y te da un enlace con la
+
+306
+00:19:57.170 --> 00:20:00.406
+clave dentro. Barra collab
+comparte la sesión en directo:
+
+307
+00:20:00.446 --> 00:20:03.260
+quien entra con barra join la
+ve y, con el enlace completo,
+
+308
+00:20:03.300 --> 00:20:05.724
+puede escribirle al agente
+que corre en tu máquina.
+
+309
+00:20:05.764 --> 00:20:09.230
+O eme pe stream emite tu
+pantalla en una página pública.
+
+310
+00:20:09.270 --> 00:20:12.320
+Ninguno se enseña en este curso: lo
+que sale de tu máquina se explica,
+
+311
+00:20:12.360 --> 00:20:16.330
+no se enseña. Y en barra collab,
+quien tiene el enlace tiene el acceso.
+
+312
+00:20:22.200 --> 00:20:25.910
+Repasemos. O eme pe guion p
+escribe la respuesta al final,
+
+313
+00:20:25.950 --> 00:20:28.286
+con Working por la salida de errores.
+
+314
+00:20:28.326 --> 00:20:33.550
+El modo JSON no tiene agent settled:
+mira is terminal y yielded en el
+
+315
+00:20:34.039 --> 00:20:37.070
+agent end. Las herramientas de
+lectura en oh my pi son read,
+
+316
+00:20:37.110 --> 00:20:40.900
+grep y glob. Un script desatendido
+lleva su política en flags:
+
+317
+00:20:40.940 --> 00:20:45.430
+herramientas de lectura, tiempo máximo y
+always ask, porque la configuración del
+
+318
+00:20:45.470 --> 00:20:46.830
+proyecto puede decir write.
+
+319
+00:20:47.488 --> 00:20:52.740
+RPC empieza con ready, negocia la versión
+dos y cierra cada petición con prompt
+
+320
+00:20:52.780 --> 00:20:57.034
+result y session settled; los diálogos
+de aprobación viajan hasta tu cliente.
+
+321
+00:20:57.074 --> 00:21:01.620
+El SDK corre en Bun y necesita restrict
+tool names para limitar de verdad las
+
+322
+00:21:01.660 --> 00:21:04.899
+herramientas. ACP lleva
+oh my pi a un editor.
+
+323
+00:21:04.939 --> 00:21:09.731
+Barra trace y barra stats miden, en el
+perfil demo y en un navegador limpio.
+
+324
+00:21:09.771 --> 00:21:14.230
+Barra export no redacta. Y barra
+ratchet mide antes de cambiar.
+
+325
+00:21:15.136 --> 00:21:20.583
+La práctica: adapta a oh my pi el
+revisar punto sh del vídeo diez.
+
+326
+00:21:20.623 --> 00:21:25.042
+Cambia las herramientas, añade always
+ask y comprueba, pidiéndole que corrija,
+
+327
+00:21:25.082 --> 00:21:29.550
+que la edición se rechaza. Después
+ejecútalo sin guion guion no session un
+
+328
+00:21:29.590 --> 00:21:33.940
+par de veces, abre barra stats en tu
+perfil de pruebas y busca en la traza
+
+329
+00:21:33.980 --> 00:21:36.930
+cuánto tiempo fue del modelo
+y cuánto de las herramientas.
+
+330
+00:21:37.972 --> 00:21:40.657
+Con este vídeo cerramos
+el bloque de oh my pi.
+
+331
+00:21:40.697 --> 00:21:43.850
+En el próximo empieza el último
+bloque, el de metodología:
+
+332
+00:21:43.890 --> 00:21:48.310
+diseñar tu harness. Veremos las
+taxonomías del harness engineering,
+
+333
+00:21:48.350 --> 00:21:53.001
+la importancia de un juego pequeño de
+herramientas, los límites centralizados y
+
+334
+00:21:53.041 --> 00:21:55.570
+la separación entre el
+anfitrión y el sandbox.
+
+335
+00:21:55.610 --> 00:21:58.470
+Y lo mediremos, como hoy. Nos vemos allí.

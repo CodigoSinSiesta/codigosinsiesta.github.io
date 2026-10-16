@@ -25,7 +25,6 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
   - `verificar` · Terminar ≠ acertar
 - **Hoy:** task (y sus agentes) → /agents (y los tuyos) → Agent Hub (seguir) → /tan · /jobs → /cleanse
 - **Hoy**
-  - `18.7.0` · Recién salido
   - `V4 Pro` · Reparte y revisa: la conversación
   - `Flash` · Hace los encargos: los subagentes
 - *En la demo:* /ag
@@ -33,7 +32,7 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 ### 2 · La herramienta task y sus agentes
 
-<p><button type="button" class="ir-a" data-t="134">▶ Ir a 2:14</button></p>
+<p><button type="button" class="ir-a" data-t="127">▶ Ir a 2:07</button></p>
 
 - **task:** El modelo llama (task) → Sesión hija (modelo, herramientas) → Trabaja sola → yield (resumen al principal)
 - *En terminal:* Una llamada a task (más abajo, en «Código y comandos»)
@@ -57,7 +56,7 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 ### 3 · /agents y tus propios agentes
 
-<p><button type="button" class="ir-a" data-t="297">▶ Ir a 4:57</button></p>
+<p><button type="button" class="ir-a" data-t="291">▶ Ir a 4:51</button></p>
 
 - *En la demo:* /agents
 - *En la demo:* task hereda Pro
@@ -80,7 +79,7 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 ### 4 · Repartir y seguir en el Agent Hub
 
-<p><button type="button" class="ir-a" data-t="542">▶ Ir a 9:02</button></p>
+<p><button type="button" class="ir-a" data-t="536">▶ Ir a 8:56</button></p>
 
 - **El reparto**
   - `scout` · Localizar: subtotal, envío, sin test
@@ -104,7 +103,7 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 ### 5 · /tan y /jobs
 
-<p><button type="button" class="ir-a" data-t="785">▶ Ir a 13:05</button></p>
+<p><button type="button" class="ir-a" data-t="779">▶ Ir a 12:59</button></p>
 
 - **Preguntas y encargos laterales**
   - `/btw` · Pregunta: vídeo 13
@@ -121,7 +120,7 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 ### 6 · /cleanse
 
-<p><button type="button" class="ir-a" data-t="952">▶ Ir a 15:52</button></p>
+<p><button type="button" class="ir-a" data-t="946">▶ Ir a 15:46</button></p>
 
 - **/cleanse:** Comprobadores (descubre) → Diagnósticos (agrupa y pesa) → Subagentes (reparte) → Verifica (vuelve a ejecutar)
 - *En terminal:* /cleanse (más abajo, en «Código y comandos»)
@@ -135,7 +134,7 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 ### 7 · Límites, riesgos y coste
 
-<p><button type="button" class="ir-a" data-t="1132">▶ Ir a 18:52</button></p>
+<p><button type="button" class="ir-a" data-t="1125">▶ Ir a 18:45</button></p>
 
 - **Permisos:** Los subagentes van en yolo — No pueden preguntarte. Su barrera: las herramientas que les das. Vídeo 19.
 - **Espacio de trabajo**
@@ -153,7 +152,7 @@ repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 ### 8 · Repaso, práctica y cierre
 
-<p><button type="button" class="ir-a" data-t="1241">▶ Ir a 20:41</button></p>
+<p><button type="button" class="ir-a" data-t="1235">▶ Ir a 20:35</button></p>
 
 - **Repaso:** task (lotes) → Sin historial (encargo autónomo) → 5 agentes (de serie) → Verifica (quien reparte)
 - **Y además:** /agents (@smol) → .omp/agents (los tuyos) → Agent Hub (Alt+A) → /tan · /jobs → /cleanse
@@ -295,7 +294,7 @@ Antes de empezar, una idea que va a atravesar todo el vídeo. Repartir no es gra
 
 El recorrido. Primero, la herramienta task, que es la que lanza subagentes, y los cinco agentes que trae oh my pi. Después, barra agents, donde se configura cada agente por su nombre, y tus propios agentes. Con eso, repartimos una tarea y la seguimos en el Agent Hub. Y terminamos con tres comandos: barra tan, barra jobs y barra cleanse.
 
-Trabajamos en la tienda, con el perfil demo, ahora en oh my pi dieciocho punto siete, que salió justo antes de grabar. Hoy la conversación la lleva DeepSeek V cuatro Pro, el capaz, y los subagentes trabajarán con Flash, el rápido. Esa es la regla de la demo: Pro reparte y revisa, Flash hace los encargos.
+Hoy la conversación la lleva DeepSeek V cuatro Pro, el capaz, y los subagentes trabajarán con Flash, el rápido. Esa es la regla de la demo: Pro reparte y revisa, Flash hace los encargos.
 
 Un vistazo gratis para empezar. Con barra a ge, el menú enseña agents: abre el hub de agentes, con el modelo, el prewalk y el advisor de cada uno. Con barra jota, jobs dice none: no hay trabajos en segundo plano. Y justo debajo, cleanse, que detecta y arregla diagnósticos del proyecto con subagentes en paralelo.
 
