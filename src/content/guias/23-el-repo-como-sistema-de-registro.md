@@ -114,6 +114,7 @@ Sacar el estado de la conversación al repo (instrucciones, progreso, documento 
   - **Límite 3 · Dos agentes a la vez se pisan el progreso.** Un fichero de progreso por agente, o ramas y worktrees (vídeos 16 y 18).
 - La memoria del vídeo 13 no sustituye esto: es contexto heurístico fuera del repo, que Pi no ve y quien clona no recibe. Úsala para tus preferencias; el estado del proyecto, en el repo.
 - **Práctica:** en un proyecto tuyo, monta el paquete mínimo a partir de las plantillas de Learn Harness Engineering, citando su licencia. Divide una tarea en tres funcionalidades de una sesión cada una, trabaja la primera, deja la segunda a medias y continúa en una sesión nueva, mejor con el otro agente. Anota el coste de reconstrucción y qué tuviste que explicar a mano: eso es lo que le falta a tu andamiaje.
+- **Materiales:** la rama `andamiaje` de la tienda: [`init.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/tienda/andamiaje/init.sh), [`funcionalidades.json`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/tienda/andamiaje/funcionalidades.json) y [`progreso.md`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/tienda/andamiaje/progreso.md), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
 - **Vídeo 24:** verificar de verdad, para que «terminado» no dependa de que el agente diga que ha terminado.
 
 ## Código y comandos

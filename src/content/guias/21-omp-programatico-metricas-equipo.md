@@ -109,6 +109,7 @@ Omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 
 - Un script desatendido lleva su política en flags: herramientas de lectura (`read,grep,glob`), tiempo máximo y `always-ask`, porque la configuración del proyecto puede decir `write`.
 - **Práctica:** adapta a omp el `revisar.sh` del vídeo 10. Cambia las herramientas, añade `always-ask` y comprueba, pidiéndole que corrija, que la edición se rechaza. Después ejecútalo sin `--no-session` un par de veces, abre `/stats` en tu perfil de pruebas y mira en la traza cuánto tiempo fue del modelo y cuánto de las herramientas.
+- **Materiales:** [`rpc/aprobador-omp.mjs`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/rpc/aprobador-omp.mjs), [`sdk-omp/resumen.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/sdk-omp/resumen.ts) y [`omp-equipo/`](https://github.com/CodigoSinSiesta/curso-pi-materiales/tree/main/omp-equipo/), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
 - **Vídeo 22 · Diseñar tu harness:** pocas herramientas, límites centralizados, anfitrión y sandbox. Y medirlo.
 
 ## Código y comandos

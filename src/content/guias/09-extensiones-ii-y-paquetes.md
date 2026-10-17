@@ -101,6 +101,7 @@ Extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y
 - **Repaso del estado:** `details` para el estado de una herramienta, `appendEntry` para lo duradero que el modelo no ve, `sendMessage` para lo que sí debe ver y almacenamiento externo para lo que vive fuera de la sesión. Se reconstruye con `getBranch()` en `session_start` y en `session_tree`.
 - **El fallo típico:** `getEntries()` y no escuchar `session_tree`. Las dos mitades hacen que una rama abandonada siga mandando.
 - **Práctica:** guarda las decisiones de tu `permisos.ts` con `appendEntry`; escríbela primero mal, provoca el fallo con `/tree`, arréglala y compruébalo en las dos direcciones del árbol. Después conviértela en un paquete, instálala en local y desactiva con `pi config` lo que no uses.
+- **Materiales:** [`extensiones/permisos.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/permisos.ts) ya con `appendEntry` y `getBranch` (el historial de la carpeta enseña el error y el arreglo) y [`extensiones/package.json`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/package.json), el manifiesto del paquete, en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
 - **En otros agentes:** la lección vale para cualquier agente que rebobine la conversación: un estado guardado en disco no se rebobina con ella.
 - **Próximo vídeo:** Pi programático: `pi -p` en scripts y CI, modo JSON, RPC y el SDK.
 

@@ -144,6 +144,7 @@ Las taxonomías de harness engineering aplicadas. Pocas herramientas bien elegid
 - Tres decisiones: un roster pequeño y medido, con la cola larga detrás de codemode, `tool_search` o el catálogo; límites en un solo sitio, sabiendo cuáles dependen de cada herramienta; y el anfitrión que decide frente al sandbox que ejecuta.
 - **Práctica, 1:** escribe la ficha de tu harness en una página, con tres apartados: qué herramientas ve el modelo y por qué, dónde vive cada límite, y qué se ejecuta dentro de una frontera y qué fuera.
 - **Práctica, 2:** elige una tarea pequeña con una prueba que la juzgue y lánzala con dos rosters, tres veces cada uno, en worktrees separados. Compara tokens, coste, llamadas, si la prueba pasa y qué hay en el diff. Si la diferencia es ruido, quédate con el roster que entiendes mejor.
+- **Materiales:** [`medir/medir.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/medir.sh), [`medir/prefijo.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/prefijo.sh) y [`medir/xdev-off.yml`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/xdev-off.yml), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
 - Apunta la fecha: el harness se degrada como el código. Cuando cambie el modelo, repite la medida.
 - **Vídeo 23:** el repo como sistema de registro: AGENTS.md, funcionalidades, progreso, arranque y traspaso.
 

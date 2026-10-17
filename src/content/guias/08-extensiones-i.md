@@ -103,6 +103,7 @@ session_start → input → before_agent_start
 
 - **Repaso:** una extensión es un módulo de TypeScript con una factoría que recibe la API de Pi. `registerCommand` añade comandos que ejecutas tú; `registerTool`, herramientas que llama el modelo, con parámetros TypeBox y `content` para el modelo y `details` para ti. `pi.on` te engancha a los eventos, y `tool_call` puede bloquear cualquier herramienta. `/reload` lo recarga todo mientras trabajas.
 - **Práctica:** escribe tu `permisos.ts` con la lista de comandos seguros de tu proyecto y úsalo una tarde; apunta qué pregunta de más y de menos y ajústalo con `/reload`. Después, una herramienta propia para tests, linter o despliegue.
+- **Materiales:** [`extensiones/hola.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/hola.ts), [`extensiones/tests.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/tests.ts) y [`extensiones/permisos.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/permisos.ts), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
 - **Próximo vídeo:** Extensiones II y paquetes: estado que sobrevive a rebobinar, el fallo típico y cómo empaquetar, instalar y publicar.
 
 ## Código y comandos

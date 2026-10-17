@@ -98,6 +98,7 @@ Descritas en la documentación de Pi; no se prueban en el curso.
   5. Si la clave no debe entrar en ningún caso, Docker Sandboxes u OpenShell.
 - **Si encuentras un fallo de seguridad en Pi:** repórtalo por el canal de seguridad del repositorio, no con un issue público. La inyección de prompts, la falta de sandbox integrado o lo que haga una extensión que instalaste no cuentan, en general, como vulnerabilidad de Pi, salvo que haya un salto de privilegios.
 - **Práctica:** crea una carpeta fuera del proyecto con un token falso y comprueba que Pi la lee. Monta el contenedor del Dockerfile, repite y verifica que ya no la ve. Por último, monta la carpeta con `:ro` y comprueba que nada se escribe en el host.
+- **Materiales:** [`docker/Dockerfile.pi`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/docker/Dockerfile.pi), [`fuera/`](https://github.com/CodigoSinSiesta/curso-pi-materiales/tree/main/fuera/) (con el token falso) y [`repo-ajeno/`](https://github.com/CodigoSinSiesta/curso-pi-materiales/tree/main/repo-ajeno/), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
 - **En tu agente:** la tríada letal se aplica igual a Claude Code, Codex u opencode. Busca en el tuyo el equivalente de cada medida: confianza de carpeta, herramientas permitidas, sandbox de sistema operativo y contenedor.
 
 ## Código y comandos
