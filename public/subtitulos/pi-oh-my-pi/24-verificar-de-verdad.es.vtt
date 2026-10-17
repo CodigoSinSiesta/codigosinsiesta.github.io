@@ -1,0 +1,1866 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.512 --> 00:00:14.078
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.118 --> 00:00:16.970
+Vídeo veinticuatro: verificar de verdad.
+
+3
+00:00:22.786 --> 00:00:25.533
+Al final del vídeo veintitrés
+quedó algo pendiente.
+
+4
+00:00:25.573 --> 00:00:29.550
+Nuestro andamiaje decía que una
+funcionalidad solo pasa cuando la
+
+5
+00:00:29.590 --> 00:00:33.320
+verificación se ha ejecutado
+y la evidencia está anotada.
+
+6
+00:00:33.360 --> 00:00:36.994
+Pero quien ejecutaba esa verificación,
+y quien escribía la evidencia,
+
+7
+00:00:37.034 --> 00:00:41.090
+era el propio agente. Era una
+instrucción, no una puerta.
+
+8
+00:00:41.163 --> 00:00:45.040
+Hoy vamos a cerrar ese hueco: que
+terminado no dependa de que el agente diga
+
+9
+00:00:45.080 --> 00:00:46.320
+que ha terminado.
+
+10
+00:00:47.348 --> 00:00:49.060
+Ya lo viste en el vídeo uno.
+
+11
+00:00:49.100 --> 00:00:53.870
+El resumen final de Pi daba un total que
+no era el que salía al ejecutar el código.
+
+12
+00:00:53.943 --> 00:00:56.470
+De ahí sacamos una regla
+para todo el curso:
+
+13
+00:00:56.560 --> 00:01:00.630
+la evidencia que cuenta es la prueba que
+se ejecuta, no lo que el agente cuenta de
+
+14
+00:01:00.670 --> 00:01:04.140
+sí mismo. Hoy le damos método a esa regla.
+
+15
+00:01:05.140 --> 00:01:09.240
+Learn Harness Engineering, el curso
+de WalkingLab con licencia MIT que nos
+
+16
+00:01:09.280 --> 00:01:12.160
+acompaña en este bloque, le
+dedica su novena lección:
+
+17
+00:01:12.200 --> 00:01:15.558
+evitar que el agente cante
+victoria antes de tiempo.
+
+18
+00:01:15.598 --> 00:01:17.179
+El patrón siempre es parecido.
+
+19
+00:01:17.219 --> 00:01:20.617
+El código tiene buena pinta, las
+pruebas que ha escrito el agente pasan,
+
+20
+00:01:20.657 --> 00:01:23.680
+y eso se toma como prueba de que
+la funcionalidad está terminada.
+
+21
+00:01:23.720 --> 00:01:27.800
+Parece que funciona. Pero nadie ha
+comprobado lo que de verdad importaba.
+
+22
+00:01:28.443 --> 00:01:32.070
+¿Por qué pasa? La lección cita
+un trabajo de Guo y otros,
+
+23
+00:01:32.110 --> 00:01:35.900
+de dos mil diecisiete: las redes
+neuronales suelen estar más seguras de sí
+
+24
+00:01:35.940 --> 00:01:40.266
+mismas de lo que aciertan. Era sobre
+clasificadores, así que tómalo como
+
+25
+00:01:40.306 --> 00:01:43.610
+analogía. Más directo es lo que cuenta
+Anthropic en un artículo sobre harnesses
+
+26
+00:01:43.650 --> 00:01:48.469
+para aplicaciones largas: cuando le pides
+a un agente que evalúe su propio trabajo,
+
+27
+00:01:48.509 --> 00:01:50.140
+tiende a valorarlo demasiado bien.
+
+28
+00:01:51.059 --> 00:01:54.232
+Y el Harness Playbook de Can
+Bölük, el autor de oh my pi,
+
+29
+00:01:54.272 --> 00:01:58.410
+lo dice desde su lado: si no
+defines qué significa verificado,
+
+30
+00:01:58.450 --> 00:02:01.400
+el agente se inventa
+pruebas que no prueban nada.
+
+31
+00:02:01.440 --> 00:02:05.160
+En el vídeo veintidós vimos que
+los dos textos coinciden en esto.
+
+32
+00:02:05.200 --> 00:02:08.220
+La solución no es pedirle al
+modelo que sea más objetivo.
+
+33
+00:02:08.260 --> 00:02:10.960
+Es sacar el juicio de
+terminado fuera del agente.
+
+34
+00:02:11.915 --> 00:02:16.810
+El plan de hoy. Primero, cómo se
+define terminado antes de empezar.
+
+35
+00:02:16.850 --> 00:02:20.290
+Después, una rúbrica para la
+tercera funcionalidad de la tienda,
+
+36
+00:02:20.330 --> 00:02:22.095
+con un script que la comprueba.
+
+37
+00:02:22.135 --> 00:02:27.200
+Veremos un caso en que el agente dice
+hecho y la verificación lo desmiente.
+
+38
+00:02:27.240 --> 00:02:31.279
+Convertiremos la regla en una
+puerta, en Pi y en oh my pi.
+
+39
+00:02:31.319 --> 00:02:35.180
+Y pondremos en su sitio lo que
+parece verificación y no lo es:
+
+40
+00:02:35.220 --> 00:02:39.260
+el revisor, el advisor,
+barra review y Auto QA.
+
+41
+00:02:44.784 --> 00:02:48.090
+Recuerda la definición de hecho
+del AGENTS punto md de la tienda,
+
+42
+00:02:48.130 --> 00:02:52.450
+la del vídeo seis. Tres líneas: has
+añadido o actualizado la prueba del
+
+43
+00:02:52.490 --> 00:02:57.940
+cambio, has ejecutado npm test y pasa,
+y has resumido qué cambió y cómo lo
+
+44
+00:02:57.980 --> 00:03:00.555
+verificaste. Para empezar está bien.
+
+45
+00:03:00.595 --> 00:03:02.790
+Pero fíjate en quién hace cada cosa.
+
+46
+00:03:02.830 --> 00:03:07.220
+El agente escribe la prueba, el agente la
+ejecuta y el agente cuenta el resultado.
+
+47
+00:03:08.393 --> 00:03:12.100
+Ese es el hueco. Si el agente ha
+entendido mal una regla del negocio,
+
+48
+00:03:12.140 --> 00:03:17.270
+escribirá el código con ese error y
+escribirá la prueba con el mismo error.
+
+49
+00:03:17.310 --> 00:03:22.490
+Las dos coinciden, npm test pasa,
+y la definición de hecho se cumple.
+
+50
+00:03:22.530 --> 00:03:25.450
+Las pruebas comprueban que el
+código hace lo que el agente cree,
+
+51
+00:03:25.490 --> 00:03:26.880
+no lo que tú querías.
+
+52
+00:03:27.726 --> 00:03:31.223
+Learn Harness Engineering propone
+tres capas de terminación.
+
+53
+00:03:31.263 --> 00:03:34.780
+La primera es estática: que el
+código se pueda cargar, el linter,
+
+54
+00:03:34.820 --> 00:03:39.770
+los tipos. La segunda es de
+ejecución: las pruebas y el arranque.
+
+55
+00:03:39.915 --> 00:03:44.160
+La tercera es de sistema: el recorrido
+completo, como lo haría un usuario.
+
+56
+00:03:44.200 --> 00:03:46.520
+Cada capa es más cara y ve más.
+
+57
+00:03:46.566 --> 00:03:49.891
+Y la décima lección explica
+por qué hace falta la tercera:
+
+58
+00:03:49.931 --> 00:03:53.990
+las pruebas unitarias aíslan cada pieza,
+así que no ven los fallos que aparecen en
+
+59
+00:03:54.030 --> 00:03:55.540
+la frontera entre dos piezas.
+
+60
+00:03:56.586 --> 00:03:59.080
+La undécima lección añade la otra mitad:
+
+61
+00:03:59.120 --> 00:04:04.360
+escribirlo antes. Un contrato, con el
+alcance, cómo se va a comprobar y qué
+
+62
+00:04:04.400 --> 00:04:08.820
+queda fuera, y una rúbrica, una lista
+de criterios puntuados para que dos
+
+63
+00:04:08.860 --> 00:04:11.501
+evaluadores lleguen a la misma conclusión.
+
+64
+00:04:11.541 --> 00:04:15.250
+La biblioteca de WalkingLab trae
+una plantilla con seis criterios,
+
+65
+00:04:15.290 --> 00:04:17.760
+puntuados de cero a dos, y un veredicto:
+
+66
+00:04:17.800 --> 00:04:19.900
+aceptar, revisar o bloquear.
+
+67
+00:04:20.895 --> 00:04:24.964
+Nosotros partimos de esa plantilla,
+con copyright de WalkingLab de dos mil
+
+68
+00:04:25.004 --> 00:04:28.770
+veinticinco y licencia
+MIT, y la dividimos en dos.
+
+69
+00:04:28.982 --> 00:04:31.303
+Hay criterios que puede
+comprobar un programa:
+
+70
+00:04:31.343 --> 00:04:35.227
+que pasan las pruebas, que el total
+coincide con el que calcula la tienda,
+
+71
+00:04:35.267 --> 00:04:38.747
+que hay evidencia anotada.
+Y hay criterios de juicio:
+
+72
+00:04:38.787 --> 00:04:42.167
+si el cambio se ha quedado en su
+alcance, si las pruebas tienen sentido,
+
+73
+00:04:42.207 --> 00:04:44.413
+si la siguiente sesión lo entenderá.
+
+74
+00:04:44.453 --> 00:04:46.355
+Los primeros los comprueba un script.
+
+75
+00:04:46.395 --> 00:04:48.320
+Los segundos, un revisor.
+
+76
+00:04:49.275 --> 00:04:51.926
+Y dos reglas sobre quién escribe qué.
+
+77
+00:04:51.966 --> 00:04:56.830
+La rúbrica la escribes tú, o un agente
+distinto, antes de que empiece el trabajo,
+
+78
+00:04:56.870 --> 00:05:00.449
+y se commitea. Y quien hace el
+trabajo no toca la verificación.
+
+79
+00:05:00.489 --> 00:05:04.576
+Es la regla del vídeo veintitrés, no
+cambiar la verificación para que pase.
+
+80
+00:05:04.616 --> 00:05:06.712
+Pero hoy no se la vamos a pedir al agente:
+
+81
+00:05:06.752 --> 00:05:07.920
+se la vamos a imponer.
+
+82
+00:05:13.754 --> 00:05:18.750
+Vamos a la tienda. Partimos de cómo quedó
+la rama andamiaje en el vídeo veintitrés:
+
+83
+00:05:18.790 --> 00:05:24.025
+formatear euros y línea de ticket pasan,
+y la siguiente es ticket cero cero tres,
+
+84
+00:05:24.065 --> 00:05:27.800
+la función que monta el texto
+completo con las líneas, el envío y
+
+85
+00:05:28.302 --> 00:05:32.060
+el total. Creamos una rama nueva,
+verificar, y antes de que ningún agente la
+
+86
+00:05:32.100 --> 00:05:34.030
+toque, añadimos tres piezas.
+
+87
+00:05:34.918 --> 00:05:38.134
+La primera es la rúbrica,
+en la carpeta rúbricas.
+
+88
+00:05:38.174 --> 00:05:41.610
+Arriba, el crédito a
+WalkingLab y el contrato.
+
+89
+00:05:41.650 --> 00:05:44.770
+Alcance: ticket punto js y sus pruebas.
+
+90
+00:05:44.857 --> 00:05:49.270
+Fuera de alcance: el carrito, el
+envío y las otras funcionalidades.
+
+91
+00:05:49.310 --> 00:05:51.770
+Después, cinco criterios automáticos.
+
+92
+00:05:51.810 --> 00:05:56.930
+Las tres capas: que el código se carga,
+que npm test pasa y una prueba de
+
+93
+00:05:56.970 --> 00:06:01.385
+aceptación. Y dos más: que ninguna
+funcionalidad pasa sin evidencias,
+
+94
+00:06:01.425 --> 00:06:03.783
+y que nadie ha tocado la verificación.
+
+95
+00:06:03.823 --> 00:06:07.500
+Al final, tres criterios de juicio,
+de cero a dos, y el veredicto.
+
+96
+00:06:08.416 --> 00:06:12.550
+La prueba de aceptación es la pieza
+clave, y la hemos escrito nosotros.
+
+97
+00:06:12.590 --> 00:06:17.830
+Vive en su propia carpeta, aceptación,
+fuera de test, así que npm test no la
+
+98
+00:06:17.870 --> 00:06:23.420
+ejecuta. Monta un pedido concreto: una
+mochila de treinta euros y tres libretas
+
+99
+00:06:23.460 --> 00:06:26.271
+de cuatro, con un cupón
+del diez por ciento.
+
+100
+00:06:26.311 --> 00:06:31.110
+Y exige que el total que imprime el ticket
+sea exactamente el que calcula total con
+
+101
+00:06:31.150 --> 00:06:35.140
+envío, la función de la tienda,
+escrito con formatear euros.
+
+102
+00:06:35.832 --> 00:06:39.193
+¿Por qué ese pedido? Porque
+está justo en la frontera.
+
+103
+00:06:39.233 --> 00:06:43.010
+Sin cupón son cuarenta y dos euros,
+por encima del umbral de envío gratis.
+
+104
+00:06:43.050 --> 00:06:46.992
+Con el cupón se queda en treinta
+y siete con ochenta, por debajo.
+
+105
+00:06:47.032 --> 00:06:50.610
+La tienda calcula el envío sobre
+el total con cupón y sin IVA,
+
+106
+00:06:50.650 --> 00:06:52.825
+así que ese pedido paga envío.
+
+107
+00:06:52.865 --> 00:06:56.310
+Es la misma familia de fallo que
+sembramos en el vídeo dieciocho:
+
+108
+00:06:56.350 --> 00:06:58.559
+sobre qué importe se calcula el envío.
+
+109
+00:06:58.599 --> 00:07:02.960
+Un fallo en la frontera entre dos piezas,
+justo lo que las pruebas unitarias no ven.
+
+110
+00:07:03.980 --> 00:07:08.430
+La segunda pieza es verificar punto sh,
+el script que comprueba los criterios
+
+111
+00:07:08.470 --> 00:07:12.090
+automáticos. Recibe el identificador
+de una funcionalidad o,
+
+112
+00:07:12.130 --> 00:07:15.290
+si no se lo das, revisa
+las que ya están en pasa.
+
+113
+00:07:15.330 --> 00:07:19.397
+Ejecuta las tres capas, comprueba que
+ninguna funcionalidad pasa sin evidencias,
+
+114
+00:07:19.437 --> 00:07:23.660
+y con git diff, que la rúbrica, la
+aceptación y el propio script siguen igual
+
+115
+00:07:23.700 --> 00:07:25.403
+que en el commit etiquetado.
+
+116
+00:07:25.443 --> 00:07:27.655
+Si el identificador no existe, falla.
+
+117
+00:07:27.695 --> 00:07:29.060
+Y solo sale con cero o con uno.
+
+118
+00:07:29.100 --> 00:07:31.190
+Enseguida verás por qué eso importa.
+
+119
+00:07:32.314 --> 00:07:35.409
+Los mensajes de error los
+escribimos para el agente.
+
+120
+00:07:35.449 --> 00:07:40.362
+La décima lección propone que digan
+qué falla, por qué y cómo arreglarlo,
+
+121
+00:07:40.402 --> 00:07:44.370
+y cita la experiencia de OpenAI, que
+escribe sus mensajes de error para meter
+
+122
+00:07:44.410 --> 00:07:46.270
+la reparación en el contexto del agente.
+
+123
+00:07:46.310 --> 00:07:51.870
+Así que cada fallo imprime tres
+líneas: error, por qué y cómo.
+
+124
+00:07:52.040 --> 00:07:54.324
+El por qué cita la regla de la tienda.
+
+125
+00:07:54.364 --> 00:07:57.280
+El cómo apunta a la función
+que hay que reutilizar.
+
+126
+00:07:57.990 --> 00:08:00.720
+Lo commiteamos y lo etiquetamos.
+
+127
+00:08:01.790 --> 00:08:06.182
+Después, en un segundo commit,
+cambiamos AGENTS punto md.
+
+128
+00:08:06.222 --> 00:08:08.950
+La definición de hecho ya
+no dice que pase npm test.
+
+129
+00:08:08.990 --> 00:08:14.125
+Dice que una funcionalidad pasa solo
+si verificar punto sh sale con cero,
+
+130
+00:08:14.165 --> 00:08:19.988
+que la evidencia es su salida, y que la
+rúbrica, la aceptación y el script no se
+tocan.
+
+131
+00:08:20.487 --> 00:08:22.970
+Y antes de trabajar,
+ejecutamos el script nosotros.
+
+132
+00:08:23.990 --> 00:08:28.392
+Sale en rojo, como debe: la prueba de
+aceptación no puede importar la función
+
+133
+00:08:28.432 --> 00:08:30.003
+ticket, porque todavía no existe.
+
+134
+00:08:30.043 --> 00:08:33.880
+Una rúbrica que falla antes del
+trabajo demuestra que comprueba algo.
+
+135
+00:08:39.439 --> 00:08:41.730
+Ahora el caso que da
+título a este capítulo.
+
+136
+00:08:42.122 --> 00:08:46.920
+Fuera de cámara hemos preparado otra rama,
+hecho falso, que sale del primer commit,
+
+137
+00:08:47.070 --> 00:08:51.830
+cuando AGENTS punto md todavía decía
+que hecho es que pase npm test.
+
+138
+00:08:51.870 --> 00:08:55.970
+La hemos escrito nosotros, imitando a un
+agente que sigue esa definición al pie de
+
+139
+00:08:56.010 --> 00:08:57.250
+la letra.
+
+140
+00:08:57.830 --> 00:09:01.600
+Mira sus dos últimos commits: la
+función ticket con sus pruebas,
+
+141
+00:09:01.640 --> 00:09:06.676
+y después ticket cero cero tres
+marcada como pasa, con su evidencia:
+
+142
+00:09:06.716 --> 00:09:08.690
+npm test, veinticuatro de veinticuatro.
+
+143
+00:09:08.730 --> 00:09:10.500
+El progreso la da por terminada.
+
+144
+00:09:11.402 --> 00:09:13.300
+Lo comprobamos sin ningún agente.
+
+145
+00:09:13.340 --> 00:09:17.309
+Ejecutamos npm test: veinticuatro
+pruebas, todas en verde.
+
+146
+00:09:17.349 --> 00:09:20.560
+Todo lo que pedía la definición
+del vídeo seis se cumple.
+
+147
+00:09:20.720 --> 00:09:26.160
+Ahora, verificar punto sh. La primera
+capa pasa, la segunda también.
+
+148
+00:09:26.447 --> 00:09:31.547
+La tercera, no. La prueba de aceptación
+dice que el ticket termina en cuarenta y
+
+149
+00:09:31.587 --> 00:09:35.178
+cinco con setenta y cuatro, y que el total
+de la tienda es cincuenta con sesenta y
+
+150
+00:09:35.218 --> 00:09:38.815
+nueve. Por qué: el envío se
+calcula sobre el total con cupón.
+
+151
+00:09:38.855 --> 00:09:42.246
+Cómo: usa total con envío
+en lugar de recalcularlo.
+
+152
+00:09:42.286 --> 00:09:44.100
+Y el script sale con uno.
+
+153
+00:09:44.639 --> 00:09:47.235
+Leemos el código para
+entender qué ha pasado.
+
+154
+00:09:47.275 --> 00:09:51.601
+La función calcula el envío sobre
+el subtotal, antes del cupón.
+
+155
+00:09:51.641 --> 00:09:55.346
+Con cuarenta y dos euros, el envío sale
+gratis, y el ticket se ahorra cuatro con
+
+156
+00:09:55.386 --> 00:09:58.070
+noventa y cinco que la tienda sí cobra.
+
+157
+00:09:58.137 --> 00:10:01.678
+Y las pruebas que acompañan al código
+usan un carrito de veinte euros y otro de
+
+158
+00:10:01.718 --> 00:10:06.317
+sesenta. En los dos casos el envío es
+el mismo, se calcule como se calcule.
+
+159
+00:10:06.357 --> 00:10:09.559
+Código y pruebas comparten
+el mismo malentendido.
+
+160
+00:10:09.599 --> 00:10:10.499
+Por eso coinciden.
+
+161
+00:10:11.527 --> 00:10:14.653
+Nada de esto es mentira:
+las pruebas pasan de verdad.
+
+162
+00:10:14.693 --> 00:10:17.781
+El problema es qué significaba pasa.
+
+163
+00:10:17.989 --> 00:10:21.010
+Con la definición del vídeo seis,
+la funcionalidad estaba terminada;
+
+164
+00:10:21.050 --> 00:10:25.540
+con la rúbrica, no. Por eso la
+verificación tiene que estar escrita
+
+165
+00:10:25.580 --> 00:10:27.780
+antes, y por otro.
+
+166
+00:10:28.931 --> 00:10:32.650
+Una aclaración honesta. Antes de
+escribir esa rama, le pedimos a Pi,
+
+167
+00:10:32.690 --> 00:10:36.873
+con DeepSeek Flash, la misma
+funcionalidad sobre el mismo commit,
+
+168
+00:10:36.913 --> 00:10:41.140
+y lo hizo bien: encontró
+verificar punto sh y lo ejecutó.
+
+169
+00:10:41.330 --> 00:10:43.510
+Por eso la rama la hemos escrito a mano.
+
+170
+00:10:43.550 --> 00:10:46.650
+No sabemos con qué frecuencia
+un agente cae en este error;
+
+171
+00:10:46.690 --> 00:10:48.380
+sí sabemos que nada lo impedía.
+
+172
+00:10:49.137 --> 00:10:54.370
+Y ahí está el punto. Si el agente lee el
+AGENTS punto md nuevo y ejecuta verificar
+
+173
+00:10:54.410 --> 00:10:58.531
+antes de marcar, verá el rojo en
+su propia sesión y lo arreglará.
+
+174
+00:10:58.571 --> 00:11:00.647
+Puede pasar, y sería lo correcto.
+
+175
+00:11:00.687 --> 00:11:04.189
+Pero que pueda pasar no es lo
+mismo que esté garantizado.
+
+176
+00:11:04.229 --> 00:11:08.055
+Mientras dependa de que el agente lo
+ejecute, sigue siendo una instrucción.
+
+177
+00:11:08.095 --> 00:11:09.740
+Vamos a convertirla en una puerta.
+
+178
+00:11:15.570 --> 00:11:19.695
+En el vídeo ocho escribimos una extensión
+de permisos con el evento tool call:
+
+179
+00:11:19.735 --> 00:11:23.080
+cada vez que el modelo pide una
+herramienta, nuestro código decide si se
+
+180
+00:11:23.120 --> 00:11:28.080
+ejecuta. En el veintitrés dijimos que una
+puerta de verdad para el estado pasa sería
+
+181
+00:11:28.120 --> 00:11:32.400
+algo así. La hemos escrito: puerta punto
+ts, en el repositorio de extensiones del
+
+182
+00:11:32.440 --> 00:11:34.320
+curso, fuera de la tienda.
+
+183
+00:11:34.960 --> 00:11:39.650
+Hace tres cosas. Primera: si el modelo
+intenta editar o escribir la rúbrica,
+
+184
+00:11:39.690 --> 00:11:44.555
+la prueba de aceptación o verificar
+punto sh, lo bloquea sin preguntar.
+
+185
+00:11:44.595 --> 00:11:50.223
+Segunda: si edita funcionalidades punto
+json, compara el fichero antes y después,
+
+186
+00:11:50.263 --> 00:11:55.220
+con el evento tool result. Si ha
+aparecido una funcionalidad nueva en pasa,
+
+187
+00:11:55.260 --> 00:11:59.654
+ejecuta verificar punto sh por
+su cuenta, con pi punto exec.
+
+188
+00:11:59.694 --> 00:12:02.550
+Si falla, devuelve el fichero a como
+estaba y marca el resultado de la
+
+189
+00:12:02.590 --> 00:12:04.390
+herramienta como error.
+
+190
+00:12:05.328 --> 00:12:10.300
+Tercera: antes de un git commit por bash,
+comprueba que todo lo que ya está en pasa
+
+191
+00:12:10.340 --> 00:12:13.070
+sigue pasando, y si no, lo bloquea.
+
+192
+00:12:13.110 --> 00:12:16.810
+El trabajo a medias se puede seguir
+commiteando, como pedía la rutina de
+
+193
+00:12:16.850 --> 00:12:18.201
+salida del vídeo veintitrés.
+
+194
+00:12:18.241 --> 00:12:20.480
+Y un detalle que descubrimos al probarla:
+
+195
+00:12:20.520 --> 00:12:25.070
+si el script se cuelga y se agota el
+tiempo, Pi no devuelve un código de error.
+
+196
+00:12:25.110 --> 00:12:29.251
+La puerta lo trata como un fallo, porque
+una verificación que no termina no ha
+
+197
+00:12:29.291 --> 00:12:30.191
+pasado.
+
+198
+00:12:30.872 --> 00:12:34.510
+Compara el fichero antes y después,
+en lugar de leer la edición,
+
+199
+00:12:34.550 --> 00:12:38.510
+porque Pi y oh my pi describen
+una edición de forma distinta,
+
+200
+00:12:38.550 --> 00:12:40.530
+pero el fichero en disco
+
+201
+00:12:41.099 --> 00:12:43.770
+es el mismo. Y el motivo del
+bloqueo es la salida del script,
+
+202
+00:12:43.810 --> 00:12:46.960
+que el modelo recibe como
+resultado de la herramienta.
+
+203
+00:12:47.000 --> 00:12:50.240
+No es una ventana para ti,
+es feedback para el agente.
+
+204
+00:12:50.280 --> 00:12:53.490
+Un bloqueo que solo dice no
+deja al modelo adivinando;
+
+205
+00:12:53.530 --> 00:12:57.560
+uno que dice qué regla rompe y qué
+función usar le da el siguiente paso.
+
+206
+00:12:58.344 --> 00:13:02.790
+Y un detalle de diseño. La extensión no
+confía en lo que el agente diga que ha
+
+207
+00:13:02.830 --> 00:13:08.550
+ejecutado. No lee su resumen ni busca en
+la conversación una salida de npm test.
+
+208
+00:13:08.590 --> 00:13:11.910
+Ejecuta la verificación ella
+misma, en el momento de marcar.
+
+209
+00:13:11.950 --> 00:13:15.030
+Es lo que pide la octava lección
+de Learn Harness Engineering:
+
+210
+00:13:15.070 --> 00:13:17.800
+el paso a pasa lo controla
+el harness, no el agente.
+
+211
+00:13:18.726 --> 00:13:23.346
+La demo. Partimos del commit anterior
+al marcado en la rama hecho falso:
+
+212
+00:13:23.386 --> 00:13:27.600
+el código con el error, sus pruebas en
+verde y ticket cero cero tres todavía en
+
+213
+00:13:27.640 --> 00:13:32.158
+curso. Ahí AGENTS punto md ni
+siquiera nombra la rúbrica.
+
+214
+00:13:32.198 --> 00:13:38.520
+A la puerta le da igual. Arrancamos Pi
+con guion e y la ruta de puerta punto ts.
+
+215
+00:13:38.910 --> 00:13:42.940
+Como barra extensions no enseña lo que
+se carga así, la puerta se anuncia al
+
+216
+00:13:42.980 --> 00:13:46.890
+arrancar: activa, pasa y
+commit pasan por verificar.
+
+217
+00:13:47.806 --> 00:13:52.670
+Le decimos: las pruebas pasan, marca
+ticket cero cero tres como pasa con la
+
+218
+00:13:52.710 --> 00:13:58.061
+evidencia de npm test. El modelo
+edita funcionalidades punto json.
+
+219
+00:13:58.101 --> 00:14:02.571
+La edición se ejecuta, la puerta
+ejecuta verificar y la deshace.
+
+220
+00:14:02.611 --> 00:14:06.470
+En pantalla aparece el aviso; en
+el resultado de la herramienta,
+
+221
+00:14:06.510 --> 00:14:10.900
+el error de la aceptación con su por
+qué y su cómo, y una última línea:
+
+222
+00:14:10.940 --> 00:14:13.520
+arregla el código, no la verificación.
+
+223
+00:14:14.183 --> 00:14:17.103
+Y lo que hace Flash después
+es justo lo que queríamos.
+
+224
+00:14:17.143 --> 00:14:21.414
+Lee la prueba de aceptación, entiende
+que el envío se calculaba sin el cupón,
+
+225
+00:14:21.454 --> 00:14:25.590
+cambia la función para usar total con
+envío, añade una prueba de regresión con
+
+226
+00:14:25.630 --> 00:14:28.611
+el pedido de la frontera
+y vuelve a marcar.
+
+227
+00:14:28.651 --> 00:14:32.090
+Esta vez el script sale con
+cero y el marcado se queda.
+
+228
+00:14:32.235 --> 00:14:36.120
+Hace tres commits, y la puerta comprueba
+el último antes de dejarlo pasar.
+
+229
+00:14:36.826 --> 00:14:43.284
+Su resumen lo dice mejor que nosotros: npm
+test pasaba, y aun así ticket cero cero
+
+230
+00:14:43.324 --> 00:14:47.668
+tres no estaba correcto. Fíjate en que
+no le hemos dicho que había un error.
+
+231
+00:14:47.708 --> 00:14:50.950
+Se lo ha dicho la verificación, en el
+momento en que intentaba dar el trabajo
+
+232
+00:14:50.990 --> 00:14:51.890
+por bueno.
+
+233
+00:14:52.817 --> 00:14:54.982
+Ahora probamos la otra mitad.
+
+234
+00:14:55.022 --> 00:14:59.510
+Le pedimos que añada al principio de la
+prueba de aceptación un comentario con la
+
+235
+00:14:59.550 --> 00:15:03.930
+fecha de hoy. Es un cambio inofensivo,
+y el modelo llega a razonar que lo hará
+
+236
+00:15:03.970 --> 00:15:08.264
+avisando. La edición se bloquea
+sin diálogo, por ruta protegida,
+
+237
+00:15:08.304 --> 00:15:13.270
+y el modelo nos contesta que no puede:
+quien implementa no toca la aceptación.
+
+238
+00:15:13.310 --> 00:15:17.413
+Ya no es una regla escrita en
+AGENTS punto md, sino una barrera.
+
+239
+00:15:17.453 --> 00:15:21.560
+No es que el agente sea malo; es que
+no debería poder mover la portería.
+
+240
+00:15:22.518 --> 00:15:27.170
+Pi trae además un evento pensado
+para el final, agent before settle,
+
+241
+00:15:27.210 --> 00:15:30.120
+justo antes de que el agente
+dé por cerrado su trabajo.
+
+242
+00:15:30.160 --> 00:15:33.000
+Puede añadir un mensaje
+y pedir una vuelta más.
+
+243
+00:15:33.040 --> 00:15:37.603
+En oh my pi el equivalente es session
+stop, que puede negarse a dejar terminar
+
+244
+00:15:37.643 --> 00:15:40.360
+al agente, con un máximo
+de ocho continuaciones.
+
+245
+00:15:40.400 --> 00:15:43.720
+Con cualquiera de los dos podrías ejecutar
+la verificación cada vez que el agente
+
+246
+00:15:43.760 --> 00:15:46.480
+dice que ha terminado. Hoy
+lo dejamos en la diapositiva.
+
+247
+00:15:52.277 --> 00:15:56.890
+Como vimos en el diecinueve, en oh my pi
+un hook es un módulo con la misma forma
+
+248
+00:15:56.930 --> 00:16:02.115
+que una extensión de Pi. Por eso puerta
+punto ts no importa nada del paquete de
+
+249
+00:16:02.155 --> 00:16:07.470
+Pi: el mismo fichero se carga en Pi con
+guion e y en oh my pi con guion guion
+hook.
+
+250
+00:16:08.090 --> 00:16:11.936
+Usamos la opción, y no la carpeta de
+hooks del proyecto, porque en el vídeo
+
+251
+00:16:11.976 --> 00:16:16.060
+veintitrés dejamos la tienda sin carpeta
+punto omp, y queremos que siga así.
+
+252
+00:16:16.912 --> 00:16:19.870
+La demo en oh my pi es la
+que no hemos preparado.
+
+253
+00:16:19.910 --> 00:16:24.460
+Volvemos a la rama verificar, sin la
+función ticket, y abrimos oh my pi con el
+
+254
+00:16:24.500 --> 00:16:30.623
+perfil demo, DeepSeek V cuatro Pro y la
+puerta cargada, que se anuncia igual que
+
+255
+00:16:30.663 --> 00:16:33.012
+en Pi. Y le decimos lo mismo
+que en el vídeo veintitrés:
+
+256
+00:16:33.052 --> 00:16:35.380
+trabaja en la siguiente funcionalidad.
+
+257
+00:16:36.210 --> 00:16:40.120
+Podía pasar de dos formas: que se fiara
+de sus pruebas y la puerta tuviera que
+
+258
+00:16:40.160 --> 00:16:43.490
+deshacer el marcado, o que
+verificara por su cuenta.
+
+259
+00:16:43.543 --> 00:16:47.180
+Pasó lo segundo. Lee la rúbrica
+y la prueba de aceptación,
+
+260
+00:16:47.385 --> 00:16:53.153
+escribe la función con total con envío,
+y ejecuta verificar punto sh ticket cero
+
+261
+00:16:53.193 --> 00:16:57.280
+cero tres. Como la salida no enseña el
+código, lo vuelve a ejecutar pidiendo el
+
+262
+00:16:57.320 --> 00:17:01.440
+código de salida: cero. Solo entonces
+marca la funcionalidad y anota como
+
+263
+00:17:01.480 --> 00:17:03.570
+evidencia la salida del script.
+
+264
+00:17:04.529 --> 00:17:08.367
+La puerta no ha tenido que hacer nada,
+y eso también es un buen resultado.
+
+265
+00:17:08.407 --> 00:17:13.590
+Lo que importa es lo que no ha pasado: que
+ticket cero cero tres quede en pasa con la
+
+266
+00:17:13.630 --> 00:17:17.180
+aceptación en rojo. Con un agente
+que verifica, la puerta es una red.
+
+267
+00:17:17.220 --> 00:17:21.230
+Con uno que no lo hace, es la diferencia
+entre dar por bueno un error y no darlo.
+
+268
+00:17:22.920 --> 00:17:26.720
+Hay otra forma de que sea el harness
+quien comprueba, y ya la conoces.
+
+269
+00:17:26.760 --> 00:17:30.981
+En el vídeo quince usamos barra
+loop con guion guion until.
+
+270
+00:17:31.021 --> 00:17:36.090
+oh my pi reenvía el encargo y, después
+de cada vuelta, ejecuta él el comando.
+
+271
+00:17:36.130 --> 00:17:39.200
+Si sale con cero, para.
+Si sale con uno, sigue.
+
+272
+00:17:39.240 --> 00:17:42.080
+Con cualquier otro
+código, el bucle se apaga.
+
+273
+00:17:42.120 --> 00:17:45.910
+Por eso el script solo sale con cero o
+con uno, y por eso falla si le das un
+
+274
+00:17:45.950 --> 00:17:49.830
+identificador que no existe: un error
+de tecleo no puede parar el bucle con un
+
+275
+00:17:49.870 --> 00:17:50.970
+falso verde.
+
+276
+00:17:51.733 --> 00:17:57.454
+Y vale fuera del agente. En los scripts de
+integración continua de los vídeos diez y
+
+277
+00:17:57.494 --> 00:18:01.050
+veintiuno, el código de
+salida lo ponían las pruebas:
+
+278
+00:18:01.090 --> 00:18:05.518
+basta con cambiar npm test
+por verificar punto sh.
+
+279
+00:18:05.558 --> 00:18:09.450
+Y si quieres una puerta que no dependa de
+ningún agente, un hook de pre commit de
+
+280
+00:18:09.490 --> 00:18:13.260
+git hace lo mismo con cualquiera
+que haga commit, persona o modelo.
+
+281
+00:18:14.211 --> 00:18:17.801
+Fíjate en lo que tenemos: un
+solo script y cuatro sitios.
+
+282
+00:18:17.841 --> 00:18:21.176
+Lo ejecuta la puerta, en Pi y en oh my pi;
+
+283
+00:18:21.216 --> 00:18:24.137
+la condición de barra loop;
+la integración continua;
+
+284
+00:18:24.177 --> 00:18:25.100
+y tú, a
+
+285
+00:18:25.680 --> 00:18:29.150
+mano. La verificación se define
+una vez y vive en el repositorio,
+
+286
+00:18:29.190 --> 00:18:31.379
+versionada, con su rúbrica al lado.
+
+287
+00:18:31.419 --> 00:18:35.246
+Es lo que el Playbook llama hacer de
+la verificación parte de la interfaz:
+
+288
+00:18:35.286 --> 00:18:37.670
+el agente la usa, pero no la redefine.
+
+289
+00:18:43.333 --> 00:18:47.620
+Quedan los criterios de juicio: si el
+cambio se ha quedado en su alcance,
+
+290
+00:18:47.660 --> 00:18:52.144
+si las pruebas tienen sentido y si
+la siguiente sesión lo entenderá.
+
+291
+00:18:52.184 --> 00:18:54.490
+Ningún script lo decide bien.
+
+292
+00:18:54.530 --> 00:18:57.646
+Aquí entra un revisor,
+con dos condiciones:
+
+293
+00:18:57.686 --> 00:19:00.838
+que no sea quien hizo el trabajo,
+y que puntúe con la rúbrica,
+
+294
+00:19:00.878 --> 00:19:02.160
+no con su intuición.
+
+295
+00:19:03.227 --> 00:19:07.269
+En la misma sesión de oh my pi le
+pedimos que use el agente reviewer,
+
+296
+00:19:07.309 --> 00:19:11.120
+el del vídeo dieciséis, para puntuar
+los tres criterios de juicio,
+
+297
+00:19:11.160 --> 00:19:15.770
+de cero a dos, con fichero y línea como
+evidencia, y que dé un veredicto sin
+
+298
+00:19:15.810 --> 00:19:20.476
+modificar nada. El agente principal copia
+en el encargo los criterios y el contrato,
+
+299
+00:19:20.516 --> 00:19:21.600
+y lanza al revisor.
+
+300
+00:19:22.569 --> 00:19:25.935
+El revisor tarda un minuto y
+medio y devuelve una tabla.
+
+301
+00:19:25.975 --> 00:19:31.077
+Alcance, dos: los cambios se quedan
+en ticket punto js y sus pruebas.
+
+302
+00:19:31.117 --> 00:19:34.580
+Pruebas con sentido, dos:
+cubren los dos lados del umbral,
+
+303
+00:19:34.620 --> 00:19:38.149
+con y sin cupón, con valores
+esperados escritos a mano.
+
+304
+00:19:38.189 --> 00:19:42.360
+Traspaso, dos: reutiliza total
+con envío y formatear euros.
+
+305
+00:19:42.513 --> 00:19:46.420
+Veredicto: aceptar. Y cada
+puntuación lleva sus líneas.
+
+306
+00:19:47.125 --> 00:19:49.200
+Pero mira un detalle de la sesión.
+
+307
+00:19:49.240 --> 00:19:53.140
+Antes de lanzar al revisor, el agente
+principal escribe en su razonamiento que
+
+308
+00:19:53.180 --> 00:19:57.050
+el veredicto probablemente será
+aceptar, y luego se corrige:
+
+309
+00:19:57.090 --> 00:20:01.620
+no debería sesgarlo. El revisor no ve ese
+razonamiento, pero sí el encargo que le
+
+310
+00:20:01.660 --> 00:20:03.530
+escribe quien hizo el trabajo.
+
+311
+00:20:03.570 --> 00:20:06.300
+Por eso un revisor es otra
+opinión, aunque venga con tabla.
+
+312
+00:20:07.298 --> 00:20:11.558
+Frente a barra review, del vídeo
+dieciocho, la diferencia es la lista.
+
+313
+00:20:11.598 --> 00:20:16.144
+Barra review busca fallos sin preguntas
+previas, y su documentación aclara que
+
+314
+00:20:16.184 --> 00:20:19.560
+correcto significa que no se
+ha establecido ningún fallo,
+
+315
+00:20:19.600 --> 00:20:23.580
+no que funcione. Con la rúbrica, el
+revisor responde a preguntas concretas
+
+316
+00:20:23.620 --> 00:20:25.160
+escritas antes de empezar.
+
+317
+00:20:26.132 --> 00:20:28.013
+Y el revisor también se equivoca.
+
+318
+00:20:28.053 --> 00:20:32.272
+Anthropic cuenta que su evaluador, al
+principio, encontraba problemas reales,
+
+319
+00:20:32.312 --> 00:20:36.375
+luego se convencía de que no eran
+graves y aprobaba el trabajo igualmente.
+
+320
+00:20:36.415 --> 00:20:40.230
+Lo arreglaron leyendo sus registros,
+buscando dónde su juicio se separaba del
+
+321
+00:20:40.270 --> 00:20:43.176
+de una persona y ajustando
+sus instrucciones.
+
+322
+00:20:43.216 --> 00:20:45.810
+A eso se le llama calibrar al evaluador.
+
+323
+00:20:45.850 --> 00:20:48.680
+Un revisor sin calibrar es
+otra opinión, con buena prosa.
+
+324
+00:20:49.644 --> 00:20:52.010
+¿Y el advisor del vídeo catorce?
+
+325
+00:20:52.050 --> 00:20:55.790
+A su WATCHDOG punto md
+puedes añadir una regla:
+
+326
+00:20:55.950 --> 00:21:01.756
+avisa si una funcionalidad pasa a pasa
+sin la salida de verificar punto sh.
+
+327
+00:21:01.796 --> 00:21:05.234
+Avisa mientras se trabaja, pero
+no aprueba ni bloquea nada.
+
+328
+00:21:05.274 --> 00:21:07.600
+Es una segunda opinión, no una puerta.
+
+329
+00:21:08.566 --> 00:21:12.390
+Así queda el reparto. El script
+decide lo que se puede comprobar.
+
+330
+00:21:12.430 --> 00:21:15.150
+La puerta impide marcar
+o commitear sin él.
+
+331
+00:21:15.211 --> 00:21:19.132
+El revisor puntúa lo que necesita
+juicio, con la rúbrica en la mano.
+
+332
+00:21:19.172 --> 00:21:21.500
+El advisor vigila mientras se trabaja.
+
+333
+00:21:21.540 --> 00:21:23.588
+Y el veredicto final lo firmas tú.
+
+334
+00:21:23.628 --> 00:21:26.160
+Ninguna pieza de opinión
+sustituye a una de ejecución.
+
+335
+00:21:32.010 --> 00:21:36.120
+El temario de este vídeo incluye Auto
+QA, y conviene ponerlo en su sitio,
+
+336
+00:21:36.160 --> 00:21:41.095
+porque el nombre engaña. Como vimos en el
+dieciocho, Auto QA no revisa tu código.
+
+337
+00:21:41.135 --> 00:21:45.360
+Es un buzón donde el modelo deja quejas
+sobre las herramientas de oh my pi cuando
+
+338
+00:21:45.400 --> 00:21:48.460
+no se comportan como dicen. O
+eme pe grievances las lista,
+
+339
+00:21:48.500 --> 00:21:50.240
+las limpia o las envía.
+
+340
+00:21:51.301 --> 00:21:53.866
+Todo lo que hemos hecho
+hoy comprueba tu trabajo.
+
+341
+00:21:53.906 --> 00:21:58.360
+Auto QA es feedback sobre el
+harness, y quien opina es el
+
+342
+00:21:58.841 --> 00:22:03.194
+modelo. Aun así, puede darte una pista: si
+una herramienta de edición falla a medias,
+
+343
+00:22:03.234 --> 00:22:07.071
+tu verificación puede fallar por
+culpa del harness, no de tu código.
+
+344
+00:22:07.111 --> 00:22:10.335
+Es la primera lección de
+Learn Harness Engineering:
+
+345
+00:22:10.375 --> 00:22:14.150
+antes de cambiar de modelo,
+atribuye el fallo a una capa.
+
+346
+00:22:14.190 --> 00:22:16.207
+Pero no lo uses para
+dar nada por terminado:
+
+347
+00:22:16.247 --> 00:22:19.660
+no comprueba ningún criterio
+ni sabe nada de tu rúbrica.
+
+348
+00:22:20.248 --> 00:22:24.360
+Y recuerda sus condiciones. Viene
+activado, no guarda nada hasta que das tu
+
+349
+00:22:24.400 --> 00:22:29.444
+consentimiento y, si aceptas, cada queja
+se envía a un servidor de oh my pi.
+
+350
+00:22:29.484 --> 00:22:33.227
+En nuestro perfil demo lo tenemos
+denegado, y hoy no lo abrimos.
+
+351
+00:22:33.267 --> 00:22:36.839
+Si no quieres que salga nada de tu
+máquina, deja el consentimiento denegado o
+
+352
+00:22:36.879 --> 00:22:39.260
+apaga dev punto auto QA.
+
+353
+00:22:44.953 --> 00:22:49.840
+Los límites, sin rodeos. El primero:
+la puerta solo ve lo que sabe mirar,
+
+354
+00:22:49.880 --> 00:22:51.831
+edit, write y los commits por bash.
+
+355
+00:22:51.871 --> 00:22:56.089
+Si el modelo escribe funcionalidades
+punto json con sed desde bash,
+
+356
+00:22:56.129 --> 00:22:58.017
+no lo reconoce como un marcado.
+
+357
+00:22:58.057 --> 00:23:01.450
+Hace falta la segunda capa de
+los vídeos ocho y diecinueve,
+
+358
+00:23:01.490 --> 00:23:04.669
+que pide aprobación para
+el bash fuera de una lista.
+
+359
+00:23:04.709 --> 00:23:09.200
+Y oh my pi tiene más herramientas que
+escriben, como vimos con el hueco de eval.
+
+360
+00:23:09.971 --> 00:23:14.864
+El segundo: el hook de pre commit de
+git se salta con guion guion no verify,
+
+361
+00:23:14.904 --> 00:23:18.170
+y un agente lo sabe. Si lo
+usas, bloquea ese patrón.
+
+362
+00:23:18.228 --> 00:23:21.874
+El tercero: la verificación
+es tan buena como la rúbrica.
+
+363
+00:23:21.914 --> 00:23:26.140
+Si la prueba de aceptación no cubre un
+caso, el script lo dejará pasar con la
+
+364
+00:23:26.180 --> 00:23:29.650
+misma seguridad. Las rúbricas también se
+revisan, y cada fallo que se cuele es un
+
+365
+00:23:29.690 --> 00:23:34.390
+criterio nuevo. La décima lección lo llama
+convertir los comentarios de revisión en
+
+366
+00:23:34.430 --> 00:23:35.920
+comprobaciones.
+
+367
+00:23:36.870 --> 00:23:39.066
+El cuarto: verificar cuesta.
+
+368
+00:23:39.106 --> 00:23:41.872
+Cada marcado y cada
+commit ejecutan el script.
+
+369
+00:23:41.912 --> 00:23:46.041
+El nuestro tarda un segundo, pero
+con una batería grande son minutos.
+
+370
+00:23:46.081 --> 00:23:49.660
+Mantén rápida la parte que se ejecuta
+siempre y deja la lenta para la
+
+371
+00:23:49.700 --> 00:23:54.500
+integración continua. Y el quinto:
+cualquier medida que se optimice se puede
+
+372
+00:23:54.540 --> 00:23:57.620
+engañar. De medir lo que no
+importa, y de la ley de Goodhart,
+
+373
+00:23:57.660 --> 00:23:59.560
+hablaremos en el próximo vídeo.
+
+374
+00:24:00.450 --> 00:24:05.640
+Repasemos. Terminado se define antes,
+por escrito, y no lo decide quien hace el
+
+375
+00:24:05.680 --> 00:24:10.040
+trabajo. La rúbrica separa lo que
+comprueba un script de lo que necesita
+
+376
+00:24:10.080 --> 00:24:15.440
+juicio. Una prueba de aceptación escrita
+por otro ve los fallos que el código y sus
+
+377
+00:24:15.480 --> 00:24:20.648
+pruebas comparten. La puerta, en Pi o
+en oh my pi, ejecuta la verificación y
+
+378
+00:24:20.688 --> 00:24:25.717
+protege lo que verifica. El revisor,
+el advisor y barra review opinan.
+
+379
+00:24:25.757 --> 00:24:28.040
+Y Auto QA no comprueba tu código.
+
+380
+00:24:29.315 --> 00:24:33.990
+La práctica: en un proyecto tuyo, elige
+la siguiente funcionalidad y escribe su
+
+381
+00:24:34.030 --> 00:24:38.330
+rúbrica antes de empezar, partiendo de
+la plantilla de WalkingLab y citando su
+
+382
+00:24:38.370 --> 00:24:42.764
+licencia. Incluye una prueba de
+aceptación que cruce dos piezas.
+
+383
+00:24:42.804 --> 00:24:47.490
+Escribe un script que solo salga con cero
+o con uno, y comprueba que falla antes del
+
+384
+00:24:47.530 --> 00:24:51.114
+trabajo. Después deja trabajar
+al agente con la puerta cargada,
+
+385
+00:24:51.154 --> 00:24:53.280
+y apunta cuántas veces lo paró y por qué.
+
+386
+00:24:54.063 --> 00:24:58.219
+En el próximo vídeo, bucles,
+grafos y el coste de orquestar.
+
+387
+00:24:58.259 --> 00:25:02.800
+Cuándo compensa un bucle, un plan
+o varios agentes, y cuándo no.
+
+388
+00:25:02.941 --> 00:25:05.627
+Hoy has construido la pieza
+que todo bucle necesita:
+
+389
+00:25:05.667 --> 00:25:09.220
+una condición de parada que no
+depende de lo que diga el agente.
+
+390
+00:25:09.260 --> 00:25:10.320
+Nos vemos allí.
