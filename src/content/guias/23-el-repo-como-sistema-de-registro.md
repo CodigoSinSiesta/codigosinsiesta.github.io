@@ -18,97 +18,104 @@ Sacar el estado de la conversación al repo (instrucciones, progreso, documento 
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Si mañana cierras la terminal:** ¿Dónde está el estado ? — Qué está terminado, qué quedó a medias, por qué, qué falta probar.
-- **Learn Harness Engineering · lección 3:** Lo que no está en el repo no existe — para el agente.
-- **La prueba de fuego:** Pi (deja algo a medias) → Repositorio (lo único compartido) → oh my pi (otro modelo, sesión nueva)
+- Si mañana cierras la terminal, ¿dónde está el estado? Qué está terminado, qué quedó a medias, por qué, qué falta probar. Si la respuesta es «en la conversación», está en el sitio más frágil.
+- Lección 3 de Learn Harness Engineering: lo que no está en el repositorio no existe para el agente. Sus tres entradas son el prompt y la tarea, los ficheros del repo y la salida de sus herramientas; tu cabeza, el chat del equipo y la sesión de ayer no están.
+- El repositorio como sistema de registro: el sitio donde vive, con autoridad, el estado del trabajo. No el código, que ya está ahí, sino qué hay que hacer, en qué punto estamos, cómo se arranca y se comprueba, y qué tiene que saber la siguiente sesión.
+- La prueba de fuego: una sesión de Pi deja una tarea a medias y una sesión nueva de oh my pi, con otro modelo y sin conversación previa, la retoma leyendo solo el repositorio.
 
 ### 2 · El mapa del repositorio y la quinta pregunta
 
 <p><button type="button" class="ir-a" data-t="128">▶ Ir a 2:08</button></p>
 
-- *En la demo:* master · solo el AGENTS.md del vídeo 6
-- **Lo que falta:** Cuatro ficheros, más uno — Que cualquier agente lea al empezar y actualice al terminar.
+- El mapa 2 del vídeo 22 tiene cinco piezas, y cada una es un fichero o una costumbre: instrucciones (el AGENTS.md del vídeo 6), estado (progreso y lista de funcionalidades), alcance (una funcionalidad cada vez), ciclo de vida (arranque, rutinas de entrada y salida, traspaso) y verificación (el vídeo 24).
+- La prueba de la sesión nueva del vídeo 6 hace cinco preguntas: qué es el proyecto, cómo está organizado, cómo se arranca, cómo se verifica y en qué punto está. AGENTS.md responde a las cuatro primeras. La quinta es la que cambia cada día.
+- *En la demo:* en master, Pi responde a la quinta deduciendo del historial de git. Pero un historial dice lo que se hizo, no lo que falta. Faltan cuatro ficheros, más un quinto cuando haga falta, que cualquier agente lea al empezar y actualice al terminar.
 
 ### 3 · El paquete mínimo
 
 <p><button type="button" class="ir-a" data-t="232">▶ Ir a 3:52</button></p>
 
-- **Plantillas adaptadas y traducidas:** © 2025 WalkingLab · MIT — En los créditos, en el AGENTS.md y con la licencia en la rama.
-- *En terminal:* Plantilla de WalkingLab → la tienda (más abajo, en «Código y comandos»)
-- **No es solo de WalkingLab:** Anthropic · el inicializador — Noviembre de 2025. Su primera sesión no escribe código de producto.
-- **Cada sesión siguiente empieza igual:** Confirma (la carpeta) → Lee (historial y progreso) → Elige (la siguiente) → Comprueba (que lo básico funciona)
-- **Lección 6:** Inicializar es una fase propia — Mezclada con el código, la infraestructura pierde: su valor aparece en la siguiente sesión.
-- **Fíjate:** Ninguna habla de código — Hablan de si una sesión que no sabe nada puede ponerse a trabajar sin adivinar.
+- El paquete mínimo, según la guía de plantillas de Learn Harness Engineering: instrucciones, script de arranque, progreso y lista de funcionalidades. El traspaso y la lista de estado limpio, cuando el proyecto crece. Las plantillas son © 2025 WalkingLab con licencia MIT: si las adaptas, cítalas en los créditos, en el AGENTS.md y con la licencia en el repo.
+- Los nombres dan igual (los traducimos; tabla más abajo, en «Código y comandos»). Lo que importa es que AGENTS.md los nombre: ningún agente actualiza un fichero de progreso por su cuenta.
+- Anthropic (noviembre de 2025) cuenta la misma idea con un agente inicializador: su primera sesión no escribe código de producto, deja la lista de funcionalidades pendientes, el arranque, el progreso y un commit. Cada sesión siguiente confirma la carpeta, lee historial y progreso, elige la siguiente funcionalidad y comprueba que lo básico funciona antes de tocar nada.
+- Lección 6: inicializar es una fase propia. Mezclada con el código, la infraestructura pierde, porque su valor solo aparece en la siguiente sesión. Un repo está bien inicializado si cumple cuatro condiciones: se puede arrancar, se puede probar, se ve el progreso y se puede retomar. Ninguna habla de cuánto código hay.
+- Estado limpio al final de cada sesión:
+  - el arranque estándar sigue funcionando;
+  - la verificación sigue pasando;
+  - el progreso está apuntado;
+  - la lista refleja lo que pasa de verdad, no lo que se espera;
+  - no queda ningún paso a medias sin anotar;
+  - la siguiente sesión puede seguir sin arreglos manuales.
 
 ### 4 · La lista de funcionalidades
 
 <p><button type="button" class="ir-a" data-t="392">▶ Ir a 6:32</button></p>
 
-- **Cada entrada:** Comportamiento (qué tiene que pasar) → Verificación (cómo se comprueba) → Estado (dónde está)
-- **Regla:** Escrito no es pasa — Pasa = verificación ejecutada + evidencia anotada.
-- **Y el estado bloqueada:** No es un fracaso — Es la forma honesta de decir que algo no puede avanzar, con el motivo en las notas.
-- **Apunte honesto:** Una instrucción, no una puerta — Hoy el paso a «pasa» lo da el propio agente. El vídeo 24 lo convierte en comprobación.
+- Cada entrada tiene tres partes: comportamiento (qué tiene que pasar), verificación (cómo se comprueba) y estado. Si falta una, no sirve. Los estados son cuatro: `sin empezar`, `en curso`, `bloqueada` y `pasa`. `bloqueada` no es un fracaso: es la forma honesta de decir que algo no puede avanzar, con el motivo en las notas.
+- Dos reglas: solo una funcionalidad `en curso` a la vez, y una funcionalidad solo cambia a `pasa` cuando la verificación se ha ejecutado y la evidencia (el comando y lo que salió) está anotada. Que el código esté escrito no cuenta.
+- Granularidad: que cada entrada quepa en una sesión. «Implementar el ticket» nunca llega a `pasa`; «crear la variable del total» convierte la lista en burocracia.
+- En JSON y no en Markdown, porque se lee con un programa (`init.sh`, `jq`, una extensión) y porque, según el artículo de Anthropic, el modelo tiende menos a reescribir un JSON; por eso pedían a las sesiones tocar solo el campo de estado.
+- Límite: según Learn Harness Engineering, el cambio a `pasa` lo decide el harness, no el agente. En esta demo lo hace el propio agente porque AGENTS.md se lo pide: es una instrucción, no una puerta. El vídeo 24 lo convierte en comprobación.
 
 ### 5 · Progreso, init.sh y traspaso
 
 <p><button type="button" class="ir-a" data-t="545">▶ Ir a 9:05</button></p>
 
-- **La palabra clave:** Verificado — Lo que comprobó, no lo que cree. Y que el registro no crezca sin fin.
-- **La regla de la plantilla:** Si la base falla, primero eso — El mismo script para ti, para el agente de mañana y para la integración continua.
-- **Lección 5:** Se pierde el porqué — La compactación conserva el qué. El traspaso es el sitio del porqué.
+- `progreso.md` tiene arriba el estado verificado (dónde está el repo, cómo se arranca y se verifica, la siguiente funcionalidad, bloqueos) y debajo un registro por sesión (objetivo, completado, verificación, evidencia, commits, riesgos, siguiente paso). Verificado significa lo que comprobó, no lo que cree. Y resume las sesiones viejas: cada línea cuesta contexto.
+- `init.sh` es el arranque estándar. El de la tienda no instala nada (un `npm install` podría dejar un fichero de bloqueo nuevo sin seguimiento): enseña la carpeta y la versión de node, lo que queda sin commitear, ejecuta `npm test` y dice cuál es la funcionalidad activa o la siguiente. Regla: si la base ya falla al empezar, primero arregla eso. Lo usan tú, el agente y la integración continua.
+- `traspaso.md`, solo si algo queda a medias, tiene cinco apartados:
+  1. lo que está verificado ahora;
+  2. lo que cambió en esta sesión;
+  3. lo que está roto o sin verificar;
+  4. el siguiente paso, con qué cuenta como terminado y qué no hay que tocar;
+  5. los comandos para arrancar y verificar.
+- `/handoff` de oh my pi guarda el traspaso como compactación en la sesión (o entre los artefactos, con `handoffSaveToDisk`), y la extensión `handoff.ts` de Pi lo convierte en el prompt de una sesión nueva. Útiles, pero ninguno se versiona con el código.
+- Lección 5: la compactación conserva el qué y pierde el porqué. El traspaso, escrito por la sesión que tomó las decisiones, es el sitio del porqué. Lo que tenga que durar más que una tarea, a un registro de decisiones.
 
 ### 6 · Montar el andamiaje en la tienda
 
 <p><button type="button" class="ir-a" data-t="720">▶ Ir a 12:00</button></p>
 
-- *En la demo:* AGENTS.md · crédito y entrada
-- *En la demo:* AGENTS.md · al terminar
-- *En la demo:* AGENTS.md · reglas nuevas
-- *En la demo:* funcionalidades.json
-- *En la demo:* progreso.md e init.sh
-- *En la demo:* Commit y primer ./init.sh
-- *En la demo:* andamiaje · la misma prueba
-- **Ya no lo deduce:** Lo lee — Un repositorio documentado frente a un sistema de registro.
+- Controla variables antes de probar: ningún fichero de contexto fuera del repo, memoria de oh my pi apagada, sin retomar sesiones y ninguna carpeta `.omp` en la tienda (un `.omp/AGENTS.md` taparía el de la raíz).
+- AGENTS.md (el del vídeo 6, con una línea de crédito a WalkingLab) gana dos rutinas:
+  - **Al empezar:** confirmar la carpeta; leer el progreso y el traspaso si tiene algo; leer la lista y elegir la funcionalidad en curso o la siguiente; mirar los últimos commits; ejecutar `./init.sh`.
+  - **Al terminar:** actualizar la lista y el progreso; escribir el traspaso si queda algo a medias o vaciarlo si no; hacer commit solo si las pruebas pasan. Es la rutina más fácil de olvidar: si no está escrita, no ocurre.
+- Y tres reglas: solo una funcionalidad en curso; `pasa` solo con la verificación ejecutada y la evidencia anotada; y no cambiar la verificación de una funcionalidad para que pase.
+- `funcionalidades.json` tiene tres entradas para un fichero nuevo, `ticket.js` (formatear euros, línea de ticket y ticket completo), todas sin empezar, con su verificación y las evidencias vacías.
+- *En la demo:* con el andamiaje, la quinta pregunta ya no se deduce del historial: se lee. Esa es la diferencia entre un repositorio documentado y un sistema de registro.
 
 ### 7 · Sesión uno, en Pi
 
 <p><button type="button" class="ir-a" data-t="872">▶ Ir a 14:32</button></p>
 
-- *En la demo:* Pi en la rama andamiaje
-- *En la demo:* El encargo más vago posible
-- *En la demo:* La rutina de entrada, tal cual
-- *En la demo:* ticket-001 · pasa con evidencias
-- *En la demo:* Commit e init.sh para la siguiente
-- **Segundo encargo:** «Empieza la siguiente…» — «…De momento escribe solo la función, sin las pruebas.»
-- **Un tercer mensaje preparado:** No hizo falta — «Haz la rutina de salida» se quedó sin enviar.
-- *En la demo:* La rutina de salida, sin pedirla
-- *En la demo:* Fuera de Pi
-- **La sesión de Pi:** La conversación no existe — Podríamos retomarla. No lo vamos a hacer.
+- Con el encargo más vago posible («trabaja en la siguiente funcionalidad»), Pi sigue la rutina de entrada tal cual y elige `ticket-001` sin que se lo digas: el qué, el dónde y el cómo se prueba salen del repo.
+- Escribe el código y las pruebas, cambia el estado a `pasa` con dos evidencias (comando y resultado), actualiza el progreso, hace commit y vuelve a ejecutar `init.sh`, que ya señala `ticket-002`. Todo en menos de un minuto. No la marcó antes `en curso`: la regla se cumple, pero el estado intermedio no llegó a verse.
+- Para dejar algo a medias, el segundo encargo pide «escribe solo la función, sin las pruebas». La rutina de salida la hace sin pedírsela, porque está en AGENTS.md: deja `ticket-002` `en curso`, escribe en el traspaso qué falta (pruebas con una y con varias unidades, y el redondeo) y hace commit solo tras comprobar que las pruebas existentes pasan.
+- La sesión de Pi existe y se podría retomar. No la retomamos: a partir de aquí, la conversación no existe.
 
 ### 8 · Sesión dos, en oh my pi
 
 <p><button type="button" class="ir-a" data-t="1035">▶ Ir a 17:15</button></p>
 
-- *En la demo:* oh my pi · sesión nueva
-- **El encargo:** «Continúa.» — Lo único compartido con la sesión anterior es el repositorio.
-- **La prueba:** Si tienes que explicarle más, el andamiaje no funciona — Lo que no esté escrito, el agente lo adivina en cada sesión.
-- *En la demo:* «Continúa.» · la misma rutina
-- **Learn Harness Engineering:** Coste de reconstrucción — Lo que tarda una sesión nueva en volver a ser productiva.
-- *En la demo:* ticket-002 · terminada por otro agente
-- **oh my pi · DeepSeek V4 Pro:** 15 turnos · 0,7 céntimos — Pi, en la sesión uno: 22 turnos y 1,5 céntimos, dos funcionalidades.
-- *En la demo:* Desde fuera, sin agente
+- Sesión nueva de oh my pi, con otro modelo (DeepSeek V4 Pro), memoria apagada y una sola palabra: «Continúa.». Si tuvieras que explicarle más, el andamiaje no funciona: lo que no está escrito, el agente lo adivina en cada sesión.
+- oh my pi carga solo el AGENTS.md de la raíz, sigue la misma rutina de entrada y su plan es justo el del traspaso: añadir las pruebas, ejecutarlas, marcar `pasa` con evidencia, actualizar progreso y traspaso, y commit. No rehace `ticket-001`.
+- Coste de reconstrucción (Learn Harness Engineering): lo que tarda una sesión nueva en volver a ser productiva. Aquí, cuatro turnos y unos 48 000 tokens antes de la primera edición, unas tres décimas de céntimo, incluido un comando de bash que falló y repitió. Sin andamiaje, esos cuatro turnos serían una conversación contigo.
+- La sesión entera: 15 turnos y 0,7 céntimos. La de Pi fueron 22 turnos y 1,5 céntimos por dos funcionalidades; no son comparables, porque cambian el modelo y la cantidad de trabajo.
+- Desde fuera y sin agente: dos sesiones de dos agentes en un mismo `git log`, dos funcionalidades en `pasa` con dos evidencias cada una, ninguna en `pasa` sin evidencias, el traspaso vacío e `init.sh` en verde señalando `ticket-003`.
+- Hay dos registros. El JSONL de la sesión dice qué vio e hizo la conversación (por eso en el vídeo 9 guardamos el estado de las extensiones en la rama de la sesión). El repositorio dice qué es verdad del proyecto. Rebobinar la conversación no rebobina tus ficheros (vídeo 3): eso lo arbitra git.
 
 ### 9 · Límites, repaso y cierre
 
 <p><button type="button" class="ir-a" data-t="1224">▶ Ir a 20:24</button></p>
 
-- **Límite 1:** Son instrucciones — Un corte brusco no deja rutina de salida: la siguiente sesión reconstruye sin traspaso.
-- **Dos límites más**
-  - `2` · Un fichero desfasado: peor que ninguno
-  - `si discrepan` · Ganan las pruebas
-  - `3` · Dos agentes a la vez: un progreso por agente, o worktrees
-- **Repaso:** «Continúa.» — Otro agente y otro modelo retoman el trabajo sin conversación.
-- **Vídeo 24:** Verificar de verdad — Que terminado no dependa de que el agente diga que ha terminado.
+- Tres límites:
+  - **Límite 1 · Son instrucciones.** Si la sesión se corta de golpe (escape, contexto agotado), no hay rutina de salida. La siguiente lo detecta con `git status` e `init.sh`, pero reconstruye sin traspaso.
+  - **Límite 2 · Un fichero desfasado es peor que ninguno.** Manda al agente en la dirección equivocada mientras cree que va bien. Si el progreso y las pruebas discrepan, ganan las pruebas.
+  - **Límite 3 · Dos agentes a la vez se pisan el progreso.** Un fichero de progreso por agente, o ramas y worktrees (vídeos 16 y 18).
+- La memoria del vídeo 13 no sustituye esto: es contexto heurístico fuera del repo, que Pi no ve y quien clona no recibe. Úsala para tus preferencias; el estado del proyecto, en el repo.
+- **Práctica:** en un proyecto tuyo, monta el paquete mínimo a partir de las plantillas de Learn Harness Engineering, citando su licencia. Divide una tarea en tres funcionalidades de una sesión cada una, trabaja la primera, deja la segunda a medias y continúa en una sesión nueva, mejor con el otro agente. Anota el coste de reconstrucción y qué tuviste que explicar a mano: eso es lo que le falta a tu andamiaje.
+- **Materiales:** la rama `andamiaje` de la tienda: [`init.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/tienda/andamiaje/init.sh), [`funcionalidades.json`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/tienda/andamiaje/funcionalidades.json) y [`progreso.md`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/tienda/andamiaje/progreso.md), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
+- **Vídeo 24:** verificar de verdad, para que «terminado» no dependa de que el agente diga que ha terminado.
 
 ## Código y comandos
 
@@ -124,33 +131,19 @@ init.sh                → init.sh
 session-handoff.md     → traspaso.md
 ```
 
-- `funcionalidades.json`: Lista con estados
-- `progreso.md`: Estado verificado y registro
-- `init.sh`: Arranque estándar
-- `traspaso.md`: Lo que queda a medias
+- `funcionalidades.json`: la lista de funcionalidades, cada una con comportamiento, verificación, estado y evidencias.
+- `progreso.md`: el estado verificado arriba y el registro por sesión debajo. `claude-progress.md` es un nombre histórico: vale para cualquier agente.
+- `init.sh`: el arranque estándar; dice si la base funciona y cuál es la siguiente funcionalidad.
+- `traspaso.md`: lo que queda a medias, en cinco apartados; vacío si no queda nada.
 
 ## Fuentes
 
-- Anthropic, *Effective harnesses for long-running agents* (Justin Young, 26 nov 2025),
-  https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents: agente inicializador que deja una
-  lista de más de 200 funcionalidades marcadas como fallando, `init.sh`, un fichero de progreso y un commit inicial;
-  lista en JSON porque el modelo tiende menos a reescribirla que un Markdown; las sesiones solo cambian el campo de
-  estado. (Leído a través de un resumen web: ver «Pendiente».)
-- Pi 1.0.4 instalado (`$(npm root -g)/@earendil-works/pi-coding-agent/`): `CHANGELOG.md` 1.0.2–1.0.4 (nada que afecte a
-  sesiones ni a ficheros de contexto); `examples/extensions/handoff.ts` (crea una sesión nueva con un prompt generado
-  que queda como borrador en el editor), `todo.ts` (estado en `details` de la sesión, para que ramificar sea correcto),
-  `auto-commit-on-exit.ts` y `dirty-repo-guard.ts` (solo se nombran).
-- oh my pi 18.6.1 (`omp read omp://…`): `context-files.md` (proveedor `agents-md`: `AGENTS.md` suelto, buscando hacia
-  la raíz del repo, prioridad 10; el nativo `.omp/AGENTS.md`, prioridad 100, lo tapa a la misma profundidad; proveedor
-  `agents` con `~/.agent(s)/AGENTS.md` de usuario activo por defecto), `handoff-generation-pipeline.md` (traspaso como
-  entrada de compactación en la misma sesión; `handoff-*.md` en los artefactos solo con `handoffSaveToDisk` y en los
-  automáticos).
-- Guiones: 03 (terminado: el árbol mueve la conversación, no los ficheros; «las decisiones de verdad tienen que vivir en
-  ficheros»; el resumen de compactación puede contar otra historia), 06 (terminado: prueba de la sesión nueva,
-  `AGENTS.md` de la tienda, rutina de salida prometida para el bloque D), 09 (estado de extensión en la rama), 12
-  (sesiones JSONL en la carpeta del perfil, `-c`, `/resume`, `autoResume` apagado), 13 (`/handoff` en el sitio;
-  memoria como contexto heurístico), 15 (save and quit deja el plan en un fichero del repo; `/todo` vive en la sesión),
-  16 y 18 (worktrees), 19 (hooks), 22 (el mapa de cinco subsistemas del repositorio; anuncia este vídeo).
+- Learn Harness Engineering (WalkingLab, © 2025, licencia MIT): lecciones 3 (lo que no está en el repo no existe), 5 (la compactación pierde el porqué) y 6 (inicializar es una fase propia), y su biblioteca de plantillas (`AGENTS.md`, `feature_list.json`, `claude-progress.md`, `init.sh`, `session-handoff.md`).
+- Anthropic, *Effective harnesses for long-running agents* (Justin Young, 26 nov 2025), https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents: el agente inicializador, la lista de funcionalidades en JSON y la rutina de cada sesión.
+- The Harness Playbook (Can Bölük): el journal de la sesión como única autoridad de la sesión.
+- Grabado con Pi 1.0.4: ejemplos de extensiones `handoff.ts`, `todo.ts`, `auto-commit-on-exit.ts` y `dirty-repo-guard.ts`.
+- Grabado con oh my pi 18.6.1: `context-files.md` (cómo busca el `AGENTS.md` y por qué `.omp/AGENTS.md` lo tapa) y `handoff-generation-pipeline.md` (`/handoff` y `handoffSaveToDisk`).
+- Vídeos relacionados: 3 (compactación y árbol), 6 (AGENTS.md y la prueba de la sesión nueva), 9 (estado de las extensiones), 12 (sesiones de oh my pi), 13 (`/handoff` y memoria), 22 (el mapa del repositorio) y 24 (verificar de verdad).
 
 ## Transcripción
 

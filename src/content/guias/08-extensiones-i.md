@@ -18,97 +18,93 @@ La API de extensiones (comandos, herramientas propias y eventos). Construimos en
 
 <p><button type="button" class="ir-a" data-t="20">▶ Ir a 0:20</button></p>
 
-- *En terminal:* Una extensión (más abajo, en «Código y comandos»)
-- **Cuidado:** Código con tus permisos — Puede leer prompts, ficheros, credenciales e historial, y ejecutar lo que quiera.
-- **Tres extensiones:** hola.ts (un comando) → tests.ts (una herramienta) → permisos.ts (un modo de aprobación)
+- **Petición frente a código:** pedirle al modelo que pregunte antes de borrar es una petición; hacer que Pi no ejecute nada sin tu permiso es código. Para eso están las extensiones.
+- **Qué es:** un módulo de TypeScript que corre dentro del proceso de Pi. Exporta por defecto una función, la factoría, que recibe el objeto `pi` con la API: registrar comandos, herramientas, atajos, opciones de CLI, proveedores o servidores MCP, y escuchar eventos.
+- **Sin compilar:** Pi carga el `.ts` con jiti (un cargador que ejecuta TypeScript sin compilarlo). `pi -e fichero.ts` la carga solo en esa ejecución; en `~/.pi/agent/extensions/`, siempre; en `.pi/extensions/`, para el proyecto, y solo con confianza.
+- **Cuidado:** una extensión corre con tus permisos. Puede leer prompts, ficheros, credenciales e historial, y ejecutar lo que quiera. Instala solo las que entiendas.
+- **El plan del vídeo:** `hola.ts` (un comando), `tests.ts` (una herramienta) y `permisos.ts` (un modo de aprobación, que Pi no trae a propósito).
 
 ### 2 · Un comando en diez líneas
 
 <p><button type="button" class="ir-a" data-t="140">▶ Ir a 2:20</button></p>
 
-- *En la demo:* hola.ts
-- *En la demo:* ctx: la puerta a Pi
-- *En la demo:* pi -e ~/csn/extensiones/hola.ts
-- *En la demo:* /ho → hola
-- *En la demo:* /hola Ana
+- **`registerCommand`** recibe el nombre, una descripción y un handler. El handler recibe el texto escrito tras el comando y `ctx`, la puerta a lo que rodea a la extensión: directorio de trabajo, modelo activo, sesión e interfaz.
+- *En la demo:* `hola.ts` llama a `ctx.ui.notify` con el saludo; cargada con `pi -e`, `/hola` aparece en el selector junto a los de serie, y `/hola Ana` muestra «hola, Ana».
+- **Más piezas de interfaz:** `select`, `confirm`, `input`, `editor` y `setStatus` (un texto fijo en el pie). Son asíncronas: tu código espera la respuesta.
+- **Los comandos los ejecutas tú;** el modelo no puede llamarlos. Si quieres darle algo al modelo, necesitas una herramienta.
 
 ### 3 · Herramientas propias con TypeBox
 
 <p><button type="button" class="ir-a" data-t="244">▶ Ir a 4:04</button></p>
 
-- *En la demo:* tests.ts: definición
-- *En la demo:* Type.Optional(Type.String(…))
-- *En la demo:* execute()
-- *En la demo:* content y details
-- *En la demo:* throw = fallo
-- *En la demo:* ¿Pasan los tests del carrito?
-- **Lo mismo que con MCP**
-  - `exposure` · Exposición: codemode, deferred, hidden…
-  - `annotations` · Anotaciones: solo lectura o destructiva
+- **Por qué una herramienta y no bash:** hace siempre lo mismo, devuelve solo lo que importa y se puede tratar distinto al pedir permisos.
+- **La definición:** nombre, etiqueta, descripción (es para el modelo: decide cuándo usarla) y parámetros con TypeBox, una librería que escribe esquemas JSON con sintaxis de TypeScript. Del mismo esquema salen el JSON schema que viaja al modelo y el tipo de los parámetros en tu código; Pi valida los argumentos antes de llamar a `execute()`.
+- **`content` frente a `details`:** `content` es lo que ve el modelo (aquí, una línea con el recuento); `details` es para ti, datos estructurados que se guardan en la sesión y sirven para dibujar la herramienta o reconstruir el estado (vídeo 09).
+- **Fallar de verdad:** para decir que la herramienta ha fallado, lanza un error desde `execute()`. Devolver un objeto, aunque diga «error», cuenta como éxito. *En la demo:* «¿pasan los tests del carrito?» → el modelo elige la herramienta, y al contexto solo entra «12 pasan, 0 fallan».
+- **Como con MCP:** las herramientas propias admiten exposición (codemode, deferred, hidden…) y anotaciones de solo lectura o destructiva (vídeo 07).
 
 ### 4 · Eventos: engancharse al ciclo de Pi
 
 <p><button type="button" class="ir-a" data-t="400">▶ Ir a 6:40</button></p>
 
-- *En terminal:* tool_call: tres respuestas posibles (más abajo, en «Código y comandos»)
-- **Fallo seguro:** Si tu handler falla, la herramienta no se ejecuta — Un error en tool_call bloquea la llamada.
+- **El ciclo de una petición** (`pi.on(evento, handler)`, entre decenas de eventos):
+
+```text
+session_start → input → before_agent_start
+  → turn_start → tool_call → tool_result → turn_end   (se repite en cada vuelta)
+→ agent_end → … → session_shutdown
+```
+
+- **Tres tipos de evento:** unos solo avisan (lo que devuelves se ignora), otros transforman (tu valor sustituye al original) y otros pueden cancelar. Cada evento declara su tipo de resultado, y TypeScript te lo dice mientras escribes.
+- **`tool_call`** llega antes de ejecutar una herramienta, con su nombre y sus argumentos. Puedes dejarla pasar, modificar los argumentos o devolver `{ block: true, reason }`; el modelo recibe el motivo como resultado.
+- **Fallo seguro:** si tu handler de `tool_call` lanza un error, Pi bloquea la herramienta. Un fallo en tu control de permisos no deja pasar la acción.
 
 ### 5 · Reglas de convivencia
 
 <p><button type="button" class="ir-a" data-t="522">▶ Ir a 8:42</button></p>
 
-- **Antes de construir más:** Cinco reglas — Una extensión vive dentro de Pi y comparte su ciclo de vida.
-- **1 · La factoría solo registra:** factoría (solo registra) → session_start (arranca lo que dure la sesión) → session_shutdown (ciérralo; que aguante dos veces)
-- **5 · Los modos**
-  - `ctx.mode` · Qué modo: interactivo, print, JSON, RPC
-  - `ctx.hasUI` · ¿Hay alguien?: para contestar un diálogo
+- **1 · La factoría solo registra.** Nada de procesos, sockets ni temporizadores ahí: a veces se carga sin abrir sesión. Arráncalo en `session_start` (o en el comando o la herramienta) y ciérralo en `session_shutdown`, con un cierre que aguante ejecutarse dos veces.
+- **2 · El ctx de un comando no es el de un evento.** Solo el de un comando puede esperar al agente, recargar, navegar por el árbol o cambiar de sesión; desde un evento, Pi se esperaría a sí mismo. Si una herramienta necesita recargar, encola un mensaje con el comando (ejemplo `reload-runtime`).
+- **3 · Los handlers pueden correr en paralelo.** Tres lecturas en un mensaje son tres `tool_call` a la vez. Si guardas estado en memoria, marca la herramienta para que se ejecute en secuencia; para editar ficheros, Pi ofrece una cola.
+- **4 · Errores y salidas largas.** Si un handler falla, Pi avisa y sigue, salvo en `tool_call` (bloquea) y en `execute()` (resultado de error). Si tu herramienta puede devolver mucho texto, recórtalo y di dónde está el resto.
+- **5 · Los modos.** Las extensiones se cargan igual en interactivo que en un script. `ctx.mode` vale `"tui"`, `"print"`, `"json"` o `"rpc"`, y `ctx.hasUI` dice si hay alguien para contestar un diálogo. La lógica no debería depender de la interfaz.
+
+> **En otros agentes:** esto se parece más a un plugin de editor que a los hooks de Claude Code. Un hook es un proceso externo que el agente llama y del que lee la salida; una extensión de Pi es código dentro del proceso, con acceso directo a su estado y su interfaz. Más potente y más delicado.
 
 ### 6 · El modo aprobación
 
 <p><button type="button" class="ir-a" data-t="709">▶ Ir a 11:49</button></p>
 
-- *En la demo:* permisos.ts: las listas
-- *En la demo:* bashSeguro()
-- *En la demo:* El handler de tool_call
-- *En la demo:* Sin interfaz: bloquear
-- *En la demo:* Preguntar
-- *En terminal:* Cargar las dos extensiones (más abajo, en «Código y comandos»)
-- **La petición:** «Añade al README una sección "Tests"…» — …que diga que se ejecutan con npm test, y comprueba que siguen pasando.
-- *En la demo:* Lecturas: sin preguntar
-- *En la demo:* Pi quiere ejecutar: edit README.md
-- *En la demo:* Permitir
-- *En la demo:* «Haz commit de ese cambio.»
-- *En la demo:* Bloquear
-- **Permitir siempre**
-  - `=` · La acción exacta: misma edición o mismo comando
-  - `/new` · Empieza vacío: una sesión nueva lo olvida
+- **Dos listas:** herramientas de solo lectura que pasan sin preguntar (`read`, `grep`, `find`, `ls` y la de tests) y comandos de bash que no cambian nada (`cd`, `ls`, `cat`, `git status`, `git log`, `git diff`, los tests).
+- **Mirar el principio no basta:** `ls && rm -rf` empieza por `ls`, y un `cat` con redirección sobrescribe. `bashSeguro()` corta el comando por `&&`, `;` y `|`, exige que todos los trozos sean seguros, y cualquier redirección o sustitución de comandos va a la pregunta. Ojo: un comando de tests como `npm test` ejecuta lo que defina el `package.json` del repo; en un repositorio ajeno no es «seguro».
+- **El handler:** si es lectura, bash seguro o algo ya permitido, pasa. Si no hay interfaz, bloquea. Si la hay, pregunta con `ctx.ui.select`: Permitir, Permitir siempre en esta sesión o Bloquear, y los contadores en el pie con `setStatus`.
+- *En la demo:* al pedir una sección «Tests» en el README, las lecturas y los tests pasan sin diálogo; la edición del README pide aprobación con el diff encima; el commit lo bloqueamos, el modelo recibe el motivo y no insiste. Un modo que pregunta por todo acaba con la persona aprobando sin leer.
+- **Permitir siempre** guarda la acción exacta (la misma edición o el mismo comando). Vive en memoria: una sesión nueva con `/new` carga la extensión de cero y la lista empieza vacía.
 
 ### 7 · Barra reload y rutas protegidas
 
 <p><button type="button" class="ir-a" data-t="951">▶ Ir a 15:51</button></p>
 
-- **Ni siquiera preguntando:** AGENTS.md y .git/ — Rutas que el modelo nunca debería tocar.
-- *En la demo:* git diff permisos.ts
-- *En la demo:* /reload
-- *En la demo:* «Añade a AGENTS.md una regla…»
-- *En la demo:* Intenta chmod u+w
-- *En la demo:* Bloquear
+- **Rutas protegidas:** `AGENTS.md` y `.git/` no se tocan ni preguntando. Una regla al principio del handler: si es `write` o `edit` sobre una de esas rutas, aviso y `block: true`, sin diálogo.
+- **`/reload`** vuelve a cargar extensiones, skills, prompts, temas y ficheros de contexto, también las cargadas con `-e`. No actualiza en caliente: tira el entorno de extensiones y lo crea de nuevo, así que contadores y permisos vuelven a cero. El ciclo de desarrollo es editar, `/reload` y probar.
+- *En la demo:* bloqueada la edición de `AGENTS.md`, el modelo intenta cambiar los permisos del fichero con `chmod u+w`. Como no está en la lista segura, la extensión pregunta y lo bloqueamos; solo entonces el modelo se detiene y propone el texto para que lo añadas tú. El modelo busca otro camino cuando le cierras uno.
 
 ### 8 · Sin interfaz, y lo que no es
 
 <p><button type="button" class="ir-a" data-t="1081">▶ Ir a 18:01</button></p>
 
-- *En la demo:* pi -p "Haz commit del cambio del README."
-- **Variantes**
-  - `timeout` · Diálogo con tiempo: sin respuesta → bloquear
-  - `annotations` · Como Codex: preguntar si no es solo lectura
-  - `examples/` · Ejemplos instalados: permission-gate, protected-paths…
+- **Sin interfaz se bloquea:** en print y JSON no hay diálogos, así que la extensión mira `ctx.hasUI` antes de preguntar; en RPC sí puede haberlos (vídeo 10). *En la demo:* `pi -p "Haz commit del cambio del README."` deja pasar `git status`, bloquea `git add` y `git commit`, y el modelo te da los dos comandos para hacerlo a mano. En un script o en CI, lo que no está en la lista segura no se ejecuta.
+- **Variantes:** diálogos con `timeout` (sin respuesta, se bloquea); decidir por anotaciones, como Codex (preguntar por todo lo que no sea de solo lectura, incluidas las herramientas MCP destructivas); y los ejemplos instalados `permission-gate`, `protected-paths`, `confirm-destructive` y `status-line`.
+- **Aprobar no es aislar:** la extensión reconoce comandos con expresiones regulares, y un modelo con prisa o un texto malicioso puede encontrar un camino que no previste. Te protege de errores y te da control; contra un ataque, limita lo que Pi alcanza con un contenedor o una máquina aparte (vídeo 05). Lo ideal, las dos cosas.
 
 ### 9 · Cierre
 
 <p><button type="button" class="ir-a" data-t="1213">▶ Ir a 20:13</button></p>
 
-- **Próximo vídeo:** Extensiones II y paquetes — Estado que sobrevive a rebobinar, el fallo típico, y empaquetar, instalar y publicar.
+- **Repaso:** una extensión es un módulo de TypeScript con una factoría que recibe la API de Pi. `registerCommand` añade comandos que ejecutas tú; `registerTool`, herramientas que llama el modelo, con parámetros TypeBox y `content` para el modelo y `details` para ti. `pi.on` te engancha a los eventos, y `tool_call` puede bloquear cualquier herramienta. `/reload` lo recarga todo mientras trabajas.
+- **Práctica:** escribe tu `permisos.ts` con la lista de comandos seguros de tu proyecto y úsalo una tarde; apunta qué pregunta de más y de menos y ajústalo con `/reload`. Después, una herramienta propia para tests, linter o despliegue.
+- **Materiales:** [`extensiones/hola.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/hola.ts), [`extensiones/tests.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/tests.ts) y [`extensiones/permisos.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/permisos.ts), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
+- **Próximo vídeo:** Extensiones II y paquetes: estado que sobrevive a rebobinar, el fallo típico y cómo empaquetar, instalar y publicar.
 
 ## Código y comandos
 
@@ -125,9 +121,8 @@ export default function (pi: ExtensionAPI) {
 }
 ```
 
-- `export default function`: La factoría
-- `registerCommand`: Registrar
-- `pi.on`: Eventos
+- `export default function`: la factoría. Solo registra; lo que dure la sesión se arranca en `session_start`.
+- Los paquetes de Pi y TypeBox se importan sin instalarlos: Pi los resuelve. Para otras dependencias de npm, un `package.json` junto a la extensión o un paquete de Pi (vídeo 09).
 
 ### tool_call: tres respuestas posibles
 
@@ -139,31 +134,28 @@ pi.on("tool_call", async (event, ctx) => {
 });
 ```
 
-- `return;`: Pasa
-- `event.input`: Modifica
-- `block: true`: Bloquea
+- Con `block: true` la herramienta no se ejecuta y el modelo recibe `reason` como resultado.
+- Si el handler lanza un error, también se bloquea.
 
 ### Cargar las dos extensiones
 
 ```text
-cp ~/csn/extensiones/permisos.ts $PI_CODING_AGENT_DIR/extensions/
-pi -e ~/csn/extensiones/tests.ts
+cp permisos.ts ~/.pi/agent/extensions/
+pi -e tests.ts
 
 [Extensions]
   permisos.ts, tests.ts
 ```
 
-- `$PI_CODING_AGENT_DIR/extensions/`: Siempre
-- `pi -e`: Esta ejecución
-- `permisos.ts, tests.ts`: Las dos
+- En `~/.pi/agent/extensions/`, la extensión se carga en todas las sesiones; con `pi -e`, solo en esa ejecución.
+- Al arrancar, la cabecera lista las extensiones cargadas.
 
 ## Fuentes
 
-- Documentación instalada de Pi 1.0.1: `docs/extensions.md`, `docs/configuration.md`, `docs/slash-commands.md`.
-- Tipos: `dist/core/extensions/types.d.ts` (41 eventos, `ToolCallEventResult`, `ExtensionUIContext`).
-- Ejemplos instalados: `examples/extensions/hello.ts`, `permission-gate.ts`, `protected-paths.ts`, `status-line.ts`,
-  `reload-runtime.ts`, `timed-confirm.ts`.
-- Documentación oficial de Pi: [configuration.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md), [extensions.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/extensions.md), [slash-commands.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/slash-commands.md)
+- Documentación oficial de Pi: [extensions.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/extensions.md), [configuration.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md) y [slash-commands.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/slash-commands.md). Grabado con Pi 1.0.1.
+- Para profundizar en la API: los tipos de `ToolCallEventResult` y `ExtensionUIContext`, en `dist/core/extensions/types.d.ts` del paquete instalado.
+- Ejemplos que se instalan con Pi, en `examples/extensions/`: `hello.ts`, `permission-gate.ts`, `protected-paths.ts`, `status-line.ts`, `reload-runtime.ts` y `timed-confirm.ts`.
+- Relacionados en el curso: vídeo 05 (aislamiento), 07 (exposición y anotaciones), 09 (estado y paquetes), 10 (RPC) y 19 (aprobaciones en oh my pi).
 
 ## Transcripción
 

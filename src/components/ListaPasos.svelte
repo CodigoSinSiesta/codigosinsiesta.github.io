@@ -54,7 +54,7 @@
         title={done ? 'Marcar como pendiente' : 'Marcar como completado'}
         onclick={() => toggle(paso.key)}
       >
-        {done ? '✓' : String(i + 1).padStart(2, '0')}
+        {done ? '✓' : String(paso.numero ?? i + 1).padStart(2, '0')}
       </button>
       <div class="cuerpo">
         <span class="badge">{BADGE[paso.tipo]}</span>

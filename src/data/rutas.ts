@@ -168,9 +168,9 @@ export const RUTAS: Ruta[] = [
     titulo: 'Pi y oh my pi',
     claim: 'Aprende un agente por dentro y sabrás usar cualquiera',
     descripcion:
-      'Un curso en vídeo para dejar de usar tu agente de programación como una caja negra. Empezamos por Pi, el más pequeño y transparente, vemos qué añade un agente completo como oh my pi y terminamos diseñando tu propio harness. Lo que aprendes sirve igual en Claude Code, Codex u opencode. En publicación: 25 de 26 vídeos.',
+      'Un curso en vídeo para dejar de usar tu agente de programación como una caja negra. Empezamos por Pi, el más pequeño y transparente, vemos qué añade un agente completo como oh my pi y terminamos diseñando tu propio harness. Lo que aprendes sirve igual en Claude Code, Codex u opencode. Son 26 vídeos, con sus guías y sus materiales.',
     nivel: 'intermedio',
-    duracion: '~10 horas hasta ahora',
+    duracion: '~10 horas',
     paraQuien:
       'Developers que ya usan Claude Code, Codex, opencode u otro agente y quieren entender qué recibe el modelo, qué puede hacer y cómo gobernarlo, en lugar de depender de lo que cada herramienta decide por ti.',
     porQue: {
@@ -199,9 +199,11 @@ export const RUTAS: Ruta[] = [
       { concepto: 'Instrucciones del proyecto', aqui: 'AGENTS.md', otros: 'Codex y opencode leen AGENTS.md; Claude Code usa CLAUDE.md' },
       { concepto: 'Herramientas externas', aqui: 'Servidores MCP y codemode', otros: 'Claude Code, Codex y opencode también conectan servidores MCP' },
       { concepto: 'Sesiones y contexto', aqui: 'La sesión como árbol, compactación, /tree y /fork', otros: 'Todos guardan y retoman sesiones, y compactan el contexto cuando se llena' },
-      { concepto: 'Modo sin interfaz', aqui: 'pi -p', otros: 'claude -p, codex exec, opencode run' },
-      { concepto: 'Permisos y aislamiento', aqui: 'Sin aprobaciones ni sandbox: los pones tú', otros: 'Cada agente trae los suyos: permisos, modos de aprobación o sandbox' },
+      { concepto: 'Modo sin interfaz', aqui: 'pi -p y omp -p (con salida JSON)', otros: 'claude -p, codex exec, opencode run' },
+      { concepto: 'Permisos y aislamiento', aqui: 'Pi: ni aprobaciones ni sandbox, los pones tú. oh my pi: modos de aprobación, pero arranca en yolo', otros: 'Cada agente trae los suyos: permisos, modos de aprobación o sandbox' },
       { concepto: 'Extender y automatizar', aqui: 'Extensiones, skills y paquetes', otros: 'Hooks, plugins, skills o comandos propios, según el agente' },
+      { concepto: 'Modelos por tarea', aqui: 'oh my pi: roles (barato o potente) y niveles de razonamiento', otros: 'Varios agentes dejan elegir modelo por subagente o por tarea' },
+      { concepto: 'Planificar antes de ejecutar', aqui: 'oh my pi: modo plan y objetivos con presupuesto', otros: 'Claude Code tiene modo plan; en cualquier agente, un plan escrito en el repo' },
       { concepto: 'Subagentes y paralelo', aqui: 'oh my pi: tareas, Hub y segundo plano', otros: 'Varios agentes ofrecen subagentes o tareas en paralelo' },
     ],
     equivalenciasNota:
@@ -227,7 +229,6 @@ export const RUTAS: Ruta[] = [
     noIncluye: [
       'Un manual de Claude Code, Codex u opencode: usamos Pi para entender los conceptos y te señalamos dónde reaparecen',
       'Entrenar o ajustar modelos',
-      'El vídeo 26 (en producción): el proyecto final',
     ],
     pasos: [],
   },

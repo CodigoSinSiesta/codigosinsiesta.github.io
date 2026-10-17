@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 15 · Planificar y dirigir"
-description: "Planes revisables, objetivos con presupuesto, bucles con condición de parada y colas de tareas. Cuándo usar cada modo y por qué no se combinan."
+description: "Planes revisables, objetivos con presupuesto, bucles con condición de parada, la cola de mensajes y la lista de tareas. Cuándo usar cada modo y por qué no se combinan."
 ruta: "pi-oh-my-pi"
 orden: 15
 duracion: "23 min"
@@ -8,7 +8,7 @@ video: "15-planificar-y-dirigir.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/15-planificar-y-dirigir.es.vtt"
 ---
 
-Planes revisables, objetivos con presupuesto, bucles con condición de parada y colas de tareas. Cuándo usar cada modo y por qué no se combinan.
+Planes revisables, objetivos con presupuesto, bucles con condición de parada, la cola de mensajes y la lista de tareas. Cuándo usar cada modo y por qué no se combinan.
 
 <p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,103 +18,108 @@ Planes revisables, objetivos con presupuesto, bucles con condición de parada y 
 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
-- **Pero la forma de trabajar era la misma:** Tú escribes → El agente trabaja (hasta que cree que ha terminado) → Te devuelve el control
-- **Hoy decidimos**
-  - `aprobar` · Quién aprueba
-  - `parar` · Cuándo para
-  - `gastar` · Cuánto gasta
-- **La regla:** Plan, goal y vibe no se combinan — Se encadenan: primero un plan, después un objetivo que lo ejecuta.
-- *En la demo:* /pl
-- *En la demo:* /go
+- Hasta ahora, la forma de trabajar era siempre la misma: tú escribes, el agente trabaja hasta que cree que ha terminado y te devuelve el control. Hoy decides tres cosas: quién aprueba, cuándo para y cuánto gasta.
+- omp trae cuatro modos: plan (investiga y te entrega un plan para aprobar), goal (persigue un objetivo turno tras turno, con presupuesto de tokens), loop (repite un mensaje hasta un límite o hasta que un comando dé la señal) y vibe (la sesión deja de programar y dirige a otros agentes).
+- La cola de mensajes y la lista de tareas valen en cualquier modo.
+- La regla del vídeo: plan, goal y vibe no se combinan, se encadenan. Primero un plan, después un objetivo que lo ejecuta.
+- El selector de comandos te dice gratis qué modo está activo (`/pl`, `/go`).
 
 ### 2 · El modo plan
 
 <p><button type="button" class="ir-a" data-t="123">▶ Ir a 2:03</button></p>
 
-- **El error más caro:** Código correcto para el problema equivocado — Editar a la vez que piensa convierte cada malentendido en cambios que hay que deshacer.
-- **El modo plan separa las dos cosas:** Explora (sin tocar el proyecto) → Escribe un plan → Tú lo apruebas (antes, nada se ejecuta)
-- *En la demo:* plan = DeepSeek V4 Pro :high
-- *En la demo:* /plan · Alt+Shift+P
-- **La petición:** Códigos de cupón — BIENVENIDA10 resta un 10 % antes del envío; un código desconocido da un error claro.
-- **Límite:** Planificar no es aislar — Aislamiento: vídeo 05. Permisos: vídeo 19.
+- El error más caro es código correcto para el problema equivocado. El modo plan separa pensar de editar: el agente explora sin tocar el proyecto, escribe un plan y nada se ejecuta hasta que lo apruebas. Es lo más parecido a revisar un pull request antes de que exista el código.
+- Asigna antes el rol `plan` (en la demo, DeepSeek V4 Pro con high). Asignarlo no entra en modo plan; al entrar con `/plan` o Alt+Shift+P, omp cambia a ese modelo solo.
+- Mientras dura, editar y escribir en el proyecto se rechaza, igual que renombrar o borrar, y `ask` espera tu respuesta sin temporizador. El plan se escribe en `local://`, una carpeta de la sesión fuera de tu repositorio.
+- Cada turno acaba de una de dos formas: el agente te pregunta con `ask`, o escribe el plan en un fichero `local://<slug>-plan.md` y lo propone escribiendo en `xd://propose`. `xd://` es el prefijo de las direcciones internas de omp (en el vídeo 11 lo vimos delante de las herramientas descubribles). El aviso de entrada nombra `local://PLAN.md`, pero el plan propuesto va en el fichero `<slug>-plan.md`.
+- Límite: planificar no es aislar. Es una forma de trabajar, no un sandbox. Para un repo en el que no confías, el aislamiento del vídeo 05 y los permisos del 19.
 
 ### 3 · Revisar el plan
 
 <p><button type="button" class="ir-a" data-t="295">▶ Ir a 4:55</button></p>
 
-- *En la demo:* La revisión del plan
-- *En la demo:* El plan quita la API de objeto
-- *En la demo:* a anotar · e editar · d borrar · u deshacer
-- *En la demo:* a · anotar la sección
-- *En la demo:* Notas por sección
-- *En la demo:* Refine plan
-- *En la demo:* El plan corregido
-- *En la demo:* Cinco salidas
-- *En la demo:* ¿Qué rol ejecuta el plan?
-- *En la demo:* Save and quit
-- *En la demo:* El plan, en un fichero del repo
+- La revisión enseña el índice de secciones, el plan entero y las opciones. En el índice, `a` anota una sección, `e` edita, `d` borra y `u` deshace. *En la demo:* el plan quitaba la API de cupón como objeto; una nota pide conservarla y otra añade un caso de redondeo.
+- «Refine plan» manda las notas al agente, que rehace el plan y lo vuelve a proponer.
+- «continue with» elige qué rol ejecuta el plan aprobado. En el vídeo 14, prewalk hacía ese cambio solo; aquí lo decides tú. Si cierras con Esc sigues en modo plan, y `/plan-review` reabre la revisión.
+
+| Salida | Qué pasa con el contexto | Gasta modelo antes de ejecutar |
+|---|---|---|
+| Approve and execute | Empieza vacío: solo pasa el plan | No |
+| Approve and compact context | Se compacta antes de ejecutar | Sí, al compactar |
+| Approve and keep context | Se conserva entero (te dice cuántos tokens llevas) | No |
+| Refine plan | Sigue en modo plan con tus notas | Sí, rehace el plan |
+| Save and quit | Guarda el plan en un fichero del repo, sale del modo plan y sigue con el contexto vacío | No (no ejecuta) |
+
+- `plan.autosave` (apagado) guarda cada plan aprobado en `.omp/plans/`. `--plan-yolo` planifica, aprueba solo y ejecuta sin revisión humana: úsalo solo con planes que no te importe rehacer.
 
 ### 4 · Objetivos con presupuesto
 
 <p><button type="button" class="ir-a" data-t="523">▶ Ir a 8:43</button></p>
 
-- *En terminal:* /goal (más abajo, en «Código y comandos»)
-- *En la demo:* /guided-goal · pregunta 1
-- *En la demo:* Preguntas 2 y 3
-- *En la demo:* Presupuesto desde el primer momento
-- *En la demo:* Goal: complete
-- **Al llegar al límite, no corta en seco:** budget limited (el estado del objetivo) → Un aviso (para que cierre) → Sin continuar (oh my pi deja de pedírselo)
-- **Recuerda:** El final lo decide el modelo — Y puede declarar cumplido algo que no lo está.
+- El modo goal convierte una petición en un objetivo persistente: cuando el agente cede el turno, omp le recuerda el objetivo y le pide que siga, hasta que el propio modelo lo da por cumplido con la herramienta `goal`. *En terminal:* /goal (más abajo, en «Código y comandos»).
+- Ojo: `/goal <objetivo>` lo crea sin presupuesto y empieza al momento. Si pones el presupuesto después, el agente ya ha trabajado sin límite, y Esc no te da tiempo, porque interrumpir pausa el objetivo.
+- `/guided-goal` te entrevista antes, con una pregunta por turno, para fijar cinco cosas: criterios de éxito comprobables, cómo se comprueban, cuántos intentos admite, el alcance y cuándo parar. Lo que puede sacar del repo no te lo pregunta. No te pide el presupuesto: díselo tú («pon un presupuesto de 200 000 tokens») y el objetivo nace con él.
+- El presupuesto cuenta tokens de entrada, de escritura en caché y de salida; las lecturas de caché no cuentan. Al llegar al límite no corta en seco: el objetivo pasa a `budget-limited`, el agente recibe un aviso para cerrar y omp deja de pedirle que siga.
+- El final lo decide el modelo, y puede declarar cumplido algo que no lo está. *En la demo:* el objetivo se cumple en una sola vuelta, con todos los tests en verde; el presupuesto no hizo falta, pero estaba ahí.
+
+> **Nota:** la locución habla de «los quince tests de partida». El número de tests de la tienda cambia de un vídeo a otro según lo que añade cada demo; lo que importa es que pasen todos antes de empezar.
 
 ### 5 · Dirigir mientras trabaja
 
 <p><button type="button" class="ir-a" data-t="743">▶ Ir a 12:23</button></p>
 
-- *En la demo:* /goal sin presupuesto · /goal show
-- **La lista de tareas**
-  - `todo` · La lleva el agente: por fases
-  - `estados` · 5 estados: pendiente … bloqueada
-  - `sesión` · Se guarda
-- *En la demo:* /todo append
-- *En la demo:* /queue
-- *En la demo:* Objetivo cumplido
-- *En la demo:* La cola, al ceder el turno
+- `/goal show` enseña objetivo, estado, tokens y presupuesto. *En la demo:* un segundo objetivo lanzado con `/goal` a secas muestra «no budget», el riesgo del capítulo anterior.
+- La lista de tareas la mantiene el agente con la herramienta `todo`: por fases, con cinco estados (pendiente, en curso, completada, abandonada y bloqueada). Se esconde al cerrarse, pero queda en la sesión. Con `/todo` la tocas tú: `edit` (en tu editor, como Markdown), `append`, `start`, `done`, `drop` y `rm`.
+- Dos formas de hablarle mientras trabaja. Enter le hace llegar el mensaje en el siguiente paso, entre herramientas: es guiar. `/queue <mensaje>` lo encola y espera a que el agente ceda el turno.
+- `/pause` congela al agente, sus subagentes y el advisor en el siguiente punto seguro, sin abortar nada. Esc, en cambio, interrumpe el turno y, en modo goal, pausa el objetivo.
 
 ### 6 · Por qué son excluyentes
 
 <p><button type="button" class="ir-a" data-t="888">▶ Ir a 14:48</button></p>
 
-- *En la demo:* /plan con un objetivo activo
-- *En la demo:* Bloqueado
-- **Cada modo cambia dos cosas**
-  - `plan` · Solo lectura: para en tu aprobación
-  - `goal` · Herramienta goal: para al cumplir o con el presupuesto
-  - `vibe` · Sin edición: dirige a otros
-- **Encadenar:** /plan (revisado) → Save and quit (fichero) → /guided-goal (con presupuesto)
+- Con un objetivo activo, `/plan` se niega («exit goal mode first») y el menú dice «blocked by goal mode». Es una regla del diseño, no un error.
+- La regla completa: plan bloquea goal y vibe; goal, activo o en pausa, bloquea plan y vibe; vibe bloquea a los otros dos. Para pasar de uno a otro, cierras el que tienes.
+- El motivo: cada modo cambia las herramientas del agente y quién decide parar. Combinarlos sería pedirle a la vez que no toque nada, que siga sin preguntar y que no programe él.
+
+| Modo | Herramientas | Quién para |
+|---|---|---|
+| plan | Solo lectura, más escribir el plan | Tú, al aprobar |
+| goal | Añade la herramienta `goal` | El modelo, al darlo por cumplido, o el presupuesto |
+| vibe | Sin edición; herramientas para dirigir a otros | La directora, al verificar |
+
+- Para usarlos juntos, encadénalos: `/plan` revisado, «Save and quit» a un fichero y `/guided-goal` con presupuesto que lo ejecuta. La cola, la lista de tareas y `/loop` sí se combinan con todo.
+
+> **Nota:** en el montaje, esta prueba aparece después de que el segundo objetivo se dé por cumplido. El bloqueo solo se produce con un objetivo activo o en pausa: para reproducirlo, lanza `/plan` antes de que el objetivo termine.
 
 ### 7 · /loop
 
 <p><button type="button" class="ir-a" data-t="968">▶ Ir a 16:08</button></p>
 
-- *En terminal:* /loop (más abajo, en «Código y comandos»)
-- *En la demo:* Un test que falla, a mano
-- *En la demo:* /loop 3 --until 'node --test'
-- *En la demo:* Una sola vuelta
-- *En la demo:* git diff
+- `/loop` reenvía tu mensaje cada vez que el agente cede el turno. En goal decide el modelo cuándo ha terminado; en loop no decide nada: algo de fuera lo para. Un bucle sin límite es la forma más directa de gastar sin techo.
+- Tres formas de acotarlo: un número de vueltas, una duración, o una condición con `--until` (sigue mientras el comando falla y para cuando sale con 0) o `--while` (al revés). Puedes combinar número y condición. *En terminal:* /loop (más abajo, en «Código y comandos»).
+- La condición se evalúa después de cada vuelta, así que la primera siempre ocurre. Si el comando da un código raro, no arranca o tarda más de 30 s, el bucle se apaga: un verificador roto no se convierte en un bucle infinito.
+- *En la demo:* con `/loop 3 --until 'node --test'`, Flash arregla el código en una vuelta y el bucle se apaga solo. El 3 era un techo, no un objetivo. `git diff` confirma que no tocó el test.
+- `loop.mode` decide qué pasa entre vueltas: `prompt` (de fábrica, el contexto crece), `compact` (compacta antes de cada vuelta, gasta modelo) o `reset` (empieza de cero). La condición es tu verificador: si es floja, el bucle para en un resultado flojo. Cuándo compensa un bucle, en el vídeo 25.
 
 ### 8 · /vibe
 
 <p><button type="button" class="ir-a" data-t="1171">▶ Ir a 19:31</button></p>
 
-- **La documentación:** Terminar no es acertar — La directora verifica leyendo los ficheros que tocaron.
-- **Solo diapositiva:** Varios agentes, varios contextos — El gasto se multiplica. Subagentes y paralelo: vídeo 16.
+- Con `/vibe`, la sesión deja de programar y pasa a ser directora. Sus herramientas se reducen a leer, la lista de tareas y cinco para manejar trabajadores: spawn (crear), send (mandar un mensaje), wait (esperar), kill (parar) y list (ver cómo van).
+- Los trabajadores son agentes completos y persistentes, cada uno con su conversación. Los `fast` usan el rol `smol`, para trabajo mecánico y borradores; los `good` usan el rol `task`, para decisiones y para revisar lo que hizo fast.
+- Empiezan en blanco: cada encargo tiene que explicarse solo, con ficheros, restricciones y cómo se sabe que está hecho.
+- Terminar no es acertar. Que un trabajador termine solo significa que su turno acabó; la directora verifica leyendo los ficheros que tocaron. `/vibe` otra vez sale y cancela los trabajadores.
+- No se prueba en el vídeo por coste: varios trabajadores en paralelo multiplican el gasto. Subagentes y paralelo, en el vídeo 16.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1255">▶ Ir a 20:55</button></p>
 
-- **Repaso: plan:** /plan (solo lectura) → Revisión (anotar, refinar) → continue with (qué rol) → Save and quit (o aprobar)
-- **Próximo vídeo:** Subagentes y trabajo en paralelo — task, el Agent Hub, tus agentes, /tan y /jobs.
+- Plan: `/plan` deja al agente en solo lectura con el modelo del rol `plan`. En la revisión anotas por secciones, refinas, apruebas con o sin contexto y eliges qué rol ejecuta, o guardas y sales. Es una forma de trabajar, no un sandbox.
+- Goal: `/guided-goal` te entrevista y crea el objetivo con el presupuesto que le pidas; `/goal` a secas lo deja sin presupuesto. El presupuesto frena sin cortar en seco.
+- Loop y vibe: `/loop` repite un mensaje acotado por número, duración o comando; `/vibe` dirige trabajadores. La cola y la lista de tareas dirigen sin interrumpir.
+- Plan, goal y vibe se encadenan, no se mezclan.
+- Práctica: asigna un modelo al rol `plan`, pide un plan para un cambio pequeño, anota una sección que no te convenza, refínalo y guárdalo con «Save and quit». Ejecútalo con `/guided-goal` y un presupuesto decidido antes. Al terminar, compara los tokens con lo previsto y revisa el diff.
 
 ## Código y comandos
 
@@ -129,9 +134,8 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 omp --goal "<objetivo>"      # desde la terminal
 ```
 
-- `set`: Fija
-- `show`: Detalle
-- `budget`: Presupuesto
+- `budget` exige un objetivo activo; si está en pausa, reanúdalo antes.
+- `drop` borra el objetivo, con confirmación; el gasto acumulado sigue en el registro de la sesión.
 
 ### /loop
 
@@ -142,84 +146,18 @@ omp --goal "<objetivo>"      # desde la terminal
 /loop --while '<comando>' <mensaje>
 ```
 
-- `/loop 10`: Número
-- `10m`: Duración
-- `--until`: Condición
+- `--while` repite mientras el comando sale con 0 y para cuando falla.
+- Esc suspende el bucle; `/loop` otra vez lo apaga.
 
 ## Fuentes
 
-- Documentación de omp 18.5.1 (la documentación de omp (omp.sh)):
-  - `vibe-mode.md`: director con `read`, `todo` opcional y cinco herramientas `vibe_*` (`vibe_spawn`, `vibe_send`,
-    `vibe_wait` con 30 s por defecto, `vibe_kill`, `vibe_list`); niveles `fast` (agente `sonic`, `@smol`) y `good`
-    (agente `task`, `@task`; sin asignar, el modelo activo o `default`); `task.agentModelOverrides`; trabajadores
-    persistentes que empiezan en blanco; al salir se cancelan y quedan terminales; excluyente con plan y goal activos
-    **y en pausa**; se rechazan nueva sesión, borrar, bifurcar, mover, `/wt` y handoff, y los `/loop` de tipo reset;
-    indicador `Vibe` con la velocidad agregada; «worker completion means the turn settled, not that its claims are
-    correct».
-  - `settings.md` §«Interaction» (`plan.enabled` `true`, `plan.defaultOnStartup` `false`; `steeringMode` y
-    `followUpMode` `one-at-a-time`), §«Precedence» (`--plan` como override de runtime), variables (`PI_PLAN_MODEL`),
-    familias de ajustes `goal.*` y `loop.*` (nombradas, sin tabla).
-  - `models.md` §«Role aliases and settings»: «assigning `plan` does not itself enter plan mode, and calling `todo`
-    does not itself select the plan model. While plan mode is active, changing the `plan` role reapplies its model».
-  - `cli-reference.md` §«Prewalk and plan modes»: `--plan-yolo` (solo lectura, autoaprueba y pasa a ejecutar),
-    `--plan-yolo-into` (por defecto el rol `smol`), `--goal <objetivo>` (sesión nueva en goal mode, solo interactivo,
-    incompatible con `--plan-yolo` y con `plan.defaultOnStartup`); `--plan <id>`; en modo print se ignora
-    `plan.defaultOnStartup`.
-  - `slash-command-internals.md` §8 (*streaming*: `steer`, `followUp`, `aside`), §10 (`/pause`: puerta global para el
-    agente principal, subagentes y advisor; para en el siguiente punto seguro; no aborta; Esc, Enter, espacio o Ctrl+C
-    reanudan), §13 (`/plan-review`: solo en modo plan; `a` anota sección o primera línea visible, `e` edita, `u` deshace;
-    el editor de notas se comporta como el de `/annotate`, §12).
-  - `resolve-tool-runtime.md`: `xd://propose` (cuerpo = el *slug* de `local://<slug>-plan.md`), solo válido en modo
-    plan; *plan-yolo* autoaprueba.
-  - `tools/todo.md`: operaciones (`init`, `start`, `done`, `drop`, `block`, `unblock`, `rm`, `append`, `view`), estados
-    (`pending`, `in_progress`, `completed`, `abandoned`, `blocked`), una sola tarea en curso, HUD que se oculta a los
-    60 s (`tasks.todoClearDelay`), ida y vuelta Markdown de `/todo`, aviso `<system-reminder>` al modelo tras una
-    edición manual, los subagentes no heredan `todo`.
-  - `tools/task.md` (en modo plan, los subagentes tienen `read`, `grep`, `glob`, `web_search` y `ast_grep`; sin
-    aislamiento ni herramientas de eval), `tools/ask.md` (en modo plan no hay temporizador), `tools/edit.md` y
-    `tools/write.md` (guarda de modo plan; `write` admite borradores `local://`), `session-tree-plan.md` §«Plan approval
-    session naming» (al aprobar, la sesión toma el título del plan si no tenía nombre), `session.md` (`mode_change` con
-    `planFilePath`), `rpc.md` (comando `goal` con `token_budget`; `queuedMessages`), `keybindings.md`
-    (`app.plan.toggle` `Alt+Shift+P`; `app.message.followUp` `Ctrl+Q`, `Ctrl+Enter`; `app.message.dequeue` `Alt+Up`,
-    `Shift+Up`), `magic-keywords.md` (`orchestrate`, solo se nombra), `non-compaction-retry-policy.md` (goal mode).
-- **Binario de omp 18.6.1** (`strings ~/.bun/bin/omp`), para lo que la documentación no cuenta:
-  - Registro: descripciones dinámicas «Plan: on (…)», «Plan: blocked by goal mode», «Vibe: blocked by plan mode»,
-    «Vibe: blocked by goal mode», «Goal: blocked by plan mode», «Goal: <estado> (<objetivo>)», «Loop: on (…)», «Loop:
-    paused», «Todos: N open (N in progress, N done)»; sintaxis `/loop [count|duration] [--while|--until '<cmd>']
-    [prompt]`; subcomandos de `/goal` y `/todo`.
-  - Modo plan: «Plan mode enabled. Plan file: local://PLAN.md»; al entrar cambia al modelo del rol `plan` y al salir lo
-    restaura; añade `write`; la guarda de escritura rechaza renombrar, borrar y «Plan mode: the working tree is
-    read-only. Write your plan to a local://<slug>-plan.md file instead.»; recordatorio si el turno acaba sin `ask` ni
-    `xd://propose`; «Exit plan mode? This exits plan mode without approving a plan.».
-  - Revisión: título «Plan mode - next step»; opciones «Approve and execute» (vacía el contexto), «Approve and compact
-    context», «Approve and keep context (~N / M)» (desactivada por encima del 95 % de contexto), «Refine plan», «Save
-    and quit» (elige ruta, guarda, sale del modo plan y vacía el contexto); selector «continue with» con los roles del
-    ciclo; «Continuing with <rol>: <modelo>»; «No plan to review yet — write one to a local://<slug>-plan.md file
-    first.»; ajustes `plan.autosave` (`false`) y `plan.autosaveDir` (vacío = `<proyecto>/.omp/plans/`).
-  - Goal: `goal.enabled` (`true`), `goal.statusInFooter` (`true`), `goal.continuationModes` (`["interactive"]`);
-    `/goal <objetivo>` crea el objetivo **sin presupuesto** y lo envía al momento; `budget` exige objetivo activo
-    («Resume the goal before adjusting the budget.»); «Goal budget set to N.»; «Drop goal? This removes the goal record.
-    Accumulated usage stays in the session log.»; `/goal show` (Objective, Status, Tokens usados / presupuesto y
-    restantes, Time spent); herramienta `goal` con `op` `create|get|complete|resume|drop` y `token_budget`; cuenta
-    entrada + escritura de caché + salida (no lecturas de caché); al llegar al presupuesto, estado `budget-limited`,
-    un mensaje oculto `goal-budget-limit` y no más continuaciones; interrumpir pausa el objetivo; «Goal mode completed.»
-    y «Goal achieved. Report final budget usage to the user».
-  - Loop: «Loop mode enabled. Limited to N iterations. … Continuing until '<cmd>' succeeds.»; el contador baja en cada
-    reenvío; la condición se evalúa tras cada vuelta; `--until` sigue con salida 1 y para con 0 («… is now satisfied.
-    Loop mode disabled.»), `--while` al revés; otro código, fallo al arrancar o tiempo agotado apagan el bucle;
-    `loop.mode` (`prompt`, `compact`, `reset`), `loop.conditionTimeoutMs` (30 000); «Loop limit reached. Loop mode
-    disabled.»; «Exit vibe mode before using reset loops.».
-  - Vibe: «Vibe mode enabled. You direct fast/good worker sessions; toolset is read + optional parent Todo + vibe
-    tools.», «Vibe mode disabled. Killed N worker sessions.».
-  - `/queue`: «Usage: /queue <message> (or start a prompt with -> / =>)», «Queued message for after compaction»; si el
-    agente está parado, se envía en el acto.
-  - Changelog embebido 18.5.x–18.6.1: `--goal` (18.4.11), goal en RPC con `goal.continuationModes: ["rpc"]`, goal
-    espera si todas las tareas están bloqueadas, goal se detiene si las continuaciones repiten la misma evidencia,
-    `/guided-goal` conversacional, `/drop` renombrado a `/delete` por `/goal drop`, `/vibe` con `todo`.
-- Vídeos anteriores: 04 (el coste de cambiar de modelo), 05 (aislamiento de verdad), 11 (`Ctrl+Q` para encolar,
-  `--plan` y `--goal` en la ayuda), 12 (`Alt+Up` devuelve un mensaje encolado; el menú enseña estado), 13 (compactar
-  cambia lo que ve el modelo), 14 (roles; `/prewalk` planifica con el caro y ejecuta con el barato; el rol `plan` «que
-  hoy solo hemos nombrado»; cierre que anuncia este vídeo).
+- Documentación de oh my pi ([omp.sh](https://omp.sh)). Grabado con omp 18.6.1.
+- `vibe-mode.md`: la directora, los trabajadores `fast` y `good` y por qué terminar no es acertar.
+- `slash-command-internals.md`: `/plan-review`, `/pause` y cómo llegan los mensajes mientras el agente trabaja.
+- `tools/todo.md`: operaciones y estados de la lista de tareas.
+- `cli-reference.md`: `--plan`, `--plan-yolo` y `--goal`.
+- `settings.md` y `models.md`: el rol `plan` y los ajustes de plan, goal y loop.
+- Vídeos relacionados del curso: 05 (aislamiento), 14 (roles y prewalk), 16 (subagentes y paralelo), 19 (permisos) y 25 (cuándo compensa un bucle).
 
 ## Transcripción
 

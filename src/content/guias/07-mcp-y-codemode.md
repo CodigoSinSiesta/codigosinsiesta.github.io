@@ -18,66 +18,73 @@ La gran novedad de Pi 1.0. Conectar servidores MCP y usarlos en modo codemode, d
 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
-- **Model Context Protocol:** Agente (cliente MCP) → Servidor MCP (expone herramientas) → Programas y datos (repos, BD, docs…)
-- **El README antiguo de Pi:** «No MCP» — Cada herramienta declarada viaja en cada petición: nombre, descripción y parámetros.
-- **En este vídeo:** Conectar (un servidor real) → Medir (el coste en contexto) → Codemode (un script por dentro)
+- **Qué es MCP:** el Model Context Protocol es un estándar abierto para que un agente (el cliente) use herramientas que expone otro programa (el servidor MCP): buscar en un repositorio, consultar una base de datos, leer documentación. Claude Code, Cursor, Codex y muchos otros hablan MCP.
+- **Por qué Pi no lo tenía:** cada herramienta declarada viaja en cada petición, con nombre, descripción y parámetros, y un servidor grande puede llenar el contexto antes de empezar. Pi proponía CLI y skills, que solo cuestan cuando se usan.
+- **Qué cambia en la 1.0:** MCP viene de serie como extensión integrada (`builtin:mcp`), acompañado de dos piezas contra ese coste: codemode y tool search.
 
 ### 2 · Conectar un servidor
 
 <p><button type="button" class="ir-a" data-t="98">▶ Ir a 1:38</button></p>
 
-- **La demo:** Servidor de ficheros limitado a la tienda — @modelcontextprotocol/server-filesystem: sin credenciales y con catorce herramientas.
-- *En la demo:* pi mcp add · pi mcp list
-- **Nota de la grabación:** command pi — En el curso, pi es un alias con --no-skills, que no admite subcomandos. Tú no lo necesitas.
-- *En terminal:* ~/.pi/agent/mcp.json (más abajo, en «Código y comandos»)
+- **Añadir y comprobar:** `pi mcp add <nombre> -- <comando>` lo guarda en `mcp.json`, y `pi mcp list` dice si conecta, cuántas herramientas tiene y en qué modo. *En la demo:* el servidor de ficheros oficial, limitado a la carpeta de la tienda, conecta con catorce herramientas en modo codemode, sin credenciales.
+- **Dónde se configura:** `~/.pi/agent/mcp.json` para los tuyos y `.pi/mcp.json` en el proyecto, que solo se carga con confianza. El formato es el de Claude Code o Cursor, así que puedes copiar tus servidores casi tal cual.
+- **Locales y remotos:** un servidor local es un proceso que Pi arranca y con el que habla por la entrada y la salida estándar; uno remoto, una URL por HTTP. Las credenciales van con variables de entorno (`${VAR}`) o un comando con `!`; para OAuth, `/mcp login`.
+- **Recomendación:** servidores personales y con credenciales, en el fichero del usuario; en el del proyecto, solo lo que el proyecto necesita.
 
 ### 3 · El coste de las herramientas en el contexto
 
 <p><button type="button" class="ir-a" data-t="282">▶ Ir a 4:42</button></p>
 
-- **El problema:** Cada herramienta declarada viaja en cada petición — Nombre, descripción y esquema de parámetros, en cada turno.
-- *En terminal:* Mídelo tú (más abajo, en «Código y comandos»)
+- **El problema:** cada herramienta declarada viaja en cada petición, con su esquema de parámetros, y se paga en tokens en cada turno. La caché de prompts lo abarata (vídeo 04), pero no quita el otro coste: cuantas más herramientas ve el modelo, más fácil es que elija mal.
+- **La medida:** con la petición «Di solo: hola», el primer contexto pasa de 1971 tokens sin servidor a 4054 con las catorce herramientas declaradas: más del doble. La tabla completa está en «Código y comandos».
+- **Mídelo tú:** `pi -p --mode json` con una petición trivial y mira el uso de tokens del primer mensaje del asistente, o el porcentaje de contexto del pie.
 
 ### 4 · Cuatro formas de exponer un servidor
 
 <p><button type="button" class="ir-a" data-t="380">▶ Ir a 6:20</button></p>
 
-- *En la demo:* /mcp
-- *En la demo:* /mcp · tienda-fs
-- *En la demo:* Exposure of tienda-fs
-- **Escala:** En codemode y deferred no se declaran — El coste inicial casi no depende de cuántas herramientas tenga el servidor.
-- *En terminal:* toolExposure (ejemplo de la documentación) (más abajo, en «Código y comandos»)
-- *En la demo:* toolExposure: las que escriben, en hidden
+- **La exposición se elige por servidor:**
+  - **codemode** (por defecto): las herramientas no se declaran al modelo; solo se llaman desde un script de la herramienta `codemode`, que las busca cuando las necesita.
+  - **deferred**: no se declaran hasta que la herramienta `tool_search` las encuentra; desde ahí se llaman directamente.
+  - **direct**: se declaran como una herramienta de serie más.
+  - **hidden**: registradas, pero inaccesibles.
+- **`/mcp`** muestra cada servidor con su estado, origen y exposición, y permite reconectar, cambiar la exposición o desactivarlo (también solo en este proyecto). Los cambios se guardan en `mcp.json`.
+- **Escala:** en codemode y deferred el coste inicial casi no depende del tamaño del servidor; en direct, cada herramienta suma.
+- **Afinar por herramienta:** `toolExposure` cambia la exposición de herramientas concretas con patrones `*`. Dale además a cada servidor una descripción de una frase: es lo que ve el modelo. *En la demo:* con `write_file`, `edit_file`, `move_file` y `create_directory` en `hidden`, el servidor de ficheros queda de solo lectura.
 
 ### 5 · Codemode por dentro
 
 <p><button type="button" class="ir-a" data-t="536">▶ Ir a 8:56</button></p>
 
-- *En terminal:* Globales de un script de codemode (más abajo, en «Código y comandos»)
-- **La demo:** Siete scripts y no fue perfecto — «Usando solo el servidor MCP tienda-fs, dime el tamaño de cada fichero .js de src y de test».
-- *En terminal:* Los scripts de la demo (resumen de la sesión) (más abajo, en «Código y comandos»)
-- *En la demo:* El último script y su resultado
-- *En terminal:* Codemode también sin MCP (más abajo, en «Código y comandos»)
-- **Codemode sin MCP:** pi --tools read,bash,edit,write,codemode — «Con un solo script, lee a la vez los cuatro ficheros…»
-- *En la demo:* Un script: ls, cuatro read en paralelo, conteo
-- *En terminal:* settings.json: codemode (más abajo, en «Código y comandos»)
+- **Tres cosas con el mismo nombre:** (a) `codemode` es una **herramienta** que deja al modelo escribir un script de JavaScript que llama a otras herramientas; (b) la **exposición** codemode de un servidor MCP hace que sus herramientas solo sean accesibles desde esa herramienta; (c) el **ajuste** `codemode.mode` decide qué pasa con las herramientas de serie: con `on` siguen declaradas y codemode también puede llamarlas; con `only` se ocultan y todo pasa por scripts.
+- **Por qué ahorra:** el script corre en un sandbox QuickJS, sin APIs de Node, sin ficheros, sin red y sin temporizadores; solo toca el mundo a través de las herramientas, y al modelo solo le llega la salida del script. Eso permite lanzar llamadas en paralelo y filtrar resultados enormes antes de que entren en el contexto.
+- **Dentro del script:** cada herramienta es un método de `tools`; para encontrar las no declaradas están `searchTools`, `describeTool` y `ALL_TOOLS`; `text` y `return` añaden salida, y `store`/`load` guardan valores pequeños entre scripts, ligados a la rama de la sesión.
+- *En la demo:* el modelo necesitó siete scripts para sacar el tamaño de cuatro ficheros. El primero olvidó el `await`; varios solo servían para descubrir qué herramientas había y cómo respondían. **La lección:** el descubrimiento cuesta. En un servidor que usas a menudo, una buena descripción o exponer en direct las dos o tres herramientas clave ahorra esos rodeos.
+- **Sin MCP:** `--tools read,bash,edit,write,codemode` (o `"+codemode"` en `defaultTools`; el `+` añade a las de serie en lugar de sustituirlas). *En la demo:* un solo script lista los ficheros, los lee en paralelo y devuelve cuatro líneas de conteo; el contenido de los ficheros nunca entra en el contexto.
 
 ### 6 · Tool search y el modo deferred
 
 <p><button type="button" class="ir-a" data-t="794">▶ Ir a 13:14</button></p>
 
-- **exposure: deferred:** Tool search — «Usando solo el servidor MCP tienda-fs, lista el contenido de src con sus tamaños».
-- *En terminal:* La sesión en modo deferred: llamadas a herramientas (más abajo, en «Código y comandos»)
-- *En la demo:* Llamadas directas tras tool_search
+- **Cómo funciona:** el modelo llama a `tool_search` con una búsqueda en lenguaje natural; Pi le devuelve las herramientas que encajan y las declara. Desde ahí las llama directamente, sin script. Quedan declaradas en esa rama de la sesión, así que no hay que buscarlas otra vez.
+- **¿Cuándo cada uno?**
+
+| Exposición | Úsala cuando… |
+|---|---|
+| codemode | Hay que combinar o filtrar muchas llamadas |
+| deferred | Usas unas pocas herramientas de un servidor grande, una y otra vez |
+| direct | El conjunto es pequeño y lo usas casi en cada tarea |
+| hidden | No quieres que el modelo use esa herramienta (p. ej. las que escriben) |
 
 ### 7 · Seguridad y buenas prácticas
 
 <p><button type="button" class="ir-a" data-t="866">▶ Ir a 14:26</button></p>
 
-- **Seguridad · 1:** Misma tubería que las de serie — Las extensiones de permisos se aplican también a MCP y a las llamadas desde codemode.
-- **Seguridad · 3:** Un servidor local corre con tus permisos — Instala solo servidores de confianza. Estado en pi mcp list; mensajes en mcp.log.
-- *En terminal:* MCP desde extensiones y ajustes (más abajo, en «Código y comandos»)
-- **Próximo vídeo:** Extensiones I — Comandos, herramientas propias, eventos y el modo de aprobación que Pi no trae.
+- **1 · La misma tubería:** todas las llamadas MCP, también las de un script de codemode, pasan por la misma tubería que las de serie. Una extensión de permisos (vídeo 08) se aplica igual.
+- **2 · Anotaciones y `hidden`:** los servidores pueden marcar sus herramientas como de solo lectura, destructivas o idempotentes, y una extensión puede usarlo para decidir qué confirmar. Si solo quieres consultar, pon en `hidden` las que escriben.
+- **3 · Un servidor local corre con tus permisos,** y uno remoto recibe lo que el modelo le mande. Instala solo servidores de confianza y guarda las credenciales en el fichero del usuario. El estado, en `pi mcp list`; los mensajes, en `mcp.log`.
+- **Detalles:** los resultados de texto de más de 20 KB llegan recortados por el medio (salvo dentro de codemode, donde el script recibe el texto entero), y `/reload` vuelve a leer la configuración.
+- **En otros agentes:** Claude Code, Cursor, Codex y opencode también hablan MCP, y el `mcp.json` de Pi usa el mismo formato que Claude Code o Cursor; la documentación trae una tabla para convertir los de VS Code, Codex y OpenCode.
 
 ## Código y comandos
 
@@ -88,32 +95,25 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 ```text
 { "mcpServers": {
     "tienda-fs": { "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "~/csn/tienda"] },
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/ruta/a/tienda"] },
     "docs": { "url": "https://example.com/mcp", "headers": { "Authorization": "Bearer ${DOCS_TOKEN}" } }
 } }
 ```
 
-- `"tienda-fs"`: Local (stdio)
-- `"url"`: Remoto (HTTP)
-- `${DOCS_TOKEN}`: Variable de entorno
+- `"tienda-fs"`: un servidor local; Pi lanza el comando y habla con él por stdio. El último argumento es la carpeta a la que se limita.
+- `"docs"`: un servidor remoto por HTTP.
+- `${DOCS_TOKEN}`: se sustituye por esa variable de entorno, para no escribir el token en el fichero.
 
-### Tamaño del primer contexto («Di solo: hola», medido con pi -p --mode json)
+### Tamaño del primer contexto según la exposición
 
-```text
-sin servidor MCP       1971 tokens   # tools de serie + AGENTS.md
-```
+Petición «Di solo: hola», medida con `pi -p --mode json`, con las cuatro herramientas de serie y el `AGENTS.md` de la tienda.
 
-- `1971 tokens`: Punto de partida
-
-### Tamaño del primer contexto
-
-```text
-sin servidor MCP       1971 tokens
-tienda-fs en direct    4054 tokens   # +2083: 14 herramientas declaradas
-```
-
-- `4054 tokens`: Más del doble
-- `+2083`: 14 herramientas
+| Exposición de `tienda-fs` | Tokens | Diferencia | Qué se declara |
+|---|---|---|---|
+| Sin servidor MCP | 1971 | — | Las herramientas de serie |
+| codemode | 2492 | +521 | La herramienta `codemode` y una línea que presenta el servidor |
+| deferred | 2193 | +222 | Nada del servidor hasta que `tool_search` lo encuentra |
+| direct | 4054 | +2083 | Las 14 herramientas del servidor |
 
 ### Mídelo tú
 
@@ -122,21 +122,7 @@ pi -p --no-session --mode json "Di solo: hola" | jq -c 'select(.type=="message_e
 # o: el porcentaje de contexto del pie tras el primer mensaje
 ```
 
-- `--mode json`: Eventos JSON
-- `.message.usage`: Tokens de la petición
-
-### Tamaño del primer contexto según la exposición
-
-```text
-sin servidor MCP       1971 tokens
-codemode               2492 tokens   # +521
-deferred               2193 tokens   # +222
-direct                 4054 tokens   # +2083
-```
-
-- `2492`: codemode
-- `2193`: deferred
-- `4054`: direct
+- `--mode json` emite cada evento como una línea JSON; `jq` se queda con el uso de tokens de cada mensaje.
 
 ### toolExposure (ejemplo de la documentación)
 
@@ -149,10 +135,9 @@ direct                 4054 tokens   # +2083
 }
 ```
 
-- `"deferred"`: Por defecto, bajo demanda
-- `"search_code": "direct"`: La más usada
-- `"delete_*": "hidden"`: Nunca
-- `"description"`: Una frase
+- `"exposure": "deferred"`: la exposición por defecto *de este servidor*; el valor por defecto de Pi es codemode.
+- `toolExposure`: excepciones por herramienta. La búsqueda de código, muy usada, en direct; las de lectura, en codemode; las de borrar, inaccesibles.
+- `"description"`: una frase para que el modelo sepa para qué sirve el servidor.
 
 ### Globales de un script de codemode
 
@@ -164,10 +149,9 @@ ALL_TOOLS.filter(t => t.name.startsWith("mcp__tienda_fs"))
 text(…) · return … · store(k, v) · load(k)
 ```
 
-- `tools.`: Llamar
-- `searchTools`: Buscar
-- `describeTool`: Declaración
-- `ALL_TOOLS`: Todas
+- `tools.<nombre>(…)`: llama a una herramienta, aunque no esté declarada al modelo.
+- `searchTools`: busca herramientas por relevancia; `describeTool`: devuelve la declaración de una; `ALL_TOOLS`: la lista completa.
+- `store`/`load`: guardan valores pequeños entre scripts, ligados a la rama de la sesión.
 
 ### Los scripts de la demo (resumen de la sesión)
 
@@ -180,9 +164,8 @@ text(…) · return … · store(k, v) · load(k)
 7  bucle: get_file_info de cada fichero → 4 líneas
 ```
 
-- `sin await`: Un fallo
-- `ALL_TOOLS`: Explorar
-- `Promise.all`: En paralelo
+- Los scripts 1 a 3 solo sirven para descubrir las herramientas: es el coste del descubrimiento. `describeNamespace` aparece en la sesión, pero no en la lista de ayudas que da la locución.
+- El 4 lanza dos llamadas en paralelo con `Promise.all`, y el 7 devuelve solo el resultado filtrado.
 
 ### Codemode también sin MCP
 
@@ -192,9 +175,8 @@ models.classify(…) · models.generateImages(…)
 # límites: 256 MB de memoria; un script no lanza otros scripts
 ```
 
-- `+codemode`: Activarlo
-- `models.`: Modelos no conversacionales
-- `256 MB`: Límites
+- `"+codemode"`: el `+` añade codemode a las herramientas de serie en lugar de sustituirlas.
+- `models.`: desde un script también se accede a modelos que no conversan, como clasificadores y generadores de imágenes.
 
 ### settings.json: codemode
 
@@ -205,9 +187,8 @@ models.classify(…) · models.generateImages(…)
 }
 ```
 
-- `"mode": "on"`: Por defecto
-- `"only"`: Solo scripts
-- `inlineBudget`: Presupuesto
+- `"mode": "on"` (por defecto): las herramientas de siempre siguen declaradas y se añade una nota sobre cómo llamarlas desde un script.
+- `inlineBudget`: lo que no cabe en esos tokens se encuentra con `searchTools`.
 
 ### La sesión en modo deferred: llamadas a herramientas
 
@@ -217,9 +198,7 @@ mcp__tienda_fs__list_allowed_directories   {}
 mcp__tienda_fs__list_directory_with_sizes  { "path": "…/tienda/src", "sortBy": "name" }
 ```
 
-- `tool_search`: Buscar
-- `list_allowed_directories`: Llamada directa
-- `list_directory_with_sizes`: Llamada directa
+- Tras `tool_search`, las dos herramientas quedan declaradas y el modelo las llama directamente, sin escribir ningún script.
 
 ### MCP desde extensiones y ajustes
 
@@ -229,16 +208,15 @@ pi.registerMcpServer("docs", { url: "https://example.com/mcp" })   // solo para 
 "extensions": ["-builtin:mcp"]   // desactivar la integrada
 ```
 
-- `registerMcpServer`: Desde una extensión
-- `/mcp`: Sustituirla
-- `-builtin:mcp`: Desactivarla
+- `registerMcpServer` usa el mismo formato que `mcp.json`. Las extensiones llegan en el vídeo 08.
+- Desde el SDK (vídeo 10), las extensiones integradas no se cargan solas: hay que añadirlas.
 
 ## Fuentes
 
-- Documentación instalada de Pi 1.0.1: `docs/mcp.md`, `docs/codemode.md`, `docs/cli.md` (`pi mcp`, `--tools`),
-  `docs/settings.md` (`defaultTools`, `codemode.*`).
+- Documentación oficial de Pi: [mcp.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md), [codemode.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/codemode.md), [cli.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md) (`pi mcp`, `--tools`) y [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md) (`defaultTools`, `codemode.*`). Grabado con Pi 1.0.1.
 - Especificación MCP: modelcontextprotocol.io.
-- Documentación oficial de Pi: [cli.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md), [codemode.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/codemode.md), [mcp.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md), [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md)
+- Servidor de la demo: `@modelcontextprotocol/server-filesystem`, en npm.
+- Relacionados en el curso: vídeo 04 (caché de prompts), 05 (seguridad de lo que instalas), 08 (extensiones de permisos) y 10 (`pi -p --mode json`).
 
 ## Transcripción
 

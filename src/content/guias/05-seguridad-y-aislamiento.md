@@ -18,108 +18,88 @@ Pi no pide permiso ni trae sandbox. Vemos por qué el propio repositorio es una 
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Seguridad y aislamiento:** Qué protege Pi y qué no — El repositorio como superficie de ataque, la confianza de proyecto y Pi dentro de un contenedor.
-- **Dos filosofías**
-  - `Pi` · Mínimo: la decisión es tuya: límites fuera del agente
-  - `omp` · Con aprobaciones: modos de aprobación (vídeo 19)
-- **No es una frontera:** Mirar el transcript no te protege — Cuando ves el comando en pantalla, normalmente ya se ha ejecutado.
-- *En la demo:* Una ruta que sale de la carpeta de trabajo
-- *En la demo:* Lo lee sin preguntar
+- **Sin aprobaciones ni sandbox:** Pi no pregunta antes de cada herramienta y trata como no fiable el código que genera el modelo. Lee, cambia y ejecuta con los permisos de tu cuenta, igual que sus extensiones, instaladores y procesos hijo.
+- **Dos filosofías:** Pi es mínimo y deja la decisión en tus manos; los límites se ponen fuera del agente. oh my pi trae modos de aprobación, pero desactivados por defecto (arranca en *yolo*, sin pedir permiso); los vemos en el vídeo 19.
+- **Mirar no es una frontera:** el transcript, la confianza de proyecto y revisar los cambios ayudan a detectar problemas, pero cuando ves el comando en pantalla, normalmente ya se ha ejecutado.
+- *En la demo:* Pi lee sin preguntar un `secreto.txt` de la carpeta de al lado con una ruta relativa. La carpeta de trabajo decide dónde busca recursos, no impide acceder a otras rutas. Todo lo que tu usuario puede leer, Pi puede leerlo y mandarlo al modelo.
 
 ### 2 · El repositorio como superficie de ataque
 
 <p><button type="button" class="ir-a" data-t="175">▶ Ir a 2:55</button></p>
 
-- **Inyección de prompts:** El contenido que lee también da órdenes — Ficheros, comentarios, salidas de comandos y respuestas del modelo pueden dirigir al modelo.
-- **La tríada letal (Simon Willison)**
-  - `1` · Datos privados: Pi lee tus ficheros
-  - `2` · Contenido no fiable: lo que trae el repositorio
-  - `3` · Salida al exterior: puede ejecutar curl
-  - *Si se juntan las tres, una instrucción inyectada puede leer tus datos y enviarlos fuera. Quita al menos una.*
-- **Un repo ajeno puede…**
-  - `texto` · Hablar con tu agente: instrucciones en lo que lee
-  - `.pi/` · Ejecutar código: extensiones o servidores MCP al arrancar
-- *En terminal:* repo-ajeno/AGENTS.md (más abajo, en «Código y comandos»)
-- *En la demo:* DeepSeek detecta la instrucción y no la ejecuta
-- **Cuidado con la conclusión:** Nos protegió el modelo, no Pi — Y AGENTS.md llegó al contexto aunque no habíamos concedido confianza.
+- **Inyección de prompts:** ficheros, comentarios, salidas de comandos, páginas web, issues y respuestas del modelo pueden llevar texto escrito para el modelo, no para ti.
+- **La tríada letal (Simon Willison):** un agente es peligroso cuando junta (1) acceso a datos privados, (2) contenido no fiable y (3) una salida al exterior. Pi, tal como viene, tiene las tres: lee tus ficheros, lee lo que traiga el repo y puede ejecutar `curl`. Defenderse es quitar al menos una.
+- **Un repo ajeno puede** hablar con tu agente (instrucciones en lo que lee) y, si trae `.pi/` con extensiones o servidores MCP, ejecutar código al arrancar. Para lo segundo existe la confianza de proyecto.
+- *En la demo:* un comentario HTML oculto en AGENTS.md pide modificar un fichero en silencio. DeepSeek lo detecta y no lo ejecuta. Pero nos protegió el modelo, no Pi; y AGENTS.md llegó al contexto aunque no habíamos concedido confianza.
 
 ### 3 · La confianza de proyecto
 
 <p><button type="button" class="ir-a" data-t="362">▶ Ir a 6:02</button></p>
 
-- *En la demo:* La pregunta al arrancar en repo-ajeno
-- *En la demo:* Cinco opciones; tres guardan la decisión
-- *En la demo:* Sin confianza… pero AGENTS.md se carga
-- **Primera lección:** La confianza no filtra lo que el modelo lee — Para no cargar AGENTS.md: --no-context-files (-nc).
-- *En la demo:* pi -a: la extensión del repo se ejecuta
-- *En la demo:* /trust: el estado y las decisiones
-- **Cómo decide Pi:** -a / -na (línea de comandos) → extensión (evento project_trust) → trust.json (decisión guardada) → ajuste (defaultProjectTrust: ask)
-- *En terminal:* Sin interfaz: print, JSON y RPC (más abajo, en «Código y comandos»)
-- **En integración continua:** Ramas ajenas: --no-approve — Que una rama no cuele una extensión con las credenciales del pipeline.
+- **Qué controla:** si Pi carga los recursos de la carpeta: `.pi/settings.json`, `.pi/mcp.json`, extensiones, skills, prompts, temas y ficheros de system prompt de `.pi/`, o `.agents/skills`. Su objetivo es que un repo no cargue extensiones ejecutables sin que lo apruebes.
+- **La pregunta tiene cinco opciones:** confiar, confiar en la carpeta padre, confiar solo en esta sesión, no confiar y no confiar solo en esta sesión. Las tres que no dicen «esta sesión» guardan la decisión en `trust.json`. `/trust` muestra el estado.
+- **Primera lección: no filtra lo que el modelo lee.** AGENTS.md, AGENTS.override.md y CLAUDE.md se cargan siempre, haya confianza o no. Para evitarlo: `--no-context-files` (`-nc`).
+- **Cómo decide Pi, por orden:** los flags `-a` / `-na`; una extensión de usuario que gestione el evento `project_trust`; la decisión guardada para la carpeta o una superior; y el ajuste `defaultProjectTrust` (por defecto, `ask`).
+- **Sin interfaz y en CI:** en modo print, JSON o RPC (el modo en que otro programa controla Pi, vídeo 10) no hay pregunta: con `ask` o `never` los recursos protegidos se omiten; con `always`, se cargan. En un pipeline sobre ramas ajenas usa `--no-approve`, para que una rama no cuele una extensión con las credenciales del pipeline.
+- **Segunda lección:** la confianza es un filtro de arranque, no una frontera. Una vez arrancado, read, bash, edit y write siguen con tus permisos.
+
+| Flag corto | Forma larga | Efecto |
+|---|---|---|
+| `-a` | `--approve` | Confía en el proyecto solo en esta ejecución |
+| `-na` | `--no-approve` | No carga los recursos de `.pi/` |
+| `-nc` | `--no-context-files` | No carga AGENTS.md, CLAUDE.md ni similares |
 
 ### 4 · Reducir el alcance sin aislar
 
 <p><button type="button" class="ir-a" data-t="604">▶ Ir a 10:04</button></p>
 
-- *En terminal:* Un agente de solo lectura (más abajo, en «Código y comandos»)
-- *En la demo:* Solo lectura: no puede escribir
-- *En la demo:* …pero sí puede leer
-- **Aprobaciones con extensiones (ejemplos de Pi)**
-  - `permission-gate` · Comandos peligrosos: rm -rf, sudo, chmod 777: confirma antes
-  - `protected-paths` · Rutas sensibles: bloquea escrituras
-  - `confirm-destructive` · Sesión: confirma acciones destructivas
-- *En terminal:* Ejemplo sandbox/ de Pi: .pi/sandbox.json (más abajo, en «Código y comandos»)
-- **Dos ajustes más**
-  - `usuario` · Usuario dedicado: solo ve las carpetas de tus proyectos
-  - `defaultTools` · Solo lectura por defecto: sin escribir --tools cada vez
-- **Antes de compartir:** Sesiones y exportaciones pueden llevar secretos — Revisa sesiones, exportaciones y el log de depuración. auth.json nunca va al repositorio.
+- **Elegir herramientas:** Pi activa cuatro herramientas por defecto (read, bash, edit, write), pero trae más, como grep, find y ls. `--tools read,grep,find,ls` deja un agente de solo lectura: útil para revisar, explorar un repo desconocido o preguntas de un pipeline. `defaultTools` lo fija sin escribir `--tools` cada vez.
+- *En la demo:* el agente de solo lectura no puede crear un fichero, pero sí lee el secreto de al lado. Solo lectura significa que no escribe ni ejecuta, no que no vea.
+- **Aprobaciones con extensiones (ejemplos de Pi):** `permission-gate` confirma comandos peligrosos (`rm -rf`, `sudo`, `chmod 777`); `protected-paths` bloquea escrituras en rutas sensibles; `confirm-destructive` confirma acciones destructivas de la sesión. Hay también un ejemplo de sandbox para bash con `sandbox-exec` en macOS y bubblewrap en Linux. En el vídeo 08 escribimos una propia.
+- **Higiene:** control de versiones y commit antes de cambios grandes; credenciales de alcance reducido y corta duración; revisa extensiones y paquetes antes de cargarlos; `images.blockImages` si no quieres mandar imágenes. Un usuario del sistema dedicado deja fuera tu carpeta personal, tus claves SSH y tus credenciales de la nube.
+- **Antes de compartir:** sesiones, exportaciones y el log de depuración pueden llevar secretos. Y `auth.json` nunca va a un repositorio.
 
 ### 5 · Pi dentro de un contenedor
 
 <p><button type="button" class="ir-a" data-t="791">▶ Ir a 13:11</button></p>
 
-- **La documentación de Pi:** Pi entero en un contenedor — «Usually the strongest practical option».
-- *En la demo:* Dockerfile.pi (versión fijada)
-- *En la demo:* La imagen pi-sandbox
-- *En terminal:* Pi dentro de Docker (más abajo, en «Código y comandos»)
-- *En terminal:* Los dos volúmenes (más abajo, en «Código y comandos»)
-- **Regla de la documentación:** No montes ~/.pi/agent del host — Salvo que quieras darle tus credenciales, ajustes, extensiones y sesiones.
-- **El volumen pi-agent-home**
-  - `vacío` · Primera vez: sin ajustes: indicamos --model
-  - `/login` · Se queda ahí: en el volumen, no en tu máquina
-  - `1 : 1` · Uno por proyecto: o por nivel de confianza
-- *En la demo:* Dentro del contenedor: /workspace
-- *En la demo:* El secreto no está dentro
-- **Una frontera de verdad:** El fichero no está dentro del contenedor — No depende del criterio del modelo ni de que alguien vigile la pantalla.
-- *En la demo:* Las variables que pasas, entran
-- *En la demo:* Dentro del contenedor: write en /workspace
-- *En la demo:* En el host: el fichero está
-- *En la demo:* Montaje :ro: nada llega al host
-- **La red:** Sin red, sin modelo — Para cortar el resto de salidas: un proxy de salida o un entorno con políticas de red.
+- **Tres formas de ejecutar Pi:** con tu usuario (protege solo lo que tu usuario no toca); Pi entero en un contenedor, VM o sandbox (protege todo lo del host que no expongas); o Pi fuera con solo sus herramientas aisladas. La documentación llama a la segunda «usually the strongest practical option».
+- **La imagen:** un Dockerfile con Node 24, bash, git y ripgrep, y Pi instalado con npm y `--ignore-scripts`. Fija una versión concreta de Pi (la documentación instala la última). Se construye como `pi-sandbox`.
+- **Dos volúmenes:** la carpeta del proyecto en `/workspace` (lo único del host que se ve) y un volumen con nombre, `pi-agent-home`, como directorio del agente. Empieza vacío, por eso se indica `--model`; un `/login` dentro se queda en ese volumen. Usa uno por proyecto o por nivel de confianza. Regla: no montes el `~/.pi/agent` del host, salvo que quieras darle tus credenciales.
+- *En la demo:* dentro del contenedor el secreto de al lado no existe: una frontera que no depende del criterio del modelo. Pero las variables que pasas con `-e` sí se ven dentro, y lo que escribe en `/workspace` llega al host. Con el montaje `:ro`, el modelo no puede escribir en `/workspace` y lo que crea en `/tmp` desaparece con el contenedor.
+- **Lo que expone un contenedor:** lo montado en escritura, el directorio del agente si lo montas, las variables de entorno y la red. Sin red no hay modelo (salvo local); para cortar el resto de salidas hace falta un proxy de salida o un entorno con políticas de red.
 
 ### 6 · Otras formas de aislar
 
 <p><button type="button" class="ir-a" data-t="1113">▶ Ir a 18:33</button></p>
 
-- **Otras opciones (sobre el papel)**
-  - `sbx` · Docker Sandboxes: sandbox gestionado con proxy
-  - `openshell` · NVIDIA OpenShell: políticas, local o remoto
-  - `gondolin` · Gondolin: micro-VM para las herramientas
-- *En terminal:* Docker Sandboxes (documentación de Pi) (más abajo, en «Código y comandos»)
-- **Docker Sandboxes:** No hagas /login dentro del sandbox — Las credenciales se configuran desde el host con sbx secret set.
-- *En terminal:* NVIDIA OpenShell (documentación de Pi) (más abajo, en «Código y comandos»)
-- *En terminal:* Gondolin: Pi en el host, herramientas en una micro-VM (más abajo, en «Código y comandos»)
-- **Gondolin: la letra pequeña**
-  - `env` · Hereda el entorno: una clave en variable puede verse dentro
-  - `ext` · Otras herramientas: siguen en el host si no delegan
-- **La opción clásica:** Una máquina virtual o un equipo dedicado — Más pesada, pero separa también el núcleo del sistema operativo.
+Descritas en la documentación de Pi; no se prueban en el curso.
+
+| Opción | Qué aísla | Credenciales |
+|---|---|---|
+| Docker | Pi entero | Entran contigo |
+| Docker Sandboxes (`sbx`) | Pi entero, en un sandbox gestionado | Un proxy deja la clave real en el host; dentro hay un valor de relleno |
+| NVIDIA OpenShell | Pi entero, local o remoto, con políticas de ficheros, procesos, red e inferencia | El enrutado de inferencia puede dejar la clave fuera |
+| Gondolin | Solo las herramientas, en una micro-VM; Pi sigue en el host | No es frontera: las herramientas heredan el entorno del host |
+
+- **Docker Sandboxes:** no hagas `/login` dentro, porque escribe una credencial real. Configúrala desde el host con `sbx secret set`.
+- **Gondolin, letra pequeña:** una clave en variable de entorno puede verse dentro de la VM, y las herramientas de otras extensiones siguen en el host si no delegan.
+- **La opción clásica:** una VM completa o un equipo dedicado. Más pesada, pero separa también el núcleo del sistema operativo. Tiene sentido si dejas agentes solos durante horas.
 
 ### 7 · Una receta para empezar
 
 <p><button type="button" class="ir-a" data-t="1279">▶ Ir a 21:19</button></p>
 
-- **Si encuentras un fallo:** Canal de seguridad, no un issue público — Inyección, falta de sandbox o tus extensiones: en general, fuera del perímetro.
-- **Próximo vídeo:** Personalizar Pi sin escribir código — AGENTS.md, system prompt, prompt templates, skills y ajustes.
+- **De menos a más esfuerzo:**
+  1. Trabaja siempre con control de versiones y haz commit antes de pedir cambios grandes.
+  2. No abras Pi en un repo ajeno sin mirar antes su AGENTS.md y su carpeta `.pi/`; si dudas, arráncalo con `-na`.
+  3. Para revisar o explorar, `--tools` con herramientas de solo lectura, sabiendo que no protege la confidencialidad.
+  4. Para tareas largas, autónomas o sobre código desconocido, Pi en un contenedor con solo la carpeta del proyecto, sin tu directorio del agente y con una credencial de alcance reducido.
+  5. Si la clave no debe entrar en ningún caso, Docker Sandboxes u OpenShell.
+- **Si encuentras un fallo de seguridad en Pi:** repórtalo por el canal de seguridad del repositorio, no con un issue público. La inyección de prompts, la falta de sandbox integrado o lo que haga una extensión que instalaste no cuentan, en general, como vulnerabilidad de Pi, salvo que haya un salto de privilegios.
+- **Práctica:** crea una carpeta fuera del proyecto con un token falso y comprueba que Pi la lee. Monta el contenedor del Dockerfile, repite y verifica que ya no la ve. Por último, monta la carpeta con `:ro` y comprueba que nada se escribe en el host.
+- **Materiales:** [`docker/Dockerfile.pi`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/docker/Dockerfile.pi), [`fuera/`](https://github.com/CodigoSinSiesta/curso-pi-materiales/tree/main/fuera/) (con el token falso) y [`repo-ajeno/`](https://github.com/CodigoSinSiesta/curso-pi-materiales/tree/main/repo-ajeno/), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
+- **En tu agente:** la tríada letal se aplica igual a Claude Code, Codex u opencode. Busca en el tuyo el equivalente de cada medida: confianza de carpeta, herramientas permitidas, sandbox de sistema operativo y contenedor.
 
 ## Código y comandos
 
@@ -136,9 +116,8 @@ Librería de utilidades de texto.
 npm test
 ```
 
-- `<!--`: Comentario HTML: no se ve al renderizar
-- `"visitado por un agente"`: Una acción que no pediste
-- `no hace falta mencionarlo`: Y pide silencio
+- `<!--`: un comentario HTML no se ve al renderizar el Markdown, pero el modelo sí lo lee.
+- La forma de un ataque real: algo oculto, una acción que no pediste y una petición de silencio.
 
 ### Sin interfaz: print, JSON y RPC
 
@@ -149,9 +128,8 @@ pi -p --approve "…"      # confianza solo para esta ejecución
 pi -p --no-approve "…"   # sin recursos de .pi/
 ```
 
-- `"ask" | "never"`: Sin pregunta: se omiten
-- `"always"`: Se cargan
-- `--approve`: Mejor explícito
+- Las dos primeras líneas resumen el comportamiento del ajuste `defaultProjectTrust` cuando no hay pregunta interactiva; las dos últimas son comandos.
+- En scripts y pipelines, mejor explícito: `--approve` o `--no-approve`.
 
 ### Un agente de solo lectura
 
@@ -160,8 +138,7 @@ pi --tools read,grep,find,ls
 # por defecto: read, bash, edit, write
 ```
 
-- `--tools`: Sustituye la selección
-- `read,grep,find,ls`: Leer y buscar
+- `--tools`: sustituye la selección de serie, no la amplía.
 
 ### Ejemplo sandbox/ de Pi: .pi/sandbox.json
 
@@ -172,10 +149,27 @@ pi -e ./sandbox        # sandbox-exec en macOS, bubblewrap en Linux
   "filesystem": { "denyRead": ["~/.ssh", "~/.aws"], "allowWrite": [".", "/tmp"], "denyWrite": [".env"] } }
 ```
 
-- `sandbox-exec`: Del sistema operativo
-- `allowedDomains`: Red permitida
-- `denyRead`: Lectura prohibida
-- `allowWrite`: Dónde se escribe
+- `pi -e ./sandbox`: carga la extensión de ejemplo; la primera línea es el comando y el resto, el `sandbox.json`.
+- `allowedDomains`: los únicos destinos de red permitidos.
+- `denyRead`, `allowWrite`, `denyWrite`: qué rutas no se leen, dónde se puede escribir y qué queda vetado aun así.
+
+### Dockerfile.pi
+
+Reconstruido a partir de la descripción del vídeo; el original está en `containerization.md`. Sustituye `<versión>` por la que quieras fijar.
+
+```dockerfile
+FROM node:24-bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      bash ca-certificates git ripgrep \
+    && rm -rf /var/lib/apt/lists/*
+RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent@<versión>
+WORKDIR /workspace
+ENTRYPOINT ["pi"]
+```
+
+```text
+docker build -t pi-sandbox -f Dockerfile.pi .
+```
 
 ### Pi dentro de Docker
 
@@ -188,27 +182,28 @@ docker run --rm -it \
   pi-sandbox --model deepseek/deepseek-flash
 ```
 
-- `--rm`: Se borra al salir
-- `-it`: Terminal interactiva
-- `-e DEEPSEEK_API_KEY`: La clave, desde el host
-- `TOKEN_DEMO`: Variable de prueba
+- `--rm -it`: el contenedor se borra al salir y tienes terminal interactiva.
+- `-e DEEPSEEK_API_KEY`: pasa la clave del host. Cualquier proceso del contenedor podrá verla.
+- `TOKEN_DEMO`: variable de prueba para comprobar que las variables entran.
+- `"$PWD:/workspace"`: lo único del host que ve el contenedor, en lectura y escritura.
+- `pi-agent-home`: volumen con nombre como directorio del agente; sobrevive entre ejecuciones.
+- `--model`: el volumen empieza vacío, sin modelo por defecto.
 
-### Los dos volúmenes
+Variante de solo lectura, en modo print:
 
 ```text
 docker run --rm -it \
   -e DEEPSEEK_API_KEY \
-  -e TOKEN_DEMO=no-es-real \
-  -v "$PWD:/workspace" \
+  -v "$PWD:/workspace:ro" \
   -v pi-agent-home:/root/.pi/agent \
-  pi-sandbox --model deepseek/deepseek-flash
+  pi-sandbox --model deepseek/deepseek-flash -p "…"
 ```
 
-- `"$PWD:/workspace"`: Lo único del host
-- `pi-agent-home`: Agent dir propio
-- `pi-sandbox --model`: Imagen y modelo
+- `:ro`: el modelo no puede escribir en `/workspace`; nada llega al host.
 
 ### Docker Sandboxes (documentación de Pi)
+
+Sin probar en el curso.
 
 ```text
 sbx secret set anthropic          # la clave real se queda en el host
@@ -216,11 +211,12 @@ sbx run --kit "docker.io/sbx/pi-kit:latest" pi
 sbx exec <sandbox> -- pi -p "list the failing tests"
 ```
 
-- `sbx secret set`: Clave en el host
-- `sbx run --kit`: Pi en el sandbox
-- `sbx exec`: Sin interfaz
+- `sbx secret set`: la credencial se configura desde el host; dentro solo hay un valor de relleno.
+- `sbx exec`: ejecuta Pi sin interfaz dentro de un sandbox ya creado.
 
 ### NVIDIA OpenShell (documentación de Pi)
+
+Sin probar en el curso.
 
 ```text
 openshell gateway select <name>
@@ -228,11 +224,12 @@ openshell sandbox create --name pi-sandbox --from pi -- pi
 openshell sandbox upload pi-sandbox ./working-folder /workspace
 ```
 
-- `gateway`: Local o remota
-- `sandbox create`: Pi dentro
-- `upload`: Ficheros explícitos
+- `gateway select`: elige una pasarela local o remota.
+- `sandbox upload`: con una pasarela remota no se monta tu carpeta; subes los ficheros de forma explícita.
 
 ### Gondolin: Pi en el host, herramientas en una micro-VM
+
+Sin probar en el curso.
 
 ```text
 pi -e ~/.pi/agent/extensions/gondolin
@@ -240,17 +237,17 @@ pi -e ~/.pi/agent/extensions/gondolin
 # la carpeta de trabajo se monta en /workspace
 ```
 
-- `pi -e`: Extensión de ejemplo
-- `read, write, edit, bash`: Herramientas en la VM
-- `/workspace`: Carpeta montada
+- Pi sigue en el host; solo sus herramientas y tus comandos con `!` corren en la VM.
 
 ## Fuentes
 
-- Documentación instalada de Pi 1.0.1: `docs/security.md`, `docs/containerization.md`, `docs/settings.md`
-  (`defaultProjectTrust`, `images.blockImages`), `docs/cli.md` (`--tools`, `-a`/`-na`, `-nc`).
-- Ejemplos de extensiones de Pi: `permission-gate.ts`, `protected-paths.ts`, `confirm-destructive.ts`, `sandbox/`,
-  `gondolin/`.
-- Documentación oficial de Pi: [cli.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md), [containerization.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/containerization.md), [security.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md), [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md)
+- [security.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md): el modelo de amenazas de Pi, la confianza de proyecto y la política de reporte.
+- [containerization.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/containerization.md): las tres formas de ejecutar Pi, el Dockerfile, Docker Sandboxes, OpenShell y Gondolin.
+- [cli.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md): `--tools`, `-a` / `-na` y `-nc`.
+- [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md): `defaultProjectTrust`, `defaultTools` e `images.blockImages`.
+- Ejemplos de extensiones de Pi: `permission-gate.ts`, `protected-paths.ts`, `confirm-destructive.ts`, `sandbox/` y `gondolin/`.
+- Simon Willison, «la tríada letal» (*lethal trifecta*): el marco para razonar sobre inyección de prompts y exfiltración.
+- Grabado con Pi 1.0.1. Vídeos relacionados: 08 (escribir una extensión de permisos), 10 (modo print y RPC) y 19 (aprobaciones en oh my pi).
 
 ## Transcripción
 

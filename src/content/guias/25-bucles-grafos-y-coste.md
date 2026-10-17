@@ -18,112 +18,108 @@ Cuándo compensa un bucle, un plan o varios agentes y cuándo solo añade coste.
 
 <p><button type="button" class="ir-a" data-t="19">▶ Ir a 0:19</button></p>
 
-- **Las tres son la misma pregunta:** ¿Cuánto hace sin ti? ¿Y está bien? — Cuánto trabajo dejas que haga el sistema, y cómo sabes que lo ha hecho bien.
-- **Lección 14:** Cada capa contiene a la anterior — Y debajo de todas, el harness.
-- **El plan de hoy:** Bucle (cuándo compensa) → /loop (aquí y allí) → Grafo (cuándo hace falta) → Coste (uno frente a varios) → Goodhart (en nuestra verificación) → Lo que viene
+- Este vídeo paga tres deudas: cuándo compensa un bucle (`/loop` y `/goal`, vídeo 15), cuándo compensa repartir entre subagentes (vídeo 16: tres agentes leen tres veces) y qué pasa cuando una medida se optimiza (el aviso del final del vídeo 24).
+- Las tres son la misma pregunta: cuánto trabajo dejas que el sistema haga sin ti, y cómo sabes que lo ha hecho bien. Learn Harness Engineering la trata en sus dos últimas lecciones: la 13, bucles; la 14, grafos.
+- La lección 14 ordena el vocabulario en cuatro capas, y cada una contiene a la anterior: el prompt (la instrucción), el contexto (lo que el modelo sabe), el bucle (repite hasta cumplir un objetivo) y el grafo (varios agentes, bucles y comprobadores conectados). Debajo de todas, el harness.
 
 ### 2 · Cuándo compensa un bucle
 
 <p><button type="button" class="ir-a" data-t="113">▶ Ir a 1:53</button></p>
 
-- **Con las tres:** De dentro del bucle a fuera — Dentro escribes cada instrucción; fuera solo decides.
-- **En otros agentes, /loop es un reloj:** En oh my pi, /loop --until sí tiene final — Enseguida lo vemos.
-- **Lección 13:** Alguien de tu equipo no debe creerte
-- **¿Cuándo no?**
-  - `condición` · No sabes escribirla
-  - `decisión` · El fallo necesita la tuya: repetir solo repite el error
-  - `tamaño` · Cabe en una vuelta: una sesión normal basta
-- **Vídeo 15 · techo de tres vueltas, bastó una:** El techo no era un objetivo
-- **La mayoría de equipos, en el segundo o el tercero:** Empieza por el primero
+- Un bucle tiene tres piezas: un objetivo, una forma de verificarlo y una condición de parada. Si falta una, tienes un agente que da vueltas. Con las tres, sales de dentro del bucle (escribes cada instrucción) y pasas a estar fuera (solo decides).
+- La prueba de una frase: ¿tiene final? Si lo tiene, es un objetivo; si no, algo que se vigila cada cierto tiempo. En otros agentes `/loop` es un reloj; en oh my pi, `/loop --until` sí tiene final.
+- Compensa cuando la parada la comprueba un programa, cuando cada vuelta deja el estado en disco (el andamiaje del vídeo 23) y cuando quien trabaja no es quien lo da por bueno. La lección lo resume así: alguien de tu equipo no debe creerte.
+- No compensa cuando no sabes escribir la condición, cuando el fallo necesita una decisión tuya (repetir solo repite el error) o cuando la tarea cabe en una vuelta. En el vídeo 15 el techo de tres vueltas no era un objetivo: bastó una.
+- Cuatro costes que no se ven: deuda de verificación (lo que se da por bueno sin comprobar), pérdida de comprensión (código que nadie ha leído), rendición (dejar de opinar) y explosión de tokens (cada vuelta arrastra lo anterior; para eso están los modos `compact` y `reset` de `/loop`). Y una escalera para no saltar escalones: objetivo con parada, tarea programada, bucle con un agente que hace y otro que comprueba, bucle que encuentra su siguiente tarea y varios bucles a la vez. Empieza por el primero.
 
 ### 3 · /loop aquí y allí
 
 <p><button type="button" class="ir-a" data-t="250">▶ Ir a 4:10</button></p>
 
-- *En terminal:* oh my pi · /loop, como en el vídeo 15 (más abajo, en «Código y comandos»)
-- **oh my pi · /loop --until:** Quien decide parar no es el modelo — Es el harness, que ejecuta el comando.
-- **Un punto al final del turno**
-  - `Claude Code` · Stop hook: debajo de su /goal
-  - `oh my pi` · session_stop: vídeo 24
-  - `Pi` · agent_before_settle: vídeo 24
-- **Lo que cambia es quién juzga:** Un modelo que lee o un script que ejecuta
+- `/loop` en oh my pi (más abajo, en «Código y comandos») reenvía tu mensaje cada vez que el agente cede el turno, acotado por un número de vueltas, una duración o un comando. Con `--until`, el harness ejecuta el comando tras cada vuelta y para cuando sale con 0: quien decide parar no es el modelo.
+- `/loop` en Claude Code es un temporizador: repite un prompt cada cierto tiempo, vive con la sesión abierta y las tareas recurrentes caducan a los siete días. Sirve para vigilar, no para terminar.
+- `/goal`: en oh my pi, el propio modelo da el objetivo por cumplido, con un presupuesto de tokens como freno. En Claude Code, un modelo pequeño aparte lee la conversación tras cada turno; es otro juez, pero no ejecuta nada.
+- Pi no trae ni `/loop` ni `/goal`. Puedes escribir un bucle de shell que repita `pi -p` hasta que el verificador salga con 0, o una extensión con `agent_before_settle` (vídeo 24). En un bucle de shell, cuándo se mira la condición depende de cómo lo escribas: si la compruebas al principio, se mira antes de cada vuelta; oh my pi la mira siempre después.
+- Regla práctica: pregunta quién decide que ha terminado. El modelo: una opinión con presupuesto. Otro modelo que lee: una segunda opinión. Un programa tuyo, como `verificar.sh`: una condición. Los tres agentes tienen un punto al final del turno donde el harness puede negarse a terminar (el Stop hook de Claude Code, bajo su `/goal`; `session_stop` en oh my pi; `agent_before_settle` en Pi). Lo que cambia es quién juzga ahí.
 
 ### 4 · De un bucle a un grafo
 
 <p><button type="button" class="ir-a" data-t="398">▶ Ir a 6:38</button></p>
 
-- **Tres fallos de un bucle solo**
-  - `1` · Goodhart: le dedicamos un capítulo
-  - `2` · Ceguera hacia arriba: ¿es el objetivo correcto?
-  - `3` · Conflicto: velocidad contra calidad
-- **Sin ramas ni vueltas:** Veinte pasos en fila son un script
+- Un bucle es una decisión aplazada: todo ocurre en el contexto de un agente, y ni él sabe dónde se ha atascado. Un grafo es la decisión tomada por adelantado. Tiene nodos (un script, una llamada al modelo o un agente), aristas (en paralelo, según una condición o hacia atrás), un estado compartido y reglas de enrutado.
+- La pieza clave es el nodo que verifica: empieza con un contexto nuevo y solo ve el resultado, no el razonamiento.
+- Tres fallos de un bucle solo que no se arreglan con más comprobaciones dentro: Goodhart (capítulo 8), la ceguera hacia arriba (nunca pregunta si su objetivo es el correcto) y el conflicto (dos bucles, velocidad y calidad, tirando en sentidos contrarios).
+- Ya has dibujado grafos: `task` con tres agentes en paralelo y verificación final (vídeo 16) es un abanico que se abre y se cierra, y `/cleanse` (reparte arreglos de diagnósticos entre subagentes y vuelve a comprobar) también.
+- Hace falta un grafo si se cumplen al menos tres de estos cinco criterios:
+  - [ ] el trabajo se divide en partes independientes;
+  - [ ] hay ramas o vueltas atrás;
+  - [ ] merece la pena guardar el estado intermedio;
+  - [ ] cada nodo se puede verificar de forma automática;
+  - [ ] lo que ahorras al repartir supera lo que cuesta coordinar.
+- Veinte pasos en fila no son un grafo: son un script.
 
 ### 5 · Lo que cuesta orquestar
 
 <p><button type="button" class="ir-a" data-t="548">▶ Ir a 9:08</button></p>
 
-- **Su conclusión, sobre su sistema:** No es una ley: lo medimos en la tienda
-- **No es magia de la arquitectura:** Más lectura y más intentos se pagan
-- **Cada subagente es una sesión:** Paga su prefijo y vuelve a leer — La caché abarata solo lo que se repite igual.
-- **La cuarta funcionalidad · ticket-004:** desglose() → base, IVA, envío y total — Cruza cupón, IVA y envío: el envío, sobre el total con cupón.
-- *En la demo:* rubricas/ticket-004.md · y verificar.sh, en rojo antes del trabajo
+- Anthropic, sobre su sistema de investigación: un agente gasta unas cuatro veces los tokens de un chat, y su sistema de varios agentes unas quince; superó a un agente solo en un 90 % en su evaluación. Pero no encaja cuando todos necesitan el mismo contexto o hay muchas dependencias, y la mayoría de tareas de programación son menos paralelizables. Es su conclusión sobre su sistema, no una ley.
+- En una de sus pruebas, los tokens gastados explicaban el 80 % de las diferencias de rendimiento: buena parte de lo que ganan varios agentes viene de gastar más. Más lectura y más intentos se pagan.
+- Cada subagente es una sesión: paga su prefijo (en el vídeo 22, de unos 4400 a más de 10 000 tokens en oh my pi, según el roster) y vuelve a leer. La caché abarata solo lo que se repite igual. Y el impuesto de orquestación (la lección 14, a partir de Addy Osmani): lanzar un agente cuesta una tecla, pero revisarlo e integrarlo cuesta tu atención, que no se paraleliza.
+- La tarea: `ticket-004`, la función `desglose()`, que devuelve base sin IVA, IVA, envío y total. Cruza cupón, IVA y envío, y se reparte bien: implementación en un fichero, pruebas en otro. Rúbrica y aceptación, escritas antes y etiquetadas; `verificar.sh` sale en rojo antes del trabajo.
+- `verificar.sh` cambió: comparaba la verificación con la etiqueta de `ticket-003` y ahora compara con la última etiqueta de rúbrica. Lo cambiamos nosotros, no un agente (en el capítulo 8 verás por qué importa).
 
 ### 6 · La misma tarea, con uno y con varios
 
 <p><button type="button" class="ir-a" data-t="713">▶ Ir a 11:53</button></p>
 
-- *En la demo:* ~/csn/medir/orquestar.sh · y sin-async.yml
-- **Varios sin task, o uno con task: no cuenta:** Tres y tres: seis ejecuciones
-- *En la demo:* time ./orquestar.sh 3
-- *En la demo:* ./resumen-orquestar.sh · una fila por ejecución
-- **oh my pi vuelve a cargar los hooks en cada subagente:** La puerta, también en los subagentes
-- **La integración, en las tres de varios:** Encajan (verde a la primera) → Lee (lo de los dos) → Verifica (y anota) → Tres commits (frente a uno)
+- `orquestar.sh` lanza cada ejecución en su propio worktree desde la etiqueta de la rúbrica, con oh my pi en modo print, DeepSeek Flash en todos los agentes y la puerta del vídeo 24. Las mismas herramientas en las dos condiciones (quitar `task` cambiaría el prefijo) y un ajuste de configuración, `sin-async.yml`, para que `task` espere a sus subagentes, porque en modo print oh my pi no los esperaba.
+- Solo cambia una frase del encargo. «Uno»: hazlo tú solo, sin `task`. «Varios»: un subagente implementa, otro escribe las pruebas sin ver la implementación y tú integras, verificas, marcas y haces commit. Quien escribe las pruebas no es quien escribe el código (lección 13).
+- El juez está fuera: el script mide el tiempo, ejecuta `verificar.sh`, cuenta ficheros tocados y llamadas a `task`, y suma tokens y coste de todos los agentes. Una ejecución de «varios» que no reparte, o una de «uno» que sí, no cuenta. Tres repeticiones de cada: seis ejecuciones.
+- El grafo de «varios»: dos nodos en paralelo (implementar y escribir pruebas), una arista que los junta en la sesión principal, que integra y ejecuta `verificar.sh`; una arista de vuelta si falla; y el commit, que pasa por la puerta. El estado compartido es la carpeta de trabajo, por eso los dos nodos no tocan el mismo fichero. oh my pi vuelve a cargar los hooks en cada subagente, así que la puerta también los vigila.
+- Las seis ejecuciones son válidas y terminan en verde sin tocar rúbrica ni aceptación (10 min 25 s en total). En las tres de «varios», las piezas encajaron a la primera, y aun así la sesión principal leyó lo de los dos, verificó, anotó y repartió el trabajo en tres commits, frente a uno. Ese trabajo de integración es el impuesto de orquestación, en pequeño.
 
 ### 7 · Lo que dicen los números
 
 <p><button type="button" class="ir-a" data-t="911">▶ Ir a 15:11</button></p>
 
-- **Con esos avisos:** Los dos aciertan: repartir no mejora el resultado — Seis de seis en verde, y con la prueba oculta.
-- **Encaja con lo que dice Anthropic:** Dos partes pequeñas, las mismas dependencias — Se pueden hacer a la vez, pero dependen de las mismas funciones de la tienda.
-- **¿Y el tiempo? · media: 144 s frente a 62 s:** Ni siquiera más rápido — Más del doble, aunque trabajaban dos a la vez.
-- **Repartir:** Cuesta más y es menos predecible — Y tu revisión, que no sale en ninguna columna, sigue siendo una.
-- **Uno o dos de cinco:** No hacía falta un grafo
-- **La regla del vídeo 16 sigue en pie:** Una tarea pequeña, en la sesión principal
-- **Vídeo 15 · el modo plan, en lenguaje de grafos:** Un nodo humano — El trabajo se detiene hasta que tú apruebas.
-- **Compensa cuando equivocarse cuesta más que esperar**
-  - `alcance` · Toca varias piezas
-  - `diseño` · Una decisión de diseño
-  - `vuelta atrás` · Difícil de deshacer: en ticket-004, la rúbrica ya era la aprobación
-- *En la demo:* oh my pi · /loop 3 --until ./verificar.sh ticket-004
-- *En la demo:* Una vuelta: «Loop condition … is now satisfied»
-- *En la demo:* Desde fuera · verificar.sh y la prueba oculta, con 0
-- **Un agente, una condición que no depende de él y un techo:** La opción más barata que verifica de verdad — Para esta tarea.
+| Media de 3 ejecuciones | Un agente | Varios |
+|---|---|---|
+| Tiempo | 62 s (de 48 a 80 s) | 144 s (de 93 a 190 s) |
+| Tokens | ≈413 000 | ≈914 000 (de ≈400 000 a más de 1,3 millones) |
+| Caché | 95 % | 94 % |
+| Coste | casi 1 céntimo de dólar | 2,5 céntimos |
+| Verificación y prueba oculta | 3 de 3 | 3 de 3 |
+
+- Tres avisos: son tres repeticiones, con un modelo barato y una tarea pequeña; con pocos casos, una diferencia puede ser ruido (vídeo 21); y DeepSeek cobra distinto según la franja horaria, así que las seis se lanzaron seguidas.
+- Los dos aciertan, y repartir no mejora el resultado. Cuesta dos veces y media lo que costó uno, porque con la caché casi igual el coste sigue a los tokens. Ni siquiera va más rápido, aunque trabajen dos a la vez, y es menos predecible. Repartir no ahorró lectura: la multiplicó, porque las dos partes dependen de las mismas funciones de la tienda. Y tu revisión, que no sale en ninguna columna, sigue siendo una.
+- Con los cinco criterios, la tarea cumple uno o dos: no hacía falta un grafo. Varios agentes compensan con partes grandes y de verdad independientes, para explorar varias soluciones, cuando el contexto de uno no da para todo o cuando la revisión necesita un contexto limpio (y ahí basta un revisor al final). La regla del vídeo 16 sigue en pie: una tarea pequeña, en la sesión principal.
+- El plan (el modo plan del vídeo 15) es un nodo humano: el trabajo se detiene hasta que apruebas. Compensa cuando equivocarse de camino cuesta más que esperar: un cambio que toca varias piezas, una decisión de diseño o algo difícil de deshacer. En `ticket-004`, la rúbrica escrita antes ya era la aprobación.
+- **La regla, por ese orden** (cada escalón cuesta más que el anterior):
+  1. Tarea pequeña con verificación: un agente y, si hace falta, un bucle con techo.
+  2. Equivocarse de camino es caro: un plan antes.
+  3. Partes grandes que no se pisan: varios agentes, con un solo punto de integración y la verificación al final.
+- *En la demo:* `/loop 3 --until './verificar.sh ticket-004'` con un solo agente para en la primera vuelta: el agente escribe `desglose()` y doce pruebas, hace commit, y el harness, no el modelo, ejecuta `verificar.sh`, que sale con 0. Alrededor de un céntimo, y la prueba oculta también pasa. Un agente, una condición que no depende de él y un techo: para esta tarea, la opción más barata que verifica de verdad.
 
 ### 8 · Goodhart: cuando verificar es el objetivo
 
 <p><button type="button" class="ir-a" data-t="1137">▶ Ir a 18:57</button></p>
 
-- **La versión que todo el mundo cita:** Una medida convertida en objetivo deja de ser buena medida
-- **Si la condición es vaga:** Se optimiza el relato — Lo que el vídeo 1 nos enseñó a no creer.
-- **/loop --until ./verificar.sh:** Su único objetivo: que el script salga con 0 — Si mide algo que no importa, el bucle lo encontrará. No por malicia.
-- *En la demo:* cuadre · verificar.sh sale con 0
-- **Una cifra de cuadre:** Medíamos que cuadrase, no que fuese correcto
-- *En la demo:* La prueba oculta, en cuadre
-- *En la demo:* Las seis ejecuciones de la comparación, con la prueba oculta
-- **Vídeo 21 · /ratchet:** Solo cuenta si mejora en casos que no ha visto
-- *En la demo:* La aceptación v2, en cuadre
-- **Vídeo 24 · lo que se cuela, un criterio nuevo:** La prueba oculta se queda fuera
-- **Ninguna métrica sola:** Varias a la vez y una que no pueda optimizar — Una prueba oculta o una revisión tuya.
+- Goodhart (1975) observó que una regularidad estadística tiende a romperse en cuanto se usa para controlar algo; Strathern (1997) lo generalizó en la versión que todo el mundo cita: cuando una medida se convierte en objetivo, deja de ser una buena medida. La lección 14 lo ilustra con un ejemplo: imagina un equipo de soporte que optimiza las incidencias resueltas y aprende a cerrarlas, no a resolverlas.
+- Un juez que lee la conversación (el `/goal` de Claude Code) mide lo que el agente cuenta: con una condición vaga, se optimiza el relato. Y `/loop --until ./verificar.sh` solo quiere que el script salga con 0: si mide algo que no importa, el bucle lo encontrará, no por malicia, sino porque es lo que optimiza.
+- *En la demo:* una aceptación que solo comprobaba que el total era el de la tienda y que base, IVA y envío sumaban ese total. La rama `cuadre`, escrita a mano, calcula el envío antes del cupón y saca el IVA por diferencia, y `verificar.sh` sale con 0. Con el pedido de la frontera da envío 0 € (la tienda cobra 4,95 €) e IVA 12,89 € (debería ser 7,94 €). Es una cifra de cuadre: medíamos que cuadrase, no que fuese correcto.
+- Lo detecta un ancla: una prueba que vive fuera del repositorio, con otro pedido e importes calculados a mano (una silla de 45 € con un cupón del 20 %), que ningún agente ve. En `cuadre` falla (envío 0 €, IVA 12,51 € en vez de 7,56 €) y las seis ejecuciones de la comparación la superan. Es la idea de `/ratchet` (vídeo 21): solo cuenta lo que mejora en casos que el agente no ha visto.
+- Después reforzamos la aceptación (cada importe exacto en dos pedidos) y movimos la etiqueta. `cuadre` sale en rojo, y A5, el criterio del vídeo 24 que comprueba que nadie ha tocado la verificación, avisa de que ha cambiado desde su etiqueta. Pero el ancla se queda fuera. Y ojo: si `verificar.sh` confía en la última etiqueta, un agente que pueda crear una etiqueta nueva tras tocar la verificación pasaría A5. Las etiquetas también son verificación.
+- Ninguna métrica sola: solo coste premia al que no verifica; funcionalidades en `pasa`, al que marca deprisa; tokens por tarea, al que lee de menos. Mira varias a la vez y guarda al menos una que el agente no pueda optimizar: una prueba oculta o una revisión tuya.
 
 ### 9 · Lo que viene, repaso y cierre
 
 <p><button type="button" class="ir-a" data-t="1363">▶ Ir a 22:43</button></p>
 
-- **Anunciado, sin fecha · vídeo 22:** omp² llega pronto — Su web no dice más.
-- **Pi · la extensión de ejemplo subagent:** Reconoce (scout) → Planifica (planner) → Trabaja (worker) → Revisa (reviewer)
-- **Procesos de Pi aparte, con tokens y coste de cada uno:** Ves todo el código del reparto — Y decides tú cuánto cuesta.
-- **Vídeo 26 · el último:** El proyecto final — Una funcionalidad de principio a fin, con Pi y con oh my pi.
-- **Todo junto:** Plan → Rúbrica (antes) → Reparto (si compensa) → Revisión (y pruebas) → Commit → Cambios (la petición)
+- A octubre de 2026 ya existen `omp --restore`, que retoma una sesión caída con lo que dejó a medias, subagentes incluidos, y Pi Durable, un paquete aparte y experimental para agentes de larga duración (cada paso guarda un punto de control que otro proceso puede retomar). omp² sigue anunciado sin fecha.
+- Para repartir en Pi hoy, la extensión de ejemplo `subagent` lanza procesos de Pi aparte (reconocimiento, planificación, trabajo y revisión) y enseña tokens y coste de cada uno. Ves todo el código del reparto y decides tú cuánto cuesta.
+- **Práctica:** elige una tarea pequeña y escribe antes su verificación y una prueba oculta fuera del repositorio. La prueba importa el código desde la ruta del worktree que le pases. Ejecuta la tarea tres veces con un agente y tres repartiendo, en worktrees separados, y apunta tiempo, tokens, coste y cuántas superan la prueba oculta. Pasa la tarea por los cinco criterios y decide con tus números si repartir compensaba.
+- **Materiales:** [`medir/orquestar.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/orquestar.sh), [`medir/resumen-orquestar.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/resumen-orquestar.sh), [`medir/sin-async.yml`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/sin-async.yml) y [`fuera/ticket-004-oculta.mjs`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/fuera/ticket-004-oculta.mjs), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
+- **Vídeo 26 · el último:** el proyecto final, una funcionalidad de principio a fin con Pi y con oh my pi: el plan, la rúbrica antes de empezar, el reparto si compensa, la revisión y las pruebas, el commit y la pull request.
 
 ## Código y comandos
 
@@ -135,96 +131,18 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 /loop 3 --until './verificar.sh ticket-004' <encargo>
 ```
 
-- `3`: Un techo: número de vueltas (o una duración)
-- `--until`: El harness ejecuta el comando tras cada vuelta
-- `'./verificar.sh ticket-004'`: Para cuando sale con 0
+- `3`: el techo, en vueltas; también acepta una duración.
+- `--until '…'`: el harness ejecuta el comando después de cada vuelta y para cuando sale con 0. Con 1 sigue; con otro código, el bucle se apaga (vídeo 24).
 
 ## Fuentes
 
-- **Learn Harness Engineering** (WalkingLab, **© 2025, licencia MIT**; clon en
-  notas de investigación del curso, `LICENSE`; ficha en notas de investigación del curso
-  l. 110–111, 255–256, 280–282, 328–332). Ideas y estructura adaptadas y traducidas, sin texto literal:
-  - L13 `docs/en/lectures/lecture-13-loop-engineering/index.md`: `/goal` = objetivo + verificación + parada (l. 37);
-    cuatro tipos de bucle (l. 55–64); `/goal` frente a `/loop` y la prueba «¿tiene final?» (l. 66–83; **se dice en el
-    vídeo que no encaja con el `/loop` de omp**, que sí tiene final con `--until`); el `/loop` de Claude Code por
-    intervalo (l. 184, 198); seis primitivas (l. 160–257); separar generador y evaluador, «someone in your crew must not
-    believe you» (l. 282–300); cuatro costes silenciosos (resumen l. 158, detalle l. 401–419; **la l. 411, «comprehension
-    rot», está corrompida en el original: se parafrasea desde l. 158**; la l. 419 dice que el prompt crece
-    «cuadráticamente»: lo que crece así es el total acumulado de tokens, y así se cuenta); escalera de madurez
-    (l. 459–469). **No se usan**: el escenario «tres personas en una semana» (l. 91, marcado como ilustración
-    didáctica), las cifras de autoresearch marcadas como ilustración (l. 370, 391) ni la tabla de Boris Cherny.
-  - L14 `docs/en/lectures/lecture-14-graph-engineering/index.md`: cuatro capas prompt → contexto → bucle → grafo y el
-    harness debajo (l. 20–43); nodos, aristas, estado compartido, enrutado (l. 45–82); el bucle como decisión aplazada y
-    el grafo como decisión por adelantado (l. 95–104); tres fallos estructurales de un bucle solo, **Goodhart**
-    (l. 112–116), ceguera hacia arriba (l. 118–122) y conflicto (l. 124–126); **anclas** (l. 137–139); grafo frente a
-    workflow (l. 141–167); el *fan-out* de subagentes ya es un grafo (l. 175–178); el nodo verificador con contexto nuevo
-    (l. 206–213); **impuesto de orquestación** (Osmani, l. 278–284); cinco criterios, «al menos tres» (l. 286–296);
-    resumen de Goodhart (l. 303); autochequeo de Goodhart (ejercicio 3, l. 345). El caso del equipo de soporte que
-    «aprende a cerrar tickets» es un **ejemplo de eigent**, no un estudio: se cuenta como ejemplo. Las cifras falsas
-    «+18 %, −85 %» (l. 274) no se usan.
-- **Anthropic, «How we built our multi-agent research system»** (13 jun 2025, Hadfield, Zhang, Lien, Scholz, Fox, Ford),
-  https://www.anthropic.com/engineering/multi-agent-research-system (leído con WebFetch el 16 oct 2026): un agente usa
-  unas **4×** los tokens de un chat y un sistema multiagente unas **15×**; en BrowseComp el uso de tokens explica el
-  **80 %** de la varianza del rendimiento; su sistema multiagente superó a un solo agente en un **90,2 %** en su
-  evaluación interna de investigación; **no encaja** cuando los agentes deben compartir contexto o hay muchas
-  dependencias, y la mayoría de tareas de programación tienen menos subtareas paralelizables que la investigación.
-- **Claude Code**, documentación oficial (leída con WebFetch el 16 oct 2026):
-  - https://code.claude.com/docs/en/scheduled-tasks: `/loop` repite un prompt **por intervalo** (o con un intervalo que
-    elige Claude, entre un minuto y una hora); ligado a la sesión, necesita la sesión abierta; las tareas recurrentes
-    **caducan a los siete días**; sin prompt usa un prompt de mantenimiento o `loop.md`.
-  - https://code.claude.com/docs/en/goal: `/goal` fija una condición; tras cada turno, un **modelo pequeño aparte** la
-    evalúa con la conversación; **no ejecuta comandos ni lee ficheros**, así que la condición debe poder demostrarse en
-    el transcript; está montado sobre un *Stop hook*.
-  - Codex: solo vía L13. **No se afirma nada de Codex** en la locución.
-- **Goodhart**: C. A. E. Goodhart (1975), «Problems of Monetary Management: The U.K. Experience», *Papers in Monetary
-  Economics*, vol. I, Reserve Bank of Australia (formulación original, sobre política monetaria). M. Strathern (1997),
-  «“Improving ratings”: audit in the British University system», *European Review* 5(3), 305–321: la formulación
-  habitual («cuando una medida se convierte en objetivo, deja de ser una buena medida»). **Solo confirmado por fuentes
-  secundarias** (p. ej. https://forrt.org/glossary/english/goodhart_s_law/): se parafrasea, sin página ni cita literal.
-- **oh my pi** instalado (binario `~/.bun/bin/omp`, docs con `omp read omp://…`; changelog extraído del binario con
-  `strings`, como en notas de investigación del curso):
-  - `/loop`: uso «/loop [count|duration] [--while|--until '<command>'] [prompt]»; «re-submits after every yield»;
-    `loop.mode` `prompt`/`compact`/`reset` (por defecto `prompt`, confirmado en el perfil demo);
-    `loop.conditionTimeoutMs` 30000; mensajes «Loop condition … is now satisfied / failed / timed out … Loop mode
-    disabled.» Sin cambios en el changelog hasta la instalada.
-  - `omp://tools/task.md`: lote `{context, tasks[]}`; `async.enabled` (en el perfil demo: `true`) → los resultados llegan
-    después como inyecciones; cada subagente es una sesión hija con su propio contexto; `tools.approvalMode` forzado a
-    `yolo` en los hijos; artefactos `<id>.jsonl` «when the parent persists artifacts»; lanzamiento especulativo solo sin
-    handlers `tool_call`/`tool_result` de extensiones (con `puerta.ts` cargada, no hay lanzamiento especulativo).
-    Perfil demo: `task.maxConcurrency` 32, `task.maxRecursionDepth` 2, `task.isolation.enabled` false.
-  - `omp://agent-hub.md`: coste, tiempo, peticiones y tokens por agente; si falta el dato, «usage —», sin estimar.
-  - Changelog: **`omp --restore <session>`** retoma una sesión y sigue con lo que dejó a medias al caerse, el turno
-    interrumpido y los subagentes (en `omp --help`: «Pick a session back up after a crash, subagents included»);
-    `--goal` para arrancar en modo goal; los subagentes de `task` devuelven su respuesta como texto (`task.structured`
-    para el modo anterior); `/new` reinicia plan y goal. **Nada de omp², Directors ni «durable»** en el changelog.
-  - `omp stats --summary` / `--json` (vídeo 21). `omp usage` / `/usage` enseñan los **límites del proveedor por
-    cuenta**, no el coste de la sesión, y están en la lista de lo que no se enseña: no se usan.
-- **Pi** instalado (`~/.asdf/installs/nodejs/25.2.1/lib/node_modules/@earendil-works/pi-coding-agent/`): sin `/loop`,
-  `/goal` ni subagentes de serie; ejemplo `examples/extensions/subagent/` (procesos `pi` aparte, *scout → planner →
-  worker*, uso y coste por agente); `agent_before_settle` (vídeo 24). CHANGELOG hasta la instalada: nada de bucles ni
-  de Durable.
-- **Web, «lo que viene»:**
-  - https://omp.sh/ (16 oct 2026): solo «omp², soon!».
-  - https://earendil.com/posts/pi-durable/ (1 oct 2026): Pi Durable, **experimental** («the API might still change»),
-    paquete `@earendil-works/pi-durable`; cada paso guarda un *checkpoint* y otro proceso retoma lo pendiente; no
-    sustituye al agente de programación. En la locución **no se ata a «Pi uno punto cero»** (regla de versiones).
-  - notas de investigación del curso §4 (Harness Playbook, Can Bölük, 2026-09-02): l. 2780 (trabajo acotado), l. 2800
-    (**Directors** ⚠ omp²: una pila de comportamientos que controlan el bucle y deciden si el agente puede ceder el
-    turno), l. 2831 (critica comprobar a mano la exclusión entre modos, «sal primero del goal mode», que vimos en el 15).
-- **Guiones** (para no repetir ni contradecir): 15 (`/loop` y `/goal`, «el tres era un techo, no un objetivo»,
-  `loop.mode`, plazo de treinta segundos, «exit goal mode first»), 16 (Hub, «tres agentes leen tres veces», reparto con
-  `task`, `shared workspace`, *yolo* en subagentes, «una sola tarea pequeña… hazla en la sesión principal»), 21
-  (`omp stats --summary`, `/ratchet`: «solo cuenta si mejora en casos que el agente no ha visto»), 22 (prefijos medidos:
-  omp ≈4,4k con cuatro herramientas y ≈8k de serie; la misma tarea ×3: tokens 70k/98k/142k y coste ≈0,3–0,4 céntimos,
-  más del 90 % de caché; omp² ya presentado con aviso), 23 (rama `andamiaje`), 24 (rama `verificar`, `verificar.sh`
-  con salida 0/1, `puerta.ts`, convertir lo que se cuela en criterio, cierre con Goodhart).
-- **Tienda** (`~/csn/tienda`, solo leída con `git show`/`git log`): rama `verificar` en `a0751bb` con `ticket-001…003`
-  en `pasa`; etiqueta `rubrica-ticket-003`; `verificar.sh` compara **A5** con esa etiqueta
-  (`git diff --quiet rubrica-ticket-003 -- rubricas aceptacion verificar.sh`); `src/carrito.js` (`totalConCupon`,
-  `aplicarIVA`, `totalConEnvio`: envío y umbral sobre el total con cupón sin IVA; IVA solo a productos);
-  `test/ticket.test.js` compara el texto exacto de `ticket()` (por eso `ticket-004` **no toca** `ticket()`).
-  `~/csn/extensiones/puerta.ts` (protege `rubricas/`, `aceptacion/`, `verificar.sh`; ejecuta la verificación al marcar
-  `pasa` y antes de `git commit`). `~/csn/medir/` (scripts del 22). La tienda está ahora en la rama `andamiaje`.
+- Learn Harness Engineering (WalkingLab, © 2025, licencia MIT): lección 13 (bucles: objetivo, verificación y parada; costes silenciosos; escalera de madurez) y lección 14 (grafos: las cuatro capas, los tres fallos de un bucle solo, anclas, impuesto de orquestación y los cinco criterios). Ideas y estructura adaptadas y traducidas.
+- Anthropic, «How we built our multi-agent research system» (13 jun 2025), https://www.anthropic.com/engineering/multi-agent-research-system: tokens frente a un chat, el 80 % de la varianza explicado por los tokens y cuándo no encaja.
+- Documentación de Claude Code: `/loop` en https://code.claude.com/docs/en/scheduled-tasks y `/goal` en https://code.claude.com/docs/en/goal.
+- Goodhart: C. A. E. Goodhart (1975), «Problems of Monetary Management: The U.K. Experience»; M. Strathern (1997), «“Improving ratings”: audit in the British University system», *European Review* 5(3).
+- Grabado con oh my pi 18.6.1: `/loop` (`--until`, `loop.mode`), `omp://tools/task.md` (subagentes, `async.enabled`) y `omp://agent-hub.md` (coste por agente). Web: https://omp.sh/.
+- Pi: el ejemplo `examples/extensions/subagent/` y Pi Durable (experimental), https://earendil.com/posts/pi-durable/.
+- Vídeos relacionados: 15 (`/loop`, `/goal` y modo plan), 16 (subagentes y `/cleanse`), 21 (`/ratchet`), 22 (prefijos y método de medida) y 24 (`verificar.sh`, A1–A5 y `puerta.ts`).
 
 ## Transcripción
 

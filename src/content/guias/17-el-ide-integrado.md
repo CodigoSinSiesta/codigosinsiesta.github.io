@@ -12,103 +12,108 @@ Lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 
 <p class="guia__nota">Dura 24 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
+> **Seguridad:** las demos de este vídeo corren con approvalMode yolo (todo se aprueba solo); en tu proyecto, configura las aprobaciones antes (vídeo 19).
+
 ## Resumen por capítulos
 
 ### 1 · Un entorno de desarrollo sin ventanas
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Vídeo 16:** Quien reparte, verifica — Hoy, la otra mitad de esa idea.
-- *En la demo:* /tools · herramientas descubribles
-- **Una tarea real:** Carpeta (de datos) → Leer (PDF y SQLite) → Refactor (LSP) → Limpieza (AST) → Fallo (depurador) → eval
+- En el vídeo 16 la regla era «quien reparte, verifica». Para verificar bien, el agente necesita lo que usas tú al programar: un servidor de lenguaje, un depurador y una forma de editar que no rompa nada.
+- omp se lo da como herramientas: `lsp` (servidor de lenguaje), `debug` (depurador), `ast_grep` y `ast_edit` (buscar y reescribir por estructura), `eval` (ejecutar código con estado) y `read`, que abre casi cualquier cosa.
+- **La razón de fondo:** dar al modelo hechos en lugar de suposiciones. Si adivina dónde se llama una función, a veces acierta; si se lo pregunta al servidor de lenguaje, lo sabe.
+- **No confundas:** el comando `/debug` no abre el depurador. Abre un selector de diagnóstico del propio omp. El depurador es la herramienta `debug`, y la maneja el modelo.
+- El orden es el de una tarea real: dar acceso a una carpeta de datos, leerla, refactorizar con LSP, limpiar con búsqueda estructural, encontrar un fallo con el depurador y probar con `eval`.
 
 ### 2 · Varias carpetas en una sesión
 
 <p><button type="button" class="ir-a" data-t="158">▶ Ir a 2:38</button></p>
 
-- *En terminal:* ~/csn/datos (fuera del repositorio) (más abajo, en «Código y comandos»)
-- *En la demo:* /dirs
-- *En la demo:* /add-dir ../datos
-- *En la demo:* /remove-dir .
-- **Cuándo sirve**
-  - `app + lib` · Cruza repos
-  - `servicio` · Y su cliente
-  - `docs` · En otro sitio
-- **Aviso:** Añadir no es aislar — «Solo lectura» en AGENTS.md es una petición. Permisos de verdad: vídeo 19.
+- Una sesión tiene un directorio de trabajo y puede tener más raíces. `/dirs` las lista, `/add-dir <ruta>` añade una y `/remove-dir` la quita (el directorio de trabajo no se puede quitar; para cambiarlo, `/move`, vídeo 12).
+- Al añadir una raíz, omp regenera el system prompt: le dice al modelo que use rutas absolutas bajo ella y carga su `AGENTS.md` y su árbol de ficheros.
+- Las raíces se guardan en la sesión y vuelven al retomarla. Para todas las sesiones: el ajuste `workspace.additionalDirectories`; al arrancar: `--add-dir`.
+- Sirve cuando el cambio cruza repositorios: una aplicación y su librería, un servicio y su cliente, el código y una documentación que vive en otro sitio.
+- **Aviso:** añadir no es aislar. Si el agente puede editar en una raíz, puede editar en todas. «Solo lectura» en un `AGENTS.md` es una petición. Permisos de verdad: vídeo 19.
 
 ### 3 · Una sola puerta: read
 
 <p><button type="button" class="ir-a" data-t="292">▶ Ir a 4:52</button></p>
 
-- *En terminal:* La petición (más abajo, en «Código y comandos»)
-- *En la demo:* read sobre un PDF
-- *En la demo:* La base, por bash
-- *En la demo:* El error está en los datos
-- *En terminal:* read con sufijos (más abajo, en «Código y comandos»)
-- **Vídeo 11:** Hashline — Cada línea con su número y la lectura con una etiqueta.
+- `read` recibe una ruta y abre casi todo: convierte a texto PDF, Word, hojas de cálculo o ePub; reconoce bases SQLite (tablas, esquema, filtros y consultas, en un modo que impide escribir), entra en archivos comprimidos y abre direcciones internas como `pr://<N>` (una pull request de GitHub, vía `gh`).
+- *En la demo:* el modelo lee la tarifa del PDF con `read`, pero consulta la base con `sqlite3` desde bash. El resultado es el mismo, pero con bash nada impide escribir. Si quieres la garantía de solo lectura, pídele que use `read`.
+- El hallazgo: dos pedidos de más de 40 € pagaron envío. El umbral del código coincide con la tarifa, así que el error está en los datos, no en el código.
+- Con sufijos lees solo un rango (`:20-40`) o el fichero tal cual (`:raw`). Sin sufijo, un fichero de código largo llega resumido: declaraciones con los cuerpos plegados, y al final qué rangos volver a leer.
+- *En terminal:* read con sufijos (más abajo, en «Código y comandos»).
 
 ### 4 · El servidor de lenguaje
 
 <p><button type="button" class="ir-a" data-t="451">▶ Ir a 7:31</button></p>
 
-- **Rename con grep: funciona casi siempre:** gastosEnvio → calcularEnvio — El casi: un nombre en un comentario, una importación con alias, un fichero sin mirar.
-- **Hay que pedirlo:** rename con apply: false — Por defecto, rename aplica los cambios.
-- *En la demo:* lsp references
-- *En la demo:* Vista previa
-- *En la demo:* git diff
-- *En la demo:* El modelo lo hizo aparte
+- Renombrar con grep funciona casi siempre. El «casi» es el problema: un nombre en un comentario, una importación con alias, un fichero que no se ha mirado. El servidor de lenguaje distingue definición, referencia y texto.
+- omp habla LSP (el protocolo que usa tu editor) y arranca el servidor solo si encuentra en el directorio de trabajo un marcador de proyecto (para JS, `package.json`) y el binario (aquí, `typescript-language-server`). Arranca en el primer uso y se comparte por proyecto.
+- **La vista previa hay que pedirla:** `rename` aplica los cambios salvo que lleve `apply: false`.
+- *En la demo:* LSP encuentra diez referencias en tres ficheros. Tras aplicar, `git diff` enseña un cambio más: el título de un test, que es texto y que el modelo editó por su cuenta. El servidor es preciso; el modelo tiene criterio propio. Revisa el diff.
+- Para otros lenguajes (rust-analyzer, gopls, pyright…) vienen decenas de configuraciones de serie; otro servidor se declara en `.omp/lsp.json`.
 
 ### 5 · Editar con precisión: hashline, ast_grep y ast_edit
 
 <p><button type="button" class="ir-a" data-t="646">▶ Ir a 10:46</button></p>
 
-- **Edición anclada:** Etiqueta (de la lectura) → Líneas (por número) → ¿Cambió? (no aplica a ciegas)
-- *En terminal:* Hashline (diapositiva) (más abajo, en «Código y comandos»)
-- **Regla:** No edita lo que no ha visto — Partes plegadas: primero hay que leerlas.
-- *En la demo:* edit con DeepSeek: sustitución de cadenas
-- *En terminal:* La petición (más abajo, en «Código y comandos»)
-- **ast_grep · apagada de fábrica:** Math.round($X * 100) / 100 — $X atrapa cualquier expresión; los espacios dan igual.
-- *En la demo:* AST Grep · 3 coincidencias
-- *En la demo:* ast_edit: propuesta, reject y resolve
-- *En la demo:* Si quieres decidir tú, pídelo
+- **Con DeepSeek verás el modo replace.** Según la documentación, la familia DeepSeek (entre otros modelos) no usa hashline, sino un modo clásico de buscar y sustituir cadenas, con coincidencia difusa de espacios. Es lo que pasa en todas las demos del curso.
+- **Si usas otro modelo: hashline.** Es el modo por defecto de omp, la edición anclada que viste en el vídeo 01. `read` numera cada línea y etiqueta la lectura; el modelo edita citando la etiqueta y los números de línea. Si el fichero cambió desde la lectura, la etiqueta no coincide y omp no aplica a ciegas. Gramática: `PUT`, `CUT`, `REM` y `MV`. La documentación añade que no edita líneas que el modelo no ha visto (`edit.enforceSeenLines`).
+- `ast_grep` busca por estructura, no por texto: el patrón se escribe como código con huecos (`$X` atrapa cualquier expresión; los espacios dan igual). **Viene apagada de fábrica**; la activamos en el perfil de la demo.
+- `ast_edit` reescribe por estructura y **siempre propone antes de aplicar**: enseña cada línea antes y después. La propuesta se acepta escribiendo en `xd://resolve` y se descarta en `xd://reject` (`xd://` son las direcciones internas con las que el modelo responde a una propuesta).
+- *En la demo:* la propuesta revela un caso con paréntesis dobles y una colisión entre reglas; el modelo la descarta y lo hace en dos etapas. Pero aprobó él mismo cada etapa sin esperarnos. Si quieres decidir tú, pídele explícitamente que pare tras la propuesta.
+- El orden de la petición importa: crea la función `redondear` después de sustituir, o su propio cuerpo coincidiría con el patrón.
 
 ### 6 · Depurar de verdad
 
 <p><button type="button" class="ir-a" data-t="862">▶ Ir a 14:22</button></p>
 
-- *En la demo:* Romper a mano
-- *En la demo:* Debug variables
-- *En la demo:* Parar es mirar
-- *En la demo:* Arreglado
-- **/debug · para reportar un fallo de oh my pi:** Revisa antes de compartir — Enseña sesiones y peticiones tal cual.
+- La herramienta `debug` habla DAP (el protocolo de los depuradores de los editores) y usa adaptadores existentes: gdb y lldb, debugpy, delve y, para JavaScript, js-debug de VS Code. Este último no viene con omp: hay que instalarlo.
+- *En la demo:* rompemos el cupón para que descuente dos veces. El agente pone un punto de ruptura, para, avanza una línea y ve el total bajar de 26,10 a 23,49 €: el descuento se aplica dos veces. Encuentra la causa sin tocar el código, que es lo que le pedimos.
+- El repertorio es el de cualquier depurador: puntos de ruptura (con condición), avanzar, entrar y salir, pila, variables y evaluar expresiones. Una sola sesión a la vez; puede engancharse a un proceso por PID o puerto; otro adaptador se declara en `dap.json`.
+- `/debug` sirve para reportar un fallo de omp (logs, rendimiento, peticiones en crudo, paquete de informe). Enseña sesiones y peticiones tal cual: revisa el informe antes de compartirlo.
 
 ### 7 · Eval, el navegador y el escritorio
 
 <p><button type="button" class="ir-a" data-t="1040">▶ Ir a 17:20</button></p>
 
-- **eval:** Un proceso que sigue vivo — JavaScript o Python, con estado entre llamadas.
-- *En la demo:* Una celda JavaScript
-- *En la demo:* Con 40 € y cupón, se paga más
-- **Relé:** Tu propio Chrome — Con tus sesiones iniciadas. Lo que haga, lo hace con tu cuenta.
-- *En terminal:* /browser (no se pulsa) (más abajo, en «Código y comandos»)
-- **/computer · solo diapositiva:** Tu escritorio real — Capturas, accesibilidad, ratón, teclado y portapapeles. Viene apagado.
+- `eval` ejecuta celdas de JavaScript o Python en un proceso que sigue vivo: lo que defines en una llamada sigue en la siguiente. Bash empieza de cero cada vez. Desde una celda se pueden llamar otras herramientas.
+- *En la demo:* una celda calcula el total con envío para varios carritos y destapa un caso de negocio: con 40 € y el cupón del 10 %, el cliente paga más que sin cupón (48,51 frente a 48,40 €), porque el descuento le deja por debajo del umbral y vuelve a pagar envío.
+- `browser` es un Chromium que el agente maneja desde `eval`: abrir, observar, hacer clic, rellenar, capturar. Para leer una página estática basta `read`. El **relé** adopta una pestaña de tu propio Chrome, con tus sesiones: lo que haga, lo hace con tu cuenta.
+- `/browser` sin argumento alterna entre oculto y visible y lo guarda en la configuración. Cámbialo solo en tu perfil de pruebas.
+- `/computer` da al agente tu escritorio real: capturas, accesibilidad, ratón, teclado y portapapeles. Viene apagado (`/computer on|off|status`, solo para la sesión). No lo activamos en el vídeo.
 
 ### 8 · Límites, riesgos y coste
 
 <p><button type="button" class="ir-a" data-t="1202">▶ Ir a 20:02</button></p>
 
-- **Primero:** Todo se ejecuta en tu máquina — Lo que en tu editor decides con un clic, aquí lo decide el modelo.
-- **Aprobaciones**
-  - `yolo` · De fábrica: nadie pregunta
-  - `write` · Para computer: y una máquina dedicada
-- **Tercero:** Lo que ve no es una orden — Una página o un PDF pueden traer instrucciones escondidas.
-- **Pauta:** Activa (lo justo) → Instala (LSP y DAP) → computer (apagado) → Vista previa (antes de cambios grandes)
+- **Todo se ejecuta en tu máquina.** Lo que en tu editor decides con un clic, aquí lo decide el modelo.
+- **Aprobaciones:** las herramientas distinguen lectura, escritura y ejecución, pero omp viene en **yolo** (aprueba todo sin preguntar), así que nadie pregunta. Para usar `/computer`, la documentación recomienda el modo `write` y una cuenta o máquina virtual dedicada.
+
+| Herramienta | En lugar de | Nivel de aprobación |
+|---|---|---|
+| `lsp` | grep y ediciones sueltas | `read` para consultar; `write` para `rename` y acciones |
+| `debug` | adivinar por qué falla | `read` para mirar; `exec` para el resto |
+| `ast_edit` | buscar y sustituir texto | siempre propuesta antes de aplicar |
+| `eval` | `node -e` por bash | `exec` |
+| `browser` | `read`, cuando hay que interactuar | `exec` |
+
+- **Propuesta no es aprobación:** en yolo, quien acepta la vista previa es el modelo, salvo que le pidas parar o configures aprobaciones (vídeo 19).
+- **Lo que ve no es una orden.** Una página o un PDF pueden traer instrucciones escondidas. Limitar los dominios del navegador ayuda, pero no es un sandbox.
+- **Dependencias:** el servidor de lenguaje y el adaptador del depurador no vienen con omp; si faltan, la herramienta falla o no aparece. Pregunta al LSP por su estado antes de fiarte. Solo busca marcadores en el directorio de trabajo, no en las raíces añadidas.
+- **Coste:** casi todo es local; gastan los turnos que deciden y la salida que vuelve al contexto. Toda la demo, con Pro, costó unos cuatro céntimos. Pide lo concreto: una tabla, un rango, una referencia.
+- **Pauta:** activa solo lo que vayas a usar; instala LSP y adaptador DAP de tus lenguajes y comprueba que responden; deja `/computer` apagado y el navegador en tu perfil de pruebas; pide la vista previa antes de un cambio grande.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1346">▶ Ir a 22:26</button></p>
 
-- **Próximo vídeo:** Git, calidad y entrega — /git, /wt, /review, omp commit, Auto QA y /security.
+- **Práctica:** en tu perfil de pruebas, abre un proyecto con un servidor de lenguaje instalado y pregúntale por su estado. Pide las referencias de una función y la vista previa de su cambio de nombre antes de aplicarla. Rompe algo a propósito y pide que lo encuentre con el depurador antes de tocar el código. Apunta qué te dio cada herramienta que no te habría dado grep.
+- **En otros agentes:** lo que importa es la idea, consultar al servidor de lenguaje o al depurador en vez de adivinar. Si tu agente no trae LSP, pídele al menos que pase el comprobador de tipos (por ejemplo, `tsc --noEmit`) después de editar.
+- **Próximo vídeo:** Git, calidad y entrega: `/git`, `/wt`, `/review`, `omp commit`, Auto QA y `/security`.
 
 ## Código y comandos
 
@@ -122,21 +127,15 @@ pedidos.db          # SQLite, tabla pedidos (20 filas)
 AGENTS.md           # «Datos de ejemplo. Solo lectura.»
 ```
 
-- `PDF`: Tarifa
-- `SQLite`: Pedidos
-- `AGENTS.md`: Instrucciones
+El `AGENTS.md` de la carpeta llega al agente al añadirla con `/add-dir`, pero su «solo lectura» es una petición, no una barrera.
 
-### La petición
+### La petición (PDF y SQLite)
 
 ```text
 Lee la tarifa de envío del PDF de la carpeta datos y dime el umbral.
 Mira qué tablas tiene pedidos.db y busca pedidos ≥ 40 € con envío cobrado.
 Compáralo con src/envio.js. No cambies nada.
 ```
-
-- `PDF`: read
-- `pedidos.db`: Consulta
-- `No cambies`: Solo lectura
 
 ### read con sufijos
 
@@ -147,11 +146,12 @@ read datos/pedidos.db:pedidos   # esquema y filas
 read datos.zip:informe.csv      # dentro de un archivo
 ```
 
-- `:20-40`: Rango
-- `:raw`: Sin resumen
-- `.db:tabla`: SQLite
+- `:raw`: devuelve el fichero entero, sin el resumen con cuerpos plegados.
+- `.db:tabla`: el esquema de la tabla y unas filas, en solo lectura.
 
-### Hashline (diapositiva)
+### Hashline
+
+La gramática de hashline. Con DeepSeek no la verás, porque edita en modo replace; está aquí como referencia.
 
 ```text
 PUT 12-14  …nuevas líneas…    # sustituye, o inserta antes/después
@@ -159,11 +159,9 @@ CUT 20-25 → PUT 40             # cortar y pegar
 REM fichero · MV a → b
 ```
 
-- `PUT`: Sustituir
-- `CUT`: Cortar
-- `REM · MV`: Borrar, mover
+Todos los números se refieren a la lectura original: el modelo no recalcula nada tras cada cambio.
 
-### La petición
+### La petición (ast_grep)
 
 ```text
 Encuentra los redondeos a céntimos con ast_grep.
@@ -171,94 +169,27 @@ Sustitúyelos con ast_edit por redondear(…), con vista previa.
 Después crea la función redondear.
 ```
 
-- `ast_grep`: Buscar
-- `ast_edit`: Reescribir
-- `Después`: El orden importa
+El «después» importa: si `redondear` existiera antes, su cuerpo coincidiría con el patrón y acabaría llamándose a sí misma.
 
-### /browser (no se pulsa)
+### /browser
+
+No se ejecuta en el vídeo; está aquí como referencia.
 
 ```text
 /browser            # alterna oculto/visible y lo guarda
 /browser headless   # explícito
 ```
 
-- `/browser`: Alterna
-- `guarda`: En la configuración
-- `perfil`: De pruebas
+Como el cambio se guarda en la configuración, pruébalo en tu perfil de pruebas.
 
 ## Fuentes
 
-- Documentación de omp 18.5.1 (la documentación de omp (omp.sh)):
-  - `tools/read.md`: un solo `path`; selectores `:N`, `:A-B`, `:raw`, `:conflicts`; documentos convertibles (`.pdf`,
-    `.docx`, `.xlsx`…, conversión con markit; `doc.pdf:page11.png` hace captura de página con Chromium); SQLite
-    (`.sqlite`, `.sqlite3`, `.db`, `.db3` con cabecera válida; `db` lista tablas con filas, `db:tabla` esquema y cinco
-    filas, `db:tabla:clave`, `?limit/offset/order/where`, `?q=SELECT…`; conexión con `PRAGMA query_only = ON`; límites
-    20, 500, 1000); archivos comprimidos (`archivo.zip:ruta`); URLs internas (`pr://`, `issue://`, `agent://`,
-    `history://`, `proc://`, `omp://`, `xd://`…); `pr://<N>`, `pr://<N>/diff` pasan por la caché SQLite de la
-    herramienta `github` (`gh`); vídeo con ffmpeg; cuadernos `.ipynb` como texto editable; hashline: cabecera
-    `[PATH#TAG]` y líneas `N:texto`, instantáneas en el `EditStore` de la sesión; `read.summarize.*` (resumen estructural
-    desde 100 líneas).
-  - `tools/edit.md`: modo por defecto `hashline`; etiqueta de cuatro hex derivada del contenido; operaciones `PUT`,
-    `CUT`, `REM`, `MV`; números de línea del snapshot original; `edit.enforceSeenLines` (no edita líneas no vistas);
-    recuperación de etiquetas viejas solo si es segura; **los modelos de la familia DeepSeek (entre otros) caen a modo
-    `replace`** salvo `PI_STRICT_EDIT_MODE`; «Hashline applies in one tool call; it does not use the staged
-    `xd://resolve` / `xd://reject` flow used by `ast_edit`».
-  - `tools/lsp.md`: acciones (`diagnostics`, `definition`, `references`, `hover`, `symbols`, `rename`, `rename_file`,
-    `code_actions`, `type_definition`, `implementation`, `status`, `reload`, `capabilities`, `request`); `lsp.enabled`
-    `true`; herramienta descubrible; lectura con aprobación `read`, `rename`/`code_actions`/`reload`/`request` con
-    `write`; **`rename` aplica salvo `apply: false`**; `symbol` obligatorio con `line`; `diagnostics` con `file: "*"`
-    lanza `npx tsc --noEmit` si hay `tsconfig.json`; `lsp.lazy` (arranque en el primer uso); servidor compartido por
-    proyecto (`lsp.shared`).
-  - `lsp-config.md`: autodetección por `rootMarkers` **solo en el cwd** y binario en `node_modules/.bin` o `PATH`;
-    ficheros `lsp.json|yaml` (proyecto `.omp/lsp.json`, usuario en el directorio del agente); tabla de servidores
-    (`typescript-language-server` para JS/TS hasta TS 6, `typescript-native` para TS 7+); un solo servidor de TS por
-    proyecto.
-  - `tools/debug.md`: herramienta `debug` = **una sesión DAP** (`launch`, `attach`, `set_breakpoint`, `continue`,
-    `step_*`, `stack_trace`, `scopes`, `variables`, `evaluate`, `output`, `terminate`…); `debug.enabled` `true`;
-    aprobación `read` para las de solo lectura y `exec` para el resto; una sola sesión raíz; adaptadores incluidos
-    (`gdb`, `lldb-dap`, `debugpy`, `dlv`, `js-debug-adapter`…) y `dap.json` propio; **adaptador JS: `dapDebugServer.js`
-    de vscode-js-debug por TCP**, autodescubierto en `~/.local/opt/js-debug/src/` o con `JS_DEBUG_DAP_SERVER` (no existe
-    el paquete npm `js-debug-adapter`); corre con `node` del PATH o con Bun. **El selector `/debug` es otra cosa:**
-    rutas de interfaz `open-artifacts`, `performance`, `work`, `dump`, `memory`, `logs`, `system`, `terminal`,
-    `protocols`, `raw-sse`, `remote-debugger`, `transcript`, `clear-cache`; los paquetes de informe contienen sesión,
-    logs, ajustes y SSE en crudo.
-  - `tools/ast-grep.md` (**desactivada por defecto**, `astGrep.enabled: false`; metavariables `$X`, `$$$`; salida con
-    anclas hashline), `tools/ast-edit.md` (activa; **siempre vista previa** «Staged as a proposal — files NOT modified
-    yet»; se aplica con `write xd://resolve` y se descarta con `xd://reject`; comprueba que la vista previa no ha
-    caducado), `resolve-tool-runtime.md` (dispositivos `xd://resolve|reject|propose`).
-  - `tools/eval.md` (una celda por llamada, `py` o `js`, estado que sobrevive; `tool.<nombre>()`, `agent()`; aprobación
-    `exec`; `%pip install`, `%bun add`; preludes de extensión documentados en `xd://eval/<nombre>`), `python-repl.md`,
-    `notebook-tool-runtime.md` (los cuadernos se editan, no se ejecutan).
-  - `tools/browser.md` (prelude de `eval`; `browser.enabled` `true`; Chromium gestionado que se instala en el primer
-    uso, CDP, relay sobre tu Chrome real; `observe`, `screenshot`…; aprobación `exec`; `allowed_domains` «is not a
-    sandbox»), `computer-use.md` (prelude desactivado; `/computer` solo cambia la sesión; actúa sobre aplicaciones
-    reales; «Screen content is untrusted data»; la doc recomienda `tools.approvalMode: write` y una cuenta o VM
-    dedicada).
-  - `settings.md` (`workspace.additionalDirectories`), `cli-reference.md` (`--add-dir`), `natives-text-search-pipeline.md`
-    (ast-grep y grep nativos en Rust).
-- **Código instalado de omp 18.6.1** (`~/.bun/install/global/node_modules/@oh-my-pi/pi-coding-agent/src/`):
-  - `slash-commands/builtin-lifecycle.ts`: `/debug` llama a `showDebugSelector()` (el selector de diagnóstico, **no**
-    el DAP); `/add-dir <ruta>` («Directory does not exist», «Not a directory», «Already in the workspace», «Added …»,
-    regenera el system prompt), `/remove-dir` («Cannot remove the working directory; use /move to change it.»),
-    `/dirs` («Workspace directories:», el cwd marcado «(working directory)»).
-  - `session/session-manager.ts`: los directorios extra se guardan en la cabecera de la sesión (sobreviven a retomarla).
-  - `system-prompt.ts` y `prompts/system/project-prompt.md`: bloque `<workspace-roots>` («Use absolute paths under these
-    roots…»); carga también el `AGENTS.md` y el árbol de cada raíz extra.
-  - `slash-commands/builtin-collaboration.ts`: `/browser` **sin argumento alterna** headless/visible y lo guarda con
-    `settings.set`; la etiqueta del menú dice «Browser: headless|visible|disabled».
-  - `slash-commands/builtin-modes.ts`: `/computer [on|off|status]`, «Toggle the native computer-use tool for this
-    session».
-  - `config/settings-schema.ts`: `edit.mode` `hashline`, `astGrep.enabled` `false`, `astEdit.enabled` `true`,
-    `debug.enabled` `true`, `lsp.enabled` `true`, `lsp.diagnosticsOnWrite` `true`, `lsp.diagnosticsOnEdit` `false`,
-    `lsp.formatOnWrite` `false`, `eval.py`/`eval.js` `true`, `browser.enabled` `true`, `computer.enabled` `false`.
-  - `lsp/defaults.json` (`typescript-language-server --stdio`, `rootMarkers` `package.json`, `tsconfig.json`,
-    `jsconfig.json`) y `dap/defaults.json` (`js-debug-adapter`, `rootMarkers` `package.json`…, `type: pwa-node`,
-    `stopOnEntry: true`).
-- Máquina (5 oct 2026, solo lectura): `typescript-language-server` 5.3.0 y `typescript` 6.0.3 instalados con npm
-  global (con `lib/tsserver.js`); `dapDebugServer.js` **no** está; `gh` instalado; la tienda no tiene remoto.
-- Vídeos anteriores: 01 (edición anclada), 11 (cabecera de hashline al desplegar la tarjeta de `read`; «servidor de
-  lenguaje, depurador, navegador»), 12 (`/move`), 15 (`xd://propose` del modo plan), 16 (cierre: «la depuración con
-  barra debug», que aquí se corrige; subagentes en modo plan sin LSP ni eval), 19 (permisos, se anuncia).
+- Documentación de oh my pi (omp.sh): `tools/read.md` (sufijos, documentos, SQLite, archivos y direcciones internas), `tools/edit.md` (hashline, modo replace para DeepSeek), `tools/lsp.md` y `lsp-config.md` (acciones, `apply: false`, autodetección).
+- `tools/debug.md` (DAP, adaptadores y diferencia con el selector `/debug`), `tools/ast-grep.md` y `tools/ast-edit.md` (patrones, propuesta y `xd://resolve|reject`).
+- `tools/eval.md`, `tools/browser.md` y `computer-use.md` (niveles de aprobación, relé, por qué `/computer` va apagado).
+- `settings.md` (`workspace.additionalDirectories`) y `cli-reference.md` (`--add-dir`).
+- Grabado con omp 18.6.1 (documentación de la 18.5.1), con `typescript-language-server` instalado con npm.
+- Vídeos relacionados del curso: 01 (edición anclada), 12 (`/move`), 16 (subagentes), 19 (aprobaciones).
 
 ## Transcripción
 

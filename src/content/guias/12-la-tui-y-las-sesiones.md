@@ -18,102 +18,101 @@ Atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **oh my pi: mismo árbol, otros movimientos**
-  - `/branch` · Rebobinar: en el menú, /rewind
-  - `/tree` · Navegar: otro comportamiento por defecto
-  - `/fork` · Bifurcar: solo se parece en el nombre
-- **Hoy:** Atajos (y selector) → Mirar (y nombrar) → Volver atrás (branch · tree · fork) → Cambiar (de sesión) → Empezar de cero (y mantenimiento)
-- **Perfil demo · DeepSeek V4.1 Flash:** Hoy no se edita ningún fichero — Todo el código va en las respuestas: rebobinar no deja el disco desfasado.
+- omp hereda el árbol de sesión de Pi (vídeo 03): un fichero JSONL donde cada entrada apunta a su padre y la hoja en la que estás decide qué rama ve el modelo.
+- Cambia la forma de moverse por él:
+  - `/branch` (en el menú, `/rewind`) es nuevo: rebobina.
+  - `/tree` sigue, pero con otro comportamiento por defecto.
+  - `/fork` se parece al de Pi solo en el nombre.
+- En la demo no se edita ningún fichero: el código va en las respuestas. Así, al rebobinar, el disco no queda desfasado respecto a la conversación.
 
 ### 2 · Atajos y selector de comandos
 
 <p><button type="button" class="ir-a" data-t="111">▶ Ir a 1:51</button></p>
 
-- *En terminal:* Atajos con comando (más abajo, en «Código y comandos»)
-- **/settings · Input:** Modo Vim — Apagado de fábrica. Movimientos, borrados y objetos de texto; nunca roba los atajos con Ctrl.
-- *En la demo:* Las descripciones dicen el estado
-- *En la demo:* /re filtra el menú
+- `/hotkeys` los lista todos. Dos que salvan trabajo: Ctrl+C vacía el editor y flecha arriba recupera el borrador; Ctrl+G abre el borrador en tu `$EDITOR` para mensajes largos.
+- Las acciones de sesión (árbol, bifurcar, retomar) no tienen tecla de fábrica; puedes asignarlas en `keybindings.yml`. Si vienes de Vim, hay un modo Vim para el editor en `/settings`, apagado de fábrica.
+- Al escribir `/` se abre el selector, y muchas descripciones te dicen el estado: `/tools` muestra cuántas herramientas tienes activas (doce de veinte disponibles con nuestro modelo); `/plan` y `/vibe`, si están en off.
+- El menú se filtra al escribir (`/re` deja rewind, resume, retry, rename, restart…). Los comandos integrados se reservan su nombre: uno tuyo no puede tapar a `/tree`.
+
+> **Nota:** la locución dice que en el vídeo 11 vimos «control q para encolar». El 11 no lo menciona. Según `keybindings.md`, encolar es Ctrl+Q (o Ctrl+Enter); compruébalo en `/hotkeys`.
 
 ### 3 · Mirar la sesión y ponerle nombre
 
 <p><button type="button" class="ir-a" data-t="289">▶ Ir a 4:49</button></p>
 
-- **Tres peticiones sin editar:** T1 (resumir envio.js) → T2 (gratis desde 50 €) → T3 (+3 € urgente)
-- *En la demo:* El código, en la respuesta
-- *En la demo:* Título automático: una llamada extra
-- *En la demo:* /session
-- *En la demo:* Mensajes, tokens y coste
-- *En la demo:* /rename envio-umbrales
-- **Para qué:** Un nombre se encuentra solo — Una sesión sin nombre es una línea más con la fecha.
+- La demo hace tres peticiones sin editar: resumir `src/envio.js`, envío gratis desde 50 € y un recargo de 3 € por urgencia.
+- omp pone título a la sesión con el primer mensaje. Es cómodo, pero es una llamada extra al modelo; si no la quieres, `--no-title`.
+- `/session` da la ficha: fichero e id, proveedor y de dónde sale la clave, mensajes, tokens (incluidos los de caché) y coste. Si tu proveedor enseña una cuenta, no la compartas tal cual.
+- `/rename <título>` lo fija sin gastar (en Pi era `/name`); sin título, lo genera con el modelo. Tu nombre tiene prioridad sobre el automático. Una sesión con nombre se encuentra sola en `/resume`.
 
 ### 4 · Rebobinar con /branch
 
 <p><button type="button" class="ir-a" data-t="462">▶ Ir a 7:42</button></p>
 
-- *En la demo:* /branch · /rewind
-- *En la demo:* ↑/↓ paso · ←/→ tus mensajes · f filtro · ⏎ rebobina
-- *En la demo:* Contorno punteado sobre T2
-- *En la demo:* Rewound to selected point
-- *En la demo:* La petición nueva: 2,95 €
-- *En la demo:* Esc Esc · las dos ramas lado a lado
+- `/branch` o `/rewind` abre la conversación a pantalla completa y eliges el punto mirándola: ↑/↓ paso a paso, ←/→ entre tus mensajes, `f` filtra, Enter rebobina.
+- Al elegir un mensaje tuyo, su texto vuelve al editor para reescribirlo. Al elegir una respuesta, te quedas justo después, con el editor vacío.
+- Nada se borra: la rama vieja sigue en el mismo fichero y la nueva cuelga del mismo punto como hermana. *En la demo:* la variante de 2,95 € convive con la del umbral de 50 €.
+- Frente a Pi, rebobinar nunca resume la rama que dejas (es inmediato y no gasta), y Esc Esc abre este selector, no el árbol. Lo cambias con `doubleEscapeAction` (`rewind`, `tree` o `none`).
+- En el punto donde se separan las ramas, la pantalla se divide en columnas para comparar las dos versiones con ←/→.
 
 ### 5 · Navegar con /tree
 
 <p><button type="button" class="ir-a" data-t="642">▶ Ir a 10:42</button></p>
 
-- *En la demo:* /tree
-- *En la demo:* ⇧L · etiqueta umbral-50
-- *En la demo:* Enter salta sin preguntar · ⇧Enter resume y salta
-- *En la demo:* Solo conoce su rama
-- **Vídeo 03:** En el fichero ≠ lo que ve el modelo — La otra rama está etiquetada y a un Enter, pero no viaja en la petición.
-- **Apunte honesto:** La hoja no se guarda — Al cargar, la sesión vuelve a la última entrada escrita. Tras moverte, envía algo.
+- `/tree` es el mapa de la sesión entera. Ctrl+O recorre los filtros (por defecto, sin herramientas, tus mensajes, etiquetadas, todo); Shift+L pone una etiqueta.
+- Enter salta sin preguntar. Si quieres resumir la rama que dejas, Shift+Enter; con `branchSummary.enabled` vuelve la pregunta de Pi. Saltar no cuesta nada salvo que pidas el resumen.
+- La rama nueva no sabe que la otra existió: el modelo solo recibe el camino de la raíz a la hoja. Lo que está en el fichero no es lo que ve el modelo (vídeo 03).
+- Apunte honesto: la hoja no se guarda. Al cargar, la sesión vuelve a la última entrada escrita. Después de moverte, envía algo antes de cerrar, retomar o bifurcar.
+- `/branch` y `/tree` mueven la conversación, no tus ficheros. Con ediciones de por medio: git para el código y el árbol para la conversación.
 
 ### 6 · Bifurcar con /fork
 
 <p><button type="button" class="ir-a" data-t="854">▶ Ir a 14:14</button></p>
 
-- *En la demo:* ls $S
-- *En la demo:* jq: tipo, id y parentId
-- *En la demo:* El comando ya lleva --profile demo
-- *En la demo:* wc -l: 20 y 20
-- **Tres formas de volver atrás**
-  - `/branch` · Rebobina: mismo fichero · sin resumen · Pi: no existía
-  - `/tree` · Navega: mismo fichero · resumen solo con ⇧Enter · Pi: preguntaba
-  - `/fork` · Duplica: fichero nuevo, entero · Pi: desde un mensaje
+- Dentro del JSONL, cada mensaje apunta al anterior por `parentId`. Una bifurcación es un mensaje cuyo padre no es la línea anterior, y una etiqueta es una entrada propia de tipo `label`. El fichero solo crece.
+- `/fork` no abre selector: duplica la sesión entera, con todas sus ramas, en un fichero nuevo, y te cambia a él. *En la demo:* los dos ficheros tienen las mismas veinte líneas.
+- omp no tiene `/clone`. Para quedarte con una rama: haz `/fork` y, en la copia, muévete con `/tree` a la rama que quieres.
+
+| Comando | Qué hace | Fichero | Resumen | En Pi |
+|---|---|---|---|---|
+| `/branch` | Rebobina | El mismo | Nunca | No existía |
+| `/tree` | Navega | El mismo | Solo con Shift+Enter | Preguntaba al saltar |
+| `/fork` | Duplica | Uno nuevo, entero | — | Copiaba desde un mensaje |
 
 ### 7 · Cambiar de sesión: /resume y /pin
 
 <p><button type="button" class="ir-a" data-t="1015">▶ Ir a 16:55</button></p>
 
-- **/pin:** Session pinned — Arriba de la lista de /resume. Otra vez /pin la desfija.
-- *En la demo:* /resume
-- *En la demo:* Tab y Supr: no en cámara
-- *En la demo:* /resume «id»
-- *En terminal:* Dónde viven las sesiones (más abajo, en «Código y comandos»)
-- *En terminal:* Retomar desde la terminal (más abajo, en «Código y comandos»)
+- `/pin` fija una sesión arriba de la lista de `/resume` (la actual o la de un id). Volver a lanzarlo la desfija.
+- `/resume` abre el selector con las sesiones de esta carpeta. Tab muestra las de todos los proyectos y Supr borra con confirmación; ojo si compartes pantalla.
+- `/resume <id>` salta directo y te deja en la última entrada escrita: la hoja no guardada, en directo.
+- Las sesiones viven en la carpeta del perfil, en `sessions/`, con una subcarpeta por directorio de trabajo. *En terminal:* Dónde viven las sesiones y Retomar desde la terminal (más abajo, en «Código y comandos»).
 
 ### 8 · Empezar de cero sin perderlo todo
 
 <p><button type="button" class="ir-a" data-t="1149">▶ Ir a 19:09</button></p>
 
-- *En la demo:* /fresh
-- *En la demo:* /clear
-- *En la demo:* Sin memoria de lo anterior
-- *En la demo:* /tree · Alt+A
-- *En la demo:* /new
-- **/delete · solo diapositiva:** No se deshace — Borra la sesión, su fichero y sus artefactos.
+- Cuatro comandos que se parecen; la diferencia está en qué conservan. Ninguno gasta modelo.
+
+| Comando | Fichero | Lo que ve el modelo | Cuándo |
+|---|---|---|---|
+| `/clear` | El mismo | Se vacía (marca una frontera `reset_boundary`) | Mismo trabajo, mente despejada |
+| `/new` | Uno nuevo | Vacío | Cambias de trabajo |
+| `/fresh` | El mismo | Igual | El proveedor parece atascado o da errores raros: reinicia su estado |
+| `/delete` | Se borra, con sus artefactos | — | Solo con sesiones que de verdad no quieras; no se deshace |
+
+- *En la demo:* tras `/clear`, el modelo dice que no tiene constancia del umbral propuesto en vez de inventarlo. La historia sigue en `/tree` con Alt+A.
+- La compactación y el traspaso, que resumen en lugar de vaciar, son del vídeo 13.
 
 ### 9 · Reintentar, reiniciar, mover y cierre
 
 <p><button type="button" class="ir-a" data-t="1321">▶ Ir a 22:01</button></p>
 
-- *En la demo:* /retry · F5 · antes, hasta 10 reintentos automáticos
-- *En la demo:* /restart · mismos flags
-- *En terminal:* /move (no grabado) (más abajo, en «Código y comandos»)
-- **Y dos límites honestos**
-  - `ficheros` · El árbol no los deshace
-  - `hoja` · Un salto no se guarda: hasta que escribes algo
-- **Próximo vídeo:** Contexto y memoria — /context, /compact, /shake, /handoff, memoria entre sesiones y /btw.
+- omp reintenta solo los errores pasajeros (límites, servidores saturados, cortes de red), hasta diez veces con esperas crecientes. `/retry` (o F5) es para cuando se agotan.
+- `/restart` cierra y vuelve a abrir con los mismos flags, incluido `--profile`, y retoma la sesión. Úsalo tras cambiar algo que solo se lee al arrancar.
+- `/move` traslada la sesión a otra carpeta de trabajo, por si empezaste en el directorio equivocado (más abajo, en «Código y comandos»).
+- Dos límites honestos: el árbol no deshace tus ficheros, y un salto no se guarda hasta que escribes algo.
+- Práctica: tres peticiones sin editar, rebobina con Esc Esc y compara las ramas en columnas, etiqueta una en `/tree`, haz `/fork` y cuenta las líneas de los dos ficheros, y termina con `/clear` preguntando algo de antes.
 
 ## Código y comandos
 
@@ -127,10 +126,6 @@ Alt+↑             saca de la cola un mensaje encolado
 # keybindings.yml: tecla para acciones de sesión (sin tecla de fábrica)
 ```
 
-- `F5 · Alt+R`: /retry
-- `Alt+↑`: Desencolar
-- `keybindings.yml`: Tus teclas
-
 ### Dónde viven las sesiones
 
 ```text
@@ -140,23 +135,22 @@ Alt+↑             saca de la cola un mensaje encolado
 # autoResume: false (de fábrica)
 ```
 
-- `sessions/`: Por carpeta
-- `.jsonl`: Una por sesión
-- `autoResume`: Retomar al arrancar
+- Hay una subcarpeta por directorio de trabajo y un `.jsonl` por sesión, que empieza por la fecha.
+- Con `autoResume: true`, omp retoma al arrancar la última sesión de la carpeta.
 
 ### Retomar desde la terminal
 
 ```text
 omp --profile demo -c            # continúa la última
 omp --profile demo -r [id]       # selector o una sesión
-/resume @claude · /resume @codex # solo diapositiva
+/resume @claude · /resume @codex # importa sesiones de otras herramientas
 ```
 
-- `-c`: Continuar
-- `-r`: Elegir
-- `@claude`: Importar
+- `-c` y `-r` funcionan igual que en Pi.
 
-### /move (no grabado)
+### /move
+
+No aparece en el vídeo; está aquí como referencia.
 
 ```text
 /move                       # buscador de rutas
@@ -164,59 +158,15 @@ omp --profile demo -r [id]       # selector o una sesión
 # mueve sesión y artefactos; recarga ajustes, skills y comandos
 ```
 
-- `/move`: Buscador
-- `ruta`: Directo
-- `recarga`: Del proyecto nuevo
-
 ## Fuentes
 
-- Documentación de omp 18.5.1 (la documentación de omp (omp.sh); `omp read omp://…` en 18.6.1 da `tree.md`,
-  `session-tree-plan.md`, `session-operations-export-share-fork-resume.md` y `keybindings.md` idénticos):
-  - `tree.md`: `/tree` frente a `/branch`, `/fork` y `/resume` («`/tree` and `/branch` navigate inside one session
-    file. `/fork` duplicates the file; `/resume` switches files»); rewind a pantalla completa (unas 600 entradas, `a`,
-    `f`, izquierda/derecha); teclas del árbol (`Ctrl+O` cicla filtros, `Alt+D/T/U/L/A`, `Shift+L`, `Shift+Enter`);
-    `branchSummary.enabled` (`false` por defecto); qué pasa al elegir un mensaje del usuario o cualquier otra entrada.
-  - `session-tree-plan.md`: rewind llama a `navigateTree(…, { summarize: false })`; `doubleEscapeAction` (`rewind`,
-    `tree`, `none`); la API `AgentSession.branch()` sí crea otro fichero (origen de la confusión).
-  - `session.md`: ruta `~/.omp/agent/sessions/<cwd codificado>/<timestamp>_<id>.jsonl`, ranura de título de 256 bytes,
-    cabecera con `parentSession`, `title_change` y `/rename` (roles `tiny`, `commit`, `smol`), `reset_boundary`, y
-    «There is no separate persisted leaf field: loading rebuilds the leaf from the last physical entry».
-  - `session-operations-export-share-fork-resume.md`: matriz de operaciones; `/new`, `/delete`, `/fresh`, `/clear`,
-    `/fork` (`SessionManager.fork()` conserva todas las entradas, `parentSession`, hereda la clave de caché), `--fork`
-    (copia completa), `AgentSession.fork(entryId)` y RPC `fork` (desde una entrada), `/resume` con argumento,
-    `/restart` (conserva los flags y añade `--resume <id>`).
-  - `session-switching-and-recent-listing.md`: selector de `/resume` (fijadas primero, marca `current`, `Tab` para todos
-    los proyectos, `Delete` o `Backspace` con búsqueda vacía borra tras confirmar, búsqueda con `history.db`).
-  - `keybindings.md`: `Ctrl+R`, `Ctrl+G`, `Ctrl+T`, `Ctrl+Shift+O`, `Alt+Up`, `F5`/`Alt+R`, `Ctrl+C` y flecha arriba
-    para recuperar un borrador (100 entradas, `composer.recallClearedDrafts`), `keybindings.yml` (los perfiles heredan
-    del perfil por defecto), modo Vim (`tui.vimMode`, Interaction → Input).
-  - `non-compaction-retry-policy.md`: reintento automático (`retry.enabled`, `retry.maxRetries` 10,
-    `retry.baseDelayMs` 500, tope de 8 s con *jitter*), errores que no se reintentan (desbordamiento de contexto → vídeo
-    13).
-  - `slash-command-internals.md` (§1 y §4: los integrados se reservan antes que los de ficheros; el autocompletado
-    combina fuentes), `settings.md` (`doubleEscapeAction`, `autoResume`, migración `branch` → `rewind`),
-    `environment-variables.md` y `rpc.md` (título automático en el primer mensaje: «an extra model call»,
-    `PI_NO_TITLE`), `cli-reference.md` (`--no-title`).
-  - `tui.md` (consultado: es el contrato de componentes para extensiones; sin datos para la locución).
-- Código fuente 18.5.1 (`~/orca/oh-my-pi`, tag `v18.5.1`, `packages/coding-agent/src/`):
-  `slash-commands/builtin-session.ts` (`/session`, `/branch` → `showUserMessageSelector`, `/fork` →
-  `handleForkCommand`, `/tree`), `slash-commands/builtin-lifecycle.ts` (`/new`, `/fresh`, `/clear`, `/delete`,
-  `/resume`, `/pin`, `/rename`, `/move`, `/restart`, `/retry`, con sus textos «Session pinned to the top of the resume
-  list.», «Nothing to retry.», «Could not generate a session title…»), `modes/controllers/command-controller.ts`
-  (`handleSessionCommand`: File, ID, Provider, Messages, Tokens, Cost; `handleForkCommand`: «Session forked · return to
-  original: omp --profile demo --resume <id> or /resume <id>»; `handleMoveCommand`),
-  `modes/controllers/selector-controller.ts` (`#rewindFromTranscript`: «Rewound to selected point», «Already at this
-  point»), `session/session-manager.ts` (`fork()` copia el fichero entero), `utils/resume-command.ts` (añade
-  `--profile` al comando sugerido), y `packages/tui/src/overlays/rewind-selector.ts` (pantalla completa, contorno
-  punteado, tira de ramas con izquierda/derecha, botones «Cancel» y «Rewind here»).
-  **Comprobado en el binario 18.6.1** (`strings`): mismos textos de `/fork`, rewind y `/retry`, y `/fork` sigue
-  llamando a `session.fork()` sin elegir mensaje. No existe un comando `/clone`.
-- `omp --help` (18.6.1): `-c`, `-r/--resume`, `--session-dir`, `--no-session`, `--no-title`, `--export`.
-- Vídeos anteriores: 03 (árbol JSONL en Pi, `/tree` con «Summarize branch?», `/fork` desde un mensaje, `/clone`,
-  `/resume`, `/name`, `Esc Esc` abre `/tree`, «el árbol mueve la conversación, no tus ficheros»), 04 (caché), 09 (estado
-  de extensiones al rebobinar con `/tree`), 11 (perfil `--profile demo`, `PI_CODING_AGENT_DIR` en el pane, «o eme pe»,
-  DeepSeek V4.1 Flash, `/hotkeys` con `Esc`, `Ctrl+Q`, `Alt+M`, `Shift+Tab`, `Ctrl+O`, `Alt+A`, `Esc Esc`; cierra anunciando
-  «la diferencia entre rebobinar, bifurcar y navegar el árbol, con barra branch, barra fork y barra tree»).
+- Documentación de oh my pi ([omp.sh](https://omp.sh)). Grabado con omp 18.6.1.
+- `tree.md`: diferencias entre `/tree`, `/branch`, `/fork` y `/resume`, filtros y teclas del árbol, `branchSummary.enabled`.
+- `session.md`: dónde se guardan las sesiones, títulos y por qué la hoja se reconstruye desde la última entrada.
+- `session-operations-export-share-fork-resume.md`: qué hacen `/new`, `/delete`, `/fresh`, `/clear`, `/fork`, `/resume` y `/restart`.
+- `keybindings.md`: atajos, recuperación de borradores, `keybindings.yml` y modo Vim.
+- `non-compaction-retry-policy.md`: qué errores se reintentan solos y cuáles no.
+- Vídeos relacionados del curso: 03 (el árbol de sesión en Pi), 11 (perfiles y `/hotkeys`) y 13 (compactación y traspaso).
 
 ## Transcripción
 

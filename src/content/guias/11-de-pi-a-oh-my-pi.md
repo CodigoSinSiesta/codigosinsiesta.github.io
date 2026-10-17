@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 11 · De Pi a oh my pi"
-description: "Qué hereda omp de Pi y qué añade, primer arranque e importación de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar."
+description: "Qué hereda omp de Pi y qué añade, primer arranque y qué recoge de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar."
 ruta: "pi-oh-my-pi"
 orden: 11
 duracion: "24 min"
@@ -8,7 +8,7 @@ video: "11-de-pi-a-oh-my-pi.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/11-de-pi-a-oh-my-pi.es.vtt"
 ---
 
-Qué hereda omp de Pi y qué añade, primer arranque e importación de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar.
+Qué hereda omp de Pi y qué añade, primer arranque y qué recoge de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar.
 
 <p class="guia__nota">Dura 24 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,88 +18,105 @@ Qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 
 <p><button type="button" class="ir-a" data-t="19">▶ Ir a 0:19</button></p>
 
-- **El bloque B, en una línea:** Instalar (02–04) → Aislar y personalizar (05–07) → Extender (08–09) → Programar (10)
-- **Bloque C:** ¿Qué me llevo, qué cambia y qué es nuevo? — La pregunta de quien ya sabe usar Pi.
-- **Hoy:** Qué es (y su motor) → Herencia (qué cambia de sitio) → Primer arranque (perfil aislado) → Cuatro comandos (para orientarse) → Pi frente a omp (una tabla)
-- **El modelo del bloque:** DeepSeek V4.1 Flash — El mismo de Pi desde el vídeo 03, con la clave en una variable de entorno.
+- Hasta aquí, la etapa «Pi a fondo» (vídeos 02–10): instalar (02–04), aislar y personalizar (05–07), extender (08–09) y programar (10). Siempre la misma idea: un núcleo pequeño al que añades lo que necesitas.
+- Empieza la etapa «oh my pi» (11–21), la filosofía contraria: baterías incluidas. Subagentes, modo plan, memoria, servidor de lenguaje, depurador, navegador y git, de serie.
+- La pregunta de este vídeo es la de quien ya sabe usar Pi: ¿qué me llevo, qué cambia de sitio y qué es nuevo? Verlo te sirve para saber qué monta de serie un agente completo y cuánto cuesta cada capa.
+- Modelo de toda la etapa: DeepSeek V4.1 Flash, el mismo de Pi desde el vídeo 03, con la clave en una variable de entorno.
 
 ### 2 · Un fork con otro motor
 
 <p><button type="button" class="ir-a" data-t="123">▶ Ir a 2:03</button></p>
 
-- **oh my pi:** Un fork de Pi — Una copia del código que evoluciona por su cuenta. Binario: omp.
-- **El rastro del origen:** pi-* · PI_* — Paquetes y variables que te sonarán del bloque B.
+- oh my pi (binario `omp`) es un fork de Pi: una copia del código que evoluciona por su cuenta, no una capa encima ni un paquete de extensiones. Sigue trayendo cambios de Pi. Lo publica Stencil Labs, con licencia MIT.
+- Pi es TypeScript sobre Node. omp corre sobre Bun y lleva un módulo nativo en Rust (búsqueda con el motor de ripgrep, terminal, shell, imágenes).
+- Dos consecuencias prácticas: se distribuye como binario autónomo, sin Node ni Bun instalados, y la herramienta bash usa un shell embebido, no el tuyo. Si un comando se comporta raro, piensa en eso.
+- Queda el rastro del origen: paquetes `pi-*` y variables `PI_*`.
 
 ### 3 · Qué hereda y qué cambia de sitio
 
 <p><button type="button" class="ir-a" data-t="243">▶ Ir a 4:03</button></p>
 
-- **Si algo no está donde esperas**
-  - `1` · Cambió de nombre
-  - `2` · Cambió de formato
-  - `3` · Ya viene integrado
+- Se hereda el núcleo del vídeo 03: el bucle de turnos (steering y follow up), la sesión como árbol en JSONL, adjuntar con `@`, los modos print, JSON y RPC, el SDK, las skills bajo demanda y las extensiones por eventos.
+- Cambia de sitio: la configuración pasa de `settings.json` en `.pi` a `config.yml` (YAML) en `~/.omp/agent`; las credenciales, de `auth.json` a una base SQLite (`agent.db`) con varias cuentas por proveedor; la herramienta `find` se llama `glob`.
+- omp no lee `.pi`: tus ajustes, prompt templates y el `/review` del vídeo 06 no se trasladan. Las extensiones de Pi, en principio, sí cargan, gracias a unos adaptadores (lo comprobamos en el vídeo 20).
+- Regla para no perderte. Si algo de Pi no está donde esperas, es por uno de tres motivos:
+  1. Cambió de nombre.
+  2. Cambió de formato.
+  3. Ya viene integrado y no hace falta la extensión.
 
 ### 4 · Instalar y arrancar en un perfil aislado
 
 <p><button type="button" class="ir-a" data-t="402">▶ Ir a 6:42</button></p>
 
-- *En terminal:* Instalar y actualizar oh my pi (más abajo, en «Código y comandos»)
-- *En la demo:* omp --version · omp --help
-- *En terminal:* Piezas opcionales (más abajo, en «Código y comandos»)
-- *En la demo:* El perfil demo
-- *En la demo:* Setup step 1 of 5
-- *En la demo:* Esc para saltar
+- *En terminal:* Instalar y actualizar oh my pi (más abajo, en «Código y comandos»). Publica versiones muy a menudo: actualiza con frecuencia y lee el changelog.
+- Las piezas opcionales (Python para `eval`, voz local) se instalan con `omp setup`; para este vídeo no hace falta ninguna. *En terminal:* Piezas opcionales.
+- Usa perfiles: `--profile <nombre>` da un directorio propio en `~/.omp/profiles/` con sus ajustes, credenciales, sesiones y cachés. Es lo que hacíamos en Pi con `PI_CODING_AGENT_DIR`, pero integrado.
+- Aviso si usas Pi: el perfil por defecto respeta `PI_CODING_AGENT_DIR`. Si la tienes exportada y arrancas sin perfil, omp usa el directorio de Pi y migra su `settings.json` a YAML. Los perfiles con nombre ignoran esa variable.
+- El primer arranque abre un asistente de cinco pasos. El primero conecta proveedores (suscripciones, OpenRouter, Copilot…). Si tu clave ya está en una variable de entorno, como `DEEPSEEK_API_KEY`, sáltalo con Esc. Para volver: `/setup` o `/providers`.
 
 ### 5 · Dentro por primera vez
 
 <p><button type="button" class="ir-a" data-t="609">▶ Ir a 10:09</button></p>
 
-- *En la demo:* Setup step 2 of 5
-- *En la demo:* Setup step 4 of 5
-- *En la demo:* Conversación, línea de estado y editor
-- *En la demo:* Primera petición
-- **Coste:** Poco, pero no gratis — Avisaremos cada vez que algo llame al modelo.
+- El segundo paso del asistente elige el modelo por defecto, con su contexto y su precio por millón de tokens. Los tres últimos son de apariencia: símbolos, estilo del editor (hay uno tipo Pi y otro tipo Claude Code) y tema.
+- La pantalla tiene tres zonas: conversación, línea de estado (modelo, thinking, carpeta, contexto y coste) y editor. Es el pie de Pi del vídeo 02 con más datos.
+- *En la demo:* una petición de solo lectura sobre `src/envio.js`. omp lee tres ficheros a la vez, contesta sin modificar nada y pone título a la sesión solo.
+- Una petición así cuesta poco, pero no es gratis. En el curso avisamos cada vez que algo llama al modelo.
 
 ### 6 · Cuatro comandos para orientarte
 
 <p><button type="button" class="ir-a" data-t="705">▶ Ir a 11:45</button></p>
 
-- *En la demo:* /changelog last 2
-- *En la demo:* /changelog full
-- *En la demo:* /hotkeys
-- *En la demo:* /hotkeys
-- **keybindings.yml:** Lo único que hereda un perfil — Tu teclado no cambia de un perfil a otro.
-- *En la demo:* /tools
-- *En la demo:* xd:// descubribles
-- *En la demo:* La descripción de read
-- *En la demo:* /settings
-- *En la demo:* Interaction → Approvals
+- Ninguno de los cuatro llama al modelo ni enseña datos tuyos.
+- `/changelog` (`last N` o `full`) cuenta qué ha cambiado. Al arrancar tras actualizar ya ves un resumen (`startup.changelogMode`). En una herramienta que publica casi a diario, léelo.
+- `/hotkeys` lista los atajos; los iremos usando en cada vídeo. Se cambian en `keybindings.yml`, lo único que un perfil hereda del perfil por defecto.
+- `/tools` enseña las herramientas que ve el agente y la descripción que recibe el modelo. Con nuestro modelo, doce activas (`read`, `bash`, `edit`, `ask`, `eval`, `glob`, `grep`, `task`, `wait`, `todo`, `web search`, `write`) y tres descubribles con el prefijo `xd://` (`ast edit`, `debug`, `lsp`). `xd://` es la dirección interna con la que omp nombra esas herramientas: el modelo solo sabe que existen y lee su documentación cuando las necesita, como el modo deferred del vídeo 07. Cada herramienta cuesta contexto; lo medimos en el vídeo 13.
+- `/settings` es un panel de once pestañas, con buscador; casi todo se aplica en caliente. En la pestaña Interaction, sección Approvals, verás `yolo`: omp no pide permiso por defecto. Los modos prudentes (`write`, `always-ask`) llegan en el vídeo 19.
 
 ### 7 · La configuración en capas
 
 <p><button type="button" class="ir-a" data-t="915">▶ Ir a 15:15</button></p>
 
-- **Prioridad, de menor a mayor:** Fábrica → Global → Proyecto → --config → CLI → Entorno
-- *En terminal:* omp config desde la terminal (más abajo, en «Código y comandos»)
-- *En la demo:* El perfil, aislado
+- Hay tres sitios. El panel escribe en la configuración global, la de tu perfil. La del proyecto va a mano en `.omp/config.yml`, en la raíz, y omp solo la busca en la carpeta desde la que arrancas, no en las superiores. `--config <fichero>` vale para una ejecución y no se guarda.
+- Prioridad, de menor a mayor: fábrica, global, proyecto, `--config`, opciones de la línea de comandos y variables de entorno de cada ajuste.
+- Los objetos se fusionan, pero las listas se reemplazan enteras. Cuando un ajuste no hace caso, casi siempre es por esto.
+- Lo tuyo (tema, atajos) va en la global. Lo del proyecto (modo de aprobación del equipo, modelos permitidos) va en el `config.yml` del repositorio, versionado con el código.
+- Ojo con repos ajenos: el `config.yml` del proyecto tiene prioridad sobre tu global. Revisa el `.omp/` de un repositorio que no conoces antes de arrancar omp en él. El vídeo 19 trata las aprobaciones.
+- *En terminal:* omp config desde la terminal (más abajo, en «Código y comandos»). Es la forma cómoda de preparar un perfil y de ver qué valor está ganando.
 
 ### 8 · Si vienes de Claude Code o de Codex
 
 <p><button type="button" class="ir-a" data-t="1042">▶ Ir a 17:22</button></p>
 
-- **Vídeo 01:** Lee Claude Code y Codex — Es verdad, con un matiz importante.
-- *En la demo:* .claude/commands/resumen-envio.md
-- *En la demo:* /resumen-envio
-- *En terminal:* Traerte conversaciones (solo diapositiva) (más abajo, en «Código y comandos»)
-- **Excepción:** .claude/agents se ignora — Los subagentes de oh my pi viven en .omp/agents (vídeo 16).
+- omp busca configuración en `.omp` y también en `.claude`, `.codex` y `.gemini`, además de las reglas de Cursor, Windsurf, Cline o Copilot.
+- De proyecto, todo entra por defecto: `CLAUDE.md`, `AGENTS.md`, skills y comandos de `.claude`, servidores MCP. De usuario, nada hasta que lo activas con `enabledProviders`: tus instrucciones personales para otra herramienta no tienen por qué valer aquí.
+- *En la demo:* un comando de Claude Code en `.claude/commands/resumen-envio.md` aparece en omp como `/resumen-envio` y funciona sin tocar ningún ajuste.
+- Puedes importar sesiones de Claude Code o Codex (`--from-claude`, `--from-codex`, `/resume @claude`); cada una se convierte en una sesión nueva de omp. Excepción: `.claude/agents` se ignora, porque el formato es distinto; los subagentes de omp viven en `.omp/agents` (vídeo 16).
+- Apunte honesto: omp no tiene `/trust`. Lo que trae el repositorio (reglas, comandos, servidores MCP) se carga al arrancar, el modo de fábrica es `yolo` y las extensiones no van en sandbox. Revisa `.omp` y `.claude` de un repo ajeno antes de abrirlo, o hazlo en un contenedor.
 
 ### 9 · Pi frente a oh my pi, y cierre
 
 <p><button type="button" class="ir-a" data-t="1221">▶ Ir a 20:21</button></p>
 
-- **La tabla:** Pi frente a oh my pi — Fila a fila.
-- **Lo que se mantiene:** Todo el bloque B sigue valiendo — Bucle, árbol de sesión, modos, SDK, skills y extensiones.
-- **Próximo vídeo:** La TUI y las sesiones — Rebobinar, bifurcar y navegar el árbol: /branch, /fork y /tree.
+| | Pi | oh my pi |
+|---|---|---|
+| Origen | El proyecto original | Fork de principios de 2026 que sigue trayendo cambios de Pi |
+| Motor | TypeScript sobre Node 22.19 o superior | Bun con partes nativas en Rust; binario autónomo |
+| Configuración | JSON en `.pi` | YAML en `.omp`, con perfiles integrados |
+| Credenciales | Un fichero JSON | Base de datos con varias cuentas |
+| Herramientas | Cuatro activas: leer, escribir, editar y bash | Muchas más de serie; con nuestro modelo, doce activas y tres descubribles (lectura de casi cualquier formato, servidor de lenguaje, depurador, subagentes, edición anclada por hash) |
+| Comandos | Unos 25 integrados | 85 |
+| Subagentes y modo plan | Extensiones de ejemplo | De serie, con objetivos con presupuesto |
+| Seguridad | Sin aprobaciones, pero con confianza de proyecto (`/trust`) | Aprobaciones con tres modos (de fábrica, `yolo`); sin confianza de proyecto |
+| Otros agentes | Lee `AGENTS.md` y `CLAUDE.md` | Lee la configuración de proyecto de media docena de herramientas, la de usuario si se lo pides, e importa sesiones de Claude Code y Codex |
+| Se mantiene | El bucle, el árbol de sesión, los modos print, JSON y RPC, el SDK, las skills y las extensiones por eventos | Lo mismo: cambia cuánto viene ya montado |
+
+> **Nota:** la locución dice que omp trae «unas treinta» herramientas. El recuento depende del modelo y de la configuración: en el vídeo 12, con este modelo, el selector muestra doce activas de veinte disponibles.
+
+- Ninguno de los dos te protege si no tomas tú las decisiones de seguridad.
+- Elige Pi cuando quieras entender y controlar cada pieza, prefieras un contexto pequeño o vayas a construir tu propio harness encima. Elige oh my pi cuando quieras un taller completo desde el primer día y aceptes aprender una superficie grande.
+- Puedes tener los dos: cada uno guarda sus cosas en su sitio, siempre que no los cruces con la misma variable de entorno.
+- Práctica: crea un perfil de pruebas, pasa el asistente y lee las pestañas de `/settings` sin cambiar nada. Luego abre con ese perfil un repo tuyo que use Claude Code o Codex y apunta qué ha recogido omp: contexto, comandos, skills y servidores.
 
 ## Código y comandos
 
@@ -113,9 +130,8 @@ irm https://omp.sh/install.ps1 | iex              # Windows (PowerShell)
 omp update --check                                # ¿hay versión nueva?
 ```
 
-- `omp.sh/install`: Una línea
-- `install.ps1`: Windows nativo
-- `omp update`: Actualizar
+- En Windows funciona de forma nativa, sin WSL. También hay fórmula de Homebrew y paquete de Bun.
+- `omp update` actualiza; con `--check` solo comprueba.
 
 ### Piezas opcionales
 
@@ -124,9 +140,6 @@ omp setup python      # entorno de Python para eval
 omp setup speech      # voz local
 omp setup --check     # qué falta, sin instalar
 ```
-
-- `omp setup python`: Python
-- `--check`: Solo comprobar
 
 ### omp config desde la terminal
 
@@ -137,11 +150,13 @@ omp --profile demo config set archive.enabled false
 omp --profile demo config reset archive.enabled
 ```
 
-- `config list`: Todas
-- `tools.approvalMode`: Clave completa
-- `config set`: Escribir
+- `config list` enseña todas las claves agrupadas por pestaña; úsalo cuando no recuerdes el nombre exacto.
+- La clave se escribe completa, con puntos: `tools.approvalMode`.
+- `archive.enabled false` impide que el modelo consulte sesiones de otros proyectos.
 
-### Traerte conversaciones (solo diapositiva)
+### Traerte conversaciones
+
+No aparece en el vídeo; está aquí como referencia.
 
 ```text
 omp --from-claude        # importa una sesión de Claude Code
@@ -149,45 +164,17 @@ omp --from-codex         # importa una sesión de Codex
 /resume @claude · /resume @codex
 ```
 
-- `--from-claude`: Claude Code
-- `--from-codex`: Codex
-- `/resume @claude`: Dentro de la TUI
+- Las listas enseñan tus sesiones reales: trátalas como datos sensibles si compartes pantalla.
 
 ## Fuentes
 
-- Documentación de omp 18.5.1 (la documentación de omp (omp.sh)):
-  - `porting-from-pi-mono.md`: último punto de sincronización `b21b42d` (22-03-2026), cambio de scopes
-    `@mariozechner/*` y `@earendil-works/*` → `@oh-my-pi/*`, «We run on Bun», §8 (adaptadores `legacy-*` para no romper
-    extensiones de Pi), §15 *Intentional Divergences* (`agent.db` frente a `auth.json`, multicuenta, `find` → `glob`,
-    `jiti` → Bun, `pkg.omp` con respaldo `pkg.pi`, `StatusLineComponent`, LSP, MCP/Exa/SSH).
-  - `cli-reference.md`: `--profile`, `--alias`, `--config`, `--from-claude`/`--from-codex` (excluyentes, requieren
-    sesión persistente), `--tools`, `--approval-mode`, subcomandos `setup`, `config`, `update`, `login`.
-  - `config-usage.md`: raíces `.omp`, `.claude`, `.codex`, `.gemini`; perfiles (`~/.omp/profiles/<name>/agent`,
-    excepción de keybindings); «Named profiles ignore `PI_CODING_AGENT_DIR`»; `.pi` no está en el orden de
-    descubrimiento; migración de `settings.json` a `config.yml` (con `.bak`).
-  - `settings.md`: tabla de ámbitos (global, proyecto solo en el cwd, overlay, runtime), `startup.setupWizard` (`true`),
-    `startup.changelogMode` (`summary`), `tools.approvalMode` (`yolo`), `enabledProviders` (por defecto `[]`),
-    `archive.enabled` (`true`).
-  - `context-files.md`: proveedores de descubrimiento; usuario de herramientas ajenas solo con `enabledProviders`;
-    proyecto activo por defecto; `~/.omp/agent/AGENTS.md` tapa los demás ficheros de usuario.
-  - `slash-command-internals.md`: proveedor `claude` (`.claude/commands/**/*.md` del proyecto con
-    `commands.enableClaudeProject: true`; los de usuario, solo con opt-in).
-  - `task-agent-discovery.md` (vía `oh-my-pi.md` §4.4): `.claude/agents` se ignora a propósito.
-  - `session-switching-and-recent-listing.md` y `session-operations-export-share-fork-resume.md`: `/resume @claude` y
-    `/resume @codex` convierten la sesión ajena en una sesión de omp nueva.
-  - `environment-variables.md` (`OMP_PROFILE`, `PI_PROFILE`, `PI_CONFIG_DIR`, `PI_CODING_AGENT_DIR` solo para el perfil
-    por defecto), `keybindings.md` y `tui.md` (consultados; sin datos nuevos para este vídeo), `models.md` y
-    `providers.md` (roles y orden de credenciales, solo para la tabla).
-- `omp --version` y `omp --help` (instalado: 18.6.1), `omp setup --help`, `omp config --help`, `omp update --help`.
-  Comparación de la documentación embebida en 18.6.1 (`omp read omp://<fichero>`) con la copia 18.5.1: los ficheros de
-  este vídeo son idénticos; las únicas diferencias son truncados de `omp read` en ficheros largos y una línea de
-  `provider-compat-reference.md`.
-- Vídeos anteriores: 01 (Pi y omp como dos filosofías; omp «lee la configuración de Claude Code y Codex»; yolo por
-  defecto; GPT-5.6-Luna; hashline), 04 (cache warming), 05 y 08 (prometen los modos de aprobación de omp para el vídeo
-  19; el repositorio como superficie de ataque; `/trust`), 06 (template `/review` en el directorio del agente de Pi),
-  07 (`deferred` y `tool_search`), 08 (`permisos.ts`), 10 (cierra el bloque B y anuncia este vídeo: «un fork de Pi sobre
-  Bun, con un núcleo en Rust y las baterías incluidas… qué hereda… qué añade, cómo se instala y cómo arrancarlo por
-  primera vez con un perfil de demo»).
+- Web e instalador de oh my pi: [omp.sh](https://omp.sh). Grabado con omp 18.6.1.
+- `porting-from-pi-mono.md`: relación con Pi, el paso a Bun y las divergencias intencionadas (`agent.db`, multicuenta, `find` pasa a `glob`).
+- `cli-reference.md`: `--profile`, `--config`, `--from-claude`, `--from-codex` y los subcomandos `setup`, `config` y `update`.
+- `config-usage.md` y `settings.md`: perfiles, raíces de configuración, ámbitos (global y proyecto) y valores de fábrica como `tools.approvalMode: yolo`.
+- `context-files.md` y `slash-command-internals.md`: qué recoge omp de `.claude`, `.codex` y otras herramientas, y cuándo hace falta `enabledProviders`.
+- `task-agent-discovery.md`: por qué se ignora `.claude/agents`.
+- Vídeos relacionados del curso: 01 (Pi y omp como dos filosofías), 05 y 08 (confianza de proyecto y aprobaciones en Pi), 07 (herramientas diferidas) y 19 (aprobaciones en omp).
 
 ## Transcripción
 

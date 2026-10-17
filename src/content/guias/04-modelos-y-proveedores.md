@@ -18,88 +18,80 @@ Todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuán
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Pi es el harness:** El modelo lo pones tú — Conectar, elegir, ajustar cuánto piensa y saber lo que cuesta.
-- *En terminal:* Dónde busca Pi las credenciales (más abajo, en «Código y comandos»)
-- *En terminal:* auth.json · la clave, obtenida con un comando (más abajo, en «Código y comandos»)
-- *En terminal:* Comprobar un proveedor (más abajo, en «Código y comandos»)
+- **Pi es el harness; el modelo lo pones tú.** Hay cinco situaciones:
+
+| Si tienes… | Cómo se conecta |
+|---|---|
+| Una suscripción que Pi soporta (ChatGPT, Claude, GitHub Copilot) | `/login` |
+| Una clave de API de un proveedor | `/login` o su variable de entorno |
+| Un modelo GGUF en tu disco | El router de llama.cpp |
+| Un servidor compatible con OpenAI, Anthropic o Google (Ollama, LM Studio, un proxy de empresa) | `models.json` |
+| Un proveedor con protocolo o autenticación propios | Una extensión que lo registre |
+
+- **Dónde se guarda:** `/login` escribe en `auth.json` (en el directorio del agente) y `/logout` lo borra. Las variables de entorno sirven en servidores y CI, donde no quieres credenciales en disco.
+- **Prioridad:** `--api-key`, después `auth.json`, después `models.json` y por último el entorno. Un `auth.json` olvidado tapa la variable de entorno.
+- **Sin clave en texto plano:** en `auth.json` puedes poner un comando precedido de `!` que obtenga la clave, por ejemplo del llavero. Pi lo ejecuta la primera vez y guarda el resultado en memoria mientras dura el proceso.
+- **Comprobar sin abrir la TUI:** `pi auth check` responde `ready`, `not_ready` o `invalid` con un código de salida distinto. Cuidado con `pi auth print-api-key` y `print-bearer-token`: imprimen el secreto.
+
+> **Nota:** antes de usar con Pi la suscripción de un proveedor (por ejemplo, la de Claude), revisa sus términos de uso: algunos limitan el uso de la suscripción en harnesses de terceros. Una clave de API es la vía más segura.
 
 ### 2 · El catálogo
 
 <p><button type="button" class="ir-a" data-t="187">▶ Ir a 3:07</button></p>
 
-- *En la demo:* pi --list-models deepseek
-- *En la demo:* El mismo modelo, dos proveedores
-- **El camino importa**
-  - `€` · Precio: por proveedor
-  - `↔` · Límites: contexto y salida
-  - `👁` · Privacidad: quién ve tus datos
-  - `✓` · Fiabilidad: recuerda los 429
-- *En terminal:* El catálogo (más abajo, en «Código y comandos»)
-- **Antes de abrir cuenta:** pi.dev/models — Proveedores, identificadores, capacidades, límites y precios.
-- *En la demo:* El modelo local, declarado en models.json
-- **¿Falta un modelo?:** Probablemente falta la sesión de su proveedor — /model solo enseña proveedores con autenticación utilizable.
+- **`pi --list-models <filtro>`:** para cada modelo, proveedor, identificador, ventana de contexto, salida máxima y si admite razonamiento e imágenes. El catálogo completo, con precios, está también en pi.dev/models.
+- **Ventana de contexto frente a salida máxima:** la ventana es todo lo que el modelo ve en una petición (sistema, herramientas y conversación); la salida máxima, lo que escribe en una respuesta. Para un agente importa sobre todo la ventana, porque la conversación crece en cada turno.
+- **El mismo modelo, varios caminos:** DeepSeek Flash llega directo de DeepSeek (1M de contexto, 384k de salida) y también vía OpenRouter, con otros nombres y límites. Según el camino cambian el precio, los límites, quién ve tus datos y la fiabilidad (recuerda los 429). Elegir proveedor importa tanto como elegir modelo.
+- **Dos capas:** un catálogo incluido en la instalación más datos recientes de pi.dev si hay red. `pi update --models` fuerza la actualización; sin red, el catálogo en caché sigue valiendo.
+- **¿Falta un modelo en `/model`?** Probablemente te falta iniciar sesión en su proveedor: el selector solo enseña proveedores con autenticación utilizable.
 
 ### 3 · Elegir y rotar
 
 <p><button type="button" class="ir-a" data-t="339">▶ Ir a 5:39</button></p>
 
-- *En la demo:* /scoped-models: tres de 408
-- *En terminal:* La rotación, guardada o al arrancar (más abajo, en «Código y comandos»)
-- *En terminal:* Elegir modelo desde la línea de comandos (más abajo, en «Código y comandos»)
-- *En terminal:* /settings.json de la demo (más abajo, en «Código y comandos»)
+- **`/model` (o `Ctrl+L`):** `Enter` elige para esta sesión y `Ctrl+S` lo guarda como predeterminado (`defaultProvider` y `defaultModel` en `settings.json`). Una sesión retomada vuelve con el modelo que tenía.
+- **Rotación:** `Ctrl+P` pasa al siguiente modelo y `Shift+Ctrl+P` al anterior. `/scoped-models` decide cuáles entran: en la demo, 3 de 408 (`Ctrl+X` desactiva todos y `Enter` activa uno). Sin `Ctrl+S` vale solo para la sesión; con él se guarda como `enabledModels`.
+- **Desde la CLI:** `--model` acepta `proveedor/id` o un trozo del nombre; `--provider` desambigua; `--models` fija la rotación con comodines; `--api-key` prueba una clave sin guardarla en `auth.json`.
 
 ### 4 · Cuánto piensa el modelo
 
 <p><button type="button" class="ir-a" data-t="457">▶ Ir a 7:37</button></p>
 
-- *En la demo:* Shift+Tab: de high a max
-- *En terminal:* El nivel, al arrancar (más abajo, en «Código y comandos»)
-- *En la demo:* Al volver a Flash: thinking off
-- *En la demo:* El razonamiento también se cobra
+- **Siete niveles:** off, minimal, low, medium, high, xhigh y max. Cada modelo admite un subconjunto y Pi solo deja elegir esos. El nivel sale en el pie y el borde del editor cambia de color.
+- **Cómo se cambia:** `/thinking`, `Shift+Tab` para rotar, `--thinking` al arrancar o el sufijo del modelo (`deepseek/deepseek-flash:low`).
+- **Ojo al rotar:** el modelo local no admite razonamiento; al pasar por él el nivel quedó en off y siguió en off al volver a Flash. Mira el pie antes de enviar.
+- **Regla de uso:** nivel alto para tareas difíciles como depurar o revisar; bajo para ediciones bien especificadas o preguntas concretas. Mide con tus tareas.
+- **El razonamiento se cobra como salida,** aunque pliegues los bloques con `Ctrl+T`.
 
 ### 5 · Cambiar de modelo a mitad de tarea
 
 <p><button type="button" class="ir-a" data-t="573">▶ Ir a 9:33</button></p>
 
-- **La estrategia:** Flash · high (hace el trabajo) → V4 Pro · max (lo revisa)
-- *En la demo:* Flash: 13/13 por 0,002 $
-- *En la demo:* V4 Pro · max revisa sin editar
-- *En la demo:* Una revisión: cinco veces la tarea
-- **Por qué cae la caché:** La caché es de cada modelo — La primera petición del modelo nuevo se paga entera.
-- *En la demo:* /session: coste por modelo y caché repagada
-- *En terminal:* Cada cambio queda en la sesión (más abajo, en «Código y comandos»)
-- *En la demo:* Cache warming: inactive
-- **Conclusión práctica:** Agrupa el trabajo: barato para hacer, caro para revisar — Y cuando dudes, mira /session.
+- **La estrategia:** un modelo barato hace y uno capaz revisa. Flash en `high` añade una validación con sus pruebas (13/13); V4 Pro en `max` revisa sin editar y encuentra tres huecos reales.
+- **La cuenta:** la tarea con Flash, 0,002 $. Tras la revisión, la sesión sube a 0,012 $: la revisión costó cinco veces la tarea. `/session` lo desglosa: 0,010 $ V4 Pro, 0,002 $ Flash, y 0,006 $ de caché repagada por 8500 tokens.
+- **Por qué cae la caché:** es de cada modelo. Lo cacheado para Flash no sirve a V4 Pro, así que la primera petición del modelo nuevo se paga entera (el acierto de caché bajó de más del 90 % a 0). Cada cambio queda como entrada `model_change` en la sesión.
+- **Cache warming:** Pi puede mantener caliente la caché si el modelo declara cuánto dura y calcula un ahorro de al menos cinco céntimos. DeepSeek no lo declara, así que en la demo sale `inactive`.
+- **Conclusión:** agrupa el trabajo. Varias tareas con el modelo barato y una revisión de conjunto con el caro, no ir y venir en cada paso. Es una estrategia que sirve en cualquier agente.
 
 ### 6 · Modelos locales
 
 <p><button type="button" class="ir-a" data-t="748">▶ Ir a 12:28</button></p>
 
-- **llama.cpp en Pi:** llama-server (router de GGUF) → /login llama.cpp (conectar) → /llama (cargar y descargar) → /model (elegirlo)
-- *En terminal:* El router de llama.cpp (más abajo, en «Código y comandos»)
-- *En terminal:* /models.json de la demo (más abajo, en «Código y comandos»)
-- **modelOverrides:** Ajusta lo que el catálogo no sabe de tu modelo — Ventana de contexto real, duración de la caché…
-- *En la demo:* Llama 3.2 3B: rápido, gratis… y equivocado
-- *En la demo:* Lee el fichero y repite el error
-- *En terminal:* Fuera de cámara: Ministral 3 14B (razonamiento) en LM Studio (más abajo, en «Código y comandos»)
-- *En terminal:* models.json: Gemma 4 E4B servido por LM Studio (más abajo, en «Código y comandos»)
-- *En la demo:* Gemma 4 E4B: lee el fichero y acierta
-- **Antes de confiar:** Una tarea cuya respuesta conoces y comprueba que la acierta — Un modelo local pequeño sirve si sabe usar herramientas: pruébalo antes.
+- **Tres caminos locales:** llama.cpp, con integración nativa (`llama-server` con una carpeta de GGUF, `/login llama.cpp`, `/llama` para cargar o descargar y `/model` para elegir); y Ollama, LM Studio, vLLM o cualquier servidor compatible, vía `models.json`. En la demo: Ollama y LM Studio.
+- **`models.json`:** URL base, tipo de API, clave (texto, `$VARIABLE` o `!comando`, que aquí se ejecuta en cada petición) y lista de modelos. Abrir `/model` lo recarga. Con `modelOverrides` corriges lo que el catálogo no sabe: la ventana real o la duración de la caché.
+- *En la demo:* Llama 3.2 3B responde en segundos y gratis, pero se inventa la respuesta. Obligado a usar `read`, lee el fichero y repite el mismo error: tener herramientas no garantiza usar bien lo que devuelven.
+- *En la demo:* un modelo de razonamiento de 14B (Ministral 3) tardó 31 s en decir «listo» y no respondió en cinco minutos con el prompt de Pi. Gemma 4 E4B, entrenado para usar herramientas, lee el fichero y acierta en unos 20 s. El tamaño no lo explica todo.
+- **Antes de confiar en un modelo local:** dale una tarea cuya respuesta conozcas y comprueba que la acierta.
 
 ### 7 · Más allá del selector
 
 <p><button type="button" class="ir-a" data-t="978">▶ Ir a 16:18</button></p>
 
-- **Virtual models · experimental:** Un modelo que elige modelo en cada petición — Por tarea, por coste o por estado de la conversación. Se registran desde una extensión.
-- *En terminal:* Un virtual model en el pie (ejemplo de la documentación) (más abajo, en «Código y comandos»)
-- **Modelos que no conversan**
-  - `classify` · Clasificadores: opción, sí/no, puntuación
-  - `images` · Imagen: generan imágenes
-- **Proveedores propios:** pi.registerProvider() — Autenticación especial, modelos dinámicos u otro protocolo. Ejemplos: GitLab Duo, Anthropic.
-- *En terminal:* Modo print, con modelo y nivel (más abajo, en «Código y comandos»)
-- *En la demo:* Una línea, correcta
-- *En terminal:* Al salir, Pi te dice cómo volver (más abajo, en «Código y comandos»)
-- **Próximo vídeo:** Seguridad y aislamiento — Sin permisos por defecto, confianza de proyecto y contenedores.
+- **Virtual models (experimentales):** un modelo que, en cada petición, elige el modelo físico y el nivel según la tarea, el coste o el estado de la conversación. Se registran desde una extensión. El pie muestra el virtual y, tras una flecha, el físico; `/session` reparte el coste por modelo físico.
+- **Modelos que no conversan:** clasificadores (eligen opción, sí/no, puntuación) y generadores de imágenes. No salen en `/model`; se usan desde *codemode* (el modelo escribe un script que llama a las herramientas; vídeo 07) o desde extensiones.
+- **Proveedores propios:** si `models.json` se queda corto (autenticación especial, modelos dinámicos, otro protocolo), una extensión registra el proveedor con `pi.registerProvider()`. La documentación trae ejemplos para GitLab Duo y para una variante de Anthropic.
+- **Modo print:** `pi -p` con modelo y nivel responde en una línea sin abrir la interfaz. Al salir de una sesión, Pi imprime cómo retomarla con `--session <id>`.
+- **Práctica:** define en `/scoped-models` un modelo barato y uno capaz, haz una tarea con el primero y revisa con el segundo. Calcula en `/session` cuánto costó la revisión y cuánto la recarga de caché.
 
 ## Código y comandos
 
@@ -115,9 +107,7 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 4. variables de entorno       (OPENROUTER_API_KEY…)
 ```
 
-- `auth.json`: Lo que guarda /login
-- `variables de entorno`: Servidores y CI
-- `1. pi --api-key`: Gana la primera
+- Gana la primera fuente que tenga clave. La variable de entorno solo se usa si no hay ninguna de las anteriores.
 
 ### auth.json · la clave, obtenida con un comando
 
@@ -126,8 +116,8 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
     "key": "!security find-generic-password -ws anthropic" } }
 ```
 
-- `!security`: Un comando con !
-- `find-generic-password`: Del llavero; se guarda en memoria
+- `!security find-generic-password`: lee la clave del llavero de macOS (solo macOS; en Linux usarías tu gestor de secretos). Pi la guarda en memoria mientras dura el proceso.
+- Este `!` marca un comando dentro de `auth.json`; no es el `!` de la TUI.
 
 ### Comprobar un proveedor
 
@@ -137,8 +127,8 @@ ready   → salida 0 · not_ready → 1 · invalid → 2
 # ⚠ pi auth print-api-key y print-bearer-token imprimen secretos
 ```
 
-- `auth check`: Para scripts
-- `print-api-key`: Nunca en una grabación
+- `auth check`: pensado para scripts; el código de salida dice el estado.
+- `print-api-key`: nunca en una grabación ni en un log.
 
 ### El catálogo
 
@@ -148,9 +138,7 @@ pi update --models     # forzar la actualización
 PI_OFFLINE=1 pi        # sin red: el catálogo en caché sigue valiendo
 ```
 
-- `incluido`: Dos capas
-- `update --models`: Actualizar
-- `PI_OFFLINE`: Sin red
+- `PI_OFFLINE=1` (o `--offline`): desactiva cualquier acceso a la red.
 
 ### La rotación, guardada o al arrancar
 
@@ -160,32 +148,29 @@ PI_OFFLINE=1 pi        # sin red: el catálogo en caché sigue valiendo
 pi --models "deepseek/*,ollama/*"
 ```
 
-- `Ctrl+S`: Guardar
-- `--models`: Al arrancar, con comodines
+- `--models`: fija la rotación al arrancar; admite comodines.
 
 ### Elegir modelo desde la línea de comandos
 
 ```text
 pi --model deepseek/deepseek-flash
 pi --provider deepseek --model flash
-pi --api-key sk-…   # temporal, no se guarda
+pi --api-key sk-…   # no se guarda en auth.json
 ```
 
-- `--model deepseek`: proveedor/id o un trozo
-- `--provider`: Si existe en varios
-- `--api-key`: Temporal
+- `--provider`: limita la búsqueda cuando el mismo modelo existe en varios proveedores.
+- `--api-key`: no se guarda en `auth.json`, pero sí queda en el historial de tu shell. Para algo más que una prueba, usa `/login` o una variable.
 
-### /settings.json de la demo
+### settings.json de la demo (directorio del agente)
 
-```text
+```json
 {
   "defaultProvider": "deepseek",
   "defaultModel": "deepseek-flash"
 }
 ```
 
-- `defaultProvider`: Proveedor
-- `"deepseek-flash"`: Modelo
+- Con qué arranca cada sesión nueva. Las retomadas vuelven con el modelo que tenían.
 
 ### El nivel, al arrancar
 
@@ -194,8 +179,7 @@ pi --model deepseek/deepseek-v4-pro --thinking max
 pi --model deepseek/deepseek-flash:low
 ```
 
-- `--thinking`: Opción
-- `:low`: Sufijo del modelo
+- `--thinking max` y el sufijo `:low` hacen lo mismo: fijar el nivel de razonamiento al arrancar.
 
 ### Cada cambio queda en la sesión
 
@@ -206,8 +190,7 @@ jq -c 'select(.type=="model_change") | {provider, modelId}' <sesión>
 {"provider":"ollama","modelId":"llama3.2:latest"}
 ```
 
-- `model_change`: Una entrada por cambio
-- `deepseek-v4-pro`: Para repartir el coste
+- Con estas entradas Pi reconstruye qué modelo atendió cada turno y reparte el coste.
 
 ### El router de llama.cpp
 
@@ -217,14 +200,14 @@ llama-server --models-dir ~/models --no-models-autoload --jinja \
 curl http://127.0.0.1:8080/health
 ```
 
-- `--models-dir`: La carpeta de GGUF
-- `--no-models-autoload`: Carga desde /llama
-- `--jinja`: Plantillas y herramientas
-- `/health`: Diagnóstico
+- `--no-models-autoload`: no carga nada al arrancar; cargas desde Pi con `/llama`.
+- `--jinja`: necesario para las plantillas de chat y las llamadas a herramientas.
+- `-c 32768`: tamaño de contexto.
+- `/health`: dice si el servidor está vivo.
 
-### /models.json de la demo
+### models.json de la demo (directorio del agente)
 
-```text
+```json
 { "providers": { "ollama": {
   "baseUrl": "http://localhost:11434/v1",
   "api": "openai-completions",
@@ -232,12 +215,12 @@ curl http://127.0.0.1:8080/health
   "models": [{ "id": "llama3.2:latest", "name": "Llama 3.2 3B (local)" }] } } }
 ```
 
-- `baseUrl`: URL base
-- `"api"`: Tipo de API
-- `"apiKey"`: Ficticia
-- `"models"`: Modelos
+- `baseUrl`: la API compatible con OpenAI que expone Ollama.
+- `"apiKey": "ollama"`: Ollama no necesita clave, pero hay que poner algo.
 
-### Fuera de cámara: Ministral 3 14B (razonamiento) en LM Studio
+### Ministral 3 14B (razonamiento) en LM Studio
+
+No aparece en el vídeo; está aquí como referencia de la prueba.
 
 ```text
 «Di solo: listo»  →  31 s · 398 de 400 tokens razonando
@@ -245,8 +228,7 @@ pi -p --model lmstudio/…ministral-3-14b-reasoning "¿Qué hace src/envio.js?"
 → 5 minutos sin respuesta (timeout)
 ```
 
-- `31 s`: Lento
-- `timeout`: No da para agente
+- Casi todos los tokens se van en razonar: demasiado lento para trabajar como agente.
 
 ### models.json: Gemma 4 E4B servido por LM Studio
 
@@ -260,9 +242,8 @@ pi -p --model lmstudio/…ministral-3-14b-reasoning "¿Qué hace src/envio.js?"
 pi --model lmstudio/google/gemma-4-e4b
 ```
 
-- `1234`: Servidor de LM Studio
-- `gemma-4-e4b`: El modelo cargado
-- `pi --model`: La misma pregunta
+- `1234`: el puerto por defecto del servidor de LM Studio.
+- `contextWindow`: declara la ventana real del modelo cargado.
 
 ### Un virtual model en el pie (ejemplo de la documentación)
 
@@ -271,8 +252,7 @@ auto • high  →  gpt-5.6-luna • medium
 /session  →  coste por modelo físico
 ```
 
-- `→`: El modelo físico
-- `/session`: Coste repartido
+- A la izquierda, el modelo virtual que elegiste; tras la flecha, el físico que atendió la petición.
 
 ### Modo print, con modelo y nivel
 
@@ -280,8 +260,7 @@ auto • high  →  gpt-5.6-luna • medium
 pi -p --no-session --model deepseek/deepseek-flash:low "En una frase: ¿qué hace src/envio.js?"
 ```
 
-- `pi -p`: Sin interfaz
-- `:low`: Poco razonamiento
+- Una petición sin interfaz, sin guardar sesión y con poco razonamiento: rápida y barata para scripts.
 
 ### Al salir, Pi te dice cómo volver
 
@@ -291,14 +270,17 @@ To resume this session: pi --session 01a1069c-ff81-71fb-bd15-2582d02197ed
 pi -c   ·   pi -r
 ```
 
-- `--session`: Por identificador
-- `pi -c`: O la última / el selector
+- `pi -c` abre la última sesión de la carpeta; `pi -r`, el selector.
 
 ## Fuentes
 
-- Documentación instalada de Pi 1.0.1: `docs/models.md`, `docs/providers.md`, `docs/settings.md` (`cacheWarming`),
-  `docs/llama-cpp.md`, `docs/virtual-models.md`, `docs/custom-provider.md`.
-- Documentación oficial de Pi: [custom-provider.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/custom-provider.md), [llama-cpp.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/llama-cpp.md), [models.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/models.md), [providers.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md), [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md), [virtual-models.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/virtual-models.md)
+- [providers.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md): las cinco formas de conectar un modelo y las credenciales.
+- [models.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/models.md): `models.json` y `modelOverrides`.
+- [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md): `defaultModel`, `enabledModels` y `cacheWarming`.
+- [llama-cpp.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/llama-cpp.md): el router de llama.cpp.
+- [virtual-models.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/virtual-models.md) y [custom-provider.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/custom-provider.md): enrutadores y proveedores propios.
+- El catálogo de modelos, en pi.dev/models. Grabado con Pi 1.0.1.
+- Vídeos relacionados: 07 (codemode), 08 (extensiones) y 14 (roles y razonamiento en oh my pi).
 
 ## Transcripción
 

@@ -18,96 +18,80 @@ Cómo escribir un `AGENTS.md` que funcione, ajustar el system prompt y crear pla
 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
-- **Personalizar sin código:** Mínimo, pero no rígido — Qué sabe del proyecto, cómo se comporta, qué repites y qué carga cuando hace falta.
-- *En terminal:* Dónde viven las piezas (más abajo, en «Código y comandos»)
-- **Antes de empezar:** Personalizar no es acumular — Cada pieza entra de una forma u otra en el contexto, y el contexto cuesta dinero y atención.
+- **Cuatro capas, y el entorno alrededor:** los ficheros de contexto (`AGENTS.md`) dicen qué sabe del proyecto; el system prompt (`SYSTEM.md`, `APPEND_SYSTEM.md`), cómo se comporta siempre; los prompt templates, qué tareas repites con un comando; y las skills, qué conocimiento carga solo cuando hace falta. Alrededor, ajustes, atajos y temas.
+- **Dos sitios:** lo personal vive en el directorio del agente (`~/.pi/agent/`) y vale en todos tus proyectos; lo del equipo, en la carpeta `.pi/` del proyecto, y viaja con el repositorio. Ver «Dónde viven las piezas», más abajo.
+- **Confianza:** lo de `.pi/` solo se carga si concedes confianza al proyecto (vídeo 05). Los ficheros de contexto son la excepción: se cargan siempre.
+- **Personalizar no es acumular:** cada pieza entra de una forma u otra en el contexto, y el contexto cuesta dinero y atención.
 
 ### 2 · Un AGENTS punto md que funcione
 
 <p><button type="button" class="ir-a" data-t="114">▶ Ir a 1:54</button></p>
 
-- **La prueba de la sesión nueva (Learn Harness Engineering)**
-  - `1` · Qué es: el proyecto
-  - `2` · Organización: el mapa
-  - `3` · Arranque: cómo se lanza
-  - `4` · Verificación: cómo se prueba
-  - `5` · Estado: en qué punto está
-  - *Adaptado de Learn Harness Engineering, © 2025 WalkingLab, licencia MIT.*
-- **Un router, no una enciclopedia**
-  - `50–200` · Líneas: el fichero de entrada
-  - `≤ 15` · Reglas duras: pocas y claras
-  - `→ docs/` · Enlaces: el detalle, fuera
-- **Lo que sobra**
-  - `README` · Copiado entero: el agente puede leerlo
-  - `estilo` · Lo que ya mira el linter: mejor ejecutarlo
-  - `cmd…` · Listas largas: de comandos raros
-  - `+1` · Una regla por fallo: sin pensar si es general
-- *En la demo:* El AGENTS.md de la tienda (adaptado de WalkingLab, MIT)
-- *En la demo:* «Hecho significa…»
-- *En terminal:* La sesión de la tarea: llamadas a herramientas (más abajo, en «Código y comandos»)
-- *En la demo:* Responde con la definición de hecho
-- *En la demo:* tienda: añade contarUnidades al carrito
-- **La evidencia, con matices**
-  - `ETH Zúrich` · Gloaguen et al.: sin mejora general de éxito; +20 % de coste de inferencia
-  - `−28 %` · Lulla et al.: mediana de tiempo, 124 tareas; no mide si es correcto
-- **Conclusión práctica:** No te fíes de la intuición: mídelo — AGENTS.md corto y una tarea de prueba que demuestre que cambia el comportamiento.
+- **Dónde lo busca Pi:** en el directorio del agente, en la carpeta de trabajo y en todas las superiores, y los carga todos. También acepta `CLAUDE.md`, y un `AGENTS.override.md` sustituye al `AGENTS.md` de su misma carpeta. Como la búsqueda va de la carpeta de trabajo hacia arriba, un `AGENTS.md` de subcarpeta (uno para el frontend, otro para la API) se suma al de la raíz cuando arrancas Pi en esa subcarpeta.
+- **La prueba de la sesión nueva** (Learn Harness Engineering): abre una sesión sin historial y pregúntate qué es el proyecto, cómo está organizado, cómo se arranca, cómo se verifica que funciona y en qué punto está. Si el repositorio no responde a esas cinco preguntas, el agente las adivina.
+- **Un router, no una enciclopedia:** entre 50 y 200 líneas, como mucho 15 reglas duras y enlaces a `docs/` para el detalle. Para empezar, apunta a menos de 100. Cada regla lleva tres datos: de dónde sale, cuándo aplica y cuándo caduca («no uses la librería de fechas antigua hasta que terminemos la migración, en noviembre»). Y lo crítico, arriba y corto: los modelos aprovechan peor lo que queda en medio de un contexto largo (*Lost in the Middle*).
+- **Lo que sobra:** el README copiado entero (el agente puede leerlo), las reglas de estilo que ya comprueba el linter (mejor que lo ejecute), las listas largas de comandos raros y una regla nueva por cada fallo sin pensar si es general.
+- **La definición de hecho es lo que más rinde:** prueba añadida o actualizada, `npm test` pasando y un resumen de qué cambió y cómo se verificó. *En la demo:* con el AGENTS.md de la tienda (rutina de entrada, mapa, pocas reglas y definición de hecho), el agente mira `git status` y el log y pasa las pruebas antes de tocar nada; al terminar resume qué cambió y cómo lo verificó, y el commit sale como `tienda: añade contarUnidades al carrito`, siguiendo la regla de los mensajes.
+
+> **La evidencia, con matices:** Gloaguen et al. (ETH Zúrich) no encontraron mejora general de éxito con ficheros de contexto, y sí un coste de inferencia más de un 20 % mayor. Lulla et al. midieron una mediana de tiempo un 28 % menor en 124 tareas, sin medir si el resultado era correcto. Conclusión: no te fíes de la intuición, mídelo con una tarea de prueba.
 
 ### 3 · El system prompt: SYSTEM y APPEND SYSTEM
 
 <p><button type="button" class="ir-a" data-t="452">▶ Ir a 7:32</button></p>
 
-- **El system prompt:** SYSTEM.md y APPEND_SYSTEM.md — Cambiar cómo se comporta Pi en todos tus proyectos.
-- **¿Cuándo SYSTEM.md?:** Para algo muy distinto de programar — Escritura, análisis de datos o experimentos con prompts. En un proyecto de software, casi nunca.
-- *En terminal:* ~/.pi/agent/APPEND_SYSTEM.md (demo) (más abajo, en «Código y comandos»)
-- *En la demo:* APPEND_SYSTEM.md: «Verificado: …»
+- **`APPEND_SYSTEM.md` añade, `SYSTEM.md` sustituye:** el primero suma tus instrucciones al final del prompt de Pi sin quitar nada, y casi siempre es el que quieres. El segundo reemplaza las instrucciones de base, que explican cómo usar las herramientas; si lo usas, eso lo explicas tú. Las definiciones de herramientas y las descripciones de skills viajan igual en los dos casos.
+- **Dónde:** en el directorio del agente o en `.pi/` del proyecto. Si existe el del proyecto y es de confianza, gana el del proyecto; los ficheros con el mismo nombre no se combinan.
+- **Cuándo `SYSTEM.md`:** para usar Pi en algo muy distinto de programar (escritura, análisis de datos) o para experimentar con prompts de sistema. En un proyecto de software, casi nunca.
+- *En la demo:* con un `APPEND_SYSTEM.md` de una línea, Pi responde que un pedido de 39,99 € paga 4,95 € de envío y cierra con «Verificado:» y el comando de `node` que lo comprueba. Es el uso típico: una preferencia tuya (idioma, tono, forma de cerrar) en cualquier proyecto. Lo del proyecto, en `AGENTS.md`.
 
 ### 4 · Prompt templates
 
 <p><button type="button" class="ir-a" data-t="611">▶ Ir a 10:11</button></p>
 
-- **Prompt templates:** El prompt que repites, como comando — Un fichero markdown en prompts/: el nombre del fichero es el comando.
-- *En terminal:* ~/.pi/agent/prompts/review.md → /review (más abajo, en «Código y comandos»)
-- **Restricciones escritas una vez**
-  - `✕` · Prohibición: «no edites ningún fichero»
-  - `≤ 3` · Formato: «tres viñetas como máximo»
-- *En terminal:* Sustituciones en un template (más abajo, en «Código y comandos»)
-- *En la demo:* El template aparece en la cabecera y en el menú
-- *En la demo:* /review "las pruebas y los comentarios"
-- **Un template…**
-  - `texto` · Solo texto: no ejecuta ni añade herramientas
-  - `/reload` · Recarga: en una sesión abierta
-  - `.pi/prompts` · Del proyecto: con confianza
+- **El prompt que repites, como comando:** un fichero markdown en `prompts/`; el nombre del fichero es el comando (`review.md` → `/review`). El frontmatter lleva la descripción del autocompletado y un `argument-hint`.
+- **Restricciones escritas una vez:** un template es el sitio para la prohibición («no edites ningún fichero») y el formato de salida («tres viñetas como máximo»). Así no dependes de acordarte cada vez.
+- **Argumentos:** `${1:-…}` es el primer argumento o un valor por defecto; también hay `$1`, `$2`, `$@` y rangos. Los argumentos siguen las comillas de la shell.
+- *En la demo:* tras subir a mano el umbral de envío gratis de 40 a 50 €, `/review "las pruebas y los comentarios"` responde con tres viñetas exactas (comentario desfasado, pruebas que fallan, falta una prueba del nuevo umbral) y sin editar nada.
+- **La pieza más barata y segura:** un template es solo texto que Pi expande; no ejecuta código ni añade herramientas. Tras editarlo en una sesión abierta, `/reload`. Los de `.pi/prompts/` solo aparecen con confianza.
 
 ### 5 · Skills
 
 <p><button type="button" class="ir-a" data-t="787">▶ Ir a 13:07</button></p>
 
-- *En terminal:* Una skill es una carpeta (más abajo, en «Código y comandos»)
-- **Carga progresiva:** Arranque (nombre + descripción) → Tarea (encaja con la descripción) → read (SKILL.md completo) → Sigue (las instrucciones)
-- *En terminal:* ~/.pi/agent/skills/notas-de-version/SKILL.md (más abajo, en «Código y comandos»)
-- *En terminal:* ~/.pi/agent/skills/notas-de-version/SKILL.md (más abajo, en «Código y comandos»)
-- *En la demo:* pi --skill …/notas-de-version
-- *En terminal:* La sesión de las notas: llamadas a herramientas (más abajo, en «Código y comandos»)
-- *En la demo:* Notas de versión con el formato de la skill
-- *En la demo:* /skill:notas-de-version
-- **Skills con ficheros:** Instrucciones y scripts juntos — Rutas relativas a la carpeta de la skill; Pi le dice al modelo dónde está.
+- **Una skill es una carpeta** con un `SKILL.md` y, si hace falta, scripts y referencias. Pi sigue la especificación abierta Agent Skills (agentskills.io), así que son portables entre agentes que la sigan.
+- **Carga progresiva:**
+  1. Al arrancar, solo entran el nombre, la descripción y la ruta.
+  2. Cuando una tarea encaja con la descripción, el modelo lee el `SKILL.md` completo.
+  3. Después sigue sus instrucciones.
+- **La descripción lo decide todo:** es lo único que ve el modelo para elegirla, así que dice qué hace y cuándo usarla. «Ayuda con PDF» no sirve. Nombre en minúsculas, números y guiones (máx. 64 caracteres); descripción de máx. 1024. Sin descripción, no se carga.
+- *En la demo:* sin nombrar la skill, se piden las notas de los seis últimos commits; el modelo lee primero el `SKILL.md` y responde con su formato (grupos, sin hashes, «Incluye 6 commits»). Para forzarla, `/skill:notas-de-version`; con `disable-model-invocation`, solo se usa a mano.
+- **¿Skill o AGENTS.md?:** lo que hace falta en casi todas las tareas, en `AGENTS.md`; lo ocasional, en una skill, que solo ocupa una línea hasta que se usa. Revisa las skills de un proyecto ajeno antes de darle confianza: pueden pedir que se ejecuten scripts.
 
 ### 6 · Ajustes, atajos y temas
 
 <p><button type="button" class="ir-a" data-t="1010">▶ Ir a 16:50</button></p>
 
-- *En la demo:* /settings
-- *En terminal:* settings.json: algunos ajustes útiles (más abajo, en «Código y comandos»)
-- *En la demo:* Theme: system, automatic, dark, light
-- *En terminal:* ~/.pi/agent/keybindings.json (más abajo, en «Código y comandos»)
-- *En la demo:* /hotkeys
+- **`/settings`** abre el panel de ajustes, con buscador, y guarda cada cambio en `settings.json`. Existe en el directorio del agente y en `.pi/`: los del proyecto mandan, y las listas de recursos (extensiones, skills, prompts, temas) se combinan. Algunos ajustes, como la confianza de proyecto por defecto o el calentamiento de caché, solo valen en el del usuario.
+- **Ajustes útiles:** nivel de razonamiento al arrancar, modelos de la rotación (vídeo 04), ocultar el razonamiento, herramientas de arranque y exclusiones con `!` en las listas de recursos. Ver el bloque `settings.json`, más abajo.
+- **Temas:** `system` (por defecto, a partir de los colores de tu terminal), `automatic` (uno para claro y otro para oscuro), `dark` y `light`. Los tuyos, en `themes/`, se recargan en caliente.
+- **Atajos:** en `keybindings.json`, cada acción con nombre recibe una tecla o una lista; un valor sustituye al de serie y una lista vacía lo desactiva. Algunas acciones, como abrir una sesión nueva o el árbol, no tienen atajo de serie. `/hotkeys` muestra los activos, y `/reload` recarga todo sin salir.
 
 ### 7 · Qué pieza para cada cosa
 
 <p><button type="button" class="ir-a" data-t="1140">▶ Ir a 19:00</button></p>
 
-- **Compartir:** pi install — Un paquete de Pi puede llevar templates, skills, temas y extensiones (vídeo 09).
-- **Próximo vídeo:** MCP y codemode — Lo nuevo de Pi. Nos vemos allí.
+| Necesitas… | Pieza | Cuándo entra en el contexto |
+|---|---|---|
+| Conocimiento del proyecto en casi cada tarea (mapa, cómo se prueba, definición de hecho) | `AGENTS.md`, corto | Siempre |
+| Una preferencia tuya en todos los proyectos | `APPEND_SYSTEM.md` | Siempre |
+| Reescribir las instrucciones de base | `SYSTEM.md` | Siempre |
+| Un prompt que repites | Prompt template | Al invocarlo |
+| Un procedimiento con pasos, referencias o scripts, de vez en cuando | Skill | Nombre y descripción siempre; el cuerpo, al usarla |
+| Que Pi haga algo nuevo (bloquear un comando, añadir una herramienta) | Extensión (vídeos 08 y 09) | Según la extensión |
+
+- **Mide lo que añades:** el pie muestra el porcentaje de contexto desde el primer mensaje y `/session`, los tokens de la sesión. Lo que no ayuda a terminar mejor o más rápido, sobra.
+- **Compartir:** un paquete de Pi puede llevar templates, skills, temas y extensiones, y se instala con `pi install` (vídeo 09).
+- **En otros agentes:** Claude Code lee `CLAUDE.md` como Pi lee `AGENTS.md`, y las skills de la especificación Agent Skills son portables entre agentes que la siguen.
 
 ## Código y comandos
 
@@ -123,9 +107,6 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
   settings.json  SYSTEM.md  APPEND_SYSTEM.md  prompts/  skills/  themes/  extensions/
 ```
 
-- `~/.pi/agent/`: Directorio del agente
-- `<proyecto>/.pi/`: Carpeta del proyecto
-
 ### La sesión de la tarea: llamadas a herramientas
 
 ```text
@@ -138,9 +119,8 @@ edit   test/carrito.test.js
 bash   npm test 2>&1 | tail -25          # 15/15
 ```
 
-- `git status`: Rutina de entrada
-- `read   src/carrito.js`: Lee el código
-- `# antes de tocar nada`: Pruebas primero
+- Las tres primeras llamadas son la rutina de entrada del `AGENTS.md`: estado de git, leer el código y pasar las pruebas antes de editar.
+- Después edita la función y sus dos pruebas nuevas (carrito normal y carrito vacío) y vuelve a pasar las pruebas.
 
 ### ~/.pi/agent/APPEND_SYSTEM.md (demo)
 
@@ -148,10 +128,6 @@ bash   npm test 2>&1 | tail -25          # 15/15
 Termina cada respuesta con una línea que empiece por «Verificado:» y diga qué comando
 ejecutaste para comprobar lo que afirmas, o «Verificado: nada» si no comprobaste nada.
 ```
-
-- `APPEND_SYSTEM`: Se suma al prompt
-- `«Verificado:»`: La línea final
-- `«Verificado: nada»`: Si no comprobó
 
 ### ~/.pi/agent/prompts/review.md → /review
 
@@ -165,10 +141,8 @@ Céntrate en ${1:-errores, casos límite y pruebas que falten}.
 Responde con tres viñetas como máximo.
 ```
 
-- `description`: Autocompletado
-- `argument-hint`: Foco opcional
-- `No edites ningún fichero`: Prohibición
-- `tres viñetas`: Formato
+- `description`: el texto que aparece en el autocompletado del comando.
+- `argument-hint`: indica que el comando admite un foco opcional.
 
 ### Sustituciones en un template
 
@@ -180,11 +154,6 @@ ${@:2}  ${@:2:1}     desde la posición 2 / uno desde la 2
 /review "API compatibility"   # comillas: un solo argumento
 ```
 
-- `${1:-`: Con valor por defecto
-- `$1  $2`: Posicionales
-- `$@`: Todos
-- `"API compatibility"`: Comillas de shell
-
 ### Una skill es una carpeta
 
 ```text
@@ -195,9 +164,7 @@ notas-de-version/
 # especificación abierta: agentskills.io
 ```
 
-- `SKILL.md`: Obligatorio
-- `scripts/`: Ficheros de apoyo
-- `agentskills.io`: Agent Skills
+- Solo `SKILL.md` es obligatorio. Las rutas a `scripts/` y `references/` se escriben relativas a la carpeta de la skill.
 
 ### ~/.pi/agent/skills/notas-de-version/SKILL.md
 
@@ -213,22 +180,18 @@ description: Redacta notas de versión a partir del historial de git. Úsala cua
 4. Termina con una línea: «Incluye N commits».
 ```
 
-- `description:`: Qué hace y cuándo
-- `git log`: Paso 1
-- `sin hashes`: Formato
-- `Incluye N commits`: Cierre
+- `description:` dice qué hace y cuándo usarla: es lo único que ve el modelo para decidir si la carga.
 
 ### La sesión de las notas: llamadas a herramientas
 
 ```text
-read   /tmp/csn/pi-agent/skills/notas-de-version/SKILL.md
+read   ~/.pi/agent/skills/notas-de-version/SKILL.md
 bash   git log --oneline -6
 bash   git log -6 --format='%h%n%s%n%b%n---'
 bash   git show --stat …
 ```
 
-- `SKILL.md`: Primero, la skill
-- `git log --oneline -6`: Después, el historial
+- Lo primero que hace el modelo es leer la skill; después, el historial.
 
 ### settings.json: algunos ajustes útiles
 
@@ -240,10 +203,10 @@ bash   git show --stat …
 "skills": ["./skills", "!./skills/borrador-*"]
 ```
 
-- `defaultThinkingLevel`: Razonamiento al arrancar
-- `enabledModels`: Rotación
-- `hideThinkingBlock`: Ocultar razonamiento
-- `!./skills`: Exclusión
+- `defaultThinkingLevel`: nivel de razonamiento con el que arranca Pi.
+- `enabledModels`: los modelos entre los que rotas (vídeo 04).
+- `defaultTools`: las herramientas con las que arranca. Aquí sustituye las cuatro de serie (read, bash, edit, write) por un juego de solo lectura con las herramientas opcionales `grep`, `find` y `ls`.
+- `!./skills/borrador-*`: carga la carpeta de skills salvo las que encajan con el patrón.
 
 ### ~/.pi/agent/keybindings.json
 
@@ -255,19 +218,18 @@ bash   git show --stat …
 }
 ```
 
-- `app.session.new`: Acción con nombre
-- `ctrl+shift+t`: Sin atajo de serie
-- `[]`: Desactivar
+- Las dos primeras acciones (sesión nueva y árbol de la sesión) no tienen atajo de serie; aquí se les da uno.
+- `[]`: desactiva el atajo de esa acción.
 
 ## Fuentes
 
-- Documentación instalada de Pi 1.0.1: `docs/configuration.md`, `docs/prompt-templates.md`, `docs/skills.md`,
-  `docs/settings.md`, `docs/keybindings.md`, `docs/themes.md`, `docs/how-pi-works.md`.
-- *Learn Harness Engineering*, lecciones L03 y L04 y la plantilla `resources/templates/AGENTS.md` (© 2025 WalkingLab,
-  licencia MIT): estructura e ideas adaptadas, no texto literal.
-- Estudios citados en L04, por su fuente primaria: Gloaguen et al., *Evaluating AGENTS.md* (ETH Zúrich, 2026) y Lulla et
-  al. (arXiv 2601.20404, tabla 1). *Lost in the Middle* (Liu et al., 2023).
-- Documentación oficial de Pi: [configuration.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md), [how-pi-works.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/how-pi-works.md), [keybindings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/keybindings.md), [prompt-templates.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/prompt-templates.md), [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md), [skills.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md), [themes.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/themes.md)
+- Documentación oficial de Pi: [configuration.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md), [prompt-templates.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/prompt-templates.md), [skills.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md), [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md), [keybindings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/keybindings.md), [themes.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/themes.md) y [how-pi-works.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/how-pi-works.md). Grabado con Pi 1.0.1.
+- *Learn Harness Engineering*, lecciones L03 y L04 y su plantilla de `AGENTS.md` (© 2025 WalkingLab, licencia MIT).
+- Gloaguen et al., *Evaluating AGENTS.md* (ETH Zúrich, 2026).
+- Lulla et al., arXiv 2601.20404.
+- Liu et al., *Lost in the Middle* (2023).
+- Especificación Agent Skills: agentskills.io.
+- Relacionados en el curso: vídeo 03 (cómo monta Pi cada petición), 05 (confianza de proyecto), 08 y 09 (extensiones y paquetes).
 
 ## Transcripción
 

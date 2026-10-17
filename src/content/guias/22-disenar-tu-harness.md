@@ -18,97 +18,135 @@ Las taxonomías de harness engineering aplicadas. Pocas herramientas bien elegid
 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
-- **De usar a diseñar:** Pi (núcleo pequeño) → oh my pi (el taller) → Bloque D (qué decides tú)
-- **Vídeo 1:** Harness: dos sentidos — El programa que ejecuta el bucle y el andamiaje de tu repositorio.
+- Con este vídeo empieza la última etapa, «Diseñar tu harness», y cambia la pregunta: ya no es qué hace este comando (lo que viste con Pi y con oh my pi), sino qué decides tú y por qué.
+- Harness tiene dos sentidos (vídeo 1): el programa que ejecuta el bucle, como Pi u oh my pi, y el andamiaje de tu repositorio. Las cinco piezas del vídeo 1 (instrucciones, herramientas, entorno, estado y feedback) describen los dos.
+- Hoy tomas tres decisiones: cuántas herramientas ve el modelo, dónde viven los límites (truncado, tiempos, aprobaciones) y quién decide frente a quién ejecuta. La primera se mide, porque un diseño que no se mide es solo una opinión.
 
 ### 2 · Tres mapas de Learn Harness Engineering
 
 <p><button type="button" class="ir-a" data-t="97">▶ Ir a 1:37</button></p>
 
-- **Fuente:** Learn Harness Engineering — WalkingLab · © 2025 · licencia MIT. Ideas y estructura, con nuestras palabras.
-- **Mapa 1 · el agente**
-  - `5 piezas` · Las del vídeo 1: qué trae el agente y qué pones tú
-  - `uso` · Analizar productos: Pi, Claude Code, Codex
-  - `alcance` · Runtime y entorno
-- **Mapa 2 · el repositorio:** Instrucciones (AGENTS.md) → Estado (progreso) → Verificación (pruebas) → Alcance (una cosa) → Ciclo de vida (arranque y traspaso)
-- **Los tres mapas:** Un mismo asiento: el de quien usa — Un agente que ya existe y quiere que trabaje mejor. Hay otro asiento.
+- Learn Harness Engineering (WalkingLab, © 2025, licencia MIT) es la base de esta etapa. Usamos sus ideas y su estructura, con nuestras palabras. No trae una taxonomía, sino tres, y cada una responde a una pregunta:
+
+| Mapa | Pregunta | Elementos | Dónde lo usas |
+|---|---|---|---|
+| 1 · El agente | ¿Qué tiene mi agente? | instrucciones, herramientas, entorno, estado, feedback | analizar productos (Pi, Claude Code, Codex); vídeo 1 |
+| 2 · El repositorio | ¿Qué tiene mi repo? | instrucciones (AGENTS.md), estado (progreso), verificación (pruebas), alcance (una funcionalidad cada vez), ciclo de vida (arranque y traspaso) | vídeo 23 |
+| 3 · El diagnóstico | ¿Dónde se ha roto? | especificación de la tarea, contexto, entorno, verificación, estado | capítulo 6 de este vídeo |
+
+- Al mapa 2 le faltan herramientas y entorno: cada pieza es un fichero o una costumbre del repo.
+- En el vídeo 1 diagnosticamos con las cinco piezas del mapa 1. El mapa 3 es más fino: separa la especificación de la tarea. La regla es la misma: antes de cambiar de modelo, atribuye el fallo a una capa.
+- Los tres están escritos desde el asiento de quien usa un agente que ya existe y quiere que trabaje mejor. Hay otro asiento.
 
 ### 3 · El Harness Playbook: la vista desde el motor
 
 <p><button type="button" class="ir-a" data-t="213">▶ Ir a 3:33</button></p>
 
-- **Can Bölük · septiembre de 2026:** The Harness Playbook — De Stencil, la empresa detrás de oh my pi. Una opinión influyente, no una metodología neutral.
-- **Su tesis:** Software de sistemas, no un bucle — Un harness no es un bucle alrededor de una petición.
-- **Cinco principios:** Sesión (con autoridad) → Control (de confianza) → Trabajo (acotado) → Compatibilidad (explícita) → Vistas (proyecciones)
-- **Aviso 1:** omp² aún se construye — No es la oh my pi que tienes instalada, y no la enseñamos como disponible.
-- **En lo que coinciden**
-  - `terminado` · Definido antes
-  - `contexto` · Un presupuesto
-  - `estado` · Fuera del modelo: repositorio o registro
+- The Harness Playbook (Can Bölük, septiembre de 2026) mira desde quien construye el runtime. Su autor es el de oh my pi, y su empresa, Stencil, está detrás: es una opinión influyente, no una metodología neutral.
+- Tesis: un harness es software de sistemas, no un bucle alrededor de una petición, como un motor de videojuego. Para diseñar, propone cuatro escenarios extremos: varios agentes en la misma carpeta, un agente remoto manejado desde el móvil, un espectador en una web de la que no te fías y una fábrica de software automática con entradas hostiles.
+- Sus cinco principios:
+  - **Sesión con autoridad:** una sola, reconstruida desde el registro, para que rebobinar, bifurcar y retomar no mientan. Si una extensión guarda su estado aparte, rebobinar miente (vídeo 9).
+  - **Control de confianza:** la política vive en el anfitrión y el sandbox solo ejecuta peticiones acotadas.
+  - **Trabajo acotado:** herramientas, subagentes y procesos en segundo plano se pueden cancelar y tienen límites centrales.
+  - **Compatibilidad explícita** con cada modelo, en vez de suponer que todos se portan igual.
+  - **Vistas como proyecciones:** la TUI, la web o el móvil enseñan el mismo estado, no copias.
+- Dos avisos para leerlo: parte del texto describe omp², la próxima arquitectura, que aún se construye y no es la oh my pi que tienes instalada; y critica abiertamente a Pi (de diecisiete extensiones de ejemplo con estado, dice que solo dos lo guardaban bien), mientras la ficha de Pi de WalkingLab elogia esas mismas extensiones.
+- Donde coinciden los dos textos: definir antes qué significa terminado, tratar el contexto como un presupuesto y guardar el estado fuera del modelo (en el repositorio o en el registro de la sesión).
 
 ### 4 · Cada esquema cobra un impuesto
 
 <p><button type="button" class="ir-a" data-t="387">▶ Ir a 6:27</button></p>
 
-- **Playbook:** Cada esquema cobra un impuesto — Y no solo en tokens.
-- **La lección:** El roster se mide — No es quién gana: son cifras de su autor, con su prueba, que no hemos reproducido.
-- *En terminal:* Pi · el roster por ejecución (más abajo, en «Código y comandos»)
-- *En terminal:* .pi/settings.json (más abajo, en «Código y comandos»)
-- **Regla práctica:** Decide el roster al empezar — Las herramientas van al principio de cada petición: ahí vive la caché.
+- Cada herramienta cobra tres impuestos: el prefijo (su esquema y sus líneas del prompt viajan en cada petición; la caché lo abarata, no lo regala), la elección (una opción más entre las que el modelo duda) y el estilo (cambia cómo trabaja el modelo).
+- Cifras del Playbook, que no hemos reproducido: con unas cinco herramientas, oh my pi hizo su prueba en 36,5 s, frente a 37 s de Pi y 42 s de Codex; con sus 23 definiciones de serie, 86 s. La lección no es quién gana, sino que el roster se mide.
+- En Pi decides el roster por ejecución (`-t`, `--exclude-tools`, `--no-mcp`) o lo versionas en `.pi/settings.json` con `defaultTools` (los dos, más abajo, en «Código y comandos»). Lo que no cabe se esconde detrás de codemode o `tool_search` (vídeo 7).
+- oh my pi monta las herramientas poco usadas como dispositivos descubribles, con direcciones `xd://`: el modelo sabe que existen y lee su documentación cuando las necesita. Es el ajuste `tools.xdev`, encendido por defecto. Learn Harness Engineering lo llama divulgación progresiva.
+- Si quitas una herramienta que el modelo necesita, no se para: improvisa con otra (sin edición, edita con bash). Y decide el roster al empezar: las herramientas van al principio de cada petición, que es lo que aprovecha la caché.
 
 ### 5 · Medir el prefijo
 
 <p><button type="button" class="ir-a" data-t="574">▶ Ir a 9:34</button></p>
 
-- *En la demo:* prefijo.sh
-- *En la demo:* Pi: tokens antes de trabajar
-- *En la demo:* oh my pi: tres configuraciones
+- Antes de medir, controla variables: ninguna extensión ni servidor MCP de vídeos anteriores, ninguna configuración de oh my pi en la tienda y el mismo modelo en los dos agentes (DeepSeek Flash).
+- `prefijo.sh` lanza «di solo hola» en modo print con `--mode json` y suma los tokens de entrada, también los de caché: lo que pesa el roster antes de trabajar.
+
+| Agente · roster | Tokens de entrada |
+|---|---|
+| Pi · sin herramientas | 794 |
+| Pi · `read,bash` | 1428 |
+| Pi · las 4 de serie | 1971 |
+| Pi · las 7 integradas | 2539 |
+| Pi · las de serie + codemode | 2542 |
+| oh my pi · `read,bash,edit,write` | 4428 |
+| oh my pi · todo, con catálogo `xd://` | ≈8000 |
+| oh my pi · todo, sin catálogo (`tools.xdev: false`) | más de 10 600 |
+
+- Lee las diferencias, no los totales: `read`+`bash` suman unos 600 tokens, `edit`+`write` unos 550 y `grep`+`find`+`ls` otros 570. Codemode sola pesa como esas tres, porque su descripción explica cómo escribir scripts.
+- El catálogo de oh my pi ahorra unos 2600 tokens por petición, aunque usar una descubrible obliga antes a leer su documentación. Con las mismas cuatro herramientas, oh my pi pesa más del doble que Pi porque su prompt de sistema trae mucho más.
+- En el vídeo 1, `/context` daba unos 6,6K para oh my pi (2,7K de prompt y 3,9K de herramientas). Aquí la cifra sale de los tokens de entrada de una petición real y con otro roster, así que no tiene por qué coincidir.
 
 ### 6 · La misma tarea con rosters distintos
 
 <p><button type="button" class="ir-a" data-t="723">▶ Ir a 12:03</button></p>
 
-- **El encargo:** faltaParaEnvioGratis(subtotal) — Cuánto falta para el envío gratis, a céntimos; 0 si ya lo tiene; misma validación; pruebas y npm test.
-- *En la demo:* medir.sh
-- *En la demo:* Juez externo y parada ante fallos
-- **Dieciocho ejecuciones:** Una sola es una anécdota — El mismo modelo, con el mismo encargo, no hace siempre lo mismo.
-- *En la demo:* time ./medir.sh 3
-- *En la demo:* ./resumen.sh
-- **18 ejecuciones:** Menos de 7 céntimos — DeepSeek Flash, los dos agentes, 5 min 48 s.
-- *En la demo:* oh my pi: media de tres
-- **Por la caché:** Más del 90 % sale de la caché — Leerla cuesta muy poco. Pagas lo que escribe el modelo y lo que no estaba en caché.
-- **Coste:** Cabe en el ruido — Con tres repeticiones, no has demostrado nada sobre el coste.
-- *En la demo:* Pi: mínimo frente a serie
-- *En la demo:* pi-minimo-1: los comandos de bash
-- **Solo read y bash:** Reescribe el fichero entero — En lugar de un cambio pequeño que puedes revisar.
-- *En la demo:* Un cambio que nadie pidió
-- **El método:** Encargo (pequeño y verificable) → Rosters (una diferencia) → Carpetas (aisladas) → Repeticiones → Juez (externo)
+- El encargo es pequeño y verificable: añadir a `envio.js` `faltaParaEnvioGratis(subtotal)`, que diga cuánto falta para el envío gratis, a céntimos, y 0 si ya lo tiene, con la misma validación que `gastosEnvio`, con pruebas y `npm test`.
+- `medir.sh` crea un worktree de git por configuración y repetición (`git worktree add --detach`, porque master ya está abierta), lanza el agente con `--mode json`, guarda los eventos y juzga desde fuera: si `npm test` pasa y cuántos ficheros cambiaron. Lleva `set -e` para pararse si un paso falla, antes de lanzar el agente en la carpeta equivocada.
+- Seis configuraciones (Pi: `read,bash`, las 4 de serie, las 7 integradas; oh my pi: 4 herramientas, con catálogo, sin catálogo), tres repeticiones cada una: 18 ejecuciones en 5 min 48 s, todas pasan `npm test` y el experimento cuesta menos de 7 céntimos de dólar.
+
+| Configuración | Tokens de media | Coste de media | Vueltas |
+|---|---|---|---|
+| oh my pi · 4 herramientas | ≈70 000 | ≈0,3 céntimos | — |
+| oh my pi · con catálogo | ≈100 000 | ≈0,3 céntimos (algo menos que con 4) | — |
+| oh my pi · sin catálogo | ≈142 000 | ≈0,4 céntimos | — |
+| Pi · `read,bash` | ≈28 000 | — | 6 a 8 |
+| Pi · las 4 de serie | ≈23 000 | — | 5 |
+
+- Los tokens siguen al prefijo, que viaja en cada vuelta; el coste no, porque más del 90 % sale de la caché. Y dentro de una misma configuración, una ejecución costó 0,2 céntimos y otra casi 0,8: con tres repeticiones, la diferencia de coste es ruido.
+- Con solo `read` y `bash`, Pi reescribió el fichero entero con un heredoc, añadió las pruebas con `cat` y arregló el import con `perl` tras fallar con `sed`. Funciona, pero pierdes un cambio pequeño que puedes revisar.
+- Diagnóstico por capas (mapa 3): el agente sacó la validación a una función nueva, `validarSubtotal`, que nadie pidió. Aparece en 10 de las 18 ejecuciones, con todos los rosters y en los dos agentes, así que no es la capa de herramientas, sino la de especificación: «con la misma validación» se lee como «reutilízala». `npm test` pasa en las 18: el juez externo no ve un cambio de más, y por eso sigues mirando el diff.
+- El método es lo que te llevas: un encargo pequeño y verificable, rosters que cambian en una sola cosa, carpetas aisladas, repeticiones y un juez externo. Con otro modelo, otra tabla.
 
 ### 7 · Límites centralizados
 
 <p><button type="button" class="ir-a" data-t="1006">▶ Ir a 16:46</button></p>
 
-- **Playbook:** Acota la salida una sola vez — Si cada herramienta trunca, cada una avisa a su manera y alguna se olvida.
-- *En la demo:* Pi · truncate.js
-- **Playbook:** Truncar dentro rompe el codemode — En un script, bash devuelve hasta 1 MiB para que el script filtre.
-- **Pi · un punto para la política:** Llamada (integrada, MCP o anidada) → tool_call (el evento) → Decisión (en un sitio)
-- *En la demo:* oh my pi · config get
-- **Pregúntate:** ¿Dónde vive su límite ? — Dentro de la pieza: repítelo. En un sitio común: escríbelo ahí y versiónalo.
+- Principio del Playbook: acota la salida una sola vez, en el centro. Si cada herramienta trunca por su cuenta, cada una avisa a su manera y alguna se olvida.
+- Pi trunca en tres sitios: las herramientas integradas cortan en 2000 líneas o 50 KB con una utilidad que cada herramienta tiene que llamar (las tuyas deben truncar; lo dice la documentación), MCP corta a los 20 KB y codemode a los 10 000 tokens.
+- El Playbook avisa de que truncar dentro de una herramienta rompe el codemode, porque el aviso se mezcla con los datos. Pi lo evita: dentro de un script de codemode, bash no se limita a los 50 KB que ve el modelo (en el vídeo, hasta un mega), para que el script filtre.
+- Para la política, Pi sí tiene un punto central: el evento `tool_call`. Por él pasa toda llamada, también las de MCP y las anidadas en un script de codemode. Por eso la extensión de permisos del vídeo 8 vigilaba todo desde un sitio.
+- oh my pi centraliza los límites en el grupo `tools` de su configuración: bash y eval comparten un recolector con 50 KB entre cabeza y cola, y el resto va a un artefacto. `tools.maxTimeout` a 0 significa sin tope. Y aunque pongas uno, no es un límite duro: en el código que revisamos, si el modelo pide un timeout de 0, el comando queda sin límite. El límite duro, fuera del modelo: `--max-time` o el de tu integración continua.
+
+> **Nota:** `bash-tool-runtime.md` dice que el tiempo se acota a 1–3600 s; el comportamiento con un timeout de 0 lo comprobamos en el código de omp 18.6.1. Comprueba tu versión.
+
+- Pregúntate, por cada pieza nueva, dónde vive su límite. Si vive dentro de la pieza, apúntalo, porque lo repetirás en cada pieza nueva. Si vive en un sitio común (`tool_call` en Pi, `tools` en oh my pi), escríbelo ahí y versiónalo. Lo que no está clasificado, trátalo como peligroso: los patrones de bash no cubren `eval` (vídeo 19).
 
 ### 8 · El anfitrión decide, el sandbox ejecuta
 
 <p><button type="button" class="ir-a" data-t="1215">▶ Ir a 20:15</button></p>
 
-- **Documentación de Pi:** Pi entero dentro: lo más fuerte — Aislar solo las herramientas es una frontera más estrecha. A veces se combinan.
-- **Vídeo 7:** codemode, del lado del harness — El script pide; las herramientas ejecutan, por el mismo punto de control.
-- **Lo más importante:** Aprobar no es aislar — Las aprobaciones deciden qué se ejecuta; una frontera decide qué puede tocar.
+- El anfitrión es dueño de la sesión, el modelo, la política, las aprobaciones y los límites; el sandbox solo ejecuta lo que le piden y devuelve una salida acotada.
+- Las tres formas de ejecutar Pi del vídeo 5, leídas con este principio:
+
+| | Pi directo | Pi entero en un contenedor | Pi fuera, herramientas en una micro-VM (Gondolin) |
+|---|---|---|---|
+| Sesión, claves y política | en tu máquina | dentro de la caja | en el anfitrión |
+| Carpeta y comandos | en tu máquina | dentro de la caja | en la micro-VM |
+| Lo que protege | ninguna frontera | toda tu máquina | las claves y la política, frente a menos superficie |
+
+- Según la documentación de Pi, meterlo entero en un entorno aislado suele ser lo más fuerte; aislar solo las herramientas es una frontera más estrecha (las de otras extensiones siguen en el anfitrión, y los comandos heredan sus variables de entorno). Son dos decisiones distintas y se pueden combinar. Docker Sandboxes aplica la idea a las credenciales: la clave real se queda fuera y dentro hay un valor de relleno.
+- `task.isolation.enabled` en oh my pi da a los subagentes un espacio aislado y devuelve sus cambios como parche: evita que se pisen, pero no es una frontera de seguridad.
+- Aprobar no es aislar: las aprobaciones deciden qué se ejecuta; solo una frontera del sistema operativo o una máquina virtual decide qué puede tocar. Lo que cruza la frontera, lo más estrecho posible: la carpeta que la tarea necesita, credenciales de poco alcance y corta vida, y red solo si hace falta.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1411">▶ Ir a 23:31</button></p>
 
-- **Apunta la fecha:** El harness se degrada — Cuando cambie el modelo, repite la medida.
-- **Vídeo 23:** El repo como sistema de registro — AGENTS.md, funcionalidades, progreso, arranque y traspaso.
+- Tres decisiones: un roster pequeño y medido, con la cola larga detrás de codemode, `tool_search` o el catálogo; límites en un solo sitio, sabiendo cuáles dependen de cada herramienta; y el anfitrión que decide frente al sandbox que ejecuta.
+- **Práctica, 1:** escribe la ficha de tu harness en una página, con tres apartados: qué herramientas ve el modelo y por qué, dónde vive cada límite, y qué se ejecuta dentro de una frontera y qué fuera.
+- **Práctica, 2:** elige una tarea pequeña con una prueba que la juzgue y lánzala con dos rosters, tres veces cada uno, en worktrees separados. Compara tokens, coste, llamadas, si la prueba pasa y qué hay en el diff. Si la diferencia es ruido, quédate con el roster que entiendes mejor.
+- **Materiales:** [`medir/medir.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/medir.sh), [`medir/prefijo.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/prefijo.sh) y [`medir/xdev-off.yml`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/medir/xdev-off.yml), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
+- Apunta la fecha: el harness se degrada como el código. Cuando cambie el modelo, repite la medida.
+- **Vídeo 23:** el repo como sistema de registro: AGENTS.md, funcionalidades, progreso, arranque y traspaso.
 
 ## Código y comandos
 
@@ -123,10 +161,10 @@ pi --exclude-tools "mcp__*"
 pi --no-mcp
 ```
 
-- `-t read,bash`: Lista cerrada
-- `+codemode,-write`: Sobre las de serie
-- `--exclude-tools`: Quita por nombre o patrón
-- `--no-mcp`: Sin MCP en esta ejecución
+- `-t read,bash`: lista cerrada; solo esas dos.
+- `-t +codemode,-write`: parte de las de serie, añade codemode y quita write.
+- `--exclude-tools "mcp__*"`: quita herramientas por nombre o con asterisco.
+- `--no-mcp`: apaga MCP solo en esta ejecución.
 
 ### .pi/settings.json
 
@@ -136,45 +174,15 @@ pi --no-mcp
 }
 ```
 
-- `defaultTools`: La misma sintaxis, en un fichero
-- `["+codemode", "-write"]`: El roster del equipo, versionado
+- `defaultTools`: la misma sintaxis que `-t`, en un fichero del proyecto. Versionado, todo el equipo arranca con el mismo roster.
 
 ## Fuentes
 
-- Pi 1.0.4 instalado (`$(npm root -g)/@earendil-works/pi-coding-agent/`):
-  - `CHANGELOG.md` 1.0.2–1.0.4: `--tools` y `--exclude-tools` con patrones `*`, `--no-mcp`, `--tools` ya no quita
-    MCP salvo que una entrada empiece por `mcp__`; las reglas del system prompt ya no nombran herramientas ocultas
-    (1.0.4); en Anthropic, redefinir herramientas a mitad de conversación conserva la caché (1.0.1).
-  - `docs/cli.md` §Tools (`-t`, `-xt`, `-nbt`, `-nt`; integradas `read`, `bash`, `edit`, `write`, `grep`, `find`,
-    `ls` y `powershell`; `codemode` y `tool_search` como extensiones integradas).
-  - `docs/settings.md` §Tools (`defaultTools` con `+name`/`-name`, `codemode.mode`, `codemode.inlineBudget` 3000).
-  - `docs/extensions.md` §Tools («Truncate large model-facing results…»; las llamadas anidadas con
-    `ctx.executeTool()` pasan por `tool_call` y `tool_result`) y §Tool exposure.
-  - `examples/extensions/truncated-tool.ts` («Custom tools MUST truncate… 50KB… 2000 lines») y
-    `dist/core/tools/truncate.js` (`DEFAULT_MAX_LINES = 2000`, `DEFAULT_MAX_BYTES = 50 * 1024`).
-  - `docs/mcp.md` (resultados de texto de más de 20 KB recortados por el medio; `timeout` 60 s por servidor) y
-    `docs/codemode.md` (`max_output_tokens` 10000; `bash` dentro de un script no está limitado a las 2000 líneas o
-    50 KB que ve el modelo).
-  - `docs/security.md` («Choose how to run Pi», tabla de tres formas; «Watching the transcript… do not create a
-    security boundary») y `docs/containerization.md`.
-- oh my pi 18.6.1 (`omp read omp://…`; `settings.md` leído en tres tramos por el corte de 50 KB):
-  - `settings.md` §«Tools and approvals»: `tools.approvalMode` (`yolo` por defecto), `tools.approval`,
-    `tools.maxTimeout` (**`0` = sin tope**), `tools.outputMaxColumns` 768, `tools.artifactSpillThreshold` 50 KB,
-    `tools.artifactHeadBytes`/`TailBytes` 20 KB, `tools.artifactTailLines` 500, `tools.artifactMaxBytes` 16 MB,
-    `tools.intentTracing` (`true`), `tools.xdev` (`true`: herramientas descubribles bajo `xd://`; desactivarlo «exposes
-    enabled tools top-level»), `tools.xdevDocs` (`catalog`).
-  - `bash-tool-runtime.md`: `OutputSink` compartido (50 KiB de presupuesto cabeza/cola, artefacto con el resto),
-    tiempo por defecto 300 s acotado a 1–3600 y por `tools.maxTimeout`; «Pattern approval is not containment»; los
-    patrones no cubren `eval`. `python-repl.md`: el mismo `OutputSink` y el mismo tope de tiempo.
-  - `cli-reference.md`: `--tools` («default: all»), `--no-tools`, `--config <file>` («extra config.yml-style overlay
-    for this run»), `--no-session`, `--approval-mode`, `--max-time`.
-  - `tools/task.md`: `isolated` y `task.isolation.enabled` (espacio de trabajo aislado con captura de parches; no se
-    presenta como frontera de seguridad).
-  - notas de investigación del curso §3.8 «Tools index» (clases Read/Write/Exec/Mixed, qué viene activo).
-- Guiones: 01 (terminado: `/context` de omp, 2,7K de prompt y 3,9K de herramientas; 12 activas de 24), 05, 06, 07
-  (terminado: 1971 / 2492 / 2193 / 4054 tokens), 08, 09, 11, 13 (borrador: `/context` con cuatro herramientas; no se
-  usa como dato), 19 y 21 (borradores).
-- Documentación oficial de Pi: [cli.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md), [codemode.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/codemode.md), [containerization.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/containerization.md), [extensions.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/extensions.md), [mcp.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md), [security.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md), [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md)
+- Learn Harness Engineering (WalkingLab, © 2025, licencia MIT): sus tres mapas, la divulgación progresiva y los directorios aislados para comparar. Ideas y estructura reutilizadas con nuestras palabras.
+- The Harness Playbook (Can Bölük, septiembre de 2026): los cinco principios, el impuesto de cada esquema y la separación entre anfitrión y sandbox. Es la opinión del autor de oh my pi.
+- Grabado con Pi 1.0.4. Documentación oficial de Pi: [cli.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md) (§Tools), [settings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md) (`defaultTools`), [extensions.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/extensions.md) (truncado y `tool_call`), [codemode.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/codemode.md), [mcp.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md), [security.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md) y [containerization.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/containerization.md).
+- Grabado con oh my pi 18.6.1. Documentación (`omp read omp://…`): `settings.md` (§«Tools and approvals»: `tools.xdev`, `tools.maxTimeout`, artefactos), `bash-tool-runtime.md` («Pattern approval is not containment»), `cli-reference.md` (`--tools`, `--config`, `--max-time`) y `tools/task.md` (aislamiento de subagentes).
+- Vídeos relacionados: 1 (las cinco piezas y `/context`), 5 (formas de ejecutar Pi), 7 (el coste de las herramientas y codemode), 8 (extensión de permisos), 9 (estado de las extensiones) y 19 (aprobaciones de oh my pi).
 
 ## Transcripción
 

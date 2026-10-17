@@ -18,94 +18,92 @@ Extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y
 
 <p><button type="button" class="ir-a" data-t="20">▶ Ir a 0:20</button></p>
 
-- **Barra reload:** Tira el entorno y lo vuelve a crear — Lo que vive en variables de la factoría desaparece con él.
-- **La pregunta:** ¿Sigue permitido en otra rama? — No: en esa historia, nadie ha aprobado nada.
-- **Hoy:** Estado (dónde guardarlo) → El fallo (provocarlo y arreglarlo) → Paquete (instalar y elegir)
+- **`/reload` no actualiza en caliente:** tira el entorno de extensiones y lo vuelve a crear, así que lo que vive en variables de la factoría desaparece. Si algo tiene que sobrevivir, hay que guardarlo fuera de la memoria del proceso.
+- **La complicación del árbol:** la sesión es un árbol (vídeo 03). Si permitiste algo en una rama y vuelves a un punto anterior, ¿sigue permitido? No: en esa historia nadie ha aprobado nada. El estado de una extensión bien hecha depende de la rama activa, no de todo el fichero.
+- **El plan:** dónde guardar el estado, el fallo típico al reconstruirlo (provocado a propósito) y cómo empaquetar, instalar y elegir qué se carga.
 
 ### 2 · Cuatro sitios para guardar
 
 <p><button type="button" class="ir-a" data-t="125">▶ Ir a 2:05</button></p>
 
-- **docs/extensions.md · State:** Cuatro sitios — Se elige según cómo participa el estado en la conversación.
-- **La regla:** Reconstruye con get branch — Las ramas abandonadas son historias alternativas.
+- **Se elige según cómo participa el estado en la conversación** (tabla de la sección *State* de `extensions.md`):
+
+| Sitio | Para qué | ¿Lo ve el modelo? | ¿Sigue a la rama? |
+|---|---|---|---|
+| `details` en el resultado de una herramienta | Estado de esa herramienta | No (solo ve `content`) | Sí |
+| `pi.appendEntry(tipo, datos)` | Datos duraderos: decisiones, preferencias, marcas | No | Sí |
+| `pi.sendMessage(…)` | Contenido propio que debe llegar al modelo | Sí; cuesta tokens en cada petición | Sí |
+| Almacenamiento externo (un fichero, una base de datos) | Lo que vive fuera de una sesión, p. ej. comandos aprobados para todo un proyecto | No | No |
+
+- **Dos métodos que se parecen mucho:** `getEntries()` devuelve todas las entradas del fichero, de todas las ramas; `getBranch()`, solo el camino desde la raíz hasta donde estás.
+- **La regla:** reconstruye el estado que depende de la rama con `getBranch()`. Las ramas abandonadas son historias alternativas.
 
 ### 3 · Details: el estado que viaja con la herramienta
 
 <p><button type="button" class="ir-a" data-t="266">▶ Ir a 4:26</button></p>
 
-- **Promesa del vídeo 08:** details en el pie — ejecutar_tests ya devolvía cuántas pasan y cuántas fallan.
-- *En la demo:* git diff tests.ts
-- *En la demo:* session_start y session_tree
-- *En la demo:* ¿Pasan los tests del carrito?
-- *En la demo:* ¿Y los del envío?
-- *En la demo:* /tree
-- *En la demo:* Sin resumen
-- **details:** El árbol hace el trabajo difícil — El estado ya estaba en los resultados de la herramienta.
+- **El patrón `reconstruir()`** (copiado del ejemplo `todo.ts`): recorre `getBranch()`, se queda con el último resultado de `ejecutar_tests` y pinta su recuento en el pie.
+- **Dos eventos para llamarlo:** `session_start` (al arrancar, recargar, empezar, retomar o bifurcar) y `session_tree` (tras moverte con `/tree`). Moverse por el árbol no recarga las extensiones; si no escuchas `session_tree`, tu estado se queda en la rama que dejaste.
+- *En la demo:* tras pasar los tests del carrito (12) y los del envío (3), `/tree` al mensaje del envío, sin resumen, devuelve el pie a «12 pasan»: en ese punto de la historia, la última ejecución fue la del carrito.
+- **El árbol hace el trabajo difícil:** no se guarda nada aparte. El estado ya estaba en los resultados de la herramienta.
 
 ### 4 · Append entry: aprobaciones que se recuerdan
 
 <p><button type="button" class="ir-a" data-t="405">▶ Ir a 6:45</button></p>
 
-- *En la demo:* git diff permisos.ts
-- *En la demo:* getEntries(): a propósito
-- *En la demo:* Permitir siempre en esta sesión
-- *En la demo:* /reload: el estado sobrevive
-- **Cuidado:** Funciona en la prueba que hiciste — Así llega este fallo a producción.
+- **Por qué no `details`:** la aprobación no es el resultado de una herramienta nuestra; ocurre en `tool_call`, sobre cualquier herramienta. Se guarda cada decisión con `pi.appendEntry`, con el tipo `permisos` y la acción y la decisión (una vez, siempre o bloquear). Además, el modelo no necesita verlo.
+- **El error, a propósito:** el `reconstruir()` de `permisos.ts` recorre `getEntries()` en lugar de `getBranch()`, y solo se llama en `session_start`. Es el error más natural: quieres recuperar todo lo que guardaste y pides todas las entradas.
+- *En la demo:* tras «Permitir siempre» la edición del README, `/reload` reconstruye desde el fichero y el pie vuelve con «1 aprobada». También sobreviviría a cerrar y retomar con `/resume`.
+- **Así llega este fallo a producción:** funciona en la prueba que hiciste.
 
 ### 5 · El fallo típico: rebobinar
 
 <p><button type="button" class="ir-a" data-t="546">▶ Ir a 9:06</button></p>
 
-- *En la demo:* /tree al mensaje del README
-- *En la demo:* Primer síntoma
-- *En la demo:* Los ficheros no se rebobinan
-- *En la demo:* Sin diálogo
-- *En la demo:* /reload no lo arregla
-- **El fallo típico**
-  - `getEntries()` · Todas las ramas: en lugar de la activa
-  - `session_tree` · Sin escuchar: solo se reconstruye al arrancar
-- **No es estético:** Es un fallo de seguridad — Una aprobación de una historia que ya no existe autoriza acciones en la actual.
+- *En la demo:* tras `/tree` al mensaje que pedía la sección del README, el pie sigue con «1 aprobada»: nadie ha reconstruido el estado. Antes de repetir, se restaura el README con `git checkout`, porque `/tree` mueve la conversación, no tus ficheros.
+- **El síntoma grave:** al repetir la petición, la edición pasa sin diálogo. `edit README.md` sigue permitido por una rama que ya no es la nuestra. Y `/reload` no lo arregla: vuelve a leer el fichero entero con `getEntries()`.
+- **Las dos mitades del fallo:** reconstruir desde todas las entradas en lugar de desde la rama activa, y reconstruir solo al arrancar y no al moverte por el árbol. Cada una basta para que el estado mienta.
+- **No es estético, es seguridad:** una aprobación de una historia que ya no existe autoriza acciones en la actual.
 
 ### 6 · El arreglo, y por qué funciona
 
 <p><button type="button" class="ir-a" data-t="697">▶ Ir a 11:37</button></p>
 
-- *En la demo:* El arreglo
-- *En la demo:* /reload con el arreglo
-- *En la demo:* El diálogo vuelve
-- *En la demo:* El pie sigue a la rama
-- *En terminal:* Las entradas custom en el fichero de la sesión (más abajo, en «Código y comandos»)
-- **La lección:** estado = f(rama) — Recargar, retomar, bifurcar y rebobinar pasan a ser el mismo caso.
+- **El arreglo, en dos líneas:** `getEntries()` pasa a `getBranch()`, y se añade `pi.on("session_tree", reconstruir)`. La opción del diálogo pasa a decir «Permitir siempre en esta rama», que es lo que hace.
+- **Por qué funciona:** `appendEntry` cuelga la entrada del punto actual del árbol, como un mensaje. Al volver atrás, queda en la rama que dejas, y `getBranch()` ya no la ve. No hay que borrar nada.
+- *En la demo:* tras `/reload` con el arreglo, el pie dice «0 aprobadas» en la rama donde la edición pasó sin preguntar; al repetir, el diálogo vuelve; y al saltar entre ramas con `/tree`, el pie cambia al momento, sin recargar.
+- **Los demás casos salen solos:** `/new` empieza un fichero vacío y todo vuelve a cero (aquí sí es lo correcto); `/resume` y `/reload` pasan por `session_start`; `/fork` copia el camino y llega con el motivo `fork`; la compactación no borra entradas. También existen `pi.setLabel` (etiquetas visibles en `/tree`) y `registerEntryRenderer` (dibujar tus entradas sin que lleguen al modelo).
+- **La lección:** estado = f(rama). Si el estado se calcula recorriendo `getBranch()`, recargar, retomar, bifurcar y rebobinar son el mismo caso.
 
 ### 7 · Un paquete de Pi
 
 <p><button type="button" class="ir-a" data-t="900">▶ Ir a 15:00</button></p>
 
-- *En la demo:* package.json
-- *En la demo:* peerDependencies: "*"
-- *En la demo:* pi install · pi list
-- *En la demo:* settings.json
-- **Paquete local:** No se copia — Pi lo carga desde donde está: sigues editando y usando barra reload.
-- *En la demo:* pi, sin -e
+- **Qué es:** un directorio o un paquete de npm normal con su `package.json`, que puede llevar extensiones, skills, prompt templates y temas. Pi encuentra lo que contiene por convención (carpetas `extensions/`, `skills/`, `prompts/`, `themes/`) o por un manifiesto: la clave `pi` del `package.json`.
+- **Dependencias:** los paquetes que pone Pi (el agente de código, el núcleo del agente, la librería de modelos, la de la interfaz de terminal y TypeBox) van en `peerDependencies` con versión `"*"`, nunca en `dependencies`; si no, tu paquete llevaría su propia copia y Pi podría acabar con clases y registros duplicados. Cualquier otra librería sí va en `dependencies`; Pi las instala si el paquete viene de npm o git, pero no si es una ruta local.
+- **Instalar en local:** `pi install <ruta>` añade la ruta a `packages` en tu `settings.json`, y `pi list` lo muestra. Un paquete local no se copia: Pi lo carga desde donde está, así que sigues editando y usando `/reload`.
+- **No lo cargues dos veces:** con el paquete instalado, no cargues además la misma extensión con `-e` ni desde la carpeta del agente.
 
 ### 8 · Elegir, instalar y publicar
 
 <p><button type="button" class="ir-a" data-t="1105">▶ Ir a 18:25</button></p>
 
-- *En la demo:* command pi config
-- *En la demo:* settings.json
-- *En la demo:* /ho
-- *En terminal:* settings.json · filtrar los recursos de un paquete (más abajo, en «Código y comandos»)
-- *En terminal:* Quitar o probar sin instalar (más abajo, en «Código y comandos»)
-- *En terminal:* Orígenes de un paquete (más abajo, en «Código y comandos»)
-- **El apunte honesto:** Instalar un paquete es ejecutar código ajeno — Lee el código, fija versiones y revisa actualizaciones.
+- **`pi config`** lista los recursos descubiertos (los de tus paquetes y los integrados: codemode, llama.cpp, MCP y tool search) y los activa o desactiva con la barra espaciadora. Tab cambia entre el ámbito personal y el del proyecto; `-l` arranca en el del proyecto. *En la demo:* al desactivar `hola.ts`, la entrada del paquete en `settings.json` pasa a ser un objeto con `"extensions": ["-hola.ts"]`, y `/hola` deja de aparecer.
+- **Filtros a mano:** omitir un tipo lo carga todo; una lista vacía no carga nada; `!` delante de un patrón lo excluye; `-` delante de una ruta concreta la quita. Los filtros solo estrechan: no cargan nada que el paquete no declare.
+- **Orígenes y versiones:** ruta local, `npm:` o `git:` (o una URL de GitHub). Una versión, etiqueta o commit queda fijada; `pi update --extensions` actualiza los paquetes sin mover las fijadas, y `pi update` a secas actualiza Pi. Aunque declares el mismo paquete de dos formas, no se carga dos veces. Con `-l` se declara en `.pi/settings.json` del proyecto, y solo se carga con confianza.
+- **Publicar:** en git, sube el repositorio y crea una etiqueta; en npm, `npm publish`. La palabra clave `pi-package` lo hace visible en la galería de pi.dev/packages.
+- **El apunte honesto:** instalar un paquete es ejecutar código ajeno con tus permisos, y puede traer skills que piden ejecutar programas. Lee el código, fija versiones y revisa las actualizaciones como cualquier dependencia.
 
 ### 9 · Cierre
 
 <p><button type="button" class="ir-a" data-t="1321">▶ Ir a 22:01</button></p>
 
-- **El fallo típico:** get entries y sin session tree — Una rama abandonada sigue mandando.
-- **Próximo vídeo:** Pi programático — pi -p en scripts y CI, modo JSON, RPC y el SDK.
+- **Repaso del estado:** `details` para el estado de una herramienta, `appendEntry` para lo duradero que el modelo no ve, `sendMessage` para lo que sí debe ver y almacenamiento externo para lo que vive fuera de la sesión. Se reconstruye con `getBranch()` en `session_start` y en `session_tree`.
+- **El fallo típico:** `getEntries()` y no escuchar `session_tree`. Las dos mitades hacen que una rama abandonada siga mandando.
+- **Práctica:** guarda las decisiones de tu `permisos.ts` con `appendEntry`; escríbela primero mal, provoca el fallo con `/tree`, arréglala y compruébalo en las dos direcciones del árbol. Después conviértela en un paquete, instálala en local y desactiva con `pi config` lo que no uses.
+- **Materiales:** [`extensiones/permisos.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/permisos.ts) ya con `appendEntry` y `getBranch` (el historial de la carpeta enseña el error y el arreglo) y [`extensiones/package.json`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/package.json), el manifiesto del paquete, en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
+- **En otros agentes:** la lección vale para cualquier agente que rebobine la conversación: un estado guardado en disco no se rebobina con ella.
+- **Próximo vídeo:** Pi programático: `pi -p` en scripts y CI, modo JSON, RPC y el SDK.
 
 ## Código y comandos
 
@@ -118,9 +116,20 @@ jq -c 'select(.type=="custom")' <fichero de la sesión>.jsonl
 {"type":"custom","id":"…","parentId":"…","customType":"permisos","data":{"que":"edit README.md","decision":"siempre"}}
 ```
 
-- `select(.type=="custom")`: Filtra
-- `"customType":"permisos"`: Nuestras
-- `"parentId"`: Dónde cuelga
+- La ruta del fichero de la sesión te la da `/session`.
+- `"customType":"permisos"`: el tipo que le dimos en `appendEntry`, para reconocer nuestras entradas.
+- `"parentId"`: el punto del árbol del que cuelga la decisión. Es lo que permite que `getBranch()` la vea o no según la rama.
+
+### settings.json · el paquete tras desactivar hola.ts con pi config
+
+No aparece literal en el vídeo; es la entrada que describe la locución.
+
+```text
+{ "source": "<ruta del paquete>",
+  "extensions": ["-hola.ts"] }
+```
+
+- `-` quita una ruta concreta del paquete; el resto de sus extensiones se sigue cargando.
 
 ### settings.json · filtrar los recursos de un paquete
 
@@ -131,19 +140,17 @@ jq -c 'select(.type=="custom")' <fichero de la sesión>.jsonl
   "prompts": ["prompts/review.md"] }
 ```
 
-- `"extensions"`: Patrones
-- `"skills": []`: Ninguna
-- `!extensions/legacy.ts`: Excluir
+- `"extensions"`: carga las extensiones que encajan con el patrón, salvo la excluida con `!`.
+- `"skills": []`: no carga ninguna skill del paquete. Si omites un tipo, se carga entero.
 
 ### Quitar o probar sin instalar
 
 ```text
-pi remove ~/csn/extensiones
+pi remove <ruta del paquete>
 pi -e npm:@ejemplo/pi-tools        # solo esta ejecución
 ```
 
-- `pi remove`: Quita la entrada
-- `pi -e npm:`: Probar
+- `pi remove` borra también la entrada del paquete en los ajustes.
 
 ### Orígenes de un paquete
 
@@ -154,26 +161,14 @@ pi install ./pi-tools
 pi update --extensions      # no mueve versiones fijadas
 ```
 
-- `npm:`: npm
-- `git:`: git
-- `--extensions`: Actualizar paquetes
+- `@1.0.0` y `@v1` fijan la versión; la ruta local no instala dependencias.
 
 ## Fuentes
 
-- Documentación instalada de Pi 1.0.1 (`$(npm root -g)/@earendil-works/pi-coding-agent/docs/`): `extensions.md`
-  (secciones *Add it to Pi*, *Context and session changes*, *State*), `packages.md` (entero), `session-format.md`
-  (`CustomEntry`, `CustomMessageEntry`, `LabelEntry`, *Tree Structure*), `sessions.md` (*Choose how to branch*),
-  `cli.md` (*Resources*, *Package commands*, *Update Pi or packages*), `configuration.md` (rutas de `settings.json`).
-- Tipos: `dist/core/extensions/types.d.ts` (`SessionStartEvent.reason` = `startup | reload | new | resume | fork`,
-  `SessionTreeEvent`, `appendEntry`, `setLabel`, `registerEntryRenderer`, `sendMessage`) y
-  `dist/core/session-manager.d.ts` (`getBranch`, `getEntries`, `ReadonlySessionManager`).
-- Ejemplos instalados: `examples/extensions/todo.ts` (estado en `details`, reconstrucción con `getBranch` en
-  `session_start` y `session_tree`), `bookmark.ts` (`pi.setLabel` y etiquetas en `/tree`), `with-deps/` (paquete con
-  `dependencies` propias y manifiesto `pi.extensions`).
-- `pi install --help` y `pi config --help` (Pi 1.0.1).
-- Vídeos anteriores: 03 (`/tree`, los ficheros no se rebobinan, «Summarize branch?»), 05 (confianza de proyecto),
-  06 (prometió los paquetes para este vídeo), 08 (`permisos.ts`, `tests.ts`, `hola.ts`; prometió `details`, estado que
-  sobrevive a `/reload` y paquetes con dependencias).
+- Documentación oficial de Pi: [extensions.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/extensions.md) (sección *State*), `packages.md`, `session-format.md` (entradas custom y estructura de árbol), `sessions.md` y `cli.md` (comandos de paquetes). Grabado con Pi 1.0.1.
+- Para leer después, en los ejemplos que se instalan con Pi: `examples/extensions/todo.ts` (estado en `details` y reconstrucción con `getBranch` en `session_start` y `session_tree`), `bookmark.ts` (`pi.setLabel`) y `with-deps/` (un paquete con dependencias propias y manifiesto `pi.extensions`).
+- Galería de paquetes: pi.dev/packages.
+- Relacionados en el curso: vídeo 03 (el árbol de la sesión), 05 (confianza de proyecto), 06 (las piezas que puede llevar un paquete) y 08 (`hola.ts`, `tests.ts` y `permisos.ts`).
 
 ## Transcripción
 

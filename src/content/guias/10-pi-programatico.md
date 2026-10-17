@@ -18,91 +18,96 @@ Pi sin interfaz, en scripts, en integración continua, por JSON y RPC y como lib
 
 <p><button type="button" class="ir-a" data-t="21">▶ Ir a 0:21</button></p>
 
-- **Mismo agente:** Cambia cómo entra, cómo sale y cuánto vive — Mismas sesiones, recursos y herramientas en todos los modos.
-- **Y una quinta vía:** El SDK — Pi como librería dentro de tu programa de Node o de Bun.
+- **Cuatro modos y un SDK sobre el mismo agente:** mismas sesiones, recursos y herramientas. Solo cambia cómo entra lo que pides, cómo sale lo que hace y si el proceso se queda vivo.
+- **Qué modo elegir:**
+
+| Modo | Úsalo si… | Qué sale | Cuándo ha terminado |
+|---|---|---|---|
+| Interactivo | Trabajas tú delante | La interfaz de terminal | Cuando lo cierras |
+| Print (`pi -p`) | Solo necesitas la respuesta final | El texto final, por stdout | Al salir el proceso |
+| JSON (`--mode json`) | Necesitas saber qué pasó por el camino: herramientas, coste | Un evento JSON por línea | Evento `agent_settled` |
+| RPC (`--mode rpc`) | Tu programa mantiene una conversación, cambia de modelo o contesta diálogos | Respuestas y eventos por stdout; órdenes por stdin | `agent_settled` por petición; el proceso sigue vivo |
+| SDK (`createAgentSession`) | Tu programa ya es TypeScript (Node o Bun) y quieres acceso a todo | Objetos y eventos de TypeScript | Se resuelve la promesa de `prompt()` |
+
+- **En otros agentes:** el modo print tiene equivalentes como `claude -p`, `codex exec` u `opencode run`. Comprueba las opciones de cada uno en su documentación.
 
 ### 2 · Pi guion p en scripts
 
 <p><button type="button" class="ir-a" data-t="138">▶ Ir a 2:18</button></p>
 
-- **pi -p · --print:** Ejecuta, escribe y termina — Sin interfaz, sin colores, sin pie.
-- *En la demo:* Sin -p: al redirigir, modo print
-- *En la demo:* git diff master | pi -p
-- *En la demo:* Solo herramientas de lectura
-- *En terminal:* Más formas de dar entrada a pi -p (más abajo, en «Código y comandos»)
-- *En la demo:* Código de salida: 0
-- **Cuidado:** Cero = ha terminado de hablar — No que sea correcto, ni que haya podido hacer lo que pediste.
+- **`pi -p` (o `--print`)** ejecuta, escribe el texto final y termina, sin interfaz, colores ni pie. Si rediriges la entrada o la salida, Pi elige el modo print solo, aunque no escribas `-p`.
+- **La entrada:** lo que llega por una tubería se antepone a la primera petición; `@fichero` adjunta un fichero; varias peticiones se ejecutan en orden en la misma sesión; `--` evita que una petición que empieza por guion se tome por una opción. *En la demo:* `git diff master | pi -p "Revisa este cambio en tres viñetas cortas"` devuelve la revisión, y el modelo avisa de que no puede ejecutar los tests porque solo tiene herramientas de lectura.
+- **Tres opciones que casi siempre quieres en un script:** `--tools read,grep,find,ls` (sin bash, edit ni write no puede cambiar nada), `--no-session` (no deja una sesión por ejecución) y `--model` (no depende de la configuración de nadie).
+- **El código de salida:** distinto de cero si la respuesta final acaba en error o se aborta (clave inválida, fallo del proveedor, conexión cortada); los errores van a stderr. **Cero significa que Pi ha terminado de hablar,** no que sea correcto ni que haya podido hacer lo que pediste.
 
 ### 3 · El modo JSON
 
 <p><button type="button" class="ir-a" data-t="305">▶ Ir a 5:05</button></p>
 
-- *En la demo:* --mode json
-- *En la demo:* jq sobre eventos.jsonl
-- *En la demo:* Los mismos eventos que las extensiones
-- **Leer JSONL desde código:** Corta solo por \n — readline también corta en U+2028 y U+2029. Y lee sin parar.
-- *En la demo:* stopReason: toolUse, stop
+- **`--mode json`** emite un registro por línea (JSONL): primero la cabecera de la sesión y después los eventos, casi los mismos que escuchan las extensiones (vídeo 08): `agent_start`/`agent_end`, `turn_*`, `message_start`/`message_update`/`message_end` y `tool_execution_*` con nombre, argumentos y resultado.
+- **El mensaje que vale es el de `message_end`:** `message_update` solo trae el trozo nuevo (el delta); `message_end` trae el mensaje completo con el uso de tokens y el coste.
+- **El final de verdad es `agent_settled`:** después de `agent_end` puede venir un reintento, una compactación o mensajes en cola.
+- **Leer JSONL desde código:** corta solo por `\n`. `readline` de Node también corta en U+2028 y U+2029, válidos dentro de un texto JSON, y partirías un registro. Y lee sin parar, o Pi se queda esperando.
+- **El código de salida no sirve aquí:** una respuesta fallida aparece en los eventos, pero no cambia el código. Decides tú mirando el `stopReason` del último `message_end` del asistente: `stop` es normal; `error` o `aborted`, no.
 
 ### 4 · Pi en un pipeline
 
 <p><button type="button" class="ir-a" data-t="474">▶ Ir a 7:54</button></p>
 
-- *En la demo:* scripts/revisar.sh
-- *En la demo:* 1 · Los tests, sin modelo
-- *En la demo:* 2 · Pi revisa el diff
-- *En la demo:* La petición
-- *En la demo:* 3 · Leer los eventos
-- *En la demo:* revisar.sh master
-- *En la demo:* errores.jsonl
-- **La lección:** Mira los eventos, no solo el código de salida — Un bloqueo no es un error de Pi. Lo detecta el script.
+- **`revisar.sh`, en tres fases:**
+  1. **Tests sin modelo:** `npm test` y guarda el código de salida. Lo que se puede comprobar sin modelo, lo comprueba el script.
+  2. **Pi revisa el diff:** el diff entra por tubería a Pi en modo JSON, sin sesión, con `--no-approve` (ignora lo del proyecto que depende de la confianza, vídeo 05), sin las skills personales, con el modelo fijado y con `-e permisos.ts` como red de seguridad. La petición pide resumen, riesgos y un veredicto final, OK o CAMBIOS.
+  3. **Leer los eventos con jq:** el `stopReason` del último mensaje, el texto final (se guarda como informe en Markdown) y las herramientas que acabaron en error, en `errores.jsonl`.
+- **Cómo decide el código de salida:** si Pi no terminó bien, el script sale con un código propio; si terminó bien, con el de los tests. El veredicto del modelo es orientativo; el que rompe el pipeline es el test. *En la demo:* tres tests fallan y el script sale con 1.
+- **La lección: mira los eventos, no solo el código de salida.** Para Pi todo fue bien (`stop`), pero `errores.jsonl` muestra dos llamadas a bash bloqueadas por la extensión. Un bloqueo no es un error de Pi; lo detecta el script. Ese fichero mezcla bloqueos y fallos (como un `npm test` en rojo): si necesitas distinguirlos, filtra por el motivo.
+- **La demo deja bash a propósito** para que salte la red de seguridad. En un pipeline de verdad, quítalo con `--tools read,grep,find,ls`.
 
 ### 5 · Integración continua
 
 <p><button type="button" class="ir-a" data-t="681">▶ Ir a 11:21</button></p>
 
-- *En la demo:* .github/workflows/revision-pi.yml
-- *En la demo:* Disparo, permisos e instalación
-- *En la demo:* Rama base y tests sin clave
-- *En la demo:* secrets.DEEPSEEK_API_KEY
-- *En la demo:* Arranque limpio y solo lectura
-- *En la demo:* upload-artifact, if: always()
-- **Un pull request es texto de otra persona:** Aprobar no es aislar — --no-approve no carga extensiones del proyecto, pero el texto puede darle instrucciones.
+- **El workflow de GitHub Actions:** se dispara en cada pull request, con permisos de solo lectura y un tiempo máximo de 10 minutos; descarga todo el historial (hace falta la rama base para el diff); prepara Node e instala Pi con `npm` usando `--ignore-scripts` y la versión fijada.
+- **Lo que protege no puede venir de la rama que se revisa:** el script y la extensión de permisos se copian desde la rama base, y los tests se ejecutan aparte, sin la clave en el entorno, porque también son código de la rama.
+- **La clave y el entorno:** `DEEPSEEK_API_KEY` sale de un secreto del repositorio, nunca del código. `PI_CODING_AGENT_DIR` apunta a un directorio temporal, para arrancar sin ajustes, sesiones ni credenciales de nadie, y `PI_SKIP_VERSION_CHECK` evita la consulta de versión nueva. Además, `revisar.sh` lee una variable propia, `PI_TOOLS` (no es una variable de Pi), para pasarle solo las herramientas de lectura.
+- **Después:** el informe, los errores y los eventos se suben como artefacto también si algo falla (`if: always()`). El ajuste `shellCommandPrefix` puede anteponer `export CI=1` a cada comando de bash, y los procesos que lanza Pi reciben `AI_AGENT=pi`.
+- **Un pull request es texto de otra persona:** su diff y su `AGENTS.md` llegan al modelo, con tu clave en el entorno. `--no-approve` evita extensiones del proyecto, pero no que el texto dé instrucciones. En CI: solo lectura, contenedor (vídeo 05) y revisa la política de secretos para ramas de terceros.
 
 ### 6 · RPC: Pi como proceso de larga vida
 
 <p><button type="button" class="ir-a" data-t="882">▶ Ir a 14:42</button></p>
 
-- **Modo RPC:** Pi como proceso de larga vida — Órdenes por la entrada estándar, respuestas y eventos por la salida.
-- *En terminal:* pi --mode rpc --no-session --tools read,grep,find,ls (más abajo, en «Código y comandos»)
-- **La clave del protocolo:** El identificador — Las órdenes se atienden de forma asíncrona: empareja por id, no por orden.
-- *En terminal:* Una petición por RPC (más abajo, en «Código y comandos»)
-- *En la demo:* Eventos hasta agent_settled
-- *En terminal:* Diálogos de extensión por RPC (más abajo, en «Código y comandos»)
-- *En la demo:* aprobador.mjs
-- *En la demo:* node aprobador.mjs
-- *En la demo:* «n»
+- **Qué es:** Pi se queda vivo, leyendo órdenes JSON por stdin y contestando por stdout. Sirve para un editor que habla con Pi durante horas o un programa en otro lenguaje.
+- **Empareja por `id`, no por orden:** las órdenes se atienden de forma asíncrona y cada respuesta repite el identificador. Un `prompt` responde enseguida con `"disposition":"started"` (aceptado, no terminado); el final es `agent_settled`. Hay órdenes para casi todo: encolar mensajes (steer y follow-up), `abort`, cambiar de modelo, compactar, bifurcar o ejecutar `bash`; y cerrar stdin apaga Pi de forma ordenada.
+- **Los diálogos viajan por el protocolo:** en RPC `ctx.hasUI` es verdadero. Un `select`, `confirm`, `input` o `editor` de una extensión sale como `extension_ui_request` y Pi espera un `extension_ui_response` con el mismo `id` y la opción escrita exactamente igual. Las notificaciones y `setStatus` también llegan, sin esperar respuesta.
+- *En la demo:* `aprobador.mjs`, un cliente de unas cuarenta líneas sin dependencias, pregunta en la terminal cuando el modelo quiere editar el README; al contestar «n», el pie pasa a «0 aprobadas · 1 bloqueadas» y el README queda intacto. La misma extensión pregunta en la interfaz, bloquea en un script y pregunta por cualquier cliente RPC.
+- **Límites:** la clase `RpcClient` de Pi empareja respuestas, pero no contesta diálogos de extensiones. Y no todo llega por RPC: el texto del pie con `setStatus` sí, pero los pies y cabeceras personalizados, los componentes propios y los temas no. Si una extensión depende de la terminal, que compruebe `ctx.mode === "tui"`.
 
 ### 7 · El SDK: Pi dentro de tu programa
 
 <p><button type="button" class="ir-a" data-t="1172">▶ Ir a 19:32</button></p>
 
-- **SDK:** createAgentSession — Sin otro proceso, sin JSON, sin protocolo: métodos de TypeScript.
-- *En la demo:* resumen.ts
-- *En la demo:* subscribe · prompt · dispose
-- *En la demo:* node resumen.ts ~/csn/tienda
+- **`createAgentSession`** devuelve una sesión con métodos de TypeScript: sin otro proceso, sin JSON y sin protocolo.
+- *En la demo:* `resumen.ts`, de unas veinte líneas, crea la sesión con el directorio de trabajo (decide qué `AGENTS.md` se carga), solo herramientas de lectura y un gestor de sesión en memoria. Se suscribe a los eventos (`subscribe`), lanza `prompt()`, lee el texto con `getLastAssistantText()` y libera recursos con `dispose()` en el `finally`. Los nombres de herramientas van a stderr y la respuesta a stdout, lista para otro programa. Se ejecuta con `node`, que entiende TypeScript sin compilar desde Node 22.18.
+- **Sin opciones se comporta como la CLI:** carga extensiones, skills, `AGENTS.md`, ajustes y credenciales. Cada pieza se puede cambiar; los ejemplos del SDK que se instalan con Pi recorren las variantes.
+- **Tres diferencias que pillan:** el SDK no carga las extensiones integradas (codemode, tool search, MCP); sin interfaz, `hasUI` es falso y `permisos.ts` bloquea como en print; y no se ponen `AI_AGENT` y compañía.
+- **¿SDK o RPC?** SDK si tu programa es de Node o Bun y quieres acceso completo; RPC si es de otro lenguaje o quieres que Pi viva en su propio proceso, que puedas reiniciar o aislar.
 
 ### 8 · Fuera del escritorio: tmux, Termux y Windows
 
 <p><button type="button" class="ir-a" data-t="1347">▶ Ir a 22:27</button></p>
 
-- **Fuera del escritorio:** tmux · Termux · Windows — La documentación de Pi dedica una guía a cada uno.
-- *En terminal:* ~/.tmux.conf (tmux 3.5 o posterior) (más abajo, en «Código y comandos»)
+- **tmux:** puede mandar Shift+Enter como un Enter normal, y para Pi no es lo mismo (salto de línea frente a enviar). Activa las teclas extendidas (bloque `~/.tmux.conf`, más abajo), reinicia el servidor de tmux y comprueba los tres atajos. De tmux 3.2 a 3.4, solo la primera línea.
+- **Termux (Android):** Node y git con el gestor de Termux y Pi con npm. `termux-setup-storage` solo si Pi necesita el almacenamiento compartido; el portapapeles, con Termux API, solo texto. Cuéntale a Pi cómo usar Android en tu `AGENTS.md` global.
+- **Windows:** nativo o en WSL. En nativo, bash es Git Bash (si tienes otro, se indica con el ajuste shell path), y existe una herramienta opcional `powershell`. El follow-up es Ctrl+Q.
 
 ### 9 · Cierre
 
 <p><button type="button" class="ir-a" data-t="1461">▶ Ir a 24:21</button></p>
 
-- **Bloque C:** De Pi a oh my pi — Un fork sobre Bun, núcleo en Rust y las baterías incluidas.
+- **Tres ideas que valen más que cualquier opción:** lo que se puede comprobar sin modelo, lo comprueba el script; el código de salida de Pi no te dice si el agente hizo lo que querías, mira los eventos; y en CI, solo lectura, la clave como secreto y un contenedor, porque aprobar no es aislar.
+- **Práctica:** escribe tu `revisar.sh`: tests por su cuenta, diff a Pi en modo JSON con herramientas de solo lectura y la extensión de permisos, informe y errores guardados. Pruébalo con una rama donde falle un test y otra donde le pidas arreglarlo, y comprueba que detecta el bloqueo aunque Pi termine con normalidad.
+- **Materiales:** [`tienda/scripts/revisar.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/tienda/scripts/revisar.sh), [`tienda/ci/permisos.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/tienda/ci/permisos.ts), [`revision-pi.yml`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/tienda/.github/workflows/revision-pi.yml), [`sdk/resumen.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/sdk/resumen.ts) y [`rpc/aprobador.mjs`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/rpc/aprobador.mjs), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
+- **Próximo vídeo:** empieza la etapa «oh my pi» (vídeos 11–21), un fork de Pi sobre Bun, con núcleo en Rust y las baterías incluidas.
 
 ## Código y comandos
 
@@ -116,9 +121,9 @@ pi -p "Primero esto" "Después esto"
 pi -p -- "-1 es un número negativo"
 ```
 
-- `@src/envio.js`: Adjuntar
-- `"Después esto"`: Varias peticiones
-- `--`: Fin de opciones
+- `@src/envio.js`: adjunta el fichero a la petición, igual que en la interfaz.
+- Dos peticiones seguidas se ejecutan en orden, en la misma sesión.
+- `--`: marca el fin de las opciones, para que la petición que empieza por guion no se lea como una.
 
 ### pi --mode rpc --no-session --tools read,grep,find,ls
 
@@ -128,9 +133,7 @@ pi -p -- "-1 es un número negativo"
    "data":{"model":{"id":"deepseek-flash","provider":"deepseek",…},…}}
 ```
 
-- `"type":"get_state"`: Orden
-- `"success":true`: Respuesta
-- `"deepseek-flash"`: Modelo
+- `→` es lo que escribes en la entrada de Pi; `←`, lo que contesta. La respuesta repite el `id` de la orden.
 
 ### Una petición por RPC
 
@@ -140,8 +143,8 @@ pi -p -- "-1 es un número negativo"
 ← {"type":"agent_start"} … {"type":"message_update",…} … {"type":"agent_settled"}
 ```
 
-- `"disposition":"started"`: Aceptada
-- `"agent_settled"`: Terminada
+- `"disposition":"started"`: la petición se ha aceptado, no que haya terminado.
+- `agent_settled`: Pi ya no va a hacer nada más por su cuenta.
 
 ### Diálogos de extensión por RPC
 
@@ -151,9 +154,8 @@ pi -p -- "-1 es un número negativo"
 ← {"type":"extension_ui_request","method":"setStatus","statusText":"permisos: 0 aprobadas · 1 bloqueadas"}
 ```
 
-- `"method":"select"`: Pregunta
-- `"value":"Bloquear"`: Respuesta exacta
-- `"setStatus"`: Sin respuesta
+- `"value"`: tiene que coincidir exactamente con una de las `options`.
+- `setStatus` no lleva `id`: es un aviso que no espera respuesta.
 
 ### ~/.tmux.conf (tmux 3.5 o posterior)
 
@@ -164,37 +166,14 @@ set -g extended-keys-format csi-u
 # Comprobar: Shift+Enter = salto de línea · Enter = enviar · Alt+Enter = follow-up
 ```
 
-- `extended-keys on`: Teclas extendidas
-- `csi-u`: Formato
-- `Alt+Enter`: follow-up
+- En tmux 3.2 a 3.4, basta la primera línea. Después, reinicia el servidor de tmux.
 
 ## Fuentes
 
-- Documentación instalada de Pi 1.0.1 (`$(npm root -g)/@earendil-works/pi-coding-agent/docs/`): `cli.md`
-  (*Invocation and output*, *Tools*, *Prompts and process*), `cli-integration.md` (entero), `json.md` (entero),
-  `rpc.md` (entero), `rpc-commands.md` (`prompt`, `get_state`, `abort`, `bash`), `rpc-extension-ui.md` (entero,
-  incluida la nota de que en RPC `ctx.hasUI` es `true`), `sdk.md` (entero), `message-types.md` (`stopReason`, `usage`),
-  `providers.md` (tabla de variables, `DEEPSEEK_API_KEY`; «useful in CI»), `models.md` (claves por entorno en CI),
-  `environment-variables.md` (`PI_CODING_AGENT_DIR`, `PI_SKIP_VERSION_CHECK`, `PI_OFFLINE`, `AI_AGENT`,
-  `PI_CODING_AGENT`, `PI_SESSION_ID`…), `shell-aliases.md` (`shellCommandPrefix`, `"export CI=1"`), `tmux.md`,
-  `termux.md`, `windows.md`.
-- Código instalado: `dist/modes/print-mode.js` (código de salida 1 solo si el último mensaje del asistente acaba en
-  `error` o `aborted`), `dist/core/extensions/runner.js` (sin contexto de UI, `hasUI` es falso y el modo por defecto es
-  `print`), `dist/core/extensions/types.d.ts` (`ExtensionMode = "tui" | "rpc" | "json" | "print"`),
-  `dist/modes/rpc/rpc-client.d.ts` y `.js` (`RpcClient`, `cliPath` por defecto `dist/cli.js`; no gestiona
-  `extension_ui_request`), `dist/core/sdk.d.ts` (`CreateAgentSessionOptions`), `dist/core/agent-session.d.ts`
-  (`getLastAssistantText`, `bindExtensions`, `dispose`).
-- Ejemplos instalados: `examples/rpc-client.ts`, `examples/rpc-extension-ui.ts`, `examples/extensions/rpc-demo.ts`,
-  `examples/sdk/01-minimal.ts`, `02-custom-model.ts`, `05-tools.ts`, `06-extensions.ts`, `examples/sdk/README.md`.
-- `pi --help` (Pi 1.0.1) y `CHANGELOG.md` (disposición de `prompt` en RPC, `AI_AGENT=pi`, `message_update` solo con
-  deltas, `agent_settled`).
-- Vídeos anteriores: 02 (prometió `pi -p` para este vídeo; Windows y Termux como plataformas; `Ctrl+Q` en Windows),
-  04 (`pi -p` con una pregunta de una línea; claves por variable de entorno para CI), 05 (`--approve`/`--no-approve` en
-  pipelines, Docker), 07 (medida de contexto con `pi -p --mode json` y `jq`; el SDK no carga las extensiones
-  integradas), 08 (`permisos.ts`; en `pi -p` bloquea porque `ctx.hasUI` es falso; «aprobar no es aislar»), 09
-  (`permisos.ts` con «Permitir siempre en esta rama», paquete en `~/csn/extensiones`; anunció este vídeo: «pi guion p
-  en scripts y en integración continua, el modo JSON, el modo RPC y el SDK con create agent session»).
-- Documentación oficial de Pi: [tmux.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/tmux.md), [windows.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/windows.md)
+- Documentación oficial de Pi, en la carpeta `docs/` del paquete: `cli.md`, `json.md`, `rpc.md`, `rpc-commands.md`, `rpc-extension-ui.md`, `sdk.md`, `cli-integration.md` y `environment-variables.md`. Grabado con Pi 1.0.1.
+- Guías de plataforma: [tmux.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/tmux.md), [windows.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/windows.md) y `termux.md`.
+- Ejemplos que se instalan con Pi: `examples/rpc-client.ts`, `examples/rpc-extension-ui.ts` y los de `examples/sdk/` (empieza por `01-minimal.ts` y su `README.md`).
+- Relacionados en el curso: vídeo 05 (`--no-approve` y contenedores), 07 (medir el contexto con `--mode json`), 08 (`permisos.ts` y `ctx.hasUI`) y 21 (lo programático en oh my pi).
 
 ## Transcripción
 

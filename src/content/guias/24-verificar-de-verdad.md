@@ -18,109 +18,108 @@ Definir antes qué significa «terminado» y comprobarlo con pruebas, rúbricas 
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Hoy:** Que terminado no dependa de que el agente lo diga — Sacar el juicio de «hecho» fuera del agente.
-- **Learn Harness Engineering · lección 9:** Cantar victoria antes de tiempo — Curso de WalkingLab, licencia MIT.
-- **Harness Playbook · Can Bölük, autor de oh my pi:** Sin definir verificado, pruebas que no prueban — Vídeo 22: los dos textos coinciden en esto.
-- **La solución:** Sacar el juicio de terminado fuera del agente — No pedirle al modelo que sea más objetivo.
-- **El plan de hoy:** Definir (terminado, antes) → Rúbrica (y un script) → Hecho (y desmentido) → Puerta (Pi y oh my pi) → Lo que parece (verificación y no lo es)
+- En el vídeo 23, el cambio a `pasa` lo ejecutaba y lo anotaba el propio agente: era una instrucción, no una puerta. Hoy cierras ese hueco, para que «terminado» no dependa de que el agente diga que ha terminado.
+- Lección 9 de Learn Harness Engineering: el agente canta victoria antes de tiempo. El código tiene buena pinta, sus propias pruebas pasan y eso se toma por terminado, pero nadie ha comprobado lo que importaba.
+- Por qué pasa: la lección cita a Guo y otros (2017), que vieron que las redes neuronales están más seguras de lo que aciertan (era sobre clasificadores: tómalo como analogía). Y Anthropic cuenta que un agente que evalúa su propio trabajo tiende a valorarlo demasiado bien. El Harness Playbook coincide: sin definir «verificado», el agente se inventa pruebas que no prueban nada.
+- La solución no es pedirle al modelo que sea más objetivo, sino sacar el juicio de «terminado» fuera del agente. El plan: definir antes qué es terminado, escribir una rúbrica con un script que la comprueba, ver un «hecho» desmentido, convertir la regla en una puerta en Pi y en oh my pi, y poner en su sitio lo que parece verificación y no lo es.
 
 ### 2 · Definir antes qué es terminado
 
 <p><button type="button" class="ir-a" data-t="160">▶ Ir a 2:40</button></p>
 
-- *En la demo:* AGENTS.md · la definición de hecho del vídeo 6
-- **El hueco:** Regla (mal entendida) → Código (con el error) → Prueba (con el mismo error) → npm test (pasa)
-- **La definición de hecho se cumple:** Lo que el agente cree, no lo que tú querías — Eso es lo que comprueban sus pruebas.
-- **Lección 10 · por qué la tercera:** Las unitarias no ven la frontera — Aíslan cada pieza: los fallos entre dos piezas se les escapan.
-- **Hoy:** No se la pedimos: se la imponemos — Al agente.
+- La definición de hecho del vídeo 6 (prueba añadida, `npm test` pasa, resumen) tiene un hueco: el agente escribe la prueba, la ejecuta y cuenta el resultado. Si entiende mal una regla de negocio, el código y la prueba llevan el mismo error, coinciden y `npm test` pasa. Las pruebas comprueban lo que el agente cree, no lo que tú querías.
+- Learn Harness Engineering propone tres capas de terminación, cada una más cara y que ve más:
+  1. **Estática:** el código se carga, linter, tipos.
+  2. **De ejecución:** las pruebas y el arranque.
+  3. **De sistema:** el recorrido completo, como un usuario. La lección 10 explica por qué hace falta: las pruebas unitarias aíslan cada pieza y no ven los fallos en la frontera entre dos.
+- Lección 11: escríbelo antes. Un contrato (alcance, cómo se comprueba y qué queda fuera) y una rúbrica, una lista de criterios puntuados para que dos evaluadores lleguen a lo mismo. La plantilla de WalkingLab trae seis criterios de 0 a 2 y un veredicto (aceptar, revisar o bloquear); aquí la separamos en criterios automáticos, que comprueba un script, y criterios de juicio, que puntúa un revisor.
+- Dos reglas: la rúbrica la escribes tú, o un agente distinto, antes del trabajo, y se commitea; y quien hace el trabajo no toca la verificación. En el vídeo 23 se la pedíamos al agente; hoy se la imponemos.
 
 ### 3 · Una rúbrica para ticket-003
 
 <p><button type="button" class="ir-a" data-t="309">▶ Ir a 5:09</button></p>
 
-- **Rama verificar · antes de que ningún agente la toque:** Tres piezas — La rúbrica, la prueba de aceptación y verificar.sh.
-- *En la demo:* rubricas/ticket-003.md · crédito y contrato
-- *En la demo:* Cinco criterios automáticos, tres de juicio y el veredicto
-- *En la demo:* aceptacion/ticket-003.mjs · fuera de test/
-- **Como en el vídeo 18:** Un fallo en la frontera — Sobre qué importe se calcula el envío: lo que las pruebas unitarias no ven.
-- *En la demo:* verificar.sh · los criterios automáticos
-- **Lección 10 · y la experiencia de OpenAI:** Errores escritos para el agente — Que metan la reparación en su contexto.
-- *En la demo:* La etiqueta rubrica-ticket-003 y el segundo commit
-- *En la demo:* AGENTS.md · la nueva definición de hecho
-- *En la demo:* ./verificar.sh ticket-003 · antes del trabajo
+- En la rama `verificar`, antes de que ningún agente la toque, añadimos tres piezas: la rúbrica (`rubricas/ticket-003.md`), la prueba de aceptación (`aceptacion/ticket-003.mjs`) y `verificar.sh`.
+- La rúbrica lleva el crédito a WalkingLab, el contrato (alcance: `ticket.js` y sus pruebas; fuera: carrito, envío y las demás funcionalidades), cinco criterios automáticos, tres de juicio (J1–J3, de 0 a 2) y el veredicto. Los automáticos:
+  - **A1:** el código se carga (capa estática).
+  - **A2:** `npm test` pasa (ejecución).
+  - **A3:** pasa la prueba de aceptación (sistema).
+  - **A4:** ninguna funcionalidad está en `pasa` sin evidencias.
+  - **A5:** nadie ha tocado la verificación: la rúbrica, la aceptación y `verificar.sh` siguen como en el commit etiquetado `rubrica-ticket-003`.
+- La prueba de aceptación la escribe otro y vive fuera de `test/`, así que `npm test` no la ejecuta. Monta un pedido en la frontera: mochila de 30 € y tres libretas de 4 € con un cupón del 10 %. Sin cupón son 42 € (envío gratis); con cupón, 37,80 €, y la tienda calcula el envío sobre el total con cupón, así que paga envío. Exige que el total del ticket sea el de `totalConEnvio`, escrito con `formatearEuros`. Es la familia de fallo del vídeo 18.
+- `verificar.sh` recibe un identificador (o, sin él, revisa las que ya están en `pasa`), falla si el identificador no existe y solo sale con 0 o con 1. Cada fallo imprime tres líneas escritas para el agente (error, por qué y cómo), como propone la lección 10: que el mensaje meta la reparación en su contexto.
+- AGENTS.md cambia su definición de hecho: una funcionalidad pasa solo si `verificar.sh` sale con 0, la evidencia es su salida y la rúbrica, la aceptación y el script no se tocan. Antes del trabajo, el script sale en rojo, porque la función `ticket` aún no existe: una rúbrica que falla antes del trabajo demuestra que comprueba algo.
 
 ### 4 · El agente dice hecho
 
 <p><button type="button" class="ir-a" data-t="514">▶ Ir a 8:34</button></p>
 
-- *En la demo:* hecho-falso · ticket-003 en pasa con «24 pass»
-- *En la demo:* npm test · 24 de 24
-- *En la demo:* ./verificar.sh ticket-003 · la verificación lo desmiente
-- *En la demo:* hecho-falso · ticket() y sus pruebas
-- **Código y pruebas:** El mismo malentendido — Por eso coinciden.
-- **Una aclaración honesta:** Pi con Flash lo hizo bien — Encontró verificar.sh y lo ejecutó. Por eso la rama hecho-falso está escrita a mano.
-- **No sabemos con qué frecuencia un agente cae en esto:** Sí sabemos que nada lo impedía
+- La rama `hecho-falso`, escrita a mano, imita a un agente que sigue la definición antigua al pie de la letra: `ticket-003` en `pasa` con «npm test, 24 de 24» como evidencia. Las 24 pruebas pasan de verdad.
+- `verificar.sh ticket-003` lo desmiente en la tercera capa: el ticket dice 45,74 € y la tienda, 50,69 €. Por qué: el envío se calcula sobre el total con cupón. Cómo: usa `totalConEnvio`. Sale con 1.
+- La función calculaba el envío sobre el subtotal antes del cupón y se ahorraba los 4,95 € que la tienda cobra. Sus pruebas usaban carritos de 20 € y 60 €, donde el envío sale igual se calcule como se calcule. Código y pruebas comparten el malentendido; por eso coinciden. La verificación tiene que estar escrita antes, y por otro.
+- Pi con DeepSeek Flash, con el mismo encargo, lo hizo bien: encontró `verificar.sh` y lo ejecutó. No sabemos con qué frecuencia un agente cae en esto; sí que nada lo impedía. Mientras dependa de que el agente ejecute el script, sigue siendo una instrucción.
 
 ### 5 · De instrucción a puerta, en Pi
 
 <p><button type="button" class="ir-a" data-t="670">▶ Ir a 11:10</button></p>
 
-- **Vídeo 8 · el evento tool_call:** Modelo (pide una herramienta) → tool_call (nuestro código) → Decide (si se ejecuta)
-- *En la demo:* ~/csn/extensiones/puerta.ts
-- *En la demo:* puerta.ts · el commit y el tiempo agotado
-- *En la demo:* puerta.ts · compara el fichero y devuelve la salida
-- **Learn Harness Engineering · lección 8:** El paso a pasa lo controla el harness — No el agente.
-- *En la demo:* pi -e ~/csn/extensiones/puerta.ts
-- *En la demo:* Pi marca ticket-003 como pasa
-- *En la demo:* La puerta deshace el marcado
-- *En la demo:* Flash arregla el código, no la verificación
-- *En la demo:* Desde fuera · verificar.sh sale con 0
-- *En la demo:* El resumen de Flash
-- **No le dijimos que había un error:** Se lo dijo la verificación — En el momento en que intentaba dar el trabajo por bueno.
-- *En la demo:* La aceptación es una ruta protegida
-- **De regla escrita a barrera:** No debería poder mover la portería — No es que el agente sea malo.
+- `puerta.ts` es una extensión sobre el evento `tool_call` del vídeo 8, que decide si se ejecuta cada herramienta. Hace tres cosas:
+  1. Bloquea sin preguntar cualquier edición o escritura de la rúbrica, la aceptación o `verificar.sh`.
+  2. Si se edita `funcionalidades.json`, compara el fichero antes y después (evento `tool_result`). Si hay una funcionalidad nueva en `pasa`, ejecuta `verificar.sh` con `pi.exec`; si falla, restaura el fichero y marca el resultado de la herramienta como error.
+  3. Antes de un `git commit` por bash, comprueba que todo lo que ya está en `pasa` sigue pasando. El trabajo a medias se puede seguir commiteando.
+- Decisiones de diseño: compara el fichero en disco y no la edición, porque Pi y oh my pi describen las ediciones de forma distinta; trata un tiempo agotado como fallo, porque Pi no devuelve código de error y una verificación que no termina no ha pasado; y devuelve la salida del script como motivo, que el modelo recibe como feedback con el siguiente paso, no como un «no» a secas.
+- No confía en lo que el agente diga que ha ejecutado: ejecuta la verificación ella misma al marcar. Es la lección 8: el cambio a `pasa` lo controla el harness, no el agente.
+- *En la demo:* sobre el código con el error, Pi marca `ticket-003` como `pasa`; la puerta lo deshace y le devuelve el error de la aceptación. Flash lee la prueba, arregla el código (no la verificación), añade una prueba de regresión y vuelve a marcar: esta vez `verificar.sh` sale con 0. Nadie le dijo que había un error: se lo dijo la verificación.
+- *En la demo:* al pedirle un comentario inofensivo en la prueba de aceptación, la edición se bloquea por ruta protegida. Ya no es una regla escrita, sino una barrera: no es que el agente sea malo, es que no debería poder mover la portería. Para el final del trabajo existen `agent_before_settle` en Pi y `session_stop` en oh my pi (hasta ocho continuaciones), que podrían ejecutar la verificación cada vez que el agente dice que ha terminado; no se usan en el vídeo.
 
 ### 6 · La misma puerta en oh my pi
 
 <p><button type="button" class="ir-a" data-t="947">▶ Ir a 15:47</button></p>
 
-- *En terminal:* Un solo fichero, sin imports del paquete (más abajo, en «Código y comandos»)
-- **La opción, no la carpeta de hooks:** Sin carpeta .omp — La tienda sigue como la dejamos en el vídeo 23.
-- *En la demo:* oh my pi · omp --hook ~/csn/extensiones/puerta.ts
-- **Rama verificar, sin la función ticket:** «Trabaja en la siguiente funcionalidad » — Lo mismo que en el vídeo 23.
-- *En la demo:* oh my pi verifica por su cuenta
-- *En la demo:* Desde fuera · verificar.sh sale con 0
-- **Por eso solo 0 o 1, y falla con un id que no existe:** Un error de tecleo no da verde — No puede parar el bucle con un falso verde.
-- **Harness Playbook:** La verificación, parte de la interfaz — El agente la usa, pero no la redefine.
+- En oh my pi un hook tiene la forma de una extensión de Pi (vídeo 19). Como `puerta.ts` no importa nada del paquete, el mismo fichero se carga con `pi -e` y con `omp --hook` (más abajo, en «Código y comandos»). Se usa la opción y no `.omp/hooks/`, para que la tienda siga sin carpeta `.omp`.
+- *En la demo:* con DeepSeek V4 Pro y el encargo del vídeo 23 («trabaja en la siguiente funcionalidad»), oh my pi lee la rúbrica y la aceptación, usa `totalConEnvio`, ejecuta `verificar.sh ticket-003`, comprueba que sale con 0 y solo entonces marca. La puerta no tuvo que actuar: con un agente que verifica, es una red; con uno que no, es la diferencia entre dar por bueno un error y no darlo.
+- `/loop --until` (vídeo 15) ejecuta el comando después de cada vuelta: con 0 para, con 1 sigue y con cualquier otro código el bucle se apaga sin cumplir nada. Por eso `verificar.sh` solo sale con 0 o con 1. Y, aparte, por eso falla con un identificador que no existe: un error de tecleo no debe dar un falso verde.
+- Un solo script y cuatro sitios: la puerta (en Pi y en oh my pi), la condición de `/loop`, la integración continua (cambia `npm test` por `verificar.sh` en los scripts de los vídeos 10 y 21) y tú, a mano. Un hook de pre-commit de git lo aplica a cualquiera que haga commit. El Playbook lo llama hacer de la verificación parte de la interfaz: el agente la usa, pero no la redefine.
 
 ### 7 · Lo que no se automatiza: el revisor
 
 <p><button type="button" class="ir-a" data-t="1118">▶ Ir a 18:38</button></p>
 
-- *En la demo:* Los criterios de juicio de la rúbrica
-- *En la demo:* El encargo al reviewer
-- *En la demo:* J1=2, J2=2, J3=2 · Aceptar
-- **En su razonamiento, antes de lanzarlo:** «Probablemente aceptar » — Y luego se corrige: no debería sesgarlo.
-- **Anthropic · su evaluador, al principio:** Veía el problema y aprobaba igual — Se convencía de que no era grave.
-- **Calibrar al evaluador:** Lee (sus registros) → Busca (dónde se separa de una persona) → Ajusta (sus instrucciones)
-- **Vídeo 14 · una regla más en WATCHDOG.md:** Avisa si pasa a «pasa» sin verificar.sh
-- **El reparto:** La opinión no sustituye a la ejecución
+- Los criterios de juicio (alcance, si las pruebas tienen sentido, si la siguiente sesión lo entenderá) los puntúa un revisor con dos condiciones: que no sea quien hizo el trabajo y que use la rúbrica, no su intuición.
+- *En la demo:* el agente `reviewer` (vídeo 16) devuelve J1, J2 y J3 a 2 y «aceptar», con líneas como evidencia. Pero antes, el agente principal razona «probablemente aceptar» y se corrige; el revisor no ve ese razonamiento, sí el encargo que le escribe quien hizo el trabajo. Y justifica el traspaso con «reutiliza `totalConEnvio`», que no es el criterio. Un revisor es otra opinión, aunque venga con tabla.
+- `/review` (vídeo 18) busca fallos sin preguntas previas, y «correcto» significa que no ha encontrado ninguno, no que funcione. Con la rúbrica, el revisor responde a preguntas escritas antes.
+- Calibra al evaluador: según Anthropic, el suyo veía problemas reales, se convencía de que no eran graves y aprobaba. Lo arreglaron leyendo sus registros, buscando dónde se separaba del juicio de una persona y ajustando sus instrucciones.
+- El reparto:
+
+| Pieza | Qué hace |
+|---|---|
+| `verificar.sh` | decide lo que se puede comprobar |
+| `puerta.ts` | impide marcar o commitear sin él |
+| Revisor | puntúa lo que necesita juicio, con la rúbrica |
+| Advisor (vídeo 14) | vigila mientras se trabaja; con una regla en `WATCHDOG.md` avisa si algo cambia a `pasa` sin la salida de `verificar.sh`, pero no aprueba ni bloquea |
+| Tú | firmas el veredicto final |
 
 ### 8 · Auto-QA: quejas sobre el harness
 
 <p><button type="button" class="ir-a" data-t="1287">▶ Ir a 21:27</button></p>
 
-- **omp grievances:** Lista las quejas, las limpia o las envía
+- Auto-QA no revisa tu código, aunque el nombre engañe (vídeo 18): es un buzón donde el modelo deja quejas sobre las herramientas de oh my pi. `omp grievances` las lista, las limpia o las envía.
+- Puede darte una pista: si una herramienta de edición falla a medias, tu verificación puede fallar por culpa del harness. Atribuye el fallo a una capa antes de cambiar de modelo. Pero no lo uses para dar nada por terminado.
+- Viene activado, no guarda nada hasta que das tu consentimiento y, si aceptas, cada queja va a un servidor de oh my pi. Para que no salga nada, deja el consentimiento denegado o apaga `dev.autoqa`.
 
 ### 9 · Límites, repaso y cierre
 
 <p><button type="button" class="ir-a" data-t="1360">▶ Ir a 22:40</button></p>
 
-- *En terminal:* Límite 2 · el hook de pre-commit (más abajo, en «Código y comandos»)
-- **Límite 3:** Tan buena como la rúbrica — Cada fallo que se cuele, un criterio nuevo: convertir la revisión en comprobaciones.
-- **Límite 5:** Lo que se optimiza se puede engañar — Goodhart, en el próximo vídeo.
-- **Vídeo 25:** Bucles, grafos y el coste de orquestar — Cuándo compensa un bucle, un plan o varios agentes, y cuándo no.
-- **Lo que todo bucle necesita:** Una condición de parada que no depende del agente
+- Cinco límites:
+  1. **La puerta solo ve lo que sabe mirar:** `edit`, `write` y los commits por bash. Un `sed` sobre `funcionalidades.json` desde bash no lo reconoce. Hace falta la segunda capa de los vídeos 8 y 19 (aprobación para el bash fuera de una lista), y oh my pi tiene más herramientas que escriben, como `eval`.
+  2. **El pre-commit se salta** con `git commit --no-verify`, y un agente lo sabe: bloquea ese patrón (más abajo, en «Código y comandos»).
+  3. **La verificación es tan buena como la rúbrica.** Si la aceptación no cubre un caso, el script lo deja pasar. Cada fallo que se cuele, un criterio nuevo (lección 10: convertir la revisión en comprobaciones).
+  4. **Verificar cuesta.** Cada marcado y cada commit ejecutan el script. Mantén rápida la parte que corre siempre y deja la lenta para la integración continua.
+  5. **Lo que se optimiza se puede engañar** (ley de Goodhart, en el vídeo 25). Un ejemplo propio: A5 compara con el commit etiquetado. Si el agente puede crear o mover la etiqueta después de tocar la verificación, A5 pasa, y la puerta no vigila `git tag`.
+- **Práctica:** en un proyecto tuyo, escribe la rúbrica de la siguiente funcionalidad antes de empezar, a partir de la plantilla de WalkingLab y citando su licencia. Incluye una prueba de aceptación que cruce dos piezas y un script que solo salga con 0 o 1, y comprueba que falla antes del trabajo. Después deja trabajar al agente con la puerta cargada y apunta cuántas veces lo paró y por qué.
+- **Materiales:** [`extensiones/puerta.ts`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/extensiones/puerta.ts), [`verificar.sh`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/tienda/verificar/verificar.sh) (rama `verificar` de la tienda) y [`fuera/ticket-004-oculta.mjs`](https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/fuera/ticket-004-oculta.mjs), en el [repositorio de materiales del curso](https://github.com/CodigoSinSiesta/curso-pi-materiales). Clónalo en `~/csn` y ejecuta `./preparar.sh`.
+- **Vídeo 25:** bucles, grafos y el coste de orquestar. Ya tienes lo que todo bucle necesita: una condición de parada que no depende de lo que diga el agente.
 
 ## Código y comandos
 
@@ -129,12 +128,12 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 ### Un solo fichero, sin imports del paquete
 
 ```text
-pi  -e     ~/csn/extensiones/puerta.ts
-$ omp --hook ~/csn/extensiones/puerta.ts
+pi -e ~/csn/extensiones/puerta.ts
+omp --hook ~/csn/extensiones/puerta.ts
 ```
 
-- `-e`: Pi · como extensión
-- `--hook`: oh my pi · como hook (vídeo 19)
+- `pi -e`: Pi carga el fichero como extensión.
+- `omp --hook`: oh my pi lo carga como hook (vídeo 19); es alias de `--extension`.
 
 ### Límite 2 · el hook de pre-commit
 
@@ -142,44 +141,16 @@ $ omp --hook ~/csn/extensiones/puerta.ts
 git commit --no-verify
 ```
 
-- `--no-verify`: Se salta el hook: bloquea ese patrón
+- `--no-verify`: se salta el hook de pre-commit. Si usas uno, bloquea este patrón en tu política de bash.
 
 ## Fuentes
 
-- Pi 1.0.4 instalado (`$(npm root -g)/@earendil-works/pi-coding-agent/`): `CHANGELOG.md` 1.0.2–1.0.4 (nada que afecte
-  a eventos de extensiones); `docs/extensions.md` (`tool_call` puede bloquear o mutar la entrada; `tool_result`
-  compone y puede cambiar `content`/`isError`; un fallo del handler de `tool_call` bloquea como *fail-safe*;
-  `agent_before_settle` «final actionable boundary… can append entries and request one continuation», con aviso de
-  bucles); `dist/core/extensions/types.d.ts` (`ToolCallEventResult {block, reason, terminate}`,
-  `ToolResultEventResult {content, isError…}`, `BoundaryResult {entries, continue}`, `pi.exec(command, args, {cwd,
-  timeout})` → `{stdout, stderr, code, killed}`; entrada de `edit`: `path` + `edits[].oldText/newText`; de `write`:
-  `path` + `content`); `examples/extensions/protected-paths.ts`.
-- oh my pi 18.6.1 (`omp read omp://…`): `hooks.md` (los hooks se cargan con el runner de extensiones; `--hook` es alias
-  de `--extension`; descubrimiento solo en `.omp/hooks/pre|post/`; `tool_call` puede devolver `block`/`reason`;
-  `tool_result` puede cambiar `content`/`isError`; «`edit` event input can also contain derived `path`/`paths`
-  fields»; `pi.exec` disponible); `extensions.md` (contexto con `cwd`, `ui`, `hasUI`; los handlers se vuelven a
-  enlazar en cada subagente, y las herramientas del advisor también pasan por `tool_call`/`tool_result`);
-  `skills/examples/safety-hook/README.md` («The `reason` text is what the LLM receives as the tool error»; el ejemplo
-  avisa de que una regex no es una frontera de seguridad completa); `advisor-watchdog.md` («does not approve actions»).
-  `omp grievances --help` (18.6.1, solo ayuda: `list|clean|push`). **No se ejecutó `omp grievances` sin `--help`**:
-  según las notas del 18, listar crea `~/.omp/autoqa.db`.
-- Web: https://omp.sh/docs/review (vía borrador 18: «Correct means no correctness bugs or blockers were established»).
-- Guiones: 01 (terminado: «la evidencia que cuenta es la prueba que se ejecuta, no lo que el agente cuenta de sí
-  mismo»; feedback como quinta pieza), 06 (terminado: «Hecho significa» de la tienda, plantilla de WalkingLab), 08
-  (terminado: `tool_call`, `block`, rutas protegidas, el modelo busca otro camino por bash), 10 (`scripts/revisar.sh`:
-  el código de salida lo ponen las pruebas, no el veredicto del modelo), 14 (advisor: `WATCHDOG.md` con la regla de
-  ejecutar los tests antes de terminar; nit/concern/blocker; «no aprueba ni bloquea»), 15 (`/loop N --until '<cmd>'`:
-  omp ejecuta el comando tras cada vuelta; 0 para, 1 sigue, otro código apaga el bucle), 16 (agente `reviewer`), 18
-  (`/review` sin garantía de encontrar el fallo sembrado de la base del envío; Auto-QA aclarado; «volveremos… en el
-  vídeo veinticuatro»), 19 (hooks en `.omp/hooks/pre/`, sin imports; dos capas: hook + `bash.patterns`; el hueco de
-  `eval`), 21 (script de revisión con omp en CI), 22 (los dos textos piden «definir antes qué significa terminado»), 23
-  (rama `andamiaje`, `funcionalidades.json`, regla «no cambiar la verificación para que pase», «es una instrucción, no
-  una puerta… lo veremos en el próximo vídeo»).
-- Tienda (`~/csn/tienda`, leída): `master` con `AGENTS.md` («Hecho significa»: prueba, `npm test`, resumen),
-  `src/carrito.js` (`totalConCupon`, `totalConEnvio`: envío y umbral sobre el total con cupón **sin IVA**, IVA solo a
-  los productos), `src/envio.js` (4,95 €, gratis desde 40 €), `"test": "node --test"`. La rama `andamiaje` **todavía no
-  existe** (el 23 no está grabado).
-- Documentación oficial de Pi: [extensions.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/extensions.md)
+- Learn Harness Engineering (WalkingLab, © 2025, licencia MIT): lecciones 8 (el harness controla el cambio de estado), 9 (cantar victoria antes de tiempo, con la cita de Guo y otros, 2017), 10 (capa de sistema, mensajes de error para el agente, revisión convertida en comprobaciones) y 11 (contrato y rúbrica), y su plantilla de rúbrica.
+- The Harness Playbook (Can Bölük): definir «verificado» y la verificación como parte de la interfaz.
+- Anthropic: su artículo sobre harnesses para aplicaciones largas (autoevaluación optimista y calibración del evaluador).
+- Grabado con Pi 1.0.4. Documentación oficial: [extensions.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/extensions.md) (`tool_call`, `tool_result`, `pi.exec`, `agent_before_settle`) y el ejemplo `protected-paths.ts`.
+- Grabado con oh my pi 18.6.1: `hooks.md` (`--hook` es alias de `--extension`; `.omp/hooks/pre|post/`), `extensions.md`, `advisor-watchdog.md` («does not approve actions») y la documentación de `/review` en https://omp.sh/docs/review.
+- Vídeos relacionados: 6 (definición de hecho), 8 (`tool_call` y rutas protegidas), 14 (advisor), 15 (`/loop --until`), 16 (agente `reviewer`), 18 (`/review` y Auto-QA), 19 (hooks) y 23 (la rama `andamiaje` y `funcionalidades.json`).
 
 ## Transcripción
 
