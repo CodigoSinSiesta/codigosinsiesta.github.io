@@ -1,0 +1,1905 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.503 --> 00:00:14.130
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.200 --> 00:00:18.460
+Vídeo veinticinco: bucles,
+grafos y el coste de orquestar.
+
+3
+00:00:24.336 --> 00:00:26.370
+Este vídeo paga tres deudas.
+
+4
+00:00:26.410 --> 00:00:31.250
+En el quince usamos barra loop y barra
+goal, y dejamos para hoy cuándo compensa
+
+5
+00:00:31.290 --> 00:00:35.700
+un bucle. En el dieciséis repartimos
+trabajo entre subagentes y dijimos que
+
+6
+00:00:35.740 --> 00:00:41.268
+tres agentes leen tres veces; cuándo
+compensa repartir también quedaba para
+
+7
+00:00:41.308 --> 00:00:43.970
+hoy. Y el veinticuatro
+terminó con una advertencia:
+
+8
+00:00:44.010 --> 00:00:46.740
+cualquier medida que se
+optimice se puede engañar.
+
+9
+00:00:48.285 --> 00:00:52.982
+Las tres son la misma pregunta: cuánto
+trabajo dejas que el sistema haga sin ti,
+
+10
+00:00:53.022 --> 00:00:55.100
+y cómo sabes que lo ha hecho bien.
+
+11
+00:00:55.368 --> 00:00:58.310
+Learn Harness Engineering, el curso
+de WalkingLab con licencia MIT que nos
+
+12
+00:00:58.350 --> 00:01:02.400
+acompaña en este bloque, le
+dedica sus dos últimas lecciones.
+
+13
+00:01:02.479 --> 00:01:05.460
+La trece, a los bucles.
+La catorce, a los grafos.
+
+14
+00:01:06.514 --> 00:01:09.400
+La catorce ordena el
+vocabulario en cuatro capas.
+
+15
+00:01:09.440 --> 00:01:11.490
+Primero el prompt, la instrucción.
+
+16
+00:01:11.530 --> 00:01:14.470
+Luego el contexto, lo que el modelo sabe.
+
+17
+00:01:14.510 --> 00:01:18.250
+Después el bucle, que repite
+hasta cumplir un objetivo.
+
+18
+00:01:18.290 --> 00:01:23.000
+Y por último el grafo: varios agentes,
+bucles y comprobadores conectados.
+
+19
+00:01:23.136 --> 00:01:26.274
+Cada capa no sustituye a
+la anterior, la contiene.
+
+20
+00:01:26.314 --> 00:01:29.540
+Y debajo de todas, según
+el curso, va el harness.
+
+21
+00:01:30.320 --> 00:01:33.510
+El plan de hoy. Cuándo compensa un bucle.
+
+22
+00:01:33.587 --> 00:01:38.170
+Qué significa barra loop en oh my pi y
+en otros agentes, porque no es lo mismo.
+
+23
+00:01:38.210 --> 00:01:41.300
+Cuándo un bucle se convierte en grafo.
+
+24
+00:01:41.716 --> 00:01:45.020
+Cuánto cuesta orquestar, con cifras
+publicadas y con las nuestras:
+
+25
+00:01:45.060 --> 00:01:48.020
+la misma funcionalidad,
+con un agente y con varios.
+
+26
+00:01:48.060 --> 00:01:48.960
+La
+
+27
+00:01:49.145 --> 00:01:51.190
+ley de Goodhart aplicada
+a nuestra verificación.
+
+28
+00:01:51.230 --> 00:01:53.260
+Y lo que viene.
+
+29
+00:01:58.714 --> 00:02:01.589
+La lección trece reduce
+un bucle a tres piezas:
+
+30
+00:02:01.629 --> 00:02:06.040
+un objetivo, una forma de verificarlo
+y una condición de parada.
+
+31
+00:02:06.080 --> 00:02:10.070
+Si falta una, no tienes un bucle,
+tienes un agente que da vueltas.
+
+32
+00:02:10.110 --> 00:02:14.296
+Con las tres, sales de dentro del
+bucle, donde escribes cada instrucción,
+
+33
+00:02:14.336 --> 00:02:16.960
+y pasas a estar fuera, donde solo decides.
+
+34
+00:02:17.682 --> 00:02:21.101
+Propone una prueba de una
+frase: ¿esto tiene final?
+
+35
+00:02:21.141 --> 00:02:24.354
+Si lo tiene, es un objetivo que
+se persigue hasta cumplirlo.
+
+36
+00:02:24.394 --> 00:02:28.270
+Si no, es algo que se vigila cada cierto
+tiempo, como el estado de la integración
+
+37
+00:02:28.310 --> 00:02:31.630
+continua. Ojo, porque la
+lección piensa en otros agentes,
+
+38
+00:02:31.670 --> 00:02:33.980
+donde barra loop es un reloj.
+
+39
+00:02:34.020 --> 00:02:38.240
+En oh my pi, barra loop con
+guion guion until sí tiene final.
+
+40
+00:02:38.280 --> 00:02:39.520
+Enseguida lo vemos.
+
+41
+00:02:40.253 --> 00:02:44.400
+¿Cuándo compensa? Cuando la condición
+de parada la comprueba un programa,
+
+42
+00:02:44.440 --> 00:02:48.250
+no una impresión. Cuando cada
+vuelta deja el estado en disco,
+
+43
+00:02:48.290 --> 00:02:52.008
+como el andamiaje del vídeo veintitrés,
+para que la siguiente sepa dónde está.
+
+44
+00:02:52.048 --> 00:02:55.589
+Y cuando quien hace el trabajo
+no es quien lo da por bueno.
+
+45
+00:02:55.629 --> 00:02:59.440
+La lección lo resume así: alguien
+de tu equipo no debe creerte.
+
+46
+00:03:00.417 --> 00:03:03.519
+¿Cuándo no? Cuando no sabes
+escribir la condición.
+
+47
+00:03:03.559 --> 00:03:08.231
+Cuando el fallo necesita una decisión
+tuya, y repetir solo repite el error.
+
+48
+00:03:08.271 --> 00:03:12.835
+Y cuando la tarea es tan pequeña que una
+sesión normal la termina en una vuelta.
+
+49
+00:03:12.875 --> 00:03:15.967
+En el quince pusimos un techo
+de tres vueltas y bastó una:
+
+50
+00:03:16.007 --> 00:03:17.400
+el techo no era un objetivo.
+
+51
+00:03:18.359 --> 00:03:21.550
+Y la lección avisa de
+cuatro costes que no se ven.
+
+52
+00:03:21.830 --> 00:03:26.151
+Deuda de verificación: lo que el
+bucle da por bueno sin comprobarlo.
+
+53
+00:03:26.191 --> 00:03:30.310
+Pérdida de comprensión:
+código que nadie ha leído.
+
+54
+00:03:30.350 --> 00:03:33.514
+Rendición: dejar de opinar
+porque todo sale solo.
+
+55
+00:03:33.554 --> 00:03:36.999
+Y la explosión de tokens: cada
+vuelta arrastra lo anterior,
+
+56
+00:03:37.039 --> 00:03:40.790
+y el total gastado crece mucho más
+deprisa que el número de vueltas.
+
+57
+00:03:40.830 --> 00:03:43.560
+Para eso están los modos
+compact y reset de barra loop.
+
+58
+00:03:44.586 --> 00:03:48.150
+La lección añade una escalera
+para no saltar escalones.
+
+59
+00:03:48.190 --> 00:03:50.980
+Primero, un objetivo con
+su condición de parada.
+
+60
+00:03:51.020 --> 00:03:54.373
+Después, una tarea
+programada que se repite.
+
+61
+00:03:54.413 --> 00:03:58.280
+Luego, un bucle con dos agentes,
+uno que hace y otro que comprueba.
+
+62
+00:03:58.320 --> 00:04:01.800
+Más arriba, un bucle que
+encuentra solo su siguiente tarea.
+
+63
+00:04:01.840 --> 00:04:04.240
+Y en lo alto, varios bucles a la vez.
+
+64
+00:04:04.280 --> 00:04:08.000
+Según el curso, la mayoría de equipos
+está en el segundo o el tercero.
+
+65
+00:04:08.040 --> 00:04:09.140
+Empieza por el primero.
+
+66
+00:04:14.890 --> 00:04:18.838
+Barra loop se llama igual en
+varios agentes y no hace lo mismo.
+
+67
+00:04:18.878 --> 00:04:23.560
+En oh my pi, como vimos en el quince,
+reenvía tu mensaje cada vez que el agente
+
+68
+00:04:23.600 --> 00:04:28.012
+cede el turno. Lo acotas con un número,
+con una duración o con un comando:
+
+69
+00:04:28.052 --> 00:04:29.190
+con guion guion until,
+
+70
+00:04:29.770 --> 00:04:34.320
+el harness ejecuta el comando tras cada
+vuelta, y el bucle para cuando sale con
+
+71
+00:04:34.360 --> 00:04:36.510
+cero. Quien decide parar no es el modelo.
+
+72
+00:04:37.260 --> 00:04:40.450
+En Claude Code, barra
+loop es un temporizador.
+
+73
+00:04:40.490 --> 00:04:44.465
+Repite un prompt cada cierto tiempo,
+cada cinco minutos, por ejemplo,
+
+74
+00:04:44.505 --> 00:04:47.194
+o con un intervalo que
+elige el propio agente.
+
+75
+00:04:47.234 --> 00:04:51.638
+Vive mientras la sesión está abierta, y
+las tareas que se repiten caducan a los
+
+76
+00:04:51.678 --> 00:04:56.650
+siete días. Está pensado para vigilar:
+un despliegue, una revisión pendiente.
+
+77
+00:04:56.690 --> 00:04:58.780
+Es el bucle por tiempo
+de la lección trece.
+
+78
+00:04:59.594 --> 00:05:03.040
+Barra goal también se
+parece y tampoco es igual.
+
+79
+00:05:03.080 --> 00:05:06.514
+En oh my pi, el propio modelo
+da el objetivo por cumplido,
+
+80
+00:05:06.554 --> 00:05:08.750
+con un presupuesto de tokens como freno.
+
+81
+00:05:08.790 --> 00:05:13.650
+En Claude Code, después de cada turno, un
+modelo pequeño aparte lee la conversación
+
+82
+00:05:13.690 --> 00:05:15.840
+y decide si la condición se cumple.
+
+83
+00:05:15.880 --> 00:05:18.952
+Es un juez distinto del que
+trabaja, pero no ejecuta nada:
+
+84
+00:05:18.992 --> 00:05:22.180
+solo puede juzgar lo que el agente
+haya enseñado en la conversación.
+
+85
+00:05:23.069 --> 00:05:27.158
+¿Y Pi? No trae ni barra
+loop ni barra goal.
+
+86
+00:05:27.198 --> 00:05:30.750
+Tienes dos caminos. Un bucle de
+shell que repite pi guion pe,
+
+87
+00:05:30.790 --> 00:05:35.622
+el modo de los scripts del vídeo diez,
+hasta que el verificador sale con cero.
+
+88
+00:05:35.662 --> 00:05:39.968
+O una extensión con el evento agent
+before settle, del vídeo veinticuatro,
+
+89
+00:05:40.008 --> 00:05:41.510
+que puede pedir una
+
+90
+00:05:42.117 --> 00:05:44.036
+vuelta más. En el bucle
+de shell hay un matiz:
+
+91
+00:05:44.076 --> 00:05:46.410
+la condición se mira antes de cada vuelta.
+
+92
+00:05:46.450 --> 00:05:47.930
+En oh my pi, después.
+
+93
+00:05:49.020 --> 00:05:54.273
+La regla práctica: antes de usar un bucle,
+pregunta quién decide que ha terminado.
+
+94
+00:05:54.313 --> 00:05:57.918
+Si lo decide el modelo, tienes
+una opinión con presupuesto.
+
+95
+00:05:57.958 --> 00:06:02.789
+Si lo decide otro modelo que lee la
+conversación, una segunda opinión.
+
+96
+00:06:02.829 --> 00:06:07.285
+Si lo decide un programa que
+escribiste tú, como verificar punto sh,
+
+97
+00:06:07.325 --> 00:06:12.323
+tienes una condición. Por eso en el
+veinticuatro el script solo salía con cero
+
+98
+00:06:12.363 --> 00:06:13.263
+o con uno.
+
+99
+00:06:14.054 --> 00:06:17.219
+Un detalle de Claude Code que
+conecta con el vídeo anterior:
+
+100
+00:06:17.259 --> 00:06:22.211
+su barra goal está montada sobre un hook
+que se dispara al final de cada turno.
+
+101
+00:06:22.251 --> 00:06:27.720
+Es la misma idea que el evento session
+stop de oh my pi y agent before settle de
+
+102
+00:06:27.760 --> 00:06:32.178
+Pi: un punto donde el harness puede
+negarse a dejar terminar al agente.
+
+103
+00:06:32.218 --> 00:06:34.464
+Lo que cambia es quién juzga en ese punto:
+
+104
+00:06:34.504 --> 00:06:37.480
+un modelo que lee, o
+un script que ejecuta.
+
+105
+00:06:43.062 --> 00:06:45.180
+Un bucle tiene un solo camino.
+
+106
+00:06:45.416 --> 00:06:49.400
+Todas las decisiones, qué hacer
+después y adónde volver si algo falla,
+
+107
+00:06:49.440 --> 00:06:52.860
+ocurren dentro del contexto
+de un único agente.
+
+108
+00:06:52.900 --> 00:06:55.936
+La lección catorce lo llama
+una decisión aplazada:
+
+109
+00:06:55.976 --> 00:07:00.340
+barata, pero sus fallos no se ven, porque
+ni el propio agente sabe dónde se ha
+
+110
+00:07:00.380 --> 00:07:03.920
+atascado. Un grafo es la
+decisión tomada por adelantado.
+
+111
+00:07:04.844 --> 00:07:06.936
+Un grafo tiene cuatro partes.
+
+112
+00:07:06.976 --> 00:07:11.710
+Nodos, que son unidades de trabajo: un
+script, una llamada al modelo o un agente
+
+113
+00:07:11.750 --> 00:07:16.470
+entero con su propio bucle. Aristas,
+cómo pasa el trabajo de uno a otro:
+
+114
+00:07:16.510 --> 00:07:19.880
+en paralelo, según una
+condición o hacia atrás.
+
+115
+00:07:19.920 --> 00:07:23.070
+Un estado compartido.
+Y reglas de enrutado:
+
+116
+00:07:23.110 --> 00:07:26.760
+si las pruebas pasan, se integra;
+si fallan, se vuelve a implementar.
+
+117
+00:07:27.588 --> 00:07:30.816
+La pieza que más importa
+es el nodo que verifica.
+
+118
+00:07:30.856 --> 00:07:34.690
+En un agente solo, la revisión ocurre
+en el mismo contexto que el trabajo:
+
+119
+00:07:34.730 --> 00:07:36.878
+el agente se revisa a sí mismo.
+
+120
+00:07:36.918 --> 00:07:41.711
+En un grafo, el verificador empieza con
+un contexto nuevo y solo ve el resultado,
+
+121
+00:07:41.751 --> 00:07:45.072
+no el razonamiento. Es lo que
+hizo el revisor del veinticuatro,
+
+122
+00:07:45.112 --> 00:07:47.840
+aunque recibiera el encargo
+de quien hizo el trabajo.
+
+123
+00:07:48.586 --> 00:07:53.040
+La lección explica por qué un
+bucle solo no basta cuando crece,
+
+124
+00:07:53.080 --> 00:07:57.520
+con tres fallos que no se arreglan
+añadiendo comprobaciones dentro.
+
+125
+00:07:57.560 --> 00:08:01.200
+El primero es Goodhart, y
+le dedicaremos un capítulo.
+
+126
+00:08:01.240 --> 00:08:06.240
+El segundo, la ceguera hacia arriba: un
+bucle nunca pregunta si su objetivo es el
+
+127
+00:08:06.280 --> 00:08:11.730
+correcto. Y el tercero, el conflicto:
+dos bucles hechos por separado,
+
+128
+00:08:11.770 --> 00:08:15.810
+uno que optimiza la velocidad y otro
+la calidad, tiran de la misma cuerda en
+
+129
+00:08:15.850 --> 00:08:17.160
+sentidos contrarios.
+
+130
+00:08:18.096 --> 00:08:21.663
+Y aquí viene una sorpresa:
+ya has dibujado grafos.
+
+131
+00:08:21.703 --> 00:08:25.790
+La herramienta task del vídeo dieciséis,
+con tres agentes en paralelo y una
+
+132
+00:08:25.830 --> 00:08:30.450
+verificación final en la sesión principal,
+es un abanico que se abre y se vuelve a
+
+133
+00:08:30.490 --> 00:08:32.839
+cerrar. Barra cleanse, también.
+
+134
+00:08:32.879 --> 00:08:36.285
+La lección distingue un grafo
+de un workflow por sus nodos:
+
+135
+00:08:36.325 --> 00:08:40.340
+en un workflow son funciones;
+en un grafo pueden ser agentes.
+
+136
+00:08:40.380 --> 00:08:43.620
+Lo nuevo es que un nodo
+cuesta una instrucción.
+
+137
+00:08:44.314 --> 00:08:49.312
+¿Cuándo hace falta? La lección da cinco
+criterios y pide que se cumplan al menos
+
+138
+00:08:49.352 --> 00:08:53.090
+tres. Que el trabajo se divida
+en partes independientes.
+
+139
+00:08:53.130 --> 00:08:55.380
+Que haya ramas o vueltas atrás.
+
+140
+00:08:55.420 --> 00:08:58.026
+Que merezca la pena guardar
+el estado intermedio.
+
+141
+00:08:58.066 --> 00:09:01.091
+Que cada nodo se pueda
+verificar de forma automática.
+
+142
+00:09:01.131 --> 00:09:04.941
+Y que lo que ahorras al repartir
+supere lo que cuesta coordinar.
+
+143
+00:09:04.981 --> 00:09:07.720
+Veinte pasos en fila no son
+un grafo: son un script.
+
+144
+00:09:13.559 --> 00:09:17.730
+El último criterio es el que más se
+olvida, así que pongámosle números.
+
+145
+00:09:17.770 --> 00:09:21.820
+Anthropic publicó cómo montó su sistema
+de investigación con varios agentes.
+
+146
+00:09:21.860 --> 00:09:24.930
+Un agente gasta unas cuatro
+veces los tokens de un chat;
+
+147
+00:09:24.970 --> 00:09:27.576
+su sistema de varios
+agentes, unas quince veces.
+
+148
+00:09:27.616 --> 00:09:31.700
+A cambio, en su propia evaluación de
+investigación, superó a un solo agente por
+
+149
+00:09:31.740 --> 00:09:32.820
+un noventa por ciento.
+
+150
+00:09:33.813 --> 00:09:36.840
+Pero el mismo artículo
+dice cuándo no encaja:
+
+151
+00:09:36.880 --> 00:09:40.520
+cuando todos los agentes necesitan el
+mismo contexto, o cuando hay muchas
+
+152
+00:09:40.560 --> 00:09:45.150
+dependencias entre ellos. Y añade que la
+mayoría de tareas de programación tienen
+
+153
+00:09:45.190 --> 00:09:48.130
+menos partes paralelizables
+que la investigación.
+
+154
+00:09:48.170 --> 00:09:51.300
+Es la conclusión de Anthropic
+sobre su sistema, no una ley.
+
+155
+00:09:51.340 --> 00:09:53.260
+Por eso hoy lo medimos en nuestra tienda.
+
+156
+00:09:54.322 --> 00:09:57.590
+Hay un dato del artículo
+que conviene leer despacio.
+
+157
+00:09:57.880 --> 00:10:02.318
+En una de sus pruebas, la cantidad de
+tokens gastados explicaba por sí sola el
+
+158
+00:10:02.358 --> 00:10:05.298
+ochenta por ciento de las
+diferencias de rendimiento.
+
+159
+00:10:05.338 --> 00:10:10.400
+Dicho de otra forma: buena parte de lo que
+ganan varios agentes viene de gastar más.
+
+160
+00:10:10.540 --> 00:10:12.110
+No es magia de la arquitectura.
+
+161
+00:10:12.150 --> 00:10:15.460
+Es más lectura y más intentos
+en paralelo, y eso se paga.
+
+162
+00:10:16.371 --> 00:10:19.580
+En el vídeo veintidós
+medimos una parte del coste.
+
+163
+00:10:19.740 --> 00:10:25.060
+Antes de leer una sola línea de tu código,
+cada sesión de oh my pi envía su prefijo:
+
+164
+00:10:25.180 --> 00:10:29.050
+entre unos cuatro mil y unos ocho
+mil tokens, según las herramientas.
+
+165
+00:10:29.090 --> 00:10:33.300
+Cada subagente es una sesión, así que
+paga su prefijo y vuelve a leer lo que
+
+166
+00:10:33.340 --> 00:10:37.470
+necesita. La caché del proveedor abarata
+el prefijo, pero solo la parte que se
+
+167
+00:10:37.510 --> 00:10:38.530
+repite igual.
+
+168
+00:10:39.622 --> 00:10:42.420
+Y hay un coste que no
+aparece en ninguna factura.
+
+169
+00:10:42.460 --> 00:10:47.267
+La lección catorce lo llama el impuesto de
+orquestación, a partir de un texto de Addy
+
+170
+00:10:47.307 --> 00:10:50.450
+Osmani. Lanzar un agente cuesta una tecla.
+
+171
+00:10:50.490 --> 00:10:55.260
+Cerrar su trabajo, revisarlo y encajarlo
+con lo que han tocado los demás cuesta tu
+
+172
+00:10:55.300 --> 00:10:57.860
+atención, y solo hay una como tú.
+
+173
+00:10:57.900 --> 00:11:01.960
+Tu revisión es en serie: más agentes
+en paralelo no la hacen más rápida.
+
+174
+00:11:02.845 --> 00:11:05.610
+La funcionalidad de hoy es
+la cuarta del andamiaje:
+
+175
+00:11:05.650 --> 00:11:09.022
+ticket cero cero cuatro,
+el desglose del pedido.
+
+176
+00:11:09.062 --> 00:11:12.542
+Una función nueva, desglose,
+que devuelve la base sin IVA,
+
+177
+00:11:12.582 --> 00:11:14.790
+el IVA, el envío y el total.
+
+178
+00:11:15.021 --> 00:11:17.804
+Cruza tres piezas de la tienda
+y cae en la frontera de siempre:
+
+179
+00:11:17.844 --> 00:11:20.750
+el envío se calcula
+sobre el total con cupón.
+
+180
+00:11:20.790 --> 00:11:24.900
+Y se reparte bien: la implementación
+en un fichero y sus pruebas en otro.
+
+181
+00:11:25.524 --> 00:11:29.540
+Como en el veinticuatro, antes de que
+trabaje ningún agente escribimos nosotros
+
+182
+00:11:29.580 --> 00:11:33.680
+la rúbrica y la prueba de
+aceptación, y las commiteamos con una
+
+183
+00:11:34.386 --> 00:11:36.880
+etiqueta. Tuvimos que
+cambiar verificar punto sh:
+
+184
+00:11:36.920 --> 00:11:40.531
+comparaba la verificación con la
+etiqueta de ticket cero cero tres,
+
+185
+00:11:40.571 --> 00:11:43.200
+y la rúbrica nueva lo ponía en rojo.
+
+186
+00:11:43.240 --> 00:11:46.279
+Ahora compara con la
+última etiqueta de rúbrica.
+
+187
+00:11:46.319 --> 00:11:48.700
+Ese cambio también lo hicimos nosotros.
+
+188
+00:11:48.740 --> 00:11:52.340
+Ejecutamos el script: rojo,
+porque la función no existe.
+
+189
+00:11:58.023 --> 00:12:02.214
+La comparación la hace un script, en la
+carpeta de mediciones del vídeo veintidós.
+
+190
+00:12:02.254 --> 00:12:05.860
+Cada ejecución trabaja en su propio
+worktree, creado desde la etiqueta de la
+
+191
+00:12:05.900 --> 00:12:11.510
+rúbrica, con oh my pi en modo print,
+DeepSeek Flash en todos los agentes y la
+
+192
+00:12:11.576 --> 00:12:13.320
+puerta del veinticuatro cargada.
+
+193
+00:12:13.608 --> 00:12:16.582
+Las mismas herramientas
+en las dos condiciones:
+
+194
+00:12:16.622 --> 00:12:20.410
+si quitáramos task, cambiaría el
+prefijo y mediríamos otra cosa.
+
+195
+00:12:21.009 --> 00:12:25.548
+Y un ajuste: que task espere a sus
+subagentes, porque en modo print oh my pi
+
+196
+00:12:25.588 --> 00:12:26.950
+no los esperaba.
+
+197
+00:12:27.860 --> 00:12:29.963
+Solo cambia una frase del encargo.
+
+198
+00:12:30.003 --> 00:12:33.614
+En la condición uno: hazlo tú
+solo, sin la herramienta task.
+
+199
+00:12:33.654 --> 00:12:38.130
+En la condición varios: reparte;
+un subagente implementa desglose,
+
+200
+00:12:38.170 --> 00:12:41.594
+otro escribe las pruebas sin ver
+la implementación, y tú integras,
+
+201
+00:12:41.634 --> 00:12:44.891
+ejecutas verificar, marcas y haces commit.
+
+202
+00:12:44.931 --> 00:12:48.480
+Es la separación de la lección trece:
+quien escribe las pruebas no es quien
+
+203
+00:12:48.520 --> 00:12:50.080
+escribe el código.
+
+204
+00:12:50.874 --> 00:12:55.904
+Y el juez está fuera. Al terminar cada
+ejecución, el script mide el tiempo,
+
+205
+00:12:55.944 --> 00:13:02.330
+ejecuta verificar punto sh, cuenta los
+ficheros tocados y las llamadas a task,
+
+206
+00:13:02.370 --> 00:13:07.470
+y suma los tokens y el coste de todos
+los agentes, no solo del principal.
+
+207
+00:13:07.510 --> 00:13:11.150
+Una ejecución de varios que no
+reparte, o una de uno que sí lo hace,
+
+208
+00:13:11.190 --> 00:13:14.990
+no cuenta. Tres repeticiones
+de cada, seis ejecuciones.
+
+209
+00:13:15.830 --> 00:13:19.292
+Antes de lanzarlo, dibujemos el
+grafo de la condición varios.
+
+210
+00:13:19.332 --> 00:13:23.667
+Dos nodos en paralelo: uno implementa
+y otro escribe las pruebas.
+
+211
+00:13:23.707 --> 00:13:28.762
+Una arista que los junta en la sesión
+principal, que integra y ejecuta verificar
+
+212
+00:13:28.802 --> 00:13:32.030
+punto sh. Una arista de
+vuelta, si el script falla.
+
+213
+00:13:32.070 --> 00:13:35.380
+Y el commit al final,
+que pasa por la puerta.
+
+214
+00:13:35.694 --> 00:13:39.710
+El estado compartido es la propia carpeta
+de trabajo, y por eso los dos nodos no
+
+215
+00:13:39.750 --> 00:13:41.560
+tocan el mismo fichero.
+
+216
+00:13:42.665 --> 00:13:45.260
+Lo lanzamos y aceleramos la espera.
+
+217
+00:13:45.339 --> 00:13:49.140
+El script tarda diez minutos y
+veinticinco segundos en total.
+
+218
+00:13:49.585 --> 00:13:53.350
+Las seis ejecuciones son válidas:
+las de uno no llaman a task,
+
+219
+00:13:53.390 --> 00:13:57.521
+y cada una de varios lo llama
+una vez, con dos subagentes.
+
+220
+00:13:57.561 --> 00:14:02.560
+Las seis terminan con verificar punto sh
+en verde, y ninguna ha tocado la rúbrica
+
+221
+00:14:02.600 --> 00:14:06.620
+ni la aceptación. La puerta
+también vale para los subagentes,
+
+222
+00:14:06.660 --> 00:14:09.260
+porque oh my pi vuelve a
+cargar los hooks en cada uno:
+
+223
+00:14:09.370 --> 00:14:11.140
+lo comprobamos al preparar la demo.
+
+224
+00:14:11.889 --> 00:14:14.750
+Ahora el resumen, en céntimos de dólar.
+
+225
+00:14:14.790 --> 00:14:19.870
+Con un agente, de media: sesenta y dos
+segundos, unos cuatrocientos trece mil
+
+226
+00:14:19.910 --> 00:14:23.570
+tokens, un noventa y cinco por
+ciento de caché y casi un céntimo.
+
+227
+00:14:23.610 --> 00:14:28.264
+Con varios: ciento cuarenta y cuatro
+segundos, unos novecientos catorce mil
+
+228
+00:14:28.304 --> 00:14:32.070
+tokens, un noventa y cuatro por ciento
+de caché y dos céntimos y medio.
+
+229
+00:14:32.110 --> 00:14:36.680
+Repartir ha usado más del doble de tokens
+y ha costado dos veces y media más.
+
+230
+00:14:36.720 --> 00:14:39.650
+Con la caché casi igual en las
+dos, el coste sigue a los tokens.
+
+231
+00:14:40.635 --> 00:14:45.520
+Y una línea que no sale en la media:
+cuánto trabajo de integración hubo.
+
+232
+00:14:45.560 --> 00:14:49.570
+En las tres ejecuciones de varios,
+las piezas encajaron a la primera:
+
+233
+00:14:49.610 --> 00:14:52.357
+verificar salió en verde
+nada más juntarlas.
+
+234
+00:14:52.397 --> 00:14:56.330
+Aun así, la sesión principal leyó lo
+que habían hecho los dos subagentes,
+
+235
+00:14:56.370 --> 00:15:00.540
+ejecutó la verificación, anotó la
+evidencia y repartió el trabajo en tres
+
+236
+00:15:00.580 --> 00:15:03.319
+commits, donde un agente solo hizo uno.
+
+237
+00:15:03.359 --> 00:15:06.119
+En una, además, quitó
+una prueba redundante.
+
+238
+00:15:06.159 --> 00:15:09.213
+Ese trabajo de integración es
+el impuesto de orquestación,
+
+239
+00:15:09.253 --> 00:15:10.153
+en pequeño.
+
+240
+00:15:16.140 --> 00:15:18.520
+Tres avisos antes de sacar conclusiones.
+
+241
+00:15:18.570 --> 00:15:22.250
+Son tres repeticiones, con un
+modelo barato y una tarea pequeña.
+
+242
+00:15:22.290 --> 00:15:26.142
+Con pocos casos, una diferencia puede ser
+ruido, como vimos con barra ratchet en el
+
+243
+00:15:26.182 --> 00:15:29.220
+veintiuno. Y DeepSeek cobra
+distinto según la franja horaria,
+
+244
+00:15:29.260 --> 00:15:31.980
+así que lanzamos las seis
+seguidas, en la misma franja.
+
+245
+00:15:32.974 --> 00:15:37.780
+Con esos avisos: los dos aciertan, y
+repartir no ha mejorado el resultado.
+
+246
+00:15:37.820 --> 00:15:40.020
+Lo que vemos encaja con
+lo que dice Anthropic.
+
+247
+00:15:40.060 --> 00:15:42.890
+La funcionalidad tiene dos partes
+que se pueden hacer a la vez,
+
+248
+00:15:42.930 --> 00:15:47.320
+pero son pequeñas, y las dos dependen
+de las mismas funciones de la tienda.
+
+249
+00:15:47.360 --> 00:15:51.440
+En cada ejecución de varios, la sesión
+principal leyó el carrito y el envío antes
+
+250
+00:15:51.480 --> 00:15:54.980
+de repartir, y después cada
+subagente volvió a leerlos.
+
+251
+00:15:55.020 --> 00:15:57.780
+Repartir no ha ahorrado
+lectura: la ha multiplicado.
+
+252
+00:15:59.275 --> 00:16:01.996
+¿Y el tiempo? Ni siquiera
+ha ido más rápido:
+
+253
+00:16:02.036 --> 00:16:06.116
+de media ha tardado más del doble,
+aunque trabajaban dos a la vez.
+
+254
+00:16:06.156 --> 00:16:10.520
+Y mira la dispersión. Con un agente, las
+tres ejecuciones van de cuarenta y ocho a
+
+255
+00:16:10.560 --> 00:16:13.790
+ochenta segundos. Con varios, de
+noventa y tres a ciento noventa,
+
+256
+00:16:13.830 --> 00:16:19.580
+y los tokens, de unos cuatrocientos
+mil a más de un millón trescientos mil.
+
+257
+00:16:19.620 --> 00:16:22.733
+Repartir no solo cuesta
+más: es menos predecible.
+
+258
+00:16:22.773 --> 00:16:26.700
+Y lo que no sale en ninguna columna
+es tu revisión, que sigue siendo una.
+
+259
+00:16:27.582 --> 00:16:30.040
+Pasemos la tarea por los cinco criterios.
+
+260
+00:16:30.240 --> 00:16:34.220
+Partes independientes: a medias,
+porque comparten dependencias.
+
+261
+00:16:34.260 --> 00:16:38.243
+Ramas o vueltas atrás: solo
+repetir si la verificación falla,
+
+262
+00:16:38.283 --> 00:16:41.696
+y eso ya lo hace un bucle.
+Estado intermedio que guardar:
+
+263
+00:16:41.736 --> 00:16:44.595
+no. Verificación automática: sí.
+
+264
+00:16:45.015 --> 00:16:47.464
+Y lo que ahorras frente a
+lo que cuesta coordinar:
+
+265
+00:16:47.504 --> 00:16:50.639
+lo acabamos de medir. Uno o dos de cinco.
+
+266
+00:16:50.679 --> 00:16:51.820
+No hacía falta un grafo.
+
+267
+00:16:53.050 --> 00:16:56.900
+¿Cuándo sí? Cuando las partes son
+grandes y de verdad independientes,
+
+268
+00:16:56.940 --> 00:16:59.966
+como tres módulos que
+no comparten ficheros.
+
+269
+00:17:00.006 --> 00:17:03.540
+Cuando quieres explorar varias
+soluciones y quedarte con una.
+
+270
+00:17:03.580 --> 00:17:05.950
+Cuando el contexto de un
+solo agente no da para todo.
+
+271
+00:17:05.990 --> 00:17:11.297
+O cuando la revisión necesita un contexto
+limpio, y ahí basta un único revisor al
+
+272
+00:17:11.337 --> 00:17:13.080
+final, como en el veinticuatro.
+
+273
+00:17:13.120 --> 00:17:17.200
+La regla del dieciséis sigue en pie: una
+tarea pequeña, en la sesión principal.
+
+274
+00:17:18.101 --> 00:17:21.121
+¿Y un plan? Faltaba la
+tercera opción del título.
+
+275
+00:17:21.161 --> 00:17:25.719
+En lenguaje de grafos, el modo plan
+del vídeo quince es un nodo humano:
+
+276
+00:17:25.759 --> 00:17:28.620
+el trabajo se detiene
+hasta que tú apruebas.
+
+277
+00:17:28.660 --> 00:17:31.978
+Compensa cuando equivocarse de
+camino cuesta más que esperar:
+
+278
+00:17:32.018 --> 00:17:35.660
+un cambio que toca varias
+piezas, una decisión de diseño,
+
+279
+00:17:35.700 --> 00:17:40.646
+algo difícil de deshacer. Para ticket cero
+cero cuatro, con la rúbrica escrita antes,
+
+280
+00:17:40.686 --> 00:17:42.780
+la aprobación ya la diste al escribirla.
+
+281
+00:17:43.900 --> 00:17:46.080
+Junta las tres opciones en una regla.
+
+282
+00:17:46.202 --> 00:17:50.004
+Si la tarea es pequeña y tiene
+verificación, un agente, y si hace falta,
+
+283
+00:17:50.044 --> 00:17:54.496
+un bucle con techo. Si equivocarse
+de camino es caro, un plan antes.
+
+284
+00:17:54.536 --> 00:17:58.380
+Y si hay partes grandes que no se pisan,
+varios agentes, con un solo punto de
+
+285
+00:17:58.420 --> 00:18:00.814
+integración y la verificación al final.
+
+286
+00:18:00.854 --> 00:18:03.780
+Por ese orden: cada escalón
+cuesta más que el anterior.
+
+287
+00:18:04.467 --> 00:18:08.336
+Y el bucle. En una sesión de oh
+my pi, con la puerta cargada,
+
+288
+00:18:08.376 --> 00:18:14.709
+escribimos barra loop tres, guion guion
+until, verificar punto sh ticket cero cero
+
+289
+00:18:14.749 --> 00:18:17.722
+cuatro, y el encargo para un solo agente.
+
+290
+00:18:17.762 --> 00:18:21.820
+Paró en la primera vuelta. El agente
+escribió el desglose y doce pruebas
+
+291
+00:18:21.860 --> 00:18:26.470
+propias, con importes escritos a mano
+en seis pedidos, hizo commit y cedió el
+
+292
+00:18:26.510 --> 00:18:32.220
+turno. Entonces el harness, no el
+modelo, ejecutó verificar punto sh:
+
+293
+00:18:32.260 --> 00:18:34.876
+salió con cero, y el bucle se apagó solo.
+
+294
+00:18:34.916 --> 00:18:38.080
+Costó alrededor de un céntimo,
+y la prueba oculta también pasa.
+
+295
+00:18:39.081 --> 00:18:42.057
+Que parase en la primera
+vuelta no le quita valor.
+
+296
+00:18:42.097 --> 00:18:45.310
+Si el script hubiera salido con uno,
+habría llegado una segunda vuelta con el
+
+297
+00:18:45.350 --> 00:18:47.765
+mismo mensaje, y una tercera como mucho:
+
+298
+00:18:47.805 --> 00:18:50.598
+el tres era un techo, como en el quince.
+
+299
+00:18:50.638 --> 00:18:54.040
+Un agente, una condición que
+no depende de él y un techo.
+
+300
+00:18:54.080 --> 00:18:56.820
+Para esta tarea, es la opción más
+barata que verifica de verdad.
+
+301
+00:19:02.587 --> 00:19:05.019
+Ahora la deuda del vídeo veinticuatro.
+
+302
+00:19:05.059 --> 00:19:08.750
+En mil novecientos setenta y cinco, el
+economista Charles Goodhart observó que
+
+303
+00:19:08.790 --> 00:19:13.660
+una regularidad estadística tiende a
+romperse en cuanto se usa para controlar
+
+304
+00:19:13.752 --> 00:19:16.470
+algo. Marilyn Strathern lo generalizó
+en mil novecientos noventa y siete,
+
+305
+00:19:16.510 --> 00:19:20.320
+hablando de la evaluación de
+universidades, y de ahí viene la versión
+
+306
+00:19:20.360 --> 00:19:24.030
+que todo el mundo cita: cuando una
+medida se convierte en objetivo,
+
+307
+00:19:24.070 --> 00:19:25.620
+deja de ser una buena medida.
+
+308
+00:19:26.622 --> 00:19:30.244
+La lección catorce lo pone como
+el primer fallo de un bucle solo,
+
+309
+00:19:30.284 --> 00:19:34.988
+con un ejemplo: un equipo de soporte que
+optimiza la tasa de incidencias resueltas.
+
+310
+00:19:35.028 --> 00:19:40.169
+La cifra sube cada semana, y meses después
+las bajas de clientes se han duplicado.
+
+311
+00:19:40.209 --> 00:19:44.368
+El bucle había aprendido a cerrar
+incidencias, no a resolverlas.
+
+312
+00:19:44.408 --> 00:19:46.220
+Hizo exactamente lo que se le pidió.
+
+313
+00:19:47.327 --> 00:19:50.477
+Y fíjate en lo que pasa con un
+juez que lee la conversación,
+
+314
+00:19:50.517 --> 00:19:53.060
+como la barra goal de Claude Code.
+
+315
+00:19:53.100 --> 00:19:56.355
+Su medida es lo que el agente
+cuenta y enseña en el transcript.
+
+316
+00:19:56.395 --> 00:19:59.860
+Su propia documentación lo dice: la
+condición tiene que poder demostrarse con
+
+317
+00:19:59.900 --> 00:20:03.092
+lo que el agente muestra.
+Bien escrita, funciona.
+
+318
+00:20:03.132 --> 00:20:06.680
+Pero si la condición es vaga,
+lo que se optimiza es el relato,
+
+319
+00:20:06.720 --> 00:20:09.360
+que es justo lo que el vídeo
+uno nos enseñó a no creer.
+
+320
+00:20:10.285 --> 00:20:13.252
+Barra loop con guion
+guion until es ese bucle.
+
+321
+00:20:13.292 --> 00:20:17.420
+Su único objetivo es que
+verificar punto sh salga con cero.
+
+322
+00:20:17.617 --> 00:20:21.379
+Si el script mide algo que no es lo
+que importa, el bucle lo encontrará.
+
+323
+00:20:21.419 --> 00:20:24.311
+No por malicia, sino
+porque es lo que optimiza.
+
+324
+00:20:24.351 --> 00:20:27.840
+Vamos a verlo con ticket cero cero
+cuatro, y lo hemos preparado nosotros.
+
+325
+00:20:28.860 --> 00:20:32.670
+Para enseñarlo, escribimos primero una
+prueba de aceptación que solo comprobaba
+
+326
+00:20:32.710 --> 00:20:36.116
+dos cosas: que el total del
+desglose era el de la tienda,
+
+327
+00:20:36.156 --> 00:20:38.920
+y que base, IVA y envío sumaban ese total.
+
+328
+00:20:39.260 --> 00:20:43.279
+Parece razonable. Después
+escribimos a mano una rama, cuadre,
+
+329
+00:20:43.319 --> 00:20:47.010
+imitando a un agente con prisa:
+calcula el envío sobre el subtotal,
+
+330
+00:20:47.050 --> 00:20:51.499
+antes del cupón, y saca el IVA por
+diferencia, el total menos todo lo demás.
+
+331
+00:20:51.539 --> 00:20:55.120
+Ejecutamos verificar punto sh: cero.
+
+332
+00:20:55.994 --> 00:20:58.820
+Leamos lo que devuelve con
+el pedido de la frontera.
+
+333
+00:20:59.130 --> 00:21:01.390
+Base, treinta y siete con ochenta.
+
+334
+00:21:01.430 --> 00:21:05.260
+Envío, cero, cuando la tienda
+cobra cuatro con noventa y cinco.
+
+335
+00:21:05.300 --> 00:21:09.940
+E IVA, doce con ochenta y nueve, en
+lugar de siete con noventa y cuatro.
+
+336
+00:21:09.980 --> 00:21:13.110
+La suma cuadra porque el IVA se
+ha calculado para que cuadre.
+
+337
+00:21:13.150 --> 00:21:17.100
+Es una cifra de cuadre. Medíamos
+que cuadrase, no que fuese correcto.
+
+338
+00:21:17.900 --> 00:21:22.300
+¿Cómo lo vimos? Con un ancla, la pieza
+que la lección dice que todo el mundo se
+
+339
+00:21:22.340 --> 00:21:26.280
+salta. Una prueba que vive fuera
+de la tienda, en otra carpeta,
+
+340
+00:21:26.320 --> 00:21:29.606
+con otro pedido y los
+importes calculados a mano:
+
+341
+00:21:29.646 --> 00:21:33.439
+una silla de cuarenta y cinco euros
+con un cupón del veinte por ciento.
+
+342
+00:21:33.479 --> 00:21:38.070
+No está en la carpeta de trabajo de
+ningún agente, y nadie se la menciona.
+
+343
+00:21:38.110 --> 00:21:43.254
+En cuadre falla: envío cero, e IVA doce
+con cincuenta y uno en lugar de siete con
+
+344
+00:21:43.294 --> 00:21:47.520
+cincuenta y seis. Y las seis ejecuciones
+de la comparación la superan.
+
+345
+00:21:48.514 --> 00:21:51.315
+Es la idea de barra ratchet
+del vídeo veintiuno:
+
+346
+00:21:51.355 --> 00:21:56.470
+una mejora solo cuenta si mejora
+en casos que el agente no ha visto.
+
+347
+00:21:56.510 --> 00:22:01.310
+Después reforzamos la aceptación, ahora
+con cada importe exacto en dos pedidos,
+
+348
+00:22:01.350 --> 00:22:05.440
+y movimos la etiqueta. Con la
+nueva, la rama cuadre sale en rojo:
+
+349
+00:22:05.480 --> 00:22:10.320
+el IVA y el envío no son los que deberían,
+y A cinco avisa de que la verificación ha
+
+350
+00:22:10.360 --> 00:22:15.140
+cambiado desde su etiqueta. Es lo que el
+veinticuatro llamaba convertir lo que se
+
+351
+00:22:15.180 --> 00:22:18.840
+cuela en un criterio nuevo. Pero
+la prueba oculta se queda fuera.
+
+352
+00:22:19.869 --> 00:22:22.233
+Y vale también para los
+números de este vídeo.
+
+353
+00:22:22.273 --> 00:22:25.975
+Si mides solo el coste, siempre
+gana un agente que no verifica nada.
+
+354
+00:22:26.015 --> 00:22:29.654
+Si mides funcionalidades en
+pasa, gana quien marca deprisa.
+
+355
+00:22:29.694 --> 00:22:34.020
+Si mides tokens por tarea, gana
+quien lee menos de lo que debería.
+
+356
+00:22:34.060 --> 00:22:38.850
+Ninguna métrica sola. Mira varias a la
+vez y guarda al menos una que el agente no
+
+357
+00:22:38.890 --> 00:22:42.320
+pueda optimizar: una prueba
+oculta o una revisión tuya.
+
+358
+00:22:48.147 --> 00:22:51.500
+Lo que viene, separando lo
+que existe de lo anunciado.
+
+359
+00:22:51.673 --> 00:22:57.170
+Existe ya: o eme pe guion guion restore
+retoma una sesión que se cayó y sigue con
+
+360
+00:22:57.210 --> 00:23:00.910
+lo que dejó a medias, incluidos los
+subagentes que estaban trabajando.
+
+361
+00:23:00.950 --> 00:23:05.090
+Del lado de Pi existe Pi Durable, un
+paquete aparte y experimental para agentes
+
+362
+00:23:05.130 --> 00:23:09.110
+de larga duración: cada paso guarda un
+punto de control y otro proceso puede
+
+363
+00:23:09.150 --> 00:23:11.580
+retomarlo. No sustituye a Pi.
+
+364
+00:23:12.203 --> 00:23:17.297
+Y anunciado, sin fecha: omp al cuadrado,
+del que hablamos en el veintidós.
+
+365
+00:23:17.337 --> 00:23:18.900
+Su web solo dice que llega pronto.
+
+366
+00:23:18.940 --> 00:23:22.150
+El Harness Playbook describe
+una pieza que viene al caso,
+
+367
+00:23:22.190 --> 00:23:25.940
+los directores: una pila de
+comportamientos que controlan el bucle,
+
+368
+00:23:25.980 --> 00:23:31.069
+como plan o goal, y deciden
+cuándo puede parar el agente.
+
+369
+00:23:31.109 --> 00:23:33.890
+Su autor critica que hoy la
+exclusión entre modos, la del quince,
+
+370
+00:23:33.930 --> 00:23:38.490
+se comprueba a mano, comando a comando;
+los directores la convertirían en una
+
+371
+00:23:38.530 --> 00:23:41.180
+pila. Hoy no está en lo
+que tienes instalado.
+
+372
+00:23:42.719 --> 00:23:45.629
+¿Y si quieres repartir en Pi hoy?
+
+373
+00:23:45.669 --> 00:23:49.490
+Pi no trae subagentes, pero entre sus
+extensiones de ejemplo hay una que los
+
+374
+00:23:49.530 --> 00:23:53.120
+lanza como procesos de Pi aparte,
+con agentes de reconocimiento,
+
+375
+00:23:53.160 --> 00:23:58.540
+planificación, trabajo y revisión, y que
+enseña los tokens y el coste de cada uno.
+
+376
+00:23:58.580 --> 00:24:01.170
+Es un buen punto de partida,
+y tiene la virtud de Pi:
+
+377
+00:24:01.210 --> 00:24:04.570
+ves todo el código del reparto,
+y decides tú cuánto cuesta.
+
+378
+00:24:05.382 --> 00:24:10.790
+Repasemos. Un bucle compensa cuando
+tiene objetivo, verificación y parada,
+
+379
+00:24:10.830 --> 00:24:12.391
+y la parada la decide un programa.
+
+380
+00:24:12.431 --> 00:24:15.760
+Barra loop de oh my pi
+para con un comando;
+
+381
+00:24:15.800 --> 00:24:19.980
+el de Claude Code repite con
+un reloj; Pi no trae ninguno.
+
+382
+00:24:20.110 --> 00:24:23.575
+Un grafo compensa con partes
+independientes y vueltas atrás.
+
+383
+00:24:23.615 --> 00:24:27.925
+Varios agentes multiplican los tokens,
+y tu revisión no se paraleliza.
+
+384
+00:24:27.965 --> 00:24:30.644
+Toda medida que se optimiza
+se acaba engañando:
+
+385
+00:24:30.684 --> 00:24:32.530
+guarda un ancla fuera de su alcance.
+
+386
+00:24:33.638 --> 00:24:38.850
+La práctica: elige una tarea pequeña de tu
+proyecto y escribe antes su verificación y
+
+387
+00:24:38.890 --> 00:24:41.475
+una prueba oculta, fuera del repositorio.
+
+388
+00:24:41.515 --> 00:24:44.990
+Ejecútala tres veces con un
+solo agente y tres repartiendo,
+
+389
+00:24:45.030 --> 00:24:50.790
+en worktrees separados, y apunta tiempo,
+tokens, coste y cuántas superan la prueba
+
+390
+00:24:50.830 --> 00:24:54.691
+oculta. Después pasa la tarea
+por los cinco criterios y decide,
+
+391
+00:24:54.731 --> 00:24:57.180
+con tus números, si repartir compensaba.
+
+392
+00:24:58.161 --> 00:25:00.986
+En el próximo vídeo,
+el último, todo junto:
+
+393
+00:25:01.026 --> 00:25:07.150
+el proyecto final. Una funcionalidad de
+principio a fin, con Pi y con oh my pi:
+
+394
+00:25:07.190 --> 00:25:11.860
+el plan, la rúbrica antes de
+empezar, el reparto si compensa,
+
+395
+00:25:11.900 --> 00:25:16.920
+la revisión, las pruebas, el
+commit y la petición de cambios.
+
+396
+00:25:16.960 --> 00:25:17.860
+Nos vemos allí.

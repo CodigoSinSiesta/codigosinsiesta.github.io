@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 21 · oh my pi programático, métricas y equipo"
-description: "omp en scripts e integración continua, su panel de estadísticas y trazas, y las funciones para trabajar en equipo."
+description: "Omp en scripts e integración continua, su panel de estadísticas y trazas, y las funciones para trabajar en equipo."
 ruta: "pi-oh-my-pi"
 orden: 21
 duracion: "22 min"
@@ -8,7 +8,7 @@ video: "21-omp-programatico-metricas-equipo.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/21-omp-programatico-metricas-equipo.es.vtt"
 ---
 
-omp en scripts e integración continua, su panel de estadísticas y trazas, y las funciones para trabajar en equipo.
+Omp en scripts e integración continua, su panel de estadísticas y trazas, y las funciones para trabajar en equipo.
 
 <p class="guia__nota">Dura 22 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -19,15 +19,7 @@ omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 <p><button type="button" class="ir-a" data-t="19">▶ Ir a 0:19</button></p>
 
 - **Vídeo 10 · Pi fuera de la TUI:** print (scripts) → JSON (eventos) → RPC (otro proceso) → SDK (tu programa) → CI (la revisión)
-- **¿Qué cambia en oh my pi?**
-  - `modos` · Los mismos: con detalles que rompen scripts
-  - `ACP` · Un quinto camino: dentro de un editor
-  - `nuevo` · Lo que Pi no tiene: panel, trazas, equipo
 - **Por orden:** omp -p (JSON) → Revisión (con red) → CI → RPC (v2) → SDK (ACP) → Métricas (/trace /stats) → Equipo (/ratchet)
-- **El montaje**
-  - `demo` · Perfil demo
-  - `Flash` · DeepSeek: barato para leer
-  - `OMP_PROFILE` · = demo: también en los scripts
 
 ### 2 · omp -p y el modo JSON
 
@@ -36,18 +28,10 @@ omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 - *En terminal:* omp -p con una tubería (más abajo, en «Código y comandos»)
 - *En la demo:* omp -p, mientras trabaja
 - *En la demo:* La respuesta, entera al final
-- **Herramientas de lectura**
-  - `Pi` · read grep find ls: vídeo 10
-  - `oh my pi` · read grep glob
-  - `find · ls` · No arranca: revisa tus scripts
 - **Vídeo 14:** omp -p --advisor — Espera las revisiones finales del advisor: hasta diez minutos.
 - *En la demo:* --mode json | jq
 - **oh my pi:** No hay agent_settled — El final se lee en agent_end.
 - *En la demo:* isTerminal · yielded · stopReason
-- **El código de salida**
-  - `omp` · ≠ 0 también en JSON: si acaba en error
-  - `Pi` · No era así
-  - `0` · Terminó: no que acertara
 
 ### 3 · La revisión, con la red de oh my pi
 
@@ -60,10 +44,6 @@ omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 - *En la demo:* errores.jsonl
 - *En la demo:* informe.md · salida 1 · git status limpio
 - *En la demo:* errores.jsonl con «corrígelo» y edit, write
-- **Por qué el flag**
-  - `.omp/config.yml` · Modo write: vídeo 19
-  - `edit` · Se aprueba sola
-  - `flag` · Gana al proyecto
 - **Dos redes y un vigilante:** --tools (la principal) → always-ask (la segunda) → El script (lo detecta)
 
 ### 4 · Integración continua
@@ -74,16 +54,6 @@ omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 - *En la demo:* Bun, la clave y el modelo
 - *En la demo:* timeout-minutes: 15 · --max-time 5m
 - **El bash de oh my pi:** CI=true — Los comandos saben que no hay nadie delante.
-- **Sin /trust, el .omp del pull request se carga**
-  - `config` · Políticas: por herramienta
-  - `reglas` · Instrucciones
-  - `hooks` · Código: con tu clave en el entorno
-  - `MCP` · Programas
-- **En integración continua**
-  - `clave` · Solo en su paso
-  - `flags` · En la rama base
-  - `--tools` · De lectura
-  - `contenedor` · Vídeo 5
 - **Vídeos 5, 19 y 20:** Aprobar no es aislar — Y en oh my pi, un flag tampoco.
 
 ### 5 · RPC, versión dos
@@ -106,17 +76,10 @@ omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 
 <p><button type="button" class="ir-a" data-t="769">▶ Ir a 12:49</button></p>
 
-- **El SDK**
-  - `createAgentSession` · Sin protocolo
-  - `Bun` · No Node
-  - `bun add` · Misma versión: que tu binario
 - *En la demo:* ~/csn/sdk-omp/resumen.ts
 - *En la demo:* stderr: herramientas · stdout: la respuesta
 - **Un detalle:** ¿En qué carpeta estoy? — El modelo dijo la del script, no la tienda. Y aun así leyó la tienda.
-- **Perfil, y SDK o RPC**
-  - `OMP_PROFILE` · Imprescindible: o usa tu agente de verdad
-  - `SDK` · En Bun: acceso a todo
-  - `RPC` · Otro lenguaje: su propio proceso
+- **El SDK lee OMP_PROFILE:** Sin perfil, tu agente de verdad — Tus credenciales, tus ajustes y tus sesiones.
 - *En terminal:* settings.json de Zed (diapositiva) (más abajo, en «Código y comandos»)
 
 ### 7 · Métricas: /trace, /stats y /export
@@ -136,10 +99,6 @@ omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 - *En la demo:* Costs
 - *En la demo:* Projects
 - **Puerto 3847:** Un panel abierto se reutiliza — Antes de compartir pantalla, mira de qué perfil es.
-- **Frustración, y sin navegador**
-  - `página` · Señales de enfado: en tus mensajes
-  - `botón` · Modelo juez: ese sí gasta
-  - `terminal` · omp stats: --summary · --json
 - *En la demo:* omp stats --summary
 - *En la demo:* /export /tmp/csn/omp21/sesion.html
 - *En la demo:* La exportación
@@ -154,30 +113,12 @@ omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 - **Dos ideas que valen siempre**
   - `ruido` · Calcúlalo antes: diez puntos pueden ser azar
   - `reservados` · Casos no vistos: solo ahí cuenta
-- **Lo que publica (no se enseña)**
-  - `/share` · Instantánea: cifrada, clave en el enlace
-  - `/collab` · En directo
-  - `/join` · Escribe al agente: en tu máquina
-  - `omp stream` · Página pública
 - **/collab:** El enlace es el acceso — Lo que sale de tu máquina se explica, no se enseña.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1217">▶ Ir a 20:17</button></p>
 
-- **Repaso · 1**
-  - `omp -p` · Al final: Working por stderr
-  - `JSON` · agent_end: isTerminal · yielded
-  - `lectura` · read grep glob
-  - `script` · Flags: y always-ask
-- **Repaso · 2**
-  - `RPC` · ready · v2: prompt_result · settled
-  - `SDK` · Bun: restrictToolNames
-  - `ACP` · Editor
-  - `/trace /stats` · Miden: perfil demo, navegador limpio
-  - `/export` · No redacta
-  - `/ratchet` · Mide antes
-- **La práctica:** revisar.sh (a omp) → always-ask (que se rechace) → Con sesión (un par de veces) → /stats (modelo o herramientas)
 - **Vídeo 22 · Bloque D:** Diseñar tu harness — Pocas herramientas, límites centralizados, anfitrión y sandbox. Y medirlo.
 
 ## Código y comandos

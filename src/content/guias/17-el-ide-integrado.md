@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 17 · El IDE integrado"
-description: "lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas y ediciones por estructura del código, y lectura de PDF o bases de datos."
+description: "Lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas y ediciones por estructura del código, y lectura de PDF o bases de datos."
 ruta: "pi-oh-my-pi"
 orden: 17
 duracion: "24 min"
@@ -8,7 +8,7 @@ video: "17-el-ide-integrado.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/17-el-ide-integrado.es.vtt"
 ---
 
-lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas y ediciones por estructura del código, y lectura de PDF o bases de datos.
+Lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas y ediciones por estructura del código, y lectura de PDF o bases de datos.
 
 <p class="guia__nota">Dura 24 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,31 +18,17 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Para verificar bien hace falta**
-  - `LSP` · Dónde se usa: servidor de lenguaje
-  - `DAP` · Parar y mirar: depurador
-  - `edición` · Sin romper
+- **Vídeo 16:** Quien reparte, verifica — Hoy, la otra mitad de esa idea.
 - *En la demo:* /tools · herramientas descubribles
-- **Hechos, no suposiciones**
-  - `adivinar` · A veces acierta
-  - `preguntar` · Lo sabe
-- **Ojo con el nombre**
-  - `/debug` · Diagnóstico de omp: logs, informes
-  - `debug` · El depurador: herramienta del modelo
-- *En la demo:* /tools en 18.7: la descripción completa
 - **Una tarea real:** Carpeta (de datos) → Leer (PDF y SQLite) → Refactor (LSP) → Limpieza (AST) → Fallo (depurador) → eval
 
 ### 2 · Varias carpetas en una sesión
 
-<p><button type="button" class="ir-a" data-t="159">▶ Ir a 2:39</button></p>
+<p><button type="button" class="ir-a" data-t="158">▶ Ir a 2:38</button></p>
 
 - *En terminal:* ~/csn/datos (fuera del repositorio) (más abajo, en «Código y comandos»)
 - *En la demo:* /dirs
 - *En la demo:* /add-dir ../datos
-- **Por dentro**
-  - `prompt` · Se regenera: rutas absolutas
-  - `AGENTS.md` · De cada raíz
-  - `datos` · «Solo lectura»: lo sabrá
 - *En la demo:* /remove-dir .
 - **Cuándo sirve**
   - `app + lib` · Cruza repos
@@ -59,40 +45,22 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 - *En la demo:* La base, por bash
 - *En la demo:* El error está en los datos
 - *En terminal:* read con sufijos (más abajo, en «Código y comandos»)
-- **Direcciones internas**
-  - `agent://` · Subagentes: vídeo 16
-  - `pr://` · Pull requests: gh y tu cuenta
-  - `/diff` · Su diff
 - **Vídeo 11:** Hashline — Cada línea con su número y la lectura con una etiqueta.
 
 ### 4 · El servidor de lenguaje
 
-<p><button type="button" class="ir-a" data-t="452">▶ Ir a 7:32</button></p>
+<p><button type="button" class="ir-a" data-t="451">▶ Ir a 7:31</button></p>
 
-- **Un rename**
-  - `grep` · Casi siempre: el casi es el problema
-  - `LSP` · Entiende el código
-- **LSP automático**
-  - `package.json` · Marcador
-  - `tsserver` · Binario: typescript-language-server
+- **Rename con grep: funciona casi siempre:** gastosEnvio → calcularEnvio — El casi: un nombre en un comentario, una importación con alias, un fichero sin mirar.
 - **Hay que pedirlo:** rename con apply: false — Por defecto, rename aplica los cambios.
 - *En la demo:* lsp references
 - *En la demo:* Vista previa
 - *En la demo:* git diff
 - *En la demo:* El modelo lo hizo aparte
-- **Más del LSP**
-  - `definition` · Ir a
-  - `hover` · Tipo
-  - `actions` · Acciones rápidas
-  - `diagnósticos` · Tras escribir
-- **Unas cincuenta de serie:** rust-analyzer, gopls, pyright… — Otro servidor: .omp/lsp.json.
-- **Funcionamiento**
-  - `perezoso` · Arranca al usarlo: la primera tarda
-  - `compartido` · Por proyecto
 
 ### 5 · Editar con precisión: hashline, ast_grep y ast_edit
 
-<p><button type="button" class="ir-a" data-t="647">▶ Ir a 10:47</button></p>
+<p><button type="button" class="ir-a" data-t="646">▶ Ir a 10:46</button></p>
 
 - **Edición anclada:** Etiqueta (de la lectura) → Líneas (por número) → ¿Cambió? (no aplica a ciegas)
 - *En terminal:* Hashline (diapositiva) (más abajo, en «Código y comandos»)
@@ -109,65 +77,37 @@ lo que convierte a omp en un entorno de desarrollo. LSP, depuración, búsquedas
 <p><button type="button" class="ir-a" data-t="862">▶ Ir a 14:22</button></p>
 
 - *En la demo:* Romper a mano
-- **DAP: adaptadores que ya existen**
-  - `gdb · lldb` · C y Rust
-  - `debugpy` · Python
-  - `delve` · Go
-  - `js-debug` · JavaScript: instalado aparte
 - *En la demo:* Debug variables
 - *En la demo:* Parar es mirar
 - *En la demo:* Arreglado
-- **El repertorio**
-  - `breakpoints` · Línea o función: con condición
-  - `step` · Avanzar: entrar, salir
-  - `stack` · Pila y ámbitos
-  - `evaluate` · Expresiones
-- **Tres detalles**
-  - `1` · Una sesión a la vez
-  - `attach` · PID o puerto
-  - `dap.json` · Otro adaptador
-- **/debug · solo diapositiva:** Diagnóstico de oh my pi — Logs, perfil, SSE en crudo, paquete de informe. Revisa antes de compartir.
+- **/debug · para reportar un fallo de oh my pi:** Revisa antes de compartir — Enseña sesiones y peticiones tal cual.
 
 ### 7 · Eval, el navegador y el escritorio
 
-<p><button type="button" class="ir-a" data-t="1041">▶ Ir a 17:21</button></p>
+<p><button type="button" class="ir-a" data-t="1040">▶ Ir a 17:20</button></p>
 
 - **eval:** Un proceso que sigue vivo — JavaScript o Python, con estado entre llamadas.
 - *En la demo:* Una celda JavaScript
 - *En la demo:* Con 40 € y cupón, se paga más
-- **eval frente a bash**
-  - `bash` · Empieza de cero
-  - `eval` · Con estado: llama a herramientas
-  - `Jupyter` · Lee y edita: no ejecuta
-- **Prelude:** browser — Chromium desde una celda: pestañas, observar, clics, capturas.
 - **Relé:** Tu propio Chrome — Con tus sesiones iniciadas. Lo que haga, lo hace con tu cuenta.
 - *En terminal:* /browser (no se pulsa) (más abajo, en «Código y comandos»)
-- **/computer · solo diapositiva:** Tu escritorio real — Capturas, accesibilidad, ratón y teclado. Apagado; /computer on solo para la sesión.
+- **/computer · solo diapositiva:** Tu escritorio real — Capturas, accesibilidad, ratón, teclado y portapapeles. Viene apagado.
 
 ### 8 · Límites, riesgos y coste
 
-<p><button type="button" class="ir-a" data-t="1203">▶ Ir a 20:03</button></p>
+<p><button type="button" class="ir-a" data-t="1202">▶ Ir a 20:02</button></p>
 
 - **Primero:** Todo se ejecuta en tu máquina — Lo que en tu editor decides con un clic, aquí lo decide el modelo.
 - **Aprobaciones**
   - `yolo` · De fábrica: nadie pregunta
   - `write` · Para computer: y una máquina dedicada
 - **Tercero:** Lo que ve no es una orden — Una página o un PDF pueden traer instrucciones escondidas.
-- **Dependencias**
-  - `LSP · DAP` · No vienen incluidos
-  - `marcadores` · Solo en el cwd
-- **Coste**
-  - `local` · LSP, DAP, ast_grep: sin modelo
-  - `~4 cts` · Toda la demo: con Pro
 - **Pauta:** Activa (lo justo) → Instala (LSP y DAP) → computer (apagado) → Vista previa (antes de cambios grandes)
 
 ### 9 · Repaso, práctica y cierre
 
-<p><button type="button" class="ir-a" data-t="1347">▶ Ir a 22:27</button></p>
+<p><button type="button" class="ir-a" data-t="1346">▶ Ir a 22:26</button></p>
 
-- **Repaso:** read (puerta única) → LSP (referencias y rename) → debug (DAP)
-- **Y además:** Hashline → ast_grep · ast_edit (con propuesta) → eval (browser · computer) → /add-dir (/dirs)
-- **Práctica:** LSP (estado) → Referencias (y vista previa) → Romper (y depurar) → Comparar (con grep)
 - **Próximo vídeo:** Git, calidad y entrega — /git, /wt, /review, omp commit, Auto QA y /security.
 
 ## Código y comandos
@@ -337,7 +277,7 @@ La razón de fondo es la de todo el curso: dar al modelo hechos en lugar de supo
 
 Antes de seguir, una aclaración, porque el nombre confunde. El comando barra debug no abre el depurador: abre un selector de diagnóstico del propio oh my pi, con logs, informes y peticiones en crudo. El depurador es la herramienta debug, y la maneja el modelo. A barra debug le dedicamos una diapositiva más adelante.
 
-Además veremos los otros comandos del tema: barra add dir, barra remove dir y barra dirs, para trabajar con varias carpetas a la vez, y barra browser y barra computer, que controlan el navegador y el escritorio. Todo en la tienda de siempre, con el perfil demo, ahora en oh my pi dieciocho punto siete, y con DeepSeek V cuatro Pro, que razona más, porque hoy hay que pensar el código.
+Además veremos los otros comandos del tema: barra add dir, barra remove dir y barra dirs, para trabajar con varias carpetas a la vez, y barra browser y barra computer, que controlan el navegador y el escritorio. Todo en la tienda de siempre, con el perfil demo, en oh my pi, y con DeepSeek V cuatro Pro, que razona más, porque hoy hay que pensar el código.
 
 El orden será el de una tarea real. Primero, dar al agente acceso a una carpeta de datos que no está en el repositorio. Después, leer lo que hay en ella. Luego, un refactor con el servidor de lenguaje, una limpieza con búsqueda estructural y un fallo que encontraremos con el depurador. Al final, eval, el navegador y el escritorio, y los límites de todo esto.
 

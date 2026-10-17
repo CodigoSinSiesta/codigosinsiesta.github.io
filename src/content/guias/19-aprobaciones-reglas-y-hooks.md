@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 19 · Aprobaciones, reglas y hooks"
-description: "endurecer omp para un repositorio de equipo con modos de aprobación, reglas que se activan solas, hooks y protección de secretos."
+description: "Endurecer omp para un repositorio de equipo con modos de aprobación, reglas que se activan solas, hooks y protección de secretos."
 ruta: "pi-oh-my-pi"
 orden: 19
 duracion: "24 min"
@@ -8,7 +8,7 @@ video: "19-aprobaciones-reglas-y-hooks.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/19-aprobaciones-reglas-y-hooks.es.vtt"
 ---
 
-endurecer omp para un repositorio de equipo con modos de aprobación, reglas que se activan solas, hooks y protección de secretos.
+Endurecer omp para un repositorio de equipo con modos de aprobación, reglas que se activan solas, hooks y protección de secretos.
 
 <p class="guia__nota">Dura 24 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -20,37 +20,12 @@ endurecer omp para un repositorio de equipo con modos de aprobación, reglas que
 
 - **Una promesa larga:** Vídeo 05 (omp sí tiene modos) → Vídeo 08 (permisos.ts a mano) → Vídeo 18 (serán límites) → Hoy (cumplirlo)
 - **De fábrica:** yolo — oh my pi aprueba todo sin preguntar.
-- **Endurecer un repositorio de equipo**
-  - `modo` · Aprobaciones: políticas y patrones
-  - `hook` · Lo que no alcanza: la configuración
-  - `TTSR` · Reglas: y /omfg
-  - `secretos` · Redacción
-- **permisos.ts del vídeo 08**
-  - `lectura` · Lista de herramientas
-  - `bash` · Comandos seguros
-  - `diálogo` · Tres opciones
-  - `rutas` · Protegidas
-  - `sin interfaz` · Bloquea
-- **El montaje**
-  - `perfil` · demo
-  - `V4 Pro` · El modelo
-  - `demo-19` · Sin remoto
+- **Pieza a pieza:** De serie, distinto o a mano — Qué trae oh my pi y qué tienes que seguir escribiendo tú.
 
 ### 2 · Niveles, modos y el fichero del proyecto
 
 <p><button type="button" class="ir-a" data-t="128">▶ Ir a 2:08</button></p>
 
-- **Cada herramienta declara un nivel**
-  - `read` · Solo lee: read, grep…
-  - `write` · Modifica: edit, write
-  - `exec` · Ejecuta: bash, eval, task…
-- **Al revés que en el 08**
-  - `sin nivel` · exec: lo prudente
-  - `MCP` · Siempre write: nómbralas
-- **tools.approvalMode**
-  - `always-ask` · Solo read: pregunta el resto
-  - `write` · read + write: pregunta exec
-  - `yolo` · Todo: de fábrica
 - *En la demo:* ~/csn/omp-equipo/config.yml
 - *En la demo:* .omp/config.yml en la tienda
 - *En la demo:* /settings · Interaction · Approvals
@@ -66,9 +41,6 @@ endurecer omp para un repositorio de equipo con modos de aprobación, reglas que
 - *En la demo:* Allow tool: bash · Approve / Deny
 - *En la demo:* allow no cubre líneas compuestas
 - *En la demo:* bash.allowCompoundCommands: false
-- **El diálogo**
-  - `vídeo 08` · Tres opciones: «siempre en esta sesión»
-  - `omp` · Approve / Deny: lo permanente, en la configuración
 - *En la demo:* edit sin preguntar (modo write)
 - *En la demo:* textoEnvio
 
@@ -80,25 +52,15 @@ endurecer omp para un repositorio de equipo con modos de aprobación, reglas que
 - *En la demo:* Dos diálogos más
 - *En la demo:* Blocked by bash pattern: git push*
 - *En la demo:* Commit sí, push no
-- **deny:** No depende de la buena voluntad — Absoluto, también en yolo, y mira cada trozo de una línea compuesta.
-- **Patrones críticos**
-  - `write / always-ask` · Obligan a preguntar
-  - `yolo` · Se ignoran
-  - `ejemplos` · rm -rf /, fork bomb: curl | sh
-- **Políticas por herramienta**
-  - `bash: prompt` · Sobrevive a --yolo
-  - `eval: prompt` · Cierra el hueco: shell desde Python o JS
+- **deny:** No depende de la buena voluntad — Es absoluto: no lo salta ni el modo yolo.
 - *En la demo:* omp --profile demo -p "Ejecuta node --version…"
-- **Subagentes**
-  - `deny` · Se aplica
-  - `prompt` · Se rechaza: nadie responde
-- **Vídeo 18:** El reviewer, con límite — git diff, git log y git show en la lista; el resto de bash se rechaza.
+- **Vídeo 18:** Ya no es una petición: es un límite — Afecta a todos los subagentes, y cubre solo lo que nombra.
 
 ### 5 · Hooks: lo que la configuración no alcanza
 
 <p><button type="button" class="ir-a" data-t="645">▶ Ir a 10:45</button></p>
 
-- **En modo write:** Editar AGENTS.md no pregunta — Las políticas son por herramienta, no por fichero.
+- **Hace falta código:** Por herramienta, no por fichero — Para esto hacen falta código y un hook.
 - *En terminal:* Un hook de oh my pi (más abajo, en «Código y comandos»)
 - *En la demo:* .omp/hooks/pre/rutas-protegidas.ts
 - *En la demo:* .omp/ y ~/csn/datos
@@ -113,15 +75,8 @@ endurecer omp para un repositorio de equipo con modos de aprobación, reglas que
 
 <p><button type="button" class="ir-a" data-t="810">▶ Ir a 13:30</button></p>
 
-- **Convenciones hasta ahora**
-  - `AGENTS.md` · En cada petición
-  - `RULES.md` · Vídeo 13
 - *En terminal:* .omp/rules/ .md (más abajo, en «Código y comandos»)
 - **Time traveling stream rules:** Vigila (el stream) → Corta (antes de ejecutar) → Inyecta (la regla) → Reintenta
-- **Disparos**
-  - `condition` · Regex
-  - `astCondition` · ast-grep
-  - `question` · Juez: no corta
 - *En la demo:* Ajustes de TTSR
 - *En la demo:* omp --profile demo ttsr list
 
@@ -143,10 +98,6 @@ endurecer omp para un repositorio de equipo con modos de aprobación, reglas que
 <p><button type="button" class="ir-a" data-t="1084">▶ Ir a 18:04</button></p>
 
 - **secrets.enabled:** Marcadores en lugar de valores — Antes de enviar al proveedor. Apagado de fábrica.
-- **De dónde salen**
-  - `entorno` · KEY, TOKEN…: ≥ 8 caracteres
-  - `secrets.yml` · Perfil y proyecto
-  - `incluidas` · Formatos conocidos: GitHub, claves…
 - **Ida y vuelta:** Valor (local) → $$marcador$$ (al proveedor) → Comando (con el marcador) → Valor real (al ejecutar)
 - *En la demo:* echo $TOKEN_DEMO
 - *En la demo:* Local: el valor · modelo: $$…$$
@@ -162,21 +113,6 @@ endurecer omp para un repositorio de equipo con modos de aprobación, reglas que
 <p><button type="button" class="ir-a" data-t="1240">▶ Ir a 20:40</button></p>
 
 - **Vídeo 08:** Aprobar no es aislar — Los patrones comparan texto: «git -C . push» no empieza por «git push».
-- **Sin /trust:** El proyecto manda — Un .omp/ ajeno puede poner yolo y ejecutar hooks al arrancar.
-- **Antes de abrir un repositorio ajeno**
-  - `.omp/` · Mira su carpeta
-  - `contenedor` · Vídeo 05
-  - `coste` · 3 céntimos: toda la demo
-- **Repaso · 1**
-  - `niveles` · read · write · exec
-  - `diálogo` · Approve / Deny
-  - `patrones` · allow · prompt · deny
-- **Repaso · 2**
-  - `políticas` · Sobreviven a --yolo
-  - `hooks` · Lo que falta
-  - `TTSR` · /omfg
-  - `secretos` · Ayuda, no tapa todo
-- **La práctica:** config.yml (write + prompt) → allow (lista corta) → deny (lo prohibido) → Una tarde (apunta) → /omfg (ttsr test)
 - **Vídeo 20:** Extender oh my pi — Extensiones, skills, plugins, MCP y comandos del proyecto.
 
 ## Código y comandos

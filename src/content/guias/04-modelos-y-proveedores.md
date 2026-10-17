@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 04 · Modelos y proveedores"
-description: "todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuánto razonan, y lo que cuesta de verdad cambiar de modelo a mitad de tarea. Cerramos probando modelos locales."
+description: "Todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuánto razonan, y lo que cuesta de verdad cambiar de modelo a mitad de tarea. Cerramos probando modelos locales."
 ruta: "pi-oh-my-pi"
 orden: 4
 duracion: "20 min"
@@ -8,7 +8,7 @@ video: "04-modelos-y-proveedores.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/04-modelos-y-proveedores.es.vtt"
 ---
 
-todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuánto razonan, y lo que cuesta de verdad cambiar de modelo a mitad de tarea. Cerramos probando modelos locales.
+Todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuánto razonan, y lo que cuesta de verdad cambiar de modelo a mitad de tarea. Cerramos probando modelos locales.
 
 <p class="guia__nota">Dura 20 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -19,21 +19,9 @@ todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuán
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
 - **Pi es el harness:** El modelo lo pones tú — Conectar, elegir, ajustar cuánto piensa y saber lo que cuesta.
-- **Cómo conectar un modelo**
-  - `/login` · Suscripción: ChatGPT, Claude, Copilot…
-  - `KEY` · Clave de API: /login o variable de entorno
-  - `GGUF` · Modelo local: router de llama.cpp
-- **Y dos casos menos habituales**
-  - `models.json` · Endpoint compatible: Ollama, LM Studio, proxies…
-  - `extensión` · Proveedor propio: protocolo o autenticación especial
 - *En terminal:* Dónde busca Pi las credenciales (más abajo, en «Código y comandos»)
 - *En terminal:* auth.json · la clave, obtenida con un comando (más abajo, en «Código y comandos»)
 - *En terminal:* Comprobar un proveedor (más abajo, en «Código y comandos»)
-- **Proveedores de la demo**
-  - `deepseek` · DeepSeek: Flash y V4 Pro
-  - `openrouter` · OpenRouter: el de los vídeos 01–02
-  - `meta` · Meta: sin facturación: no se usa
-  - `ollama` · Ollama: local, sin cuenta
 
 ### 2 · El catálogo
 
@@ -48,9 +36,6 @@ todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuán
   - `✓` · Fiabilidad: recuerda los 429
 - *En terminal:* El catálogo (más abajo, en «Código y comandos»)
 - **Antes de abrir cuenta:** pi.dev/models — Proveedores, identificadores, capacidades, límites y precios.
-- **Dos columnas que se confunden**
-  - `context` · Ventana de contexto: todo lo que ve en una petición
-  - `max-out` · Salida máxima: lo que escribe en una respuesta
 - *En la demo:* El modelo local, declarado en models.json
 - **¿Falta un modelo?:** Probablemente falta la sesión de su proveedor — /model solo enseña proveedores con autenticación utilizable.
 
@@ -58,13 +43,6 @@ todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuán
 
 <p><button type="button" class="ir-a" data-t="339">▶ Ir a 5:39</button></p>
 
-- **/model**
-  - `Ctrl+L` · Abrir: el selector
-  - `Enter` · Esta sesión: el modelo elegido
-  - `Ctrl+S` · Predeterminado: para las nuevas
-- **Rotar**
-  - `Ctrl+P` · Siguiente: modelo
-  - `⇧Ctrl+P` · Anterior: modelo
 - *En la demo:* /scoped-models: tres de 408
 - *En terminal:* La rotación, guardada o al arrancar (más abajo, en «Código y comandos»)
 - *En terminal:* Elegir modelo desde la línea de comandos (más abajo, en «Código y comandos»)
@@ -74,13 +52,9 @@ todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuán
 
 <p><button type="button" class="ir-a" data-t="457">▶ Ir a 7:37</button></p>
 
-- **Niveles de razonamiento:** off → minimal → low → medium → high → xhigh → max
 - *En la demo:* Shift+Tab: de high a max
 - *En terminal:* El nivel, al arrancar (más abajo, en «Código y comandos»)
 - *En la demo:* Al volver a Flash: thinking off
-- **¿Cuánto razonamiento?**
-  - `↑` · Tareas difíciles: depurar, revisar
-  - `↓` · Tareas claras: editar, preguntar
 - *En la demo:* El razonamiento también se cobra
 
 ### 5 · Cambiar de modelo a mitad de tarea
@@ -104,17 +78,9 @@ todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuán
 - **llama.cpp en Pi:** llama-server (router de GGUF) → /login llama.cpp (conectar) → /llama (cargar y descargar) → /model (elegirlo)
 - *En terminal:* El router de llama.cpp (más abajo, en «Código y comandos»)
 - *En terminal:* /models.json de la demo (más abajo, en «Código y comandos»)
-- **apiKey en models.json**
-  - `"…"` · Texto: tal cual
-  - `$VAR` · Variable: de entorno
-  - `!cmd` · Comando: en cada petición
 - **modelOverrides:** Ajusta lo que el catálogo no sabe de tu modelo — Ventana de contexto real, duración de la caché…
 - *En la demo:* Llama 3.2 3B: rápido, gratis… y equivocado
 - *En la demo:* Lee el fichero y repite el error
-- **Lo que pide un agente**
-  - `1` · Instrucciones largas: seguirlas
-  - `2` · Herramientas: formato correcto
-  - `3` · Razonar: sobre lo que obtiene
 - *En terminal:* Fuera de cámara: Ministral 3 14B (razonamiento) en LM Studio (más abajo, en «Código y comandos»)
 - *En terminal:* models.json: Gemma 4 E4B servido por LM Studio (más abajo, en «Código y comandos»)
 - *En la demo:* Gemma 4 E4B: lee el fichero y acierta
@@ -133,12 +99,6 @@ todas las formas de conectar un modelo, cómo rotar entre varios y ajustar cuán
 - *En terminal:* Modo print, con modelo y nivel (más abajo, en «Código y comandos»)
 - *En la demo:* Una línea, correcta
 - *En terminal:* Al salir, Pi te dice cómo volver (más abajo, en «Código y comandos»)
-- **Recapitulando**
-  - `🔌` · Conectar: suscripción, clave, local, endpoint
-  - `↔` · Proveedor: mismo modelo, otros precios
-  - `Ctrl+P` · Rotar: /model · /scoped-models
-  - `$` · Coste: caché al cambiar
-- **Práctica:** scoped-models (barato y capaz) → Tarea + revisión (uno y otro) → /session (calcula el coste) → Local (ponlo a prueba)
 - **Próximo vídeo:** Seguridad y aislamiento — Sin permisos por defecto, confianza de proyecto y contenedores.
 
 ## Código y comandos

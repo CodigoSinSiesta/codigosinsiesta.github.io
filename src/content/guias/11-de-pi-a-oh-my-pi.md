@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 11 · De Pi a oh my pi"
-description: "qué hereda omp de Pi y qué añade, primer arranque e importación de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar."
+description: "Qué hereda omp de Pi y qué añade, primer arranque e importación de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar."
 ruta: "pi-oh-my-pi"
 orden: 11
 duracion: "24 min"
@@ -8,7 +8,7 @@ video: "11-de-pi-a-oh-my-pi.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/11-de-pi-a-oh-my-pi.es.vtt"
 ---
 
-qué hereda omp de Pi y qué añade, primer arranque e importación de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar.
+Qué hereda omp de Pi y qué añade, primer arranque e importación de la configuración de Claude Code o Codex. Una tabla para decidir cuál usar.
 
 <p class="guia__nota">Dura 24 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -28,50 +28,16 @@ qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 <p><button type="button" class="ir-a" data-t="123">▶ Ir a 2:03</button></p>
 
 - **oh my pi:** Un fork de Pi — Una copia del código que evoluciona por su cuenta. Binario: omp.
-- **Un fork sin ruptura**
-  - `sync` · Sigue a Pi: guía para traer cambios
-  - `MIT` · Stencil Labs: licencia MIT
-  - `Zechner` · Colaborador: el autor de Pi
-- **Otro motor**
-  - `Node` · Pi: TypeScript sobre Node
-  - `Bun + Rust` · oh my pi: búsqueda, terminal, shell, imágenes
-- **Por qué te importa**
-  - `binario` · Autónomo: sin Node ni Bun
-  - `bash` · Shell embebido: no es tu shell de siempre
 - **El rastro del origen:** pi-* · PI_* — Paquetes y variables que te sonarán del bloque B.
 
 ### 3 · Qué hereda y qué cambia de sitio
 
 <p><button type="button" class="ir-a" data-t="243">▶ Ir a 4:03</button></p>
 
-- **Se hereda tal cual**
-  - `bucle` · Steering y follow-up
-  - `JSONL` · Árbol de sesión
-  - `@` · Adjuntar ficheros
-  - `-p json rpc` · Modos y SDK: vídeo 10
-  - `skills` · Bajo demanda
-  - `tool_call` · Extensiones: vídeo 08
-- **Cambia de sitio**
-  - `config.yml` · YAML: ~/.omp/agent
-  - `agent.db` · SQLite: varias cuentas
-  - `glob` · Antes find
-- **Si vienes de Pi:** Tu .pi no se traslada — Ajustes, prompt templates y el /review del vídeo 06 no los verá oh my pi.
-- **Extensiones de Pi:** Adaptadores — Reescribe sus imports y acepta el manifiesto de Pi. Lo probamos en el vídeo 20.
 - **Si algo no está donde esperas**
   - `1` · Cambió de nombre
   - `2` · Cambió de formato
   - `3` · Ya viene integrado
-- **El bloque C**
-  - `12` · TUI y sesiones
-  - `13` · Contexto
-  - `14` · Modelos
-  - `15` · Planificar
-  - `16` · Subagentes
-  - `17` · IDE
-  - `18` · Git
-  - `19` · Aprobaciones
-  - `20` · Extender
-  - `21` · Programático
 
 ### 4 · Instalar y arrancar en un perfil aislado
 
@@ -80,31 +46,24 @@ qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 - *En terminal:* Instalar y actualizar oh my pi (más abajo, en «Código y comandos»)
 - *En la demo:* omp --version · omp --help
 - *En terminal:* Piezas opcionales (más abajo, en «Código y comandos»)
-- **--profile:** Perfiles aislados — Ajustes, credenciales, sesiones y cachés propios. Grabamos con el perfil demo.
-- **Cuidado:** PI_CODING_AGENT_DIR — El perfil por defecto la respeta; los perfiles con nombre la ignoran.
 - *En la demo:* El perfil demo
 - *En la demo:* Setup step 1 of 5
 - *En la demo:* Esc para saltar
 
 ### 5 · Dentro por primera vez
 
-<p><button type="button" class="ir-a" data-t="617">▶ Ir a 10:17</button></p>
+<p><button type="button" class="ir-a" data-t="609">▶ Ir a 10:09</button></p>
 
 - *En la demo:* Setup step 2 of 5
 - *En la demo:* Setup step 4 of 5
-- *En la demo:* La línea de estado
+- *En la demo:* Conversación, línea de estado y editor
 - *En la demo:* Primera petición
 - **Coste:** Poco, pero no gratis — Avisaremos cada vez que algo llame al modelo.
 
 ### 6 · Cuatro comandos para orientarte
 
-<p><button type="button" class="ir-a" data-t="713">▶ Ir a 11:53</button></p>
+<p><button type="button" class="ir-a" data-t="705">▶ Ir a 11:45</button></p>
 
-- **Cuatro comandos**
-  - `/changelog` · Qué cambió
-  - `/hotkeys` · El teclado
-  - `/tools` · Herramientas
-  - `/settings` · Ajustes
 - *En la demo:* /changelog last 2
 - *En la demo:* /changelog full
 - *En la demo:* /hotkeys
@@ -118,64 +77,28 @@ qué hereda omp de Pi y qué añade, primer arranque e importación de la config
 
 ### 7 · La configuración en capas
 
-<p><button type="button" class="ir-a" data-t="926">▶ Ir a 15:26</button></p>
+<p><button type="button" class="ir-a" data-t="915">▶ Ir a 15:15</button></p>
 
-- **Dónde se escribe**
-  - `global` · Tu perfil: /settings y config set
-  - `.omp/config.yml` · Proyecto: solo en la carpeta de arranque
-  - `--config` · Una ejecución: no se guarda
 - **Prioridad, de menor a mayor:** Fábrica → Global → Proyecto → --config → CLI → Entorno
 - *En terminal:* omp config desde la terminal (más abajo, en «Código y comandos»)
-- **Un consejo**
-  - `global` · Lo tuyo: tema y atajos
-  - `repo` · Lo del proyecto: aprobaciones, modelos; se versiona
 - *En la demo:* El perfil, aislado
 
 ### 8 · Si vienes de Claude Code o de Codex
 
-<p><button type="button" class="ir-a" data-t="1053">▶ Ir a 17:33</button></p>
+<p><button type="button" class="ir-a" data-t="1042">▶ Ir a 17:22</button></p>
 
 - **Vídeo 01:** Lee Claude Code y Codex — Es verdad, con un matiz importante.
-- **Proyecto: se lee por defecto**
-  - `.omp` · La suya
-  - `.claude…` · Otras herramientas: .codex, .gemini
-  - `Cursor…` · Reglas: Windsurf, Cline, Copilot
-- **Usuario: al revés:** enabledProviders — Tu configuración personal de otras herramientas no se carga hasta que la activas.
 - *En la demo:* .claude/commands/resumen-envio.md
 - *En la demo:* /resumen-envio
 - *En terminal:* Traerte conversaciones (solo diapositiva) (más abajo, en «Código y comandos»)
 - **Excepción:** .claude/agents se ignora — Los subagentes de oh my pi viven en .omp/agents (vídeo 16).
-- **El apunte honesto**
-  - `/trust` · No existe: el repo carga al arrancar
-  - `yolo` · Por defecto: no pregunta
-  - `revisar` · .omp y .claude: o un contenedor
 
 ### 9 · Pi frente a oh my pi, y cierre
 
-<p><button type="button" class="ir-a" data-t="1232">▶ Ir a 20:32</button></p>
+<p><button type="button" class="ir-a" data-t="1221">▶ Ir a 20:21</button></p>
 
 - **La tabla:** Pi frente a oh my pi — Fila a fila.
-- **Pi frente a oh my pi**
-  - `Origen` · Original · fork 2026
-  - `Motor` · Node · Bun + Rust
-  - `Config` · JSON · YAML y perfiles
-  - `Credenciales` · JSON · SQLite multicuenta
-- **Pi frente a oh my pi**
-  - `Herramientas` · 4 · ~30 (12 activas)
-  - `Comandos` · ~25 · 85
-  - `Subagentes` · Ejemplo · de serie
-- **Pi frente a oh my pi**
-  - `Seguridad` · /trust · aprobaciones (yolo)
-  - `Otros agentes` · AGENTS/CLAUDE · media docena
 - **Lo que se mantiene:** Todo el bloque B sigue valiendo — Bucle, árbol de sesión, modos, SDK, skills y extensiones.
-- **¿Cuál elegir?**
-  - `Pi` · Entender y controlar: contexto pequeño, tu propio harness
-  - `omp` · Taller completo: superficie grande
-- **Repaso**
-  - `fork` · Bun + Rust
-  - `yml` · Config y SQLite
-  - `--profile` · Perfiles
-- **La práctica:** Un perfil (--profile) → /settings (diez minutos leyendo) → Tu repo (qué recoge solo)
 - **Próximo vídeo:** La TUI y las sesiones — Rebobinar, bifurcar y navegar el árbol: /branch, /fork y /tree.
 
 ## Código y comandos
@@ -313,7 +236,7 @@ Lo que añade lo iremos desmontando en este bloque, una pieza por vídeo. La int
 
 Instalar oh my pi es una línea. En macOS y Linux, curl contra o eme pe punto ese hache barra install, con una tubería a ese hache. En Windows, el equivalente en PowerShell, y la web destaca que funciona en Windows de forma nativa, sin WSL. También hay fórmula de Homebrew y paquete de Bun. Para actualizar, o eme pe update, y con guion guion check solo comprueba si hay versión nueva.
 
-En nuestro equipo ya está instalado, así que no ejecutamos el instalador delante de la cámara. Comprobamos la versión con o eme pe guion guion version: dieciocho punto seis punto uno, la última cuando grabamos. oh my pi publica versiones muy a menudo, así que es normal que veas un número más alto. Por eso en este curso actualizamos antes de cada vídeo y leemos el changelog.
+En nuestro equipo ya está instalado, así que no ejecutamos el instalador delante de la cámara. Comprobamos que responde con o eme pe guion guion version. oh my pi publica versiones muy a menudo, así que conviene actualizar con frecuencia y leer el changelog.
 
 Hay piezas opcionales que no vienen en la instalación básica, como el entorno de Python para la herramienta que ejecuta código, o los modelos locales de voz. Se instalan con o eme pe setup, seguido de python o de speech. Y con guion guion check, o eme pe setup solo te dice qué falta, sin instalar nada. Para este vídeo no necesitamos ninguna.
 
@@ -341,7 +264,7 @@ Una petición así cuesta muy poco, pero no es gratis. A partir de aquí, cada v
 
 Con el agente en marcha, cuatro comandos para orientarte el primer día. Ninguno llama al modelo y ninguno enseña datos tuyos, así que puedes probarlos tranquilo en cualquier perfil.
 
-El primero, barra changelog. Muestra las novedades de la versión. Con last y un número, solo las últimas entradas; con full, todas. Barra changelog last dos nos enseña la dieciocho punto seis punto cero y la dieciocho punto seis punto uno, de los días tres y cuatro de octubre: mejoras en la vista de roles de barra models, correcciones en la edición anclada y en barra by the way.
+El primero, barra changelog. Muestra las novedades de la versión. Con last y un número, solo las últimas entradas; con full, todas. Barra changelog last dos nos enseña las dos últimas, de los días tres y cuatro de octubre: mejoras en la vista de roles de barra models, correcciones en la edición anclada y en barra by the way.
 
 Al arrancar después de una actualización, oh my pi ya te enseña un resumen, y eso se controla con un ajuste, startup punto changelog mode. Merece la pena leerlo: en una herramienta que publica casi a diario, es la forma de enterarte de que algo ha cambiado.
 

@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 03 · Pi por dentro"
-description: "qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un árbol que se puede rebobinar, bifurcar y compactar sin perder nada."
+description: "Qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un árbol que se puede rebobinar, bifurcar y compactar sin perder nada."
 ruta: "pi-oh-my-pi"
 orden: 3
 duracion: "23 min"
@@ -8,7 +8,7 @@ video: "03-pi-por-dentro.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/03-pi-por-dentro.es.vtt"
 ---
 
-qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un árbol que se puede rebobinar, bifurcar y compactar sin perder nada.
+Qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un árbol que se puede rebobinar, bifurcar y compactar sin perder nada.
 
 <p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -19,17 +19,8 @@ qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
 - **Hoy abrimos la tapa:** El bucle (turno a turno) → El contexto (qué ve el modelo) → La sesión (un árbol) → Compactar (cuando no cabe)
-- **Cambio de modelo**
-  - `01–02` · Qwen 3.8 27B: gratuito · errores 429
-  - `03→` · DeepSeek Flash: de pago, muy barato · high
-- **Una petición al modelo:** Prompt de sistema (instrucciones) → Rama activa (la historia) → Herramientas (definiciones) → Ajustes (razonamiento…)
-- **Un turno:** Streaming (texto y llamadas) → Herramientas (Pi las ejecuta) → Resultados (se registran) → ¿Otro turno? (si hay que verlos)
 - *En la demo:* Una tarea, muchas peticiones
 - *En la demo:* Con un modelo de pago, el pie muestra el coste
-- **Entre turno y turno**
-  - `∥` · En paralelo: varias herramientas a la vez
-  - `Enter` · Steering: al acabar el turno
-  - `Alt+Enter` · Follow-up: sin trabajo pendiente
 - **Errores del proveedor:** Pi espera y reintenta: retrying 2/3 — Los intentos fallidos quedan en la sesión, marcados para que el modelo no los vea.
 - **Recuperación por desbordamiento:** ¿No cabe en la ventana? Compacta y reintenta una vez — Por eso a veces aparece una compactación que no pediste.
 
@@ -42,35 +33,13 @@ qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un 
   - `repo` · AGENTS.md del proyecto: y de las carpetas superiores
   - `~` · AGENTS.md global: del directorio del agente
 - *En terminal:* El prompt de sistema de Pi (guardado en la sesión) (más abajo, en «Código y comandos»)
-- **Cambiar el prompt de sistema**
-  - `SYSTEM.md` · Sustituye: el prompt entero
-  - `APPEND_SYSTEM.md` · Añade: texto al final
-- **02 · Las herramientas: cuatro de serie**
-  - `read` · Leer: ficheros e imágenes, por trozos
-  - `bash` · Ejecutar: comandos en la carpeta de trabajo
-  - `edit` · Editar: reemplazos exactos de texto
-  - `write` · Escribir: crear o reescribir un fichero
-  - *Cada petición lleva el nombre, la descripción y los parámetros de cada una.*
-- **Herramientas frente a skills**
-  - `tools` · Definición completa: en cada petición, siempre
-  - `skills` · Solo la descripción: las instrucciones, cuando el modelo decide usarlas
-- **03 · La conversación:** Lo que hay en el fichero no es lo que ve el modelo — Solo viaja la rama activa. Las ramas abandonadas se quedan en el fichero.
-- **04 · Lo que añades tú**
-  - `/tpl` · Plantillas: se expanden antes
-  - `@` · Ficheros e imágenes: entran en el mensaje
-  - `!` · Salida de comandos: también es contexto
 - **Todo queda guardado:** El principio de la conversación es lo que está en caché — La primera petición guarda el prompt completo; los cambios, solo como diferencia.
-- **Cómo verlo con tus ojos**
-  - `/session` · Totales: mensajes, herramientas, tokens
-  - `JSONL` · Detalle: el prompt y cada mensaje
-  - `/export` · Lectura cómoda: una página HTML
 
 ### 3 · La sesión es un árbol
 
 <p><button type="button" class="ir-a" data-t="363">▶ Ir a 6:03</button></p>
 
 - *En terminal:* ~/.pi/agent/sessions/--…-csn-tienda--/ _ .jsonl (más abajo, en «Código y comandos»)
-- **Un árbol con id y parentId:** Raíz (cabecera) → Entradas (cada una con su padre) → Hoja (donde estás) → Rama activa (de la hoja a la raíz)
 - *En la demo:* /name precios: el nombre, en el pie
 - *En la demo:* Los tipos de entrada de la sesión
 - *En la demo:* Cada entrada apunta a su padre
@@ -86,11 +55,6 @@ qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un 
 - **Aviso:** /tree mueve la conversación, no tus ficheros — Tu control de versiones es git; el árbol de Pi es la memoria de la conversación.
 - *En la demo:* La opción A, a salvo en git
 - *En la demo:* /tree: el árbol de la sesión
-- **Filtros y etiquetas en /tree**
-  - `Ctrl+T` · Sin resultados: de herramientas
-  - `Ctrl+U` · Solo tus: mensajes
-  - `⇧L` · Etiqueta: la entrada
-  - `Esc Esc` · Abre /tree: con el editor vacío
 - *En la demo:* «Summarize branch?»
 - **Otra forma de moverse:** Elige una respuesta y sigue desde ahí — Pi te coloca justo después, con el editor vacío.
 - *En la demo:* El resumen de rama, en el punto de vuelta
@@ -104,32 +68,16 @@ qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un 
 
 <p><button type="button" class="ir-a" data-t="783">▶ Ir a 13:03</button></p>
 
-- **Otro fichero de sesión**
-  - `/fork` · Desde un mensaje: empieza de nuevo aparte
-  - `/clone` · Copia la rama: tal como está
 - *En la demo:* /fork: elige el mensaje
 - *En la demo:* Forked to new session
 - *En la demo:* Una sesión nueva, casi vacía
 - *En la demo:* /resume: las sesiones de la carpeta
-- **Atajos de /resume**
-  - `Tab` · Carpeta o todas: el ámbito
-  - `Ctrl+N` · Con nombre: solo esas
-  - `Ctrl+R` · Renombrar: la sesión
-  - `Ctrl+D` · Borrar: con trash, reversible
 - *En terminal:* La sesión original y su clon (más abajo, en «Código y comandos»)
-- **Tres formas de ramificar**
-  - `/tree` · Mismo fichero: alternativas juntas
-  - `/fork` · Fichero nuevo: desde un mensaje anterior
-  - `/clone` · Copia independiente: del estado actual
 
 ### 6 · La compactación
 
 <p><button type="button" class="ir-a" data-t="920">▶ Ir a 15:20</button></p>
 
-- **Cuándo compacta Pi**
-  - `ventana − reserva` · Umbral: contexto por encima
-  - `16.384` · Reserva: para la respuesta
-  - `20.000` · Se conservan: tokens recientes, sin resumir
 - *En la demo:* No es un fallo: no hay nada antiguo que resumir
 - *En terminal:* Ajustes de la demo: /settings.json (más abajo, en «Código y comandos»)
 - *En la demo:* Compacted from 8,927 tokens
@@ -140,10 +88,6 @@ qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un 
 - **Un error sutil:** El modelo obedece aunque no tenga el material — Quien leyera solo el resumen creería que probamos dos tipos de IVA.
 - *En la demo:* Acierta con el resumen de rama y lo reciente
 - *En la demo:* Ficheros leídos y modificados, acumulados
-- **Lecciones**
-  - `Ctrl+O` · Revisa el resumen: se lee en un minuto
-  - `/compact …` · Instrucciones: solo para lo que se resume
-  - `git` · Decisiones en ficheros: código, pruebas y commits
 - **Y una cuarta**
   - `/model` · Un modelo mejor: justo antes de compactar
   - `modelOverrides` · Márgenes por modelo: 200k no es 1M
@@ -160,7 +104,6 @@ qué pasa en cada turno y qué recibe exactamente el modelo. La sesión como un 
   - `🌳` · Árbol JSONL: tree · fork · clone · resume
   - `⇣` · Compactación: resume lo antiguo, a veces mal
 - **Una sola idea:** La conversación es memoria de trabajo; la verdad vive en el repositorio — Código, pruebas y git.
-- **Práctica:** Cambio (y rama de git) → /tree (alternativa + resumen) → Compactar (con instrucciones) → Ctrl+O (busca lo falso)
 - *En terminal:* Para ir más allá (más abajo, en «Código y comandos»)
 - **Próximo vídeo:** Modelos y proveedores — Varios proveedores, cambiar a mitad de tarea, modelos locales y costes.
 

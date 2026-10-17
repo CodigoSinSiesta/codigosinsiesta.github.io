@@ -1,0 +1,1701 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.472 --> 00:00:14.045
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.085 --> 00:00:17.400
+Vídeo veintitrés: el repo
+como sistema de registro.
+
+3
+00:00:23.349 --> 00:00:25.280
+Empecemos con una pregunta incómoda.
+
+4
+00:00:25.320 --> 00:00:29.340
+Si mañana cierras la terminal, ¿dónde está
+el estado de lo que estabas haciendo con
+
+5
+00:00:29.380 --> 00:00:33.432
+el agente? Qué funcionalidades están
+terminadas, cuál quedó a medias,
+
+6
+00:00:33.472 --> 00:00:37.260
+por qué elegiste una solución
+y no otra, qué falta probar.
+
+7
+00:00:37.300 --> 00:00:42.370
+Si la respuesta es en la conversación, lo
+tienes en el sitio más frágil de todos.
+
+8
+00:00:43.230 --> 00:00:45.100
+Recuerda lo que hemos ido viendo.
+
+9
+00:00:45.140 --> 00:00:49.580
+En el vídeo tres, la compactación de
+Pi escribió un resumen que contaba otra
+
+10
+00:00:49.620 --> 00:00:54.160
+historia, y sacamos una lección: las
+decisiones de verdad tienen que vivir en
+
+11
+00:00:54.200 --> 00:00:59.490
+ficheros. En el doce, las sesiones de oh
+my pi son ficheros JSONL en la carpeta de
+
+12
+00:00:59.530 --> 00:01:01.668
+tu perfil, no en tu proyecto.
+
+13
+00:01:01.708 --> 00:01:06.270
+En el trece, barra handoff y la memoria,
+que son útiles, pero son resúmenes y
+
+14
+00:01:06.310 --> 00:01:08.020
+pistas, no la verdad.
+
+15
+00:01:08.714 --> 00:01:12.830
+Learn Harness Engineering, el curso
+de WalkingLab con licencia MIT que nos
+
+16
+00:01:12.870 --> 00:01:16.781
+acompaña en este bloque, lo resume
+en una idea de su tercera lección:
+
+17
+00:01:16.821 --> 00:01:20.715
+lo que no está en el repositorio
+no existe para el agente.
+
+18
+00:01:20.755 --> 00:01:25.578
+Un agente tiene tres entradas: el prompt
+y la tarea, los ficheros del repositorio,
+
+19
+00:01:25.618 --> 00:01:27.694
+y la salida de sus herramientas.
+
+20
+00:01:27.734 --> 00:01:32.060
+Tu cabeza, el chat del equipo y la
+sesión de ayer no están en esa lista.
+
+21
+00:01:33.096 --> 00:01:38.089
+Por eso este vídeo va de convertir el
+repositorio en el sistema de registro:
+
+22
+00:01:38.129 --> 00:01:41.615
+el sitio donde vive, con
+autoridad, el estado del trabajo.
+
+23
+00:01:41.655 --> 00:01:44.907
+No el código, que ya vive
+ahí, sino todo lo demás:
+
+24
+00:01:44.947 --> 00:01:48.815
+qué hay que hacer, en qué punto
+estamos, cómo se arranca y se comprueba,
+
+25
+00:01:48.855 --> 00:01:51.140
+y qué tiene que saber la siguiente sesión.
+
+26
+00:01:51.892 --> 00:01:54.900
+Y la prueba de fuego la
+haremos con dos agentes.
+
+27
+00:01:54.940 --> 00:01:59.340
+Una sesión de Pi trabajará en la
+tienda y dejará una tarea a medias.
+
+28
+00:01:59.490 --> 00:02:03.890
+Después, una sesión nueva de oh my pi,
+con otro modelo y sin ninguna conversación
+
+29
+00:02:03.930 --> 00:02:07.700
+previa, tendrá que retomarla
+leyendo solo el repositorio.
+
+30
+00:02:13.507 --> 00:02:17.460
+En el vídeo veintidós presentamos el
+segundo mapa de Learn Harness Engineering,
+
+31
+00:02:17.500 --> 00:02:21.800
+el del repositorio, con cinco
+piezas: instrucciones, estado,
+
+32
+00:02:21.840 --> 00:02:25.920
+verificación, alcance y
+ciclo de vida de la sesión.
+
+33
+00:02:25.972 --> 00:02:28.110
+Prometimos que era el mapa de este vídeo.
+
+34
+00:02:28.150 --> 00:02:31.600
+Cada pieza es un fichero o una
+costumbre, y hoy vamos a montarlas.
+
+35
+00:02:32.696 --> 00:02:36.981
+Las instrucciones ya las tienes:
+el AGENTS punto md del vídeo seis.
+
+36
+00:02:37.021 --> 00:02:41.010
+El estado será un fichero de progreso
+y una lista de funcionalidades.
+
+37
+00:02:41.050 --> 00:02:45.083
+El alcance, una regla sencilla:
+una funcionalidad cada vez.
+
+38
+00:02:45.123 --> 00:02:48.581
+El ciclo de vida, un script de
+arranque, una rutina de entrada,
+
+39
+00:02:48.621 --> 00:02:51.441
+una de salida y un documento de traspaso.
+
+40
+00:02:51.481 --> 00:02:55.280
+Y la verificación la nombramos hoy, pero
+es el tema entero del próximo vídeo.
+
+41
+00:02:56.227 --> 00:03:00.356
+En el vídeo seis hicimos la prueba de la
+sesión nueva, con sus cinco preguntas:
+
+42
+00:03:00.396 --> 00:03:03.645
+qué es el proyecto, cómo está
+organizado, cómo se arranca,
+
+43
+00:03:03.685 --> 00:03:06.180
+cómo se verifica y en qué punto está.
+
+44
+00:03:06.233 --> 00:03:10.514
+Nuestro AGENTS punto md estaba pensado
+para responder a las cuatro primeras.
+
+45
+00:03:10.554 --> 00:03:15.080
+La quinta es la que hoy nos importa,
+porque es la única que cambia cada día.
+
+46
+00:03:15.755 --> 00:03:18.653
+Lo comprobamos en la tienda,
+tal como quedó en master.
+
+47
+00:03:18.693 --> 00:03:23.160
+En modo print, sin sesión, le pedimos a
+Pi que no edite nada y conteste las cinco
+
+48
+00:03:23.200 --> 00:03:28.198
+preguntas. Qué es, cómo está organizada,
+cómo se arranca y cómo se prueba,
+
+49
+00:03:28.238 --> 00:03:29.780
+lo saca del AGENTS punto md.
+
+50
+00:03:29.820 --> 00:03:34.538
+Pero en qué punto está el trabajo
+lo deduce del historial de git:
+
+51
+00:03:34.578 --> 00:03:38.300
+árbol limpio, el último commit y
+lo que añadieron los anteriores.
+
+52
+00:03:38.741 --> 00:03:41.600
+Y un historial dice lo que
+se hizo, no lo que falta.
+
+53
+00:03:42.635 --> 00:03:44.853
+Esa es la carencia que vamos a cubrir.
+
+54
+00:03:44.893 --> 00:03:49.480
+Cuatro ficheros, más un quinto cuando haga
+falta, que cualquier agente pueda leer al
+
+55
+00:03:49.520 --> 00:03:51.520
+empezar y actualizar al terminar.
+
+56
+00:03:57.350 --> 00:04:00.571
+Learn Harness Engineering trae
+una biblioteca de plantillas,
+
+57
+00:04:00.611 --> 00:04:04.238
+y su guía dice qué copiar primero:
+el fichero de instrucciones,
+
+58
+00:04:04.278 --> 00:04:09.342
+un script de arranque, un fichero de
+progreso y una lista de funcionalidades.
+
+59
+00:04:09.382 --> 00:04:14.300
+El traspaso y una lista de comprobación de
+estado limpio se añaden cuando el proyecto
+
+60
+00:04:14.607 --> 00:04:18.120
+crece. Nosotros partimos de esas
+plantillas, con copyright de WalkingLab de
+
+61
+00:04:18.160 --> 00:04:23.109
+dos mil veinticinco y licencia MIT, las
+adaptamos a la tienda y las traducimos,
+
+62
+00:04:23.149 --> 00:04:27.470
+y lo dejamos dicho en los créditos, en el
+propio AGENTS punto md y con el texto de
+
+63
+00:04:27.510 --> 00:04:28.860
+la licencia en la rama.
+
+64
+00:04:30.007 --> 00:04:31.702
+Un detalle sobre los nombres.
+
+65
+00:04:31.742 --> 00:04:35.672
+La plantilla de progreso se
+llama claude progress punto md,
+
+66
+00:04:35.712 --> 00:04:39.880
+y la propia plantilla explica que es un
+nombre histórico y que vale para cualquier
+
+67
+00:04:39.920 --> 00:04:43.452
+agente. Añade algo importante:
+ningún agente lo actualiza solo.
+
+68
+00:04:43.492 --> 00:04:47.268
+Funciona porque las instrucciones del
+repositorio le dicen que lo lea al empezar
+
+69
+00:04:47.308 --> 00:04:52.059
+y lo actualice al terminar. Por eso
+nosotros usamos nombres en español:
+
+70
+00:04:52.099 --> 00:04:57.650
+funcionalidades punto json, progreso punto
+md, init punto sh y traspaso punto md.
+
+71
+00:04:57.690 --> 00:05:01.460
+El nombre da igual; lo que importa
+es que AGENTS punto md los nombre.
+
+72
+00:05:02.355 --> 00:05:04.339
+Esta idea no es solo de WalkingLab.
+
+73
+00:05:04.379 --> 00:05:08.540
+Anthropic publicó en noviembre de dos mil
+veinticinco un artículo sobre agentes que
+
+74
+00:05:08.580 --> 00:05:10.700
+trabajan durante muchas sesiones.
+
+75
+00:05:10.740 --> 00:05:14.660
+Su primera sesión, a la que llaman
+inicializador, no escribe código de
+
+76
+00:05:14.700 --> 00:05:18.430
+producto: deja una lista de más
+de doscientas funcionalidades,
+
+77
+00:05:18.470 --> 00:05:22.410
+todas marcadas como pendientes, un script
+de arranque, un fichero de progreso y un
+
+78
+00:05:22.450 --> 00:05:25.877
+primer commit. Cada sesión
+siguiente empieza igual:
+
+79
+00:05:25.917 --> 00:05:30.903
+confirma la carpeta, lee el historial y el
+progreso, elige la siguiente funcionalidad
+
+80
+00:05:30.943 --> 00:05:33.500
+y comprueba que lo básico
+funciona antes de tocar nada.
+
+81
+00:05:34.520 --> 00:05:37.588
+Learn Harness Engineering lo
+convierte en un principio:
+
+82
+00:05:37.628 --> 00:05:40.775
+la inicialización es una fase propia.
+
+83
+00:05:40.815 --> 00:05:44.890
+Su sexta lección lo explica así: si
+mezclas montar el entorno con escribir
+
+84
+00:05:44.930 --> 00:05:48.378
+funcionalidades, el agente
+prioriza el código, porque se ve,
+
+85
+00:05:48.418 --> 00:05:53.060
+y descuida la infraestructura, cuyo valor
+solo aparece en la siguiente sesión.
+
+86
+00:05:53.793 --> 00:05:55.967
+¿Cuándo está bien
+inicializado un repositorio?
+
+87
+00:05:56.007 --> 00:06:00.323
+Con cuatro condiciones: se
+puede arrancar, se puede probar,
+
+88
+00:06:00.363 --> 00:06:03.265
+se ve el progreso y se puede retomar.
+
+89
+00:06:03.305 --> 00:06:06.188
+Fíjate en que ninguna
+habla de cuánto código hay.
+
+90
+00:06:06.228 --> 00:06:10.580
+Hablan de si una sesión que no sabe nada
+puede ponerse a trabajar sin adivinar.
+
+91
+00:06:11.465 --> 00:06:14.013
+Y hay una condición simétrica
+para el final de cada sesión,
+
+92
+00:06:14.053 --> 00:06:16.620
+que el curso llama estado limpio.
+
+93
+00:06:16.660 --> 00:06:19.830
+Su lista de comprobación es corta: el
+arranque estándar sigue funcionando,
+
+94
+00:06:19.870 --> 00:06:23.210
+la verificación sigue pasando,
+el progreso está apuntado,
+
+95
+00:06:23.250 --> 00:06:26.450
+la lista refleja lo que pasa de
+verdad y no lo que se espera,
+
+96
+00:06:26.490 --> 00:06:30.060
+no queda ningún paso a medias sin anotar,
+y la siguiente sesión puede seguir sin
+
+97
+00:06:30.100 --> 00:06:31.380
+arreglos manuales.
+
+98
+00:06:37.186 --> 00:06:40.880
+Empecemos por la pieza más nueva,
+la lista de funcionalidades.
+
+99
+00:06:40.920 --> 00:06:44.810
+Para Learn Harness Engineering no es
+una lista de tareas para personas,
+
+100
+00:06:44.850 --> 00:06:46.660
+sino una estructura del harness.
+
+101
+00:06:46.700 --> 00:06:51.500
+Cada entrada tiene tres partes: un
+comportamiento, que dice qué tiene que
+
+102
+00:06:51.624 --> 00:06:54.490
+pasar; una verificación,
+que dice cómo se comprueba;
+
+103
+00:06:54.530 --> 00:06:58.340
+y un estado. Si falta una de
+las tres, la entrada no sirve.
+
+104
+00:06:59.300 --> 00:07:03.551
+Los estados de la plantilla son
+cuatro: sin empezar, en curso,
+
+105
+00:07:03.591 --> 00:07:08.730
+bloqueada y pasa. Y tiene dos reglas
+que valen más que todo lo demás.
+
+106
+00:07:08.770 --> 00:07:11.522
+Solo puede haber una
+funcionalidad en curso a la vez.
+
+107
+00:07:11.562 --> 00:07:15.920
+Y una funcionalidad solo pasa a pasa
+cuando la verificación se ha ejecutado de
+
+108
+00:07:15.960 --> 00:07:19.707
+verdad y la evidencia está
+anotada: el comando y lo que salió.
+
+109
+00:07:19.747 --> 00:07:21.480
+Que el código esté escrito no cuenta.
+
+110
+00:07:22.593 --> 00:07:27.586
+Nuestra lista tiene tres entradas,
+todas en un fichero nuevo de la tienda,
+
+111
+00:07:27.626 --> 00:07:32.490
+ticket punto js. La primera, formatear
+euros, que devuelve un importe con dos
+
+112
+00:07:32.530 --> 00:07:35.546
+decimales, coma y el símbolo del euro.
+
+113
+00:07:35.586 --> 00:07:39.910
+La segunda, línea de ticket, que
+escribe una línea con la cantidad,
+
+114
+00:07:39.950 --> 00:07:41.880
+el nombre, el precio y el
+
+115
+00:07:42.582 --> 00:07:47.537
+importe. La tercera, ticket, que monta el
+texto completo con el envío y el total.
+
+116
+00:07:47.577 --> 00:07:52.000
+Cada una cabe en una sesión, que es la
+granularidad que recomienda el curso.
+
+117
+00:07:52.616 --> 00:07:55.310
+La granularidad importa
+más de lo que parece.
+
+118
+00:07:55.350 --> 00:07:58.822
+Una entrada como implementar
+el ticket es demasiado grande:
+
+119
+00:07:58.862 --> 00:08:01.970
+no se termina en una sesión
+y nunca llega a pasar.
+
+120
+00:08:02.010 --> 00:08:05.837
+Una como crear la variable del
+total es demasiado pequeña,
+
+121
+00:08:05.877 --> 00:08:07.995
+y la lista se convierte en burocracia.
+
+122
+00:08:08.035 --> 00:08:12.850
+Y el estado bloqueada no es un fracaso:
+es la forma honesta de decir que algo no
+
+123
+00:08:12.890 --> 00:08:15.980
+puede avanzar, con el
+motivo escrito en las notas.
+
+124
+00:08:16.619 --> 00:08:19.210
+¿Por qué en JSON y no en
+una lista en markdown?
+
+125
+00:08:19.250 --> 00:08:22.986
+Por dos razones. La primera es
+que se puede leer con un programa:
+
+126
+00:08:23.026 --> 00:08:27.780
+init punto sh, una consulta de jota cu
+o una extensión pueden saber cuál es la
+
+127
+00:08:27.820 --> 00:08:29.810
+siguiente sin preguntarle a nadie.
+
+128
+00:08:29.850 --> 00:08:32.127
+La segunda la cuenta
+Anthropic en su artículo:
+
+129
+00:08:32.167 --> 00:08:36.148
+el modelo tiende menos a cambiar o
+sobrescribir un JSON que un markdown,
+
+130
+00:08:36.188 --> 00:08:39.920
+y por eso pedían a las sesiones que
+solo tocaran el campo que dice si pasa.
+
+131
+00:08:40.826 --> 00:08:42.780
+Y aquí va el primer apunte honesto.
+
+132
+00:08:42.820 --> 00:08:46.780
+Learn Harness Engineering insiste en que
+el paso a pasa no lo decide el agente,
+
+133
+00:08:46.820 --> 00:08:50.970
+sino el harness: el agente pide la
+verificación, y es otra pieza la que la
+
+134
+00:08:51.010 --> 00:08:55.780
+ejecuta y cambia el estado. En nuestra
+demo, ese paso lo da el propio agente,
+
+135
+00:08:55.820 --> 00:08:57.670
+porque AGENTS punto md se lo pide.
+
+136
+00:08:57.710 --> 00:08:59.670
+Es una instrucción, no una puerta.
+
+137
+00:08:59.710 --> 00:09:04.190
+De cómo convertir una instrucción en una
+comprobación hablaremos en el próximo
+
+138
+00:09:04.230 --> 00:09:05.130
+vídeo.
+
+139
+00:09:09.991 --> 00:09:12.269
+El fichero de progreso tiene dos partes.
+
+140
+00:09:12.309 --> 00:09:16.610
+Arriba, el estado verificado: dónde
+está el repositorio, cómo se arranca,
+
+141
+00:09:16.650 --> 00:09:21.539
+cómo se verifica, cuál es la siguiente
+funcionalidad y si hay algún bloqueo.
+
+142
+00:09:21.579 --> 00:09:24.694
+Debajo, un registro con
+una entrada por sesión:
+
+143
+00:09:24.734 --> 00:09:28.870
+objetivo, lo completado, qué
+verificación se ejecutó, la evidencia,
+
+144
+00:09:28.910 --> 00:09:32.020
+los commits, los riesgos
+y el siguiente paso.
+
+145
+00:09:32.724 --> 00:09:34.715
+Fíjate en la palabra verificado.
+
+146
+00:09:34.755 --> 00:09:39.060
+El estado de arriba no es lo que el
+agente cree, sino lo que comprobó.
+
+147
+00:09:39.100 --> 00:09:42.090
+Es la misma idea de la definición
+de hecho del vídeo seis,
+
+148
+00:09:42.130 --> 00:09:44.290
+aplicada a todo el proyecto.
+
+149
+00:09:44.330 --> 00:09:46.830
+Y conviene que el registro
+no crezca sin fin:
+
+150
+00:09:46.870 --> 00:09:50.490
+cada sesión lo lee entero, y
+cada línea cuesta contexto.
+
+151
+00:09:50.530 --> 00:09:53.860
+Cuando se haga largo, resume las
+sesiones viejas en una línea.
+
+152
+00:09:54.506 --> 00:09:58.934
+El segundo fichero es init
+punto sh, el arranque estándar.
+
+153
+00:09:58.974 --> 00:10:02.832
+La plantilla instala dependencias,
+verifica y arranca la aplicación.
+
+154
+00:10:02.872 --> 00:10:06.220
+La tienda no tiene dependencias,
+así que no instalamos nada:
+
+155
+00:10:06.260 --> 00:10:10.700
+un npm install podría dejar un fichero
+de bloqueo nuevo sin seguimiento,
+
+156
+00:10:10.740 --> 00:10:13.227
+justo lo contrario de un estado limpio.
+
+157
+00:10:13.267 --> 00:10:17.492
+El nuestro enseña la carpeta y la versión
+de node, lo que queda sin commitear,
+
+158
+00:10:17.532 --> 00:10:22.910
+ejecuta npm test, y termina diciendo cuál
+es la funcionalidad activa o la siguiente.
+
+159
+00:10:23.894 --> 00:10:27.356
+¿Para qué un script si el
+agente sabe ejecutar npm test?
+
+160
+00:10:27.396 --> 00:10:30.734
+Porque el arranque deja de
+depender de la memoria de nadie.
+
+161
+00:10:30.774 --> 00:10:34.591
+La regla de la plantilla es clara: si la
+verificación de base ya falla al empezar,
+
+162
+00:10:34.631 --> 00:10:38.480
+primero se arregla eso, y no se apila
+trabajo nuevo encima de un punto de
+
+163
+00:10:38.520 --> 00:10:43.230
+partida roto. Y el mismo script lo usas
+tú, el agente de mañana y la integración
+
+164
+00:10:43.270 --> 00:10:44.170
+continua.
+
+165
+00:10:44.893 --> 00:10:49.101
+El tercero es el traspaso, y es el
+que el vídeo trece nos dejó pendiente.
+
+166
+00:10:49.141 --> 00:10:52.693
+La plantilla tiene cinco apartados:
+lo que está verificado ahora;
+
+167
+00:10:52.733 --> 00:10:56.538
+lo que cambió en esta sesión; lo
+que está roto o sin verificar;
+
+168
+00:10:56.578 --> 00:11:00.402
+el siguiente paso, con qué cuenta
+como terminado y qué no hay que tocar;
+
+169
+00:11:00.442 --> 00:11:02.553
+y los comandos para arrancar y verificar.
+
+170
+00:11:02.593 --> 00:11:05.180
+Solo hace falta cuando una
+sesión deja algo a medias.
+
+171
+00:11:05.823 --> 00:11:07.358
+Compáralo con lo que ya conoces.
+
+172
+00:11:07.398 --> 00:11:11.472
+Barra handoff de oh my pi
+genera un documento de traspaso,
+
+173
+00:11:11.512 --> 00:11:14.985
+pero lo guarda como una compactación
+dentro de la misma sesión.
+
+174
+00:11:15.025 --> 00:11:19.370
+Si activas handoff save to disk, los
+traspasos automáticos se guardan además
+
+175
+00:11:19.410 --> 00:11:23.430
+como ficheros, pero entre los artefactos
+de la sesión, no en tu proyecto.
+
+176
+00:11:23.470 --> 00:11:28.890
+Y Pi trae un ejemplo de extensión, handoff
+punto ts, que resume la conversación en un
+
+177
+00:11:28.930 --> 00:11:31.251
+prompt para abrir una sesión nueva.
+
+178
+00:11:31.291 --> 00:11:34.280
+Los tres son útiles. Ninguno
+se versiona con el código.
+
+179
+00:11:35.095 --> 00:11:39.078
+Nuestro traspaso punto md sí, y
+cualquier agente lo puede leer.
+
+180
+00:11:39.118 --> 00:11:43.530
+La quinta lección de Learn Harness
+Engineering explica que la compactación
+
+181
+00:11:43.570 --> 00:11:48.203
+conserva el qué y pierde el porqué: el
+código queda, pero no el motivo de cada
+
+182
+00:11:48.243 --> 00:11:52.815
+decisión. El traspaso, escrito por
+la sesión que tomó las decisiones,
+
+183
+00:11:52.855 --> 00:11:55.070
+es el sitio para ese porqué.
+
+184
+00:11:55.197 --> 00:11:58.930
+Lo que tenga que durar más que una
+tarea va a un registro de decisiones.
+
+185
+00:12:04.891 --> 00:12:08.281
+Vamos a la demo. Trabajamos en
+una rama nueva de la tienda,
+
+186
+00:12:08.321 --> 00:12:11.630
+andamiaje, creada desde master,
+para no ensuciar los demás vídeos.
+
+187
+00:12:11.670 --> 00:12:15.438
+Antes de grabar comprobamos
+lo que podría colarse:
+
+188
+00:12:15.478 --> 00:12:19.410
+ningún fichero de contexto fuera del
+repositorio, la memoria de oh my pi
+
+189
+00:12:19.450 --> 00:12:25.110
+apagada, sin retomar sesiones al arrancar
+y ninguna carpeta punto omp en la tienda,
+
+190
+00:12:25.150 --> 00:12:28.360
+porque un AGENTS punto md dentro
+de ella taparía el de la raíz.
+
+191
+00:12:29.494 --> 00:12:31.940
+Hoy hacemos nosotros de
+sesión inicializadora:
+
+192
+00:12:31.980 --> 00:12:35.630
+los ficheros los hemos escrito a mano,
+aunque podrías encargárselos a una primera
+
+193
+00:12:35.670 --> 00:12:39.359
+sesión del agente.
+Primero, AGENTS punto md.
+
+194
+00:12:39.399 --> 00:12:43.240
+Es el del vídeo seis, con una línea de
+crédito a WalkingLab y dos secciones
+
+195
+00:12:43.280 --> 00:12:49.070
+nuevas. Al empezar: confirmar la carpeta,
+leer el progreso y el traspaso si tiene
+
+196
+00:12:49.130 --> 00:12:52.883
+algo, leer la lista y elegir la
+funcionalidad en curso o la siguiente,
+
+197
+00:12:52.923 --> 00:12:57.360
+mirar los últimos commits
+y ejecutar init punto sh.
+
+198
+00:12:58.005 --> 00:13:02.190
+Al terminar: actualizar la lista y el
+progreso, escribir el traspaso si queda
+
+199
+00:13:02.230 --> 00:13:07.340
+algo a medias o vaciarlo si no, y
+hacer commit solo si las pruebas pasan.
+
+200
+00:13:07.380 --> 00:13:10.410
+Esa rutina de salida es la que
+dejamos pendiente en el vídeo seis,
+
+201
+00:13:10.450 --> 00:13:14.570
+y la más fácil de olvidar: al final de una
+sesión, el agente quiere contestar que ha
+
+202
+00:13:14.610 --> 00:13:17.094
+terminado, y tú quieres
+cerrar la terminal.
+
+203
+00:13:17.134 --> 00:13:19.040
+Si no está escrita, no ocurre.
+
+204
+00:13:19.914 --> 00:13:22.470
+Y tres reglas nuevas, cortas.
+
+205
+00:13:22.510 --> 00:13:24.640
+Solo una funcionalidad en curso.
+
+206
+00:13:24.680 --> 00:13:28.612
+Pasa solo con la verificación
+ejecutada y la evidencia anotada.
+
+207
+00:13:28.652 --> 00:13:32.260
+Y no cambiar la verificación de
+una funcionalidad para que pase,
+
+208
+00:13:32.300 --> 00:13:35.480
+que es la trampa más tentadora
+cuando una prueba se resiste.
+
+209
+00:13:36.139 --> 00:13:39.407
+Después, con jota cu, la
+lista de funcionalidades:
+
+210
+00:13:39.447 --> 00:13:44.410
+las reglas y las tres entradas, todas sin
+empezar, cada una con su comportamiento,
+
+211
+00:13:44.450 --> 00:13:48.867
+su verificación con los casos
+concretos y sus evidencias vacías.
+
+212
+00:13:48.907 --> 00:13:52.529
+Y el progreso, con el estado
+verificado y el registro vacío,
+
+213
+00:13:52.569 --> 00:13:58.520
+junto a init punto sh. Lo commiteamos
+todo junto y ejecutamos init punto sh por
+
+214
+00:13:58.560 --> 00:14:03.140
+primera vez: la carpeta, la versión
+de node, nada sin commitear,
+
+215
+00:14:03.180 --> 00:14:07.600
+las pruebas pasan y la siguiente
+es ticket cero cero uno.
+
+216
+00:14:08.586 --> 00:14:12.680
+Ahora repetimos la prueba de la sesión
+nueva, con la misma orden que antes.
+
+217
+00:14:12.720 --> 00:14:15.480
+Las cuatro primeras
+respuestas apenas cambian.
+
+218
+00:14:15.520 --> 00:14:20.110
+La quinta, sí: los tres tickets están
+sin empezar, no hay ninguno en curso,
+
+219
+00:14:20.150 --> 00:14:24.440
+el traspaso está vacío y la
+siguiente es ticket cero cero uno.
+
+220
+00:14:24.480 --> 00:14:26.821
+Ya no deduce el punto en el que estamos:
+
+221
+00:14:26.861 --> 00:14:30.650
+lo lee. Esa es la diferencia entre tener
+un repositorio documentado y tener un
+
+222
+00:14:30.690 --> 00:14:31.960
+sistema de registro.
+
+223
+00:14:37.678 --> 00:14:42.570
+Arrancamos Pi en la rama, con una
+sesión normal y DeepSeek Flash.
+
+224
+00:14:42.610 --> 00:14:46.594
+En la cabecera, en contexto,
+solo aparece AGENTS punto md.
+
+225
+00:14:46.634 --> 00:14:51.100
+Y le damos el encargo más vago posible:
+trabaja en la siguiente funcionalidad.
+
+226
+00:14:51.175 --> 00:14:54.620
+No le decimos cuál, ni en qué
+fichero, ni cómo se prueba.
+
+227
+00:14:54.660 --> 00:14:56.620
+Todo eso tiene que salir del repositorio.
+
+228
+00:14:57.877 --> 00:15:01.250
+Lo primero que hace es la rutina
+de entrada, tal cual está escrita:
+
+229
+00:15:01.290 --> 00:15:06.950
+la carpeta y el log de git, la lectura
+del progreso, del traspaso y de la lista,
+
+230
+00:15:06.990 --> 00:15:09.570
+y la ejecución de init punto sh.
+
+231
+00:15:09.610 --> 00:15:13.284
+En su razonamiento lo dice: la
+siguiente es ticket cero cero uno,
+
+232
+00:15:13.324 --> 00:15:16.570
+formatear euros, y no
+hay ninguna en curso.
+
+233
+00:15:16.610 --> 00:15:19.990
+Después mira el código que ya
+existe para seguir el mismo estilo.
+
+234
+00:15:20.936 --> 00:15:25.680
+Escribe ticket punto js y su fichero
+de pruebas, ejecuta las pruebas y,
+
+235
+00:15:25.720 --> 00:15:28.180
+con todo en verde, edita la
+
+236
+00:15:28.799 --> 00:15:33.610
+lista. Mira el cambio: el estado pasa a
+pasa, y en evidencias anota dos entradas,
+
+237
+00:15:33.650 --> 00:15:36.930
+cada una con su comando y su resultado.
+
+238
+00:15:37.300 --> 00:15:40.380
+Un detalle honesto: no la
+marcó antes como en curso;
+
+239
+00:15:40.420 --> 00:15:43.780
+la escribió, la probó y la
+cerró en el mismo turno.
+
+240
+00:15:43.820 --> 00:15:47.550
+La regla de una sola en curso se cumple,
+pero el estado intermedio no llegó a
+
+241
+00:15:47.590 --> 00:15:48.490
+verse.
+
+242
+00:15:49.158 --> 00:15:53.120
+Después actualiza el progreso con su
+entrada de sesión, hace commit con el
+
+243
+00:15:53.160 --> 00:15:58.050
+formato de la tienda y, al final, vuelve a
+ejecutar init punto sh para comprobar que
+
+244
+00:15:58.090 --> 00:16:02.994
+la siguiente sesión puede arrancar:
+pasa, y ya señala ticket cero cero dos.
+
+245
+00:16:03.034 --> 00:16:05.660
+Toda la funcionalidad,
+en menos de un minuto.
+
+246
+00:16:06.325 --> 00:16:10.290
+Ahora queremos dejar algo a medias, como
+pasa en la vida real cuando se acaba el
+
+247
+00:16:10.330 --> 00:16:15.730
+día o el presupuesto. Le pedimos: empieza
+la siguiente, y de momento escribe solo la
+
+248
+00:16:15.770 --> 00:16:20.150
+función, sin las pruebas. Teníamos
+preparado un tercer mensaje para pedirle
+
+249
+00:16:20.190 --> 00:16:22.740
+la rutina de salida. No hizo falta.
+
+250
+00:16:23.452 --> 00:16:28.351
+Al terminar el turno, la hizo por su
+cuenta, porque está en AGENTS punto md.
+
+251
+00:16:28.391 --> 00:16:32.475
+Línea de ticket queda en curso, no
+en pasa, porque falta su prueba.
+
+252
+00:16:32.515 --> 00:16:37.100
+Escribe el traspaso: lo que ya está hecho,
+lo que falta, que son las pruebas con una
+
+253
+00:16:37.140 --> 00:16:41.880
+y con varias unidades y el redondeo,
+y que no ha tocado la verificación.
+
+254
+00:16:41.920 --> 00:16:46.570
+Actualiza el progreso, comprueba que las
+pruebas que ya existían siguen pasando y,
+
+255
+00:16:46.610 --> 00:16:48.360
+solo entonces, hace commit.
+
+256
+00:16:49.300 --> 00:16:51.610
+Salimos de Pi y lo
+comprobamos desde fuera.
+
+257
+00:16:51.650 --> 00:16:55.330
+Git log enseña los dos
+commits de la sesión.
+
+258
+00:16:55.374 --> 00:16:59.960
+Git show, que el último cambió la
+lista, el progreso, ticket punto js y el
+
+259
+00:17:00.000 --> 00:17:05.864
+traspaso. Y init punto sh dice
+que línea de ticket está en curso.
+
+260
+00:17:05.904 --> 00:17:09.605
+Esta sesión de Pi existe, en su
+fichero del directorio del agente,
+
+261
+00:17:09.645 --> 00:17:12.384
+y podríamos retomarla.
+No lo vamos a hacer.
+
+262
+00:17:12.424 --> 00:17:14.650
+A partir de aquí, la
+conversación no existe.
+
+263
+00:17:20.312 --> 00:17:24.140
+Abrimos oh my pi con el perfil
+demo, en la misma carpeta,
+
+264
+00:17:24.180 --> 00:17:28.349
+con una sesión nueva, sin retomar
+nada y con la memoria apagada.
+
+265
+00:17:28.389 --> 00:17:32.415
+Otro agente y otro modelo,
+DeepSeek V cuatro Pro.
+
+266
+00:17:32.455 --> 00:17:36.270
+Lo único que comparte con la
+sesión anterior es el repositorio.
+
+267
+00:17:36.310 --> 00:17:39.560
+Y le escribimos una
+sola palabra: continúa.
+
+268
+00:17:40.216 --> 00:17:44.520
+Esa palabra es la prueba. Si tuvieras
+que explicarle qué estabas haciendo,
+
+269
+00:17:44.560 --> 00:17:48.800
+qué fichero toca y cómo se prueba,
+el andamiaje no estaría funcionando:
+
+270
+00:17:48.840 --> 00:17:51.729
+estarías haciendo tú de
+memoria del proyecto.
+
+271
+00:17:51.769 --> 00:17:55.150
+Lo que no esté escrito, el agente lo va a
+adivinar, y lo va a adivinar de nuevo en
+
+272
+00:17:55.190 --> 00:17:56.140
+cada sesión.
+
+273
+00:17:57.000 --> 00:18:00.680
+oh my pi carga por su cuenta
+el AGENTS punto md de la raíz,
+
+274
+00:18:00.720 --> 00:18:05.320
+porque busca uno suelto desde la carpeta
+de trabajo hasta la raíz del repositorio.
+
+275
+00:18:05.360 --> 00:18:10.370
+Y la rutina de entrada es la misma:
+la carpeta y el log, init punto sh,
+
+276
+00:18:10.410 --> 00:18:14.380
+que le dice que línea de ticket está
+en curso, y la lectura del progreso,
+
+277
+00:18:14.420 --> 00:18:17.070
+del traspaso, de la lista y del código.
+
+278
+00:18:17.110 --> 00:18:19.800
+En su plan aparece justo
+lo que pedía el traspaso:
+
+279
+00:18:19.840 --> 00:18:24.631
+añadir las pruebas, ejecutarlas,
+marcarla como pasa con evidencia,
+
+280
+00:18:24.671 --> 00:18:28.030
+actualizar el progreso y el
+traspaso, y hacer commit.
+
+281
+00:18:28.070 --> 00:18:29.380
+No rehace formatear euros.
+
+282
+00:18:30.326 --> 00:18:34.140
+Learn Harness Engineering llama
+a esto coste de reconstrucción:
+
+283
+00:18:34.180 --> 00:18:37.465
+lo que tarda una sesión nueva
+en volver a ser productiva.
+
+284
+00:18:37.505 --> 00:18:42.220
+Aquí, cuatro turnos y unos cuarenta y ocho
+mil tokens antes de su primera edición,
+
+285
+00:18:42.260 --> 00:18:44.480
+unas tres décimas de céntimo.
+
+286
+00:18:44.520 --> 00:18:48.460
+Y uno de esos turnos fue un tropiezo:
+su primer comando de bash llevaba un
+
+287
+00:18:48.500 --> 00:18:51.463
+parámetro que no tocaba,
+falló, y lo repitió.
+
+288
+00:18:51.503 --> 00:18:55.280
+Sin andamiaje, esos cuatro turnos
+serían una conversación contigo.
+
+289
+00:18:56.266 --> 00:18:59.950
+Después, el trabajo: tres pruebas
+nuevas para línea de ticket,
+
+290
+00:18:59.990 --> 00:19:03.339
+con una unidad, con varias y con redondeo;
+
+291
+00:19:03.379 --> 00:19:07.180
+las pruebas del fichero y las
+veintiuna de la tienda en verde;
+
+292
+00:19:07.410 --> 00:19:10.383
+la funcionalidad en
+pasa, con sus evidencias;
+
+293
+00:19:10.423 --> 00:19:15.666
+el progreso actualizado y el traspaso
+vaciado, porque ya no queda nada a medias.
+
+294
+00:19:15.706 --> 00:19:18.730
+Commit, y comprueba que
+el árbol queda limpio.
+
+295
+00:19:18.770 --> 00:19:22.290
+La sesión entera, quince turnos
+y siete décimas de céntimo.
+
+296
+00:19:23.270 --> 00:19:26.010
+Ahora lo comprobamos desde
+fuera, sin ningún agente.
+
+297
+00:19:26.050 --> 00:19:31.050
+Git log enseña dos sesiones de dos
+agentes distintos en un mismo historial.
+
+298
+00:19:31.090 --> 00:19:35.490
+Una consulta de jota cu sobre la lista
+enseña dos funcionalidades que pasan,
+
+299
+00:19:35.530 --> 00:19:38.750
+cada una con dos evidencias,
+y una sin empezar.
+
+300
+00:19:38.790 --> 00:19:42.470
+Otra busca funcionalidades que
+pasan sin evidencias, y sale vacía.
+
+301
+00:19:42.510 --> 00:19:44.845
+El traspaso tiene cero bytes.
+
+302
+00:19:44.885 --> 00:19:50.414
+E init punto sh termina en verde y dice
+que la siguiente es ticket cero cero tres.
+
+303
+00:19:50.454 --> 00:19:53.650
+Mañana, cualquiera, persona
+o agente, empieza por ahí.
+
+304
+00:19:54.716 --> 00:19:57.724
+Ahora, una distinción que
+vale para todo el bloque.
+
+305
+00:19:57.764 --> 00:20:02.066
+Hay dos registros. El journal
+de la sesión, ese fichero JSONL,
+
+306
+00:20:02.106 --> 00:20:04.830
+dice qué vio y qué hizo la conversación;
+
+307
+00:20:04.870 --> 00:20:08.130
+el Harness Playbook pide que sea
+la única autoridad de la sesión,
+
+308
+00:20:08.170 --> 00:20:12.530
+y por eso en el vídeo nueve guardamos
+el estado de las extensiones en la rama.
+
+309
+00:20:12.570 --> 00:20:15.230
+El repositorio dice qué
+es verdad del proyecto.
+
+310
+00:20:15.270 --> 00:20:19.830
+No compiten. Y recuerda el vídeo tres:
+rebobinar la conversación no rebobina tus
+
+311
+00:20:19.870 --> 00:20:23.560
+ficheros. Si hay que deshacer
+el progreso, lo arbitra git.
+
+312
+00:20:29.320 --> 00:20:32.410
+Tres límites honestos.
+El primero ya lo dijimos:
+
+313
+00:20:32.450 --> 00:20:34.460
+todo esto son instrucciones.
+
+314
+00:20:34.500 --> 00:20:38.320
+Hoy los dos agentes las siguieron,
+pero si la sesión se corta de golpe,
+
+315
+00:20:38.360 --> 00:20:43.218
+con escape o porque se agota el contexto,
+no hay rutina de salida y no se escribe
+
+316
+00:20:43.258 --> 00:20:47.988
+nada. La siguiente sesión lo detecta
+gracias a git status y a init punto sh,
+
+317
+00:20:48.028 --> 00:20:50.723
+pero tendrá que reconstruir sin traspaso.
+
+318
+00:20:50.763 --> 00:20:55.020
+Pi trae ejemplos de extensiones que hacen
+commit al salir o vigilan el repositorio
+
+319
+00:20:55.060 --> 00:20:59.100
+sucio, pero una red automática tiene
+que entender bien cuándo actúa.
+
+320
+00:21:01.056 --> 00:21:04.119
+El segundo: un fichero
+desfasado es peor que ninguno.
+
+321
+00:21:04.159 --> 00:21:06.023
+La tercera lección del
+curso lo dice claro:
+
+322
+00:21:06.063 --> 00:21:10.026
+la documentación vieja manda al agente en
+la dirección equivocada mientras él cree
+
+323
+00:21:10.066 --> 00:21:13.532
+que va bien. Si el progreso dice
+una cosa y las pruebas otra,
+
+324
+00:21:13.572 --> 00:21:19.260
+ganan las pruebas. El tercero: dos agentes
+escribiendo a la vez el mismo progreso se
+
+325
+00:21:19.300 --> 00:21:23.337
+pisan. Para trabajo en paralelo,
+un fichero de progreso por agente,
+
+326
+00:21:23.377 --> 00:21:26.600
+o ramas y worktrees, como en los
+vídeos dieciséis y dieciocho.
+
+327
+00:21:27.501 --> 00:21:30.241
+Y un apunte sobre la
+memoria del vídeo trece.
+
+328
+00:21:30.281 --> 00:21:33.540
+No es incompatible con todo
+esto, pero no lo sustituye.
+
+329
+00:21:33.580 --> 00:21:38.022
+La memoria es contexto heurístico
+y vive fuera del repositorio:
+
+330
+00:21:38.062 --> 00:21:41.341
+Pi no la ve, y quien clona
+el proyecto no la recibe.
+
+331
+00:21:41.381 --> 00:21:45.126
+Usa la memoria para tus preferencias
+y las pistas que se repiten.
+
+332
+00:21:45.166 --> 00:21:49.370
+Lo que define el estado del proyecto, en
+el repositorio, junto al código y con su
+
+333
+00:21:49.410 --> 00:21:50.340
+historial.
+
+334
+00:21:51.445 --> 00:21:54.907
+Repasemos. El repositorio
+es el sistema de registro:
+
+335
+00:21:54.947 --> 00:21:57.930
+lo que no está escrito en
+él no existe para el agente.
+
+336
+00:21:57.970 --> 00:22:03.100
+El paquete mínimo son cuatro ficheros:
+AGENTS punto md con rutina de entrada y de
+
+337
+00:22:03.140 --> 00:22:08.710
+salida, una lista de funcionalidades con
+comportamiento, verificación y estado,
+
+338
+00:22:08.750 --> 00:22:11.320
+un progreso verificado e init punto sh.
+
+339
+00:22:11.360 --> 00:22:14.537
+El traspaso, cuando algo queda a medias.
+
+340
+00:22:14.577 --> 00:22:17.410
+Y una sesión nueva, incluso
+con otro agente y otro modelo,
+
+341
+00:22:17.450 --> 00:22:20.620
+retoma el trabajo sin
+conversación, con una sola palabra.
+
+342
+00:22:21.495 --> 00:22:26.010
+La práctica: en un proyecto tuyo, monta el
+paquete mínimo a partir de las plantillas
+
+343
+00:22:26.050 --> 00:22:29.364
+de Learn Harness Engineering,
+citando su licencia.
+
+344
+00:22:29.404 --> 00:22:33.931
+Divide una tarea en tres funcionalidades
+que quepan en una sesión cada una.
+
+345
+00:22:33.971 --> 00:22:37.224
+Trabaja la primera con un
+agente, deja la segunda a medias,
+
+346
+00:22:37.264 --> 00:22:40.548
+y continúa en una sesión nueva,
+mejor con el otro agente.
+
+347
+00:22:40.588 --> 00:22:44.350
+Anota el coste de reconstrucción
+y qué tuviste que explicar a mano:
+
+348
+00:22:44.390 --> 00:22:46.240
+eso es lo que le falta a tu andamiaje.
+
+349
+00:22:47.194 --> 00:22:50.196
+En el próximo vídeo, verificar de verdad.
+
+350
+00:22:50.236 --> 00:22:54.010
+Definir antes qué significa
+terminado, pruebas, rúbricas,
+
+351
+00:22:54.050 --> 00:22:58.327
+revisión con el advisor y
+con el reviewer, y Auto QA.
+
+352
+00:22:58.367 --> 00:23:02.750
+Y lo que hoy ha quedado en instrucción:
+que terminado no dependa de que el agente
+
+353
+00:23:02.790 --> 00:23:05.000
+diga que ha terminado. Nos vemos allí.

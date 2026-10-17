@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 13 · Contexto y memoria"
-description: "medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación."
+description: "Medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación."
 ruta: "pi-oh-my-pi"
 orden: 13
 duracion: "25 min"
@@ -8,7 +8,7 @@ video: "13-contexto-y-memoria.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/13-contexto-y-memoria.es.vtt"
 ---
 
-medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación.
+Medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación.
 
 <p class="guia__nota">Dura 25 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,10 +18,6 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **oh my pi va más lejos**
-  - `5` · Formas de compactar: encadenadas en orden
-  - `sin LLM` · Adelgazar: sin llamar al modelo
-  - `memoria` · Entre sesiones: Pi no la tiene
 - **Hoy:** Medir (/context) → Adelgazar (/shake · /compact) → Traspasar (/handoff) → Laterales (/btw · extended) → Memoria (entre sesiones)
 - **Perfil demo · DeepSeek V4.1 Flash:** Ventana de 1M tokens — Hoy sí editamos tests. /compact, /handoff y /btw gastan modelo.
 
@@ -32,25 +28,13 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 - *En la demo:* omp --profile demo --no-session · /context
 - *En la demo:* Una sesión vacía: 6,7K tokens
 - *En la demo:* Reserva: 15 % de la ventana
-- **Sesión vacía:** Herramientas 3,7K prompt 2,6K — Cada herramienta viaja en cada petición: 12 activas de 20 disponibles.
 - *En la demo:* --tools read,bash,edit,write
-- **¿Quitar herramientas?**
-  - `1M` · Ventana grande: 3K tokens son poca cosa
-  - `MCP` · Ventana pequeña: aquí la cuenta cambia decisiones
-- **.omp/RULES.md:** Una regla que siempre viaja — Completa en cada petición, aunque la conversación crezca o se compacte.
 - *En la demo:* /co: el estado en el menú
 
 ### 3 · Cuándo compacta solo oh my pi
 
-<p><button type="button" class="ir-a" data-t="307">▶ Ir a 5:07</button></p>
+<p><button type="button" class="ir-a" data-t="306">▶ Ir a 5:06</button></p>
 
-- **La reserva para la respuesta**
-  - `16 384` · Pi: siempre fija
-  - `máx(16 384; 15 %)` · oh my pi: con 1M: 150K
-- **El umbral**
-  - `% · tokens` · A mano: ajustes de compactación
-  - `mitad de turno` · También: entre herramientas
-- **Activada de fábrica:** Compactación especulativa — El resumen se prepara en segundo plano antes de cruzar el umbral.
 - **Limpieza previa, sin modelo**
   - `truncar` · Resultados antiguos: protege los recientes
   - `superadas` · Lecturas repetidas
@@ -60,7 +44,7 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 4 · Adelgazar sin modelo: /shake
 
-<p><button type="button" class="ir-a" data-t="438">▶ Ir a 7:18</button></p>
+<p><button type="button" class="ir-a" data-t="437">▶ Ir a 7:17</button></p>
 
 - **Tres turnos:** T1 (leer y testear) → T2 (registro de 2000 líneas) → T3 (test de 40 €)
 - *En la demo:* grep en vez de leer 2000 líneas
@@ -69,64 +53,41 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 - *En la demo:* Messages: 8,1K
 - **La pantalla no cambia:** Lo que adelgaza es lo que ve el modelo — Cada resultado quitado queda como referencia artifact://, recuperable.
 - *En la demo:* Lo digerido puede irse
-- **Los tres modos de /shake**
-  - `elide` · Resultados y bloques: por defecto
-  - `images` · Imágenes
-  - `thinking` · Razonamiento
-- **Shake automático frente a manual**
-  - `automático` · Prudente: protege lo reciente
-  - `/shake` · Agresivo: úsalo cuando sabes qué sobra
 
 ### 5 · /compact y sus modos
 
-<p><button type="button" class="ir-a" data-t="603">▶ Ir a 10:03</button></p>
+<p><button type="button" class="ir-a" data-t="602">▶ Ir a 10:02</button></p>
 
-- **Perfil demo:** keepRecentTokens: 3000 — Solo para la demo. De fábrica, 20 000.
-- **/compact [modo] [foco]**
-  - `soft` · Resumen local: modelo activo
-  - `remote` · Del proveedor
-  - `snapcompact` · En imágenes: sin modelo
-- **Gasta modelo:** /compact soft — conserva la decisión sobre el caso de 40 euros y el estado de los tests
+- **Gasta modelo:** /compact soft «foco» — conserva la decisión sobre el caso de 40 euros y el estado de los tests
 - *En la demo:* El divisor: 15K → 9,3K
 - *En la demo:* Control O y la rueda
 - *En la demo:* El resumen detecta el desliz
 - *En la demo:* Turno partido, ficheros y la huella de /shake
 - *En la demo:* Messages: 2,6K
 - *En la demo:* Distingue lo que sabe de lo que supone
-- **remote**
-  - `Responses` · OpenAI: resumen guardado: un marcador
-  - `Anthropic` · Beta
-  - `completions` · DeepSeek: aquí no aplica
 - **snapcompact:** La historia, en imágenes — Sin modelo, sin clave, sin red. Exige un modelo que lea imágenes: DeepSeek Flash las lee.
 - *En la demo:* Nada que archivar tras /compact soft
 - **Vídeo 04:** Adelgazar rompe la caché — La siguiente petición se paga casi entera. Adelgaza cuando compense.
 
 ### 6 · Traspasar con /handoff
 
-<p><button type="button" class="ir-a" data-t="874">▶ Ir a 14:34</button></p>
+<p><button type="button" class="ir-a" data-t="873">▶ Ir a 14:33</button></p>
 
 - *En la demo:* Antes: 17 mensajes
-- **Gasta modelo:** /handoff — céntrate en el estado de los tests y en lo que falta por hacer
+- **Gasta modelo:** /handoff «foco» — céntrate en el estado de los tests y en lo que falta por hacer
 - *En la demo:* Generating handoff…
 - *En la demo:* Compactado en el sitio
 - *En la demo:* Mismo ID, mismo fichero
-- **Frente a /compact**
-  - `traspaso` · Escrito para otra instancia: contexto de trabajo, no instrucciones
-  - `caché` · Misma clave: aprovecha la caché
-- **handoffSaveToDisk:** Los automáticos, a disco — Tercero en la lista. Los traspasos manuales no se guardan aparte.
 - **Vídeo 23:** Lo que importa va al repo — Código, tests y decisiones. Un traspaso es un resumen de un modelo.
 
 ### 7 · Preguntas laterales y contexto extendido
 
-<p><button type="button" class="ir-a" data-t="1022">▶ Ir a 17:02</button></p>
+<p><button type="button" class="ir-a" data-t="1021">▶ Ir a 17:01</button></p>
 
 - **/btw:** Barra by the way — Una pregunta que no se queda en la sesión.
 - *En la demo:* /btw ¿qué ficheros hemos modificado hoy?
 - *En la demo:* f · seguimiento en el historial
 - *En la demo:* Las laterales no entran en Messages
-- **Pero se paga**
-  - `/btw` · Dudas rápidas: envía el contexto actual
-  - `/tan` · Trabajo lateral: vídeo 16
 - *En la demo:* /extended-context status
 - **/extended-context on|off**
   - `config` · Se guarda: no solo esta sesión
@@ -134,13 +95,9 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 ### 8 · Memoria entre sesiones
 
-<p><button type="button" class="ir-a" data-t="1163">▶ Ir a 19:23</button></p>
+<p><button type="button" class="ir-a" data-t="1162">▶ Ir a 19:22</button></p>
 
 - **memory.backend: off:** Memoria entre sesiones — Guarda lo aprendido y lo inyecta en sesiones futuras.
-- **Backends**
-  - `local` · Resume sesiones: al arrancar
-  - `mnemopi` · SQLite local
-  - `hindsight` · Servidor: de equipo
 - **Backend local, al arrancar:** Fase 1 (extraer de cada sesión) → Fase 2 (consolidar) → Inyectar (resumen corto)
 - *En terminal:* Memoria de la demo (perfil demo, fuera de cámara) (más abajo, en «Código y comandos»)
 - *En la demo:* /memory stats
@@ -149,23 +106,12 @@ medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 - *En la demo:* Sesión nueva: recuerda y avisa
 - *En la demo:* /memory view
 - *En la demo:* Dos recuerdos: uno no lo pedimos
-- **Si quieres más**
-  - `embeddings` · Por significado: variante multilingüe
-  - `smol` · Con modelo: gasta al consolidar
-  - `hindsight` · De equipo: servidor y token
-- **/memory**
-  - `queue` · Pendiente
-  - `sync` · Consolidar
-  - `clear` · Borrar: nunca en cámara
 - **Límite honesto:** Memoria = pista, no verdad — Si contradice al código o a ti, gana el código y ganas tú.
 
 ### 9 · Repaso, práctica y cierre
 
-<p><button type="button" class="ir-a" data-t="1403">▶ Ir a 23:23</button></p>
+<p><button type="button" class="ir-a" data-t="1402">▶ Ir a 23:22</button></p>
 
-- **Repaso:** /context (medir) → Herramientas (3,7K → 1,1K) → Umbral (y methodOrder) → /shake (sin modelo)
-- **Y además:** /compact (soft · remote · snap) → /handoff (en el sitio) → /btw (no ensucia) → Memoria (como pista)
-- **Práctica:** /context (antes) → /shake (tras unos turnos) → /compact soft (y léelo) → /handoff (compara)
 - **Próximo vídeo:** Modelos, roles y razonamiento — DeepSeek Flash para el trabajo, DeepSeek V4 Pro para revisar.
 
 ## Código y comandos
@@ -281,7 +227,7 @@ Trabajamos como siempre en la tienda, con el perfil demo y DeepSeek V cuatro pun
 
 **2 · Medir con barra context**
 
-Empezamos sin gastar nada. Arrancamos oh my pi con el perfil demo y la opción guion guion no session, para no dejar una sesión a medias, y escribimos barra context. Aparece un informe, context usage, con el nombre del modelo y el tamaño de su ventana: un millón. En esta versión, el informe ya no se queda en la conversación: lo miras, pulsas escape y desaparece.
+Empezamos sin gastar nada. Arrancamos oh my pi con el perfil demo y la opción guion guion no session, para no dejar una sesión a medias, y escribimos barra context. Aparece un informe, context usage, con el nombre del modelo y el tamaño de su ventana: un millón. El informe no se queda en la conversación: lo miras, pulsas escape y desaparece.
 
 El informe tiene un medidor de bloques de colores y una leyenda. System prompt es el prompt de sistema de oh my pi: dos mil seiscientos tokens. System tools son las definiciones de las herramientas: tres mil setecientos. System context recoge lo que se inyecta además, como tus ficheros de contexto: cuatrocientos cuarenta y dos. Skills, cero, porque el perfil demo no las carga. Y Messages, cero: aún no hemos escrito nada.
 

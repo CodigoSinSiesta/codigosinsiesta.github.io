@@ -168,9 +168,9 @@ export const RUTAS: Ruta[] = [
     titulo: 'Pi y oh my pi',
     claim: 'Aprende un agente por dentro y sabrás usar cualquiera',
     descripcion:
-      'Un curso en vídeo para dejar de usar tu agente de programación como una caja negra. Empezamos por Pi, el más pequeño y transparente, vemos qué añade un agente completo como oh my pi y terminamos diseñando tu propio harness. Lo que aprendes sirve igual en Claude Code, Codex u opencode. En publicación: 21 de 26 vídeos.',
+      'Un curso en vídeo para dejar de usar tu agente de programación como una caja negra. Empezamos por Pi, el más pequeño y transparente, vemos qué añade un agente completo como oh my pi y terminamos diseñando tu propio harness. Lo que aprendes sirve igual en Claude Code, Codex u opencode. En publicación: 25 de 26 vídeos.',
     nivel: 'intermedio',
-    duracion: '~8 horas hasta ahora',
+    duracion: '~10 horas hasta ahora',
     paraQuien:
       'Developers que ya usan Claude Code, Codex, opencode u otro agente y quieren entender qué recibe el modelo, qué puede hacer y cómo gobernarlo, en lugar de depender de lo que cada herramienta decide por ti.',
     porQue: {
@@ -227,7 +227,7 @@ export const RUTAS: Ruta[] = [
     noIncluye: [
       'Un manual de Claude Code, Codex u opencode: usamos Pi para entender los conceptos y te señalamos dónde reaparecen',
       'Entrenar o ajustar modelos',
-      'Los vídeos 22 a 26 (en producción): diseño de harness, estado en el repositorio, verificación, orquestación y proyecto final',
+      'El vídeo 26 (en producción): el proyecto final',
     ],
     pasos: [],
   },

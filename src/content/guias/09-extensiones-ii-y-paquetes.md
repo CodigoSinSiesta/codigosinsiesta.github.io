@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 09 · Extensiones II: estado y paquetes"
-description: "extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y cómo evitarlo. Empaquetar, instalar y publicar."
+description: "Extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y cómo evitarlo. Empaquetar, instalar y publicar."
 ruta: "pi-oh-my-pi"
 orden: 9
 duracion: "24 min"
@@ -8,7 +8,7 @@ video: "09-extensiones-ii-y-paquetes.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/09-extensiones-ii-y-paquetes.es.vtt"
 ---
 
-extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y cómo evitarlo. Empaquetar, instalar y publicar.
+Extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y cómo evitarlo. Empaquetar, instalar y publicar.
 
 <p class="guia__nota">Dura 24 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,12 +18,7 @@ extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y
 
 <p><button type="button" class="ir-a" data-t="20">▶ Ir a 0:20</button></p>
 
-- **El modo aprobación del vídeo 08**
-  - `tool_call` · Un evento: antes de cada herramienta
-  - `3` · Opciones: permitir, siempre, bloquear
-  - `/reload` · Se olvidaba: contadores y «siempre» a cero
 - **Barra reload:** Tira el entorno y lo vuelve a crear — Lo que vive en variables de la factoría desaparece con él.
-- **La sesión es un árbol:** Raíz (el inicio) → Rama A (la que dejas) → Rama B (el camino nuevo)
 - **La pregunta:** ¿Sigue permitido en otra rama? — No: en esa historia, nadie ha aprobado nada.
 - **Hoy:** Estado (dónde guardarlo) → El fallo (provocarlo y arreglarlo) → Paquete (instalar y elegir)
 
@@ -32,23 +27,6 @@ extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y
 <p><button type="button" class="ir-a" data-t="125">▶ Ir a 2:05</button></p>
 
 - **docs/extensions.md · State:** Cuatro sitios — Se elige según cómo participa el estado en la conversación.
-- **Cuatro sitios para guardar**
-  - `details` · Sigue a la rama: en el resultado de la herramienta
-- **Cuatro sitios para guardar**
-  - `details` · Sigue a la rama: en el resultado de la herramienta
-  - `appendEntry` · Duradero, invisible: entrada custom en el árbol
-- **Cuatro sitios para guardar**
-  - `details` · Sigue a la rama: en el resultado de la herramienta
-  - `appendEntry` · Duradero, invisible: entrada custom en el árbol
-  - `sendMessage` · Lo ve el modelo: cuesta tokens
-- **Cuatro sitios para guardar**
-  - `details` · Sigue a la rama: en el resultado de la herramienta
-  - `appendEntry` · Duradero, invisible: entrada custom en el árbol
-  - `sendMessage` · Lo ve el modelo: cuesta tokens
-  - `externo` · Fuera de la sesión: fichero o base de datos
-- **Dos formas de leer**
-  - `getEntries()` · Todo el fichero: todas las ramas
-  - `getBranch()` · La rama activa: de la raíz a donde estás
 - **La regla:** Reconstruye con get branch — Las ramas abandonadas son historias alternativas.
 
 ### 3 · Details: el estado que viaja con la herramienta
@@ -68,9 +46,6 @@ extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y
 
 <p><button type="button" class="ir-a" data-t="405">▶ Ir a 6:45</button></p>
 
-- **Las decisiones no son resultados**
-  - `tool_call` · Antes de ejecutar: edit, write, bash…
-  - `appendEntry` · Guardar aparte: el modelo no lo ve
 - *En la demo:* git diff permisos.ts
 - *En la demo:* getEntries(): a propósito
 - *En la demo:* Permitir siempre en esta sesión
@@ -96,38 +71,18 @@ extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y
 <p><button type="button" class="ir-a" data-t="697">▶ Ir a 11:37</button></p>
 
 - *En la demo:* El arreglo
-- **Por qué funciona:** appendEntry (cuelga del punto actual) → /tree (la entrada queda en la otra rama) → getBranch (ya no la ve)
 - *En la demo:* /reload con el arreglo
 - *En la demo:* El diálogo vuelve
 - *En la demo:* El pie sigue a la rama
 - *En terminal:* Las entradas custom en el fichero de la sesión (más abajo, en «Código y comandos»)
-- **El resto de casos**
-  - `/new` · Vacío: todo a cero
-  - `/resume` · session_start: reconstruye
-  - `/fork` · Copia el camino: motivo fork
-  - `compactar` · No borra: entradas del fichero
-- **De la misma familia**
-  - `setLabel` · Etiquetas: visibles en /tree
-  - `registerEntryRenderer` · Dibujar: tus entradas custom
 - **La lección:** estado = f(rama) — Recargar, retomar, bifurcar y rebobinar pasan a ser el mismo caso.
 
 ### 7 · Un paquete de Pi
 
 <p><button type="button" class="ir-a" data-t="900">▶ Ir a 15:00</button></p>
 
-- **Un paquete de Pi lleva**
-  - `ts` · Extensiones
-  - `SKILL` · Skills
-  - `/` · Prompts
-  - `json` · Temas
-- **Cómo decir qué contiene**
-  - `carpetas` · Convención: extensions, skills, prompts, themes
-  - `"pi"` · Manifiesto: rutas en package.json
 - *En la demo:* package.json
 - *En la demo:* peerDependencies: "*"
-- **Dependencias**
-  - `dependencies` · Otras librerías: npm y git las instalan
-  - `local` · Ruta local: npm install es cosa tuya
 - *En la demo:* pi install · pi list
 - *En la demo:* settings.json
 - **Paquete local:** No se copia — Pi lo carga desde donde está: sigues editando y usando barra reload.
@@ -143,34 +98,13 @@ extensiones con estado que sobreviven a rebobinar la sesión, el fallo típico y
 - *En terminal:* settings.json · filtrar los recursos de un paquete (más abajo, en «Código y comandos»)
 - *En terminal:* Quitar o probar sin instalar (más abajo, en «Código y comandos»)
 - *En terminal:* Orígenes de un paquete (más abajo, en «Código y comandos»)
-- **Identidad de un paquete**
-  - `npm` · El nombre
-  - `git` · El repositorio: sin la versión
-  - `local` · Ruta absoluta
-- **Ámbitos**
-  - `usuario` · Ajustes personales: settings.json del agente
-  - `-l` · Proyecto: solo con confianza (vídeo 05)
-- **Publicar (solo explicado)**
-  - `git` · Etiqueta: pi install git:…@v1
-  - `npm` · npm publish
-  - `pi-package` · Galería: pi.dev/packages
 - **El apunte honesto:** Instalar un paquete es ejecutar código ajeno — Lee el código, fija versiones y revisa actualizaciones.
 
 ### 9 · Cierre
 
 <p><button type="button" class="ir-a" data-t="1321">▶ Ir a 22:01</button></p>
 
-- **Repaso: dónde va el estado**
-  - `details` · Herramienta: sigue a la rama
-  - `appendEntry` · Duradero: el modelo no lo ve
-  - `sendMessage` · Para el modelo
-  - `externo` · Fuera: de la sesión
 - **El fallo típico:** get entries y sin session tree — Una rama abandonada sigue mandando.
-- **Repaso: paquetes**
-  - `"pi"` · Manifiesto: peerDependencies "*"
-  - `install` · Ruta, npm o git: list · config · remove
-  - `publish` · Publicar: npm o etiqueta git
-- **La práctica:** Rómpela (get entries + /tree) → Arréglala (get branch + session_tree) → Empaquétala (pi install · pi config)
 - **Próximo vídeo:** Pi programático — pi -p en scripts y CI, modo JSON, RPC y el SDK.
 
 ## Código y comandos

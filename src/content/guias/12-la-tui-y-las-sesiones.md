@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 12 · La TUI y las sesiones"
-description: "atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar una sesión en omp."
+description: "Atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar una sesión en omp."
 ruta: "pi-oh-my-pi"
 orden: 12
 duracion: "25 min"
@@ -8,7 +8,7 @@ video: "12-la-tui-y-las-sesiones.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/12-la-tui-y-las-sesiones.es.vtt"
 ---
 
-atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar una sesión en omp.
+Atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar una sesión en omp.
 
 <p class="guia__nota">Dura 25 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,7 +18,6 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Pi, vídeo 03:** JSONL (un árbol) → /tree (saltar) → /fork · /clone (fichero nuevo) → /resume (cambiar de sesión)
 - **oh my pi: mismo árbol, otros movimientos**
   - `/branch` · Rebobinar: en el menú, /rewind
   - `/tree` · Navegar: otro comportamiento por defecto
@@ -30,21 +29,6 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 
 <p><button type="button" class="ir-a" data-t="111">▶ Ir a 1:51</button></p>
 
-- **Ya los conoces (vídeo 11)**
-  - `Esc` · Parar
-  - `Ctrl+Q` · Encolar
-  - `Alt+M` · Modelo
-  - `⇧Tab` · Thinking
-  - `Ctrl+O` · Herramientas
-- **Borradores que no se pierden**
-  - `Ctrl+C` · Vacía el editor
-  - `↑` · Lo recupera: con imágenes y pegados
-  - `100` · Borradores: solo mientras está abierto
-- **Más espacio, menos ruido**
-  - `Ctrl+G` · $EDITOR: mensajes largos
-  - `Ctrl+T` · Thinking: ocultar o mostrar
-  - `Ctrl+⇧+O` · Herramientas: esconder actividad
-  - `Ctrl+R` · Historial: el del perfil
 - *En terminal:* Atajos con comando (más abajo, en «Código y comandos»)
 - **/settings · Input:** Modo Vim — Apagado de fábrica. Movimientos, borrados y objetos de texto; nunca roba los atajos con Ctrl.
 - *En la demo:* Las descripciones dicen el estado
@@ -59,9 +43,6 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 - *En la demo:* Título automático: una llamada extra
 - *En la demo:* /session
 - *En la demo:* Mensajes, tokens y coste
-- **/session tiene subcomandos (solo diapositiva)**
-  - `/session delete` · Borra la sesión: no se deshace
-  - `/session pin` · Fija una cuenta: enseña cuentas · no es /pin
 - *En la demo:* /rename envio-umbrales
 - **Para qué:** Un nombre se encuentra solo — Una sesión sin nombre es una línea más con la fecha.
 
@@ -69,19 +50,11 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 
 <p><button type="button" class="ir-a" data-t="462">▶ Ir a 7:42</button></p>
 
-- **La idea:** T1 (resumen) → T2 (gratis desde 50) → T3 (+3 € urgente) → T2′ (2,95 € entre 25 y 40)
 - *En la demo:* /branch · /rewind
 - *En la demo:* ↑/↓ paso · ←/→ tus mensajes · f filtro · ⏎ rebobina
 - *En la demo:* Contorno punteado sobre T2
 - *En la demo:* Rewound to selected point
 - *En la demo:* La petición nueva: 2,95 €
-- **En el fichero:** Nada se ha borrado — La rama del umbral de 50 sigue ahí; la nueva cuelga del mismo punto, como una hermana.
-- **Qué eliges al rebobinar**
-  - `tu mensaje` · Vuelve al editor: para reescribirlo
-  - `respuesta` · Editor vacío: la rama sale desde ahí
-- **Frente a Pi**
-  - `sin resumen` · Inmediato: no gasta modelo
-  - `Esc Esc` · Abre el rewind: doubleEscapeAction: rewind · tree · none
 - *En la demo:* Esc Esc · las dos ramas lado a lado
 
 ### 5 · Navegar con /tree
@@ -89,21 +62,11 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 <p><button type="button" class="ir-a" data-t="642">▶ Ir a 10:42</button></p>
 
 - *En la demo:* /tree
-- **Filtros del árbol**
-  - `default` · Por defecto
-  - `Alt+T` · Sin tool results
-  - `Alt+U` · Solo tuyos
-  - `Alt+L` · Etiquetadas
-  - `Alt+A` · Todo
 - *En la demo:* ⇧L · etiqueta umbral-50
 - *En la demo:* Enter salta sin preguntar · ⇧Enter resume y salta
-- **branchSummary.enabled: false:** Moverse no cuesta — Pero la rama nueva no sabe que la otra existió.
 - *En la demo:* Solo conoce su rama
 - **Vídeo 03:** En el fichero ≠ lo que ve el modelo — La otra rama está etiquetada y a un Enter, pero no viaja en la petición.
 - **Apunte honesto:** La hoja no se guarda — Al cargar, la sesión vuelve a la última entrada escrita. Tras moverte, envía algo.
-- **Lo que no cambia**
-  - `git` · El código: el árbol no deshace ficheros
-  - `rewind` · Otra cosa: herramienta de checkpoints, apagada
 
 ### 6 · Bifurcar con /fork
 
@@ -111,10 +74,8 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 
 - *En la demo:* ls $S
 - *En la demo:* jq: tipo, id y parentId
-- **/fork:** Sin selector — Duplica la sesión entera, con todas sus ramas, en un fichero nuevo.
 - *En la demo:* El comando ya lleva --profile demo
 - *En la demo:* wc -l: 20 y 20
-- **Sin /clone: una rama a su fichero:** /fork (copia todo) → /tree (elige la rama) → Sigue (desde ahí)
 - **Tres formas de volver atrás**
   - `/branch` · Rebobina: mismo fichero · sin resumen · Pi: no existía
   - `/tree` · Navega: mismo fichero · resumen solo con ⇧Enter · Pi: preguntaba
@@ -127,7 +88,7 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 - **/pin:** Session pinned — Arriba de la lista de /resume. Otra vez /pin la desfija.
 - *En la demo:* /resume
 - *En la demo:* Tab y Supr: no en cámara
-- *En la demo:* /resume
+- *En la demo:* /resume «id»
 - *En terminal:* Dónde viven las sesiones (más abajo, en «Código y comandos»)
 - *En terminal:* Retomar desde la terminal (más abajo, en «Código y comandos»)
 
@@ -135,21 +96,12 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 
 <p><button type="button" class="ir-a" data-t="1149">▶ Ir a 19:09</button></p>
 
-- **Cuatro formas de empezar de cero**
-  - `/fresh` · Proveedor
-  - `/clear` · Contexto
-  - `/new` · Sesión
-  - `/delete` · Borrar
 - *En la demo:* /fresh
 - *En la demo:* /clear
 - *En la demo:* Sin memoria de lo anterior
 - *En la demo:* /tree · Alt+A
 - *En la demo:* /new
 - **/delete · solo diapositiva:** No se deshace — Borra la sesión, su fichero y sus artefactos.
-- **Cuál usar**
-  - `/clear` · Mismo trabajo: mente despejada
-  - `/new` · Otro trabajo
-  - `/fresh` · El proveedor: falla o se atasca
 
 ### 9 · Reintentar, reiniciar, mover y cierre
 
@@ -158,11 +110,9 @@ atajos, selector de comandos y todas las formas de rebobinar, bifurcar y retomar
 - *En la demo:* /retry · F5 · antes, hasta 10 reintentos automáticos
 - *En la demo:* /restart · mismos flags
 - *En terminal:* /move (no grabado) (más abajo, en «Código y comandos»)
-- **Repaso:** Atajos (y selector) → /session (/rename) → /branch (rebobina) → /tree (navega) → /fork (duplica)
 - **Y dos límites honestos**
   - `ficheros` · El árbol no los deshace
   - `hoja` · Un salto no se guarda: hasta que escribes algo
-- **Práctica:** Tres turnos (sin editar) → Esc Esc (y reescribe) → /tree (etiqueta y pregunta) → /fork (wc -l) → /clear (y pregunta)
 - **Próximo vídeo:** Contexto y memoria — /context, /compact, /shake, /handoff, memoria entre sesiones y /btw.
 
 ## Código y comandos
