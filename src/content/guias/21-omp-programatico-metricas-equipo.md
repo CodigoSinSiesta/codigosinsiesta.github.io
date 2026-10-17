@@ -18,108 +18,98 @@ Omp en scripts e integración continua, su panel de estadísticas y trazas, y la
 
 <p><button type="button" class="ir-a" data-t="19">▶ Ir a 0:19</button></p>
 
-- **Vídeo 10 · Pi fuera de la TUI:** print (scripts) → JSON (eventos) → RPC (otro proceso) → SDK (tu programa) → CI (la revisión)
-- **Por orden:** omp -p (JSON) → Revisión (con red) → CI → RPC (v2) → SDK (ACP) → Métricas (/trace /stats) → Equipo (/ratchet)
+- Lo del vídeo 10 sigue valiendo en oh my pi, porque lo hereda: modo print para scripts, modo JSON con todos los eventos, RPC para controlarlo desde otro proceso y el SDK para meterlo en tu programa. Hoy solo ves lo que cambia.
+- Los cambios son de tres tipos. Los modos son los mismos, pero con detalles que rompen un script si no los conoces. Hay una vía que Pi no tiene: ACP, para usar oh my pi dentro de un editor. Y hay piezas nuevas: un panel local de estadísticas, trazas por sesión y comandos para trabajar en equipo.
+- Exporta `OMP_PROFILE=demo` solo en ese panel de terminal. Así cada omp que lances, también desde un script, usa el perfil de pruebas y no el tuyo.
+
+| | Pi (vídeo 10) | oh my pi |
+|---|---|---|
+| Herramientas de lectura | `read,grep,find,ls` | `read,grep,glob` (pedir `find` o `ls` impide arrancar) |
+| Fin de la ejecución en JSON | `agent_settled` | `agent_end` con `isTerminal` y `yielded` |
+| Código de salida en modo JSON | 0 aunque la respuesta acabe en error | distinto de cero si acaba en error o abortada |
+| Red de seguridad del script | tu extensión de permisos | el flag `--approval-mode always-ask` |
+| RPC | versión 1 | versión 2: `ready`, `negotiate_protocol`, `prompt_result`, `session_settled` |
+| SDK | Node | Bun; `toolNames` necesita `restrictToolNames: true` |
 
 ### 2 · omp -p y el modo JSON
 
 <p><button type="button" class="ir-a" data-t="123">▶ Ir a 2:03</button></p>
 
-- *En terminal:* omp -p con una tubería (más abajo, en «Código y comandos»)
-- *En la demo:* omp -p, mientras trabaja
-- *En la demo:* La respuesta, entera al final
-- **Vídeo 14:** omp -p --advisor — Espera las revisiones finales del advisor: hasta diez minutos.
-- *En la demo:* --mode json | jq
-- **oh my pi:** No hay agent_settled — El final se lee en agent_end.
-- *En la demo:* isTerminal · yielded · stopReason
+- `omp -p` procesa la petición, escribe la respuesta y sale. Lo que llega por una tubería entra como contexto (más abajo, en «Código y comandos»).
+- La respuesta no llega poco a poco: sale entera al terminar, y mientras tanto ves `Working...` por la salida de errores. Para un script es lo cómodo.
+- Con `--advisor` (el revisor del vídeo 14), en modo print omp espera hasta diez minutos a que el advisor acabe sus revisiones finales. Cuéntalo al fijar el tiempo máximo de un trabajo de integración continua.
+- `--mode json` da una cabecera de sesión y después todos los eventos. No existe `agent_settled`: el final se lee en `agent_end`. `isTerminal` dice si es el final o viene algo más, como un reintento; `yielded`, si el agente terminó su trabajo. Cada mensaje del asistente cierra con su `stopReason` (`toolUse` o `stop`) y su coste.
+- Código de salida: en Pi, el modo JSON salía con 0 aunque la respuesta acabara en error. En oh my pi, una respuesta final con error o abortada da un código distinto de cero también en JSON. Lo que no cambia: un 0 dice que omp terminó, no que hiciera lo que querías.
 
 ### 3 · La revisión, con la red de oh my pi
 
 <p><button type="button" class="ir-a" data-t="297">▶ Ir a 4:57</button></p>
 
-- *En la demo:* scripts/revisar-omp.sh
-- *En la demo:* La línea de oh my pi
-- *En la demo:* --approval-mode always-ask
-- **Vídeo 10 → 21:** Un flag, no una extensión — --approval-mode always-ask: la red de seguridad del script.
-- *En la demo:* errores.jsonl
-- *En la demo:* informe.md · salida 1 · git status limpio
-- *En la demo:* errores.jsonl con «corrígelo» y edit, write
-- **Dos redes y un vigilante:** --tools (la principal) → always-ask (la segunda) → El script (lo detecta)
+- `revisar-omp.sh` tiene las tres partes del `revisar.sh` del vídeo 10: ejecuta `npm test` y guarda el código (lo que se comprueba sin modelo lo comprueba el script), pasa el diff a omp en modo JSON y lee los eventos con `jq`.
+- La línea de omp lleva su política en flags: `--no-session` y `--no-title` (una llamada menos), `--max-time 5m` contra un agente atascado, `--no-extensions` y `--no-skills` para no depender de cada máquina, `--tools read,grep,glob` y el modelo solo si se fija desde fuera.
+- La clave es `--approval-mode always-ask`. Sin interfaz, lo que necesita aprobación falla (vídeo 19). En Pi necesitabas tu extensión de permisos; aquí basta un flag. Y el flag gana al modo del proyecto: con el `.omp/config.yml` del equipo en `write`, sin él el script habría editado código sin que nadie se enterase.
+- El script detecta el bloqueo leyendo los eventos `tool_execution_end` con `isError: true` y los guarda en `errores.jsonl`, aparte del informe. *En la demo:* al pedirle «si encuentras un fallo, corrígelo» con `edit` y `write`, las dos fallan, el script avisa y `git status` sigue limpio. Para omp todo ha ido bien: quien lo detecta es el script.
+- Dos redes y un vigilante: `--tools` es la barrera principal (una herramienta que no está activa no la aprueba ninguna política); `always-ask` es la segunda, porque una política `allow` del proyecto para `edit` la aprobaría igual; y el script es quien avisa.
 
 ### 4 · Integración continua
 
 <p><button type="button" class="ir-a" data-t="488">▶ Ir a 8:08</button></p>
 
-- *En la demo:* .github/workflows/revision-omp.yml
-- *En la demo:* Bun, la clave y el modelo
-- *En la demo:* timeout-minutes: 15 · --max-time 5m
-- **El bash de oh my pi:** CI=true — Los comandos saben que no hay nadie delante.
-- **Vídeos 5, 19 y 20:** Aprobar no es aislar — Y en oh my pi, un flag tampoco.
+- El workflow de GitHub Actions es casi el del vídeo 10: permisos de solo lectura, historial completo para el diff, script copiado desde la rama base, tests en un paso sin la clave e informe subido como artefacto aunque algo falle.
+- Lo que cambia es la instalación: omp necesita Bun y su paquete con la versión fijada. La clave llega por un secreto (`DEEPSEEK_API_KEY`), el modelo por una variable y, como en un runner no hay perfiles, una carpeta temporal hace de directorio del agente.
+- Tiempos: `timeout-minutes: 15` para el trabajo y `--max-time 5m` para omp; la diferencia deja margen para instalar, probar y subir el informe. El bash de omp pone `CI=true` en sus comandos, así que saben que no hay nadie delante.
+- omp no tiene `/trust` (vídeo 20). En un pull request carga el `.omp/` de la rama: configuración, políticas, reglas, hooks y servidores MCP. Los hooks son código que corre en tu runner con tu clave en el entorno. Por eso: clave solo en el paso que la necesita, flags en el script de la rama base, herramientas de lectura y omp en un contenedor (vídeo 5). Aprobar no es aislar, y un flag tampoco.
 
 ### 5 · RPC, versión dos
 
 <p><button type="button" class="ir-a" data-t="592">▶ Ir a 9:52</button></p>
 
-- *En la demo:* omp --mode rpc --no-session --tools read,grep,glob
-- *En la demo:* ready · negotiate_protocol
-- *En la demo:* prompt_result · session_settled
-- *En la demo:* get_session_stats
-- *En terminal:* ~/csn/rpc/aprobador-omp.mjs (resumen) (más abajo, en «Código y comandos»)
-- *En la demo:* aprobador-omp.mjs
-- *En la demo:* Aprobado desde el cliente
-- **RPC v2, además**
-  - `set_host_tools` · Tus herramientas: las ofrece el cliente
-  - `título` · Apagado: una llamada menos
-  - `clientes` · TS · Python · Rust · Go: oficiales
+- RPC sirve para hablar con omp desde otro programa, una línea por mensaje. Al arrancar envía `ready`: versiones 1 y 2 del protocolo y tamaño máximo de línea, un megabyte. Con `negotiate_protocol` pides la 2, y a partir de ahí un mensaje grande llega troceado en vez de recortado.
+- Cada petición acaba con dos eventos nuevos: `prompt_result` (cómo terminó esa petición, con su identificador) y `session_settled` (ya no queda nada pendiente). Para enseñar la respuesta, espera al primero; para cerrar o reciclar el proceso, al segundo. `get_session_stats` da mensajes, herramientas, tokens y coste.
+- El cliente `aprobador-omp.mjs` (más abajo, en «Código y comandos») recibe los diálogos de aprobación de omp como peticiones `select` y contesta `Approve` o `Deny`. La decisión sigue siendo de omp y su configuración; dónde se pregunta lo decide tu cliente: una web, un bot o un editor.
+- Además, en la versión 2:
+  - `set_host_tools`: tu cliente ofrece herramientas propias al modelo.
+  - Título automático apagado en RPC: una llamada menos.
+  - Clientes oficiales en TypeScript, Python, Rust y Go, que negocian la versión 2 y juntan los trozos por ti.
 
 ### 6 · El SDK y ACP
 
 <p><button type="button" class="ir-a" data-t="769">▶ Ir a 12:49</button></p>
 
-- *En la demo:* ~/csn/sdk-omp/resumen.ts
-- *En la demo:* stderr: herramientas · stdout: la respuesta
-- **Un detalle:** ¿En qué carpeta estoy? — El modelo dijo la del script, no la tienda. Y aun así leyó la tienda.
-- **El SDK lee OMP_PROFILE:** Sin perfil, tu agente de verdad — Tus credenciales, tus ajustes y tus sesiones.
-- *En terminal:* settings.json de Zed (diapositiva) (más abajo, en «Código y comandos»)
+- El SDK de omp corre en Bun, no en Node: `bun add @oh-my-pi/pi-coding-agent`, en la misma versión que tu binario.
+- La trampa: `toolNames` no es una lista blanca. Pide esas herramientas, pero no quita las demás; para que sean las únicas añade `restrictToolNames: true`. Y cierra con `await session.dispose()`, porque el cierre es asíncrono.
+- El SDK lee `OMP_PROFILE`. Sin él usa tu agente de verdad: tus credenciales, tus ajustes y tus sesiones.
+- *En la demo:* el modelo dice que su carpeta de trabajo es la del script, no la tienda que le pasamos, y aun así lee los ficheros de la tienda. Si tu programa depende de la carpeta, compruébalo con tu versión.
+- ¿SDK o RPC? Si tu programa corre en Bun y quieres acceso a todo, el SDK. Si es de otro lenguaje o prefieres que omp viva en su propio proceso, RPC. ACP (Agent Client Protocol) lleva omp a un editor: el editor lanza `omp acp` como proceso hijo y pone la interfaz y su propia puerta de permisos; omp pone modelos, credenciales, ajustes, skills y extensiones (configuración de Zed más abajo).
 
 ### 7 · Métricas: /trace, /stats y /export
 
 <p><button type="button" class="ir-a" data-t="897">▶ Ir a 14:57</button></p>
 
-- *En la demo:* omp --profile demo, sesión guardada
-- **/trace y /stats:** Abren tu navegador — Si grabas o compartes pantalla: un navegador limpio, sin sesiones.
-- *En la demo:* /trace
-- *En la demo:* La traza de la sesión
-- *En la demo:* Timeline
-- *En la demo:* Transcript: npm test 178 s · git status 321 s
-- *En la demo:* /stats · Overview
-- *En la demo:* Models
-- *En la demo:* Requests
-- *En la demo:* Tools
-- *En la demo:* Costs
-- *En la demo:* Projects
-- **Puerto 3847:** Un panel abierto se reutiliza — Antes de compartir pantalla, mira de qué perfil es.
-- *En la demo:* omp stats --summary
-- *En la demo:* /export /tmp/csn/omp21/sesion.html
-- *En la demo:* La exportación
-- **/export:** No redacta secretos — AGENTS.md, rutas y conversación: revísala antes de enviarla.
+- `/trace` y `/stats` abren tu navegador predeterminado, con tus cuentas y pestañas. Si grabas o compartes pantalla, usa un navegador limpio y el perfil de pruebas: el panel enseña rutas de proyectos, modelos, costes y la traza de cada sesión.
+- `/trace` responde a «¿por qué va lenta esta sesión?». *En la demo:* casi ocho minutos de reloj y solo quince segundos de modelo; el resto son dos barras de bash (178 s y 321 s), que es el tiempo que bash esperó a que aprobáramos, porque la configuración del equipo tiene bash en `prompt`.
+- `/stats` levanta un panel local en el puerto 3847 con las sesiones del perfil: portada con peticiones, coste, tokens y tasa de caché, y páginas de modelos, costes, peticiones, herramientas y proyectos. El coste es una estimación a precio de API, no tu factura. Si ya hay un panel abierto en ese puerto, se reutiliza: antes de compartir pantalla, mira de qué perfil es.
+- La página de frustración manda tus mensajes a un modelo juez si pulsas su botón, y eso sí gasta. Sin navegador: `omp stats --summary` da una tabla por modelo y por carpeta, y `--json` lo mismo para un script.
+- `/export ruta` guarda la sesión en HTML (por defecto, en el directorio actual, dentro del repo). Incluye el system prompt, las herramientas, tu AGENTS.md y toda la conversación, sin redactar secretos: revísala antes de enviarla.
 
 ### 8 · Equipo: /ratchet y lo que publica
 
 <p><button type="button" class="ir-a" data-t="1127">▶ Ir a 18:47</button></p>
 
-- **Solo explicado:** /ratchet — Mejorar un flujo con modelo con datos, no con intuición.
-- **Dos tiempos:** Evaluación (3 aprobaciones) → Reparto (congelado) → Rondas (un cambio)
-- **Dos ideas que valen siempre**
-  - `ruido` · Calcúlalo antes: diez puntos pueden ser azar
-  - `reservados` · Casos no vistos: solo ahí cuenta
-- **/collab:** El enlace es el acceso — Lo que sale de tu máquina se explica, no se enseña.
+- `/ratchet` (solo se explica, porque gasta mucho) mejora un flujo que usa un modelo, como un prompt que clasifica incidencias, con datos y no con intuición.
+- Funciona en dos tiempos. Primero construye una evaluación con tres aprobaciones tuyas (los casos, el evaluador y el plan) y reparte los casos en dos grupos congelados: uno para trabajar y otro reservado que el agente no ve. Después, en cada ronda, propone un solo cambio y lo mantiene solo si mejora en los reservados.
+- Dos ideas que valen aunque no lo uses:
+  - Calcula el ruido antes: con pocos casos, diez puntos de diferencia pueden ser azar.
+  - Un cambio solo cuenta si mejora en casos que el agente no ha visto.
+- `/share` sube una instantánea cifrada con la clave en el enlace. `/collab` comparte la sesión en directo: con el enlace completo, otra persona puede escribirle al agente que corre en tu máquina; el enlace es el acceso. `omp stream` emite tu pantalla en una página pública. Lo que sale de tu máquina se explica, no se enseña.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1217">▶ Ir a 20:17</button></p>
 
-- **Vídeo 22 · Bloque D:** Diseñar tu harness — Pocas herramientas, límites centralizados, anfitrión y sandbox. Y medirlo.
+- Un script desatendido lleva su política en flags: herramientas de lectura (`read,grep,glob`), tiempo máximo y `always-ask`, porque la configuración del proyecto puede decir `write`.
+- **Práctica:** adapta a omp el `revisar.sh` del vídeo 10. Cambia las herramientas, añade `always-ask` y comprueba, pidiéndole que corrija, que la edición se rechaza. Después ejecútalo sin `--no-session` un par de veces, abre `/stats` en tu perfil de pruebas y mira en la traza cuánto tiempo fue del modelo y cuánto de las herramientas.
+- **Vídeo 22 · Diseñar tu harness:** pocas herramientas, límites centralizados, anfitrión y sandbox. Y medirlo.
 
 ## Código y comandos
 
@@ -133,9 +123,9 @@ git diff master \
       "Revisa este diff en tres viñetas."
 ```
 
-- `git diff`: Contra la base
-- `|`: Entra como contexto
-- `-p`: Responde y sale
+- `git diff master`: el cambio de la rama frente a la base.
+- `|`: lo que llega por la tubería entra como contexto.
+- `-p`: responde una vez y sale.
 
 ### ~/csn/rpc/aprobador-omp.mjs (resumen)
 
@@ -148,11 +138,11 @@ if (ev.type === "extension_ui_request" && ev.method === "select")
 // 3. get_session_stats → una línea
 ```
 
-- `ready`: Arranque
-- `select`: Approve / Deny
-- `stats`: Al final
+- `ready`: lo primero que envía omp; hasta entonces no mandes nada.
+- `select`: cada diálogo de aprobación llega así y se contesta con `Approve` o `Deny`.
+- `get_session_stats`: al final, para escribir tokens y coste en una línea.
 
-### settings.json de Zed (diapositiva)
+### settings.json de Zed
 
 ```text
 "agent_servers": {
@@ -160,89 +150,20 @@ if (ev.type === "extension_ui_request" && ev.method === "select")
                 "args": ["--profile", "demo", "acp"] } }
 ```
 
-- `acp`: Proceso hijo
-- `agent_servers`: La entrada
-- `--profile demo`: Nuestro perfil
+No aparece en la terminal del vídeo; está aquí como referencia.
+
+- `agent_servers`: la entrada de Zed para agentes externos.
+- `acp`: Zed lanza omp como proceso hijo en modo ACP.
+- `--profile demo`: el perfil de pruebas, delante del subcomando.
 
 ## Fuentes
 
-- Documentación instalada de omp 18.6.1 (`omp read omp://…`), comparada con la documentación de omp (omp.sh):
-  **idénticas** `cli-reference.md`, `sdk.md`, `stream.md`, `session-operations-export-share-fork-resume.md`,
-  `collab.md`, `config-usage.md`, `approval-mode.md` y `advisor-watchdog.md`; `rpc.md` y `environment-variables.md`
-  solo difieren porque `omp read` corta a 50 KB (prefijo idéntico; se leyeron enteros en la copia).
-  - `cli-reference.md`: «Headless / print mode» (última respuesta por stdout al terminar, `Working...` por stderr,
-    stdin no TTY elige print, `--print-thoughts`, `--no-title`, `--max-time`); «`--mode json` emits a session header
-    followed by events… Terminal turn failures produce a nonzero exit status in both text and JSON modes»; tabla de
-    `--mode` (`text`, `json`, `rpc`, `rpc-ui`, `acp`); `--no-ui`; `--approval-mode`, `--auto-approve`/`--yolo`,
-    `--tools`, `--no-extensions`, `--no-skills`, `--no-rules`, `--config`, `--profile` («applied before subcommand
-    routing»); subcomandos `acp`, `stats`, `share`, `join`, `collab`, `stream`, `clip`, `play`.
-  - `rpc.md`: `ready` con `supportedProtocolVersions: [1, 2]`; `negotiate_protocol` y `rpc_chunk`; la respuesta de
-    `prompt` = admitido; `prompt_result` (`agentInvoked`, `status`, `sessionSettled`) y `session_settled` («Yield vs
-    settled»); fallo del proveedor = `success: true` + `stopReason: "error"`; RPC desactiva el título automático;
-    `extension_ui_request` (`select`, `confirm`, `input`, `editor`, `ask`…) y `--no-ui`; «Tool approval prompts use
-    the extension runner… Under `--no-ui`, tools requiring approval fail closed»; herramientas del host
-    (`set_host_tools`, `host_tool_call`, `host_tool_result`); `get_session_stats`, `export_html`; clientes TypeScript,
-    Python (`omp-rpc`), Rust y Go generados del esquema; cerrar stdin = apagado ordenado con código 0.
-  - `sdk.md`: `bun add @oh-my-pi/pi-coding-agent`, Bun 1.3.14 o superior; «provide to override, omit to discover»;
-    `agentDir` por defecto `~/.omp/agent`; `SessionManager.inMemory()`; **`toolNames` no es una lista blanca sin
-    `restrictToolNames: true`** (que además apaga MCP, extensiones, comandos y LSP); `hasUI` falso por defecto;
-    `agent_end` con `isTerminal`/`yielded`; `await session.dispose()`.
-  - `approval-mode.md` §«ACP sessions» (la puerta de permisos del cliente se mantiene con la configuración por defecto;
-    `omp acp --yolo` o `--approval-mode yolo` para ir desatendido) y §«Subagents».
-  - `advisor-watchdog.md` §«Headless runs»: `omp -p --advisor` espera hasta diez minutos las revisiones finales; las
-    salidas con error, 30 segundos.
-  - `session-operations-export-share-fork-resume.md`: `/export [--themes] [ruta]`, nombre por defecto
-    `omp-session-<…>.html` en el directorio actual, abre el navegador, **sin redacción ni cifrado**, incluye system
-    prompt, descripciones de herramientas y transcripciones de subagentes; `--export` en la CLI; `/dump`; `/share`
-    (cifrado AES-256-GCM, clave en el fragmento, `share.redactSecrets`, `my.omp.sh` o gist secreto).
-  - `collab.md`: `/collab`, `/collab view`, `/join`, `/leave`; «Possession of the link is the trust boundary»; el
-    relay ve solo texto cifrado; `collab.displayName` por defecto = nombre de usuario del sistema; `collab.autoStart`.
-  - `stream.md`: `omp stream` emite la pantalla en `live.omp.sh/<usuario>` (cuenta Stencil); `/record` es local;
-    `omp clip` sube la grabación como clip público; el chat no se redacta.
-  - `config-usage.md` §«Profiles» (`--profile`, `OMP_PROFILE`; sesiones y `agent.db` por perfil); 
-    `environment-variables.md`: orden de `$env` (proceso → `.env` del cwd → `.env` del perfil → `~/.omp/.env` →
-    `~/.env`, solo para claves sin valor), `OMP_PROFILE`, `PI_CODING_AGENT_DIR` (solo perfil por defecto),
-    `PI_NO_TITLE`, `PI_RPC_EMIT_TITLE`, **`PI_BASH_NO_CI`** («Suppresses automatic `CI=true` injection»), `PI_PROXY`,
-    `DEEPSEEK_API_KEY` (§1 y `providers.md`), OpenTelemetry (`OTEL_EXPORTER_OTLP_*`, `telemetry.otlpExportEnabled`).
-- **Código 18.5.1** (`~/orca/oh-my-pi`, `git show v18.5.1:…`, solo lectura):
-  - `modes/print-mode.ts`: cabecera en JSON; todos los eventos de sesión por stdout; el código de salida lo decide el
-    `stopReason` final (`error`/`aborted`) en todos los modos (issue #11498); no hay evento `agent_settled`.
-  - `extensibility/extensions/wrapper.ts`: `select(…, ["Approve", "Deny"])`; «Tool "…" requires approval but no
-    interactive UI available».
-  - `slash-commands/builtin-collaboration.ts`: `/export` («Export session to HTML file», rechaza `--copy`), `/trace`
-    («Open this session's trace in the stats dashboard», «No session file yet — send a message first.», URL
-    `…/#/traces?s=<fichero>`), `/share`, `/join`; `builtin-session.ts`: `/stats` registra un **juez** para la página
-    Frustration cuyo coste va a la sesión.
-  - `packages/stats` (`README.md`, `server.ts`, `frustration.ts`, `port-conflict.ts`): panel en `127.0.0.1:3847`;
-    páginas Overview, Models, Providers, Costs, Requests, Errors, Traces, Tools, Frustration, Projects y Gain; abrir el
-    panel no llama a ningún modelo; el juicio de frustración es un POST explícito con cabecera propia; **si ya hay un
-    panel compatible en el puerto, se reutiliza**; métricas (tokens/s, tasa y ahorro de caché, errores, latencia,
-    TTFT, coste estimado a precio de API, «N/A» para modelos solo de suscripción).
-  - `utils/src/dirs.ts`: `getStatsDbPath()` y `getSessionsDir()` cuelgan de la raíz del perfil
-    (`~/.omp/profiles/<nombre>/stats.db`).
-  - `session/agent-session-types.ts`: `SessionStats` (mensajes, llamadas a herramientas, tokens, `cost`).
-  - `prompts/ratchet-kickoff.md` y `prompts/tools/ratchet.md`: una ronda de preguntas con `ask`, tres aprobaciones
-    (`inputs`, `grader`, `plan`), reparto train/test congelado, un cambio por ronda, `keep`/`revert`, suelo de ruido
-    ≈ `1/sqrt(n_test · reps)`, parada en `plateau` o `done`, estado en `.omp/ratchet/<flujo>/`; sin `ask` no construye
-    nada.
-  - `examples/sdk/` (01-minimal … 13-sql-sessions).
-- **Binario 18.6.1** (`~/.bun/bin/omp`, `grep -a`): «Launch the local stats dashboard», «Open this session's trace in
-  the stats dashboard», «Build (or reuse) an eval for an LLM flow, then hillclimb it unattended», `negotiate_protocol`,
-  `session_settled`. Changelog 18.5.1–18.6.1: solo un arreglo de `EPIPE` cuando un servidor RPC sale a mitad de una
-  escritura (18.6.0); nada cambia lo que cuenta este vídeo.
-- `omp --help`, `omp stats --help` (`--port`, `--host`, `--json`, `--summary`) y `omp acp --help` (18.6.1, solo
-  ayuda). `bun --version` → 1.3.14. Zed no está instalado en la máquina.
-- Vídeos anteriores: 10 (`pi -p`, JSON con `jq`, `scripts/revisar.sh`, red de seguridad con `permisos.ts`, workflow
-  `revision-pi.yml` solo como fichero, RPC a mano y `aprobador.mjs`, SDK con `resumen.ts`; «aprobar no es aislar»), 11
-  (perfil demo; `PI_CODING_AGENT_DIR` exportado en el pane: sin perfil, omp usaría el directorio de Pi; `archive`), 12
-  (título automático: una llamada extra; `--no-title`), 13 (`/btw` no entra en las exportaciones), 14 (**promete**
-  `omp -p --advisor` y el advisor en `/stats` para este vídeo; `DEEPSEEK_API_KEY` en omp), 19 (`.omp/config.yml` del
-  equipo con `approvalMode: write`, `bash: prompt` y patrones; `-p` falla con lo que pide aprobación; ACP conserva la
-  puerta del cliente; `/export` no redacta), 20 (sin `/trust`; lo que carga una carpeta; `skills.enableAgentsUser
-  false`; **cierra anunciando este vídeo**).
-- Tienda (`~/csn/tienda`, leída): rama `master` limpia, ramas `iva-antes` e `iva-despues`, sin remoto, sin `.omp/`,
-  `scripts/` ni `.github/`; `package.json` con `"test": "node --test"`. No existen todavía `~/csn/omp-equipo/` ni el
-  perfil `~/.omp/profiles/demo` (se crean al grabar los vídeos 11–20).
+- Grabado con omp 18.6.1. Documentación de omp (omp.sh, también con `omp read omp://…`): `cli-reference.md` (modo print, `--mode`, `--approval-mode`, `--tools`, `--no-extensions`, `--max-time`), `rpc.md` (protocolo v2, `extension_ui_request`, herramientas del host, clientes oficiales) y `sdk.md` (Bun, `toolNames` y `restrictToolNames`, `dispose`).
+- `approval-mode.md` (§«ACP sessions») y `advisor-watchdog.md` (§«Headless runs»: la espera de hasta diez minutos con `--advisor`).
+- `session-operations-export-share-fork-resume.md` (`/export`, `/share`) y `collab.md` («Possession of the link is the trust boundary»).
+- `config-usage.md` (§«Profiles») y `environment-variables.md` (`OMP_PROFILE`, `PI_BASH_NO_CI` para quitar `CI=true`).
+- `omp stats --help` (`--port`, `--json`, `--summary`) y `omp acp --help`.
+- Vídeos relacionados: 10 (Pi programático: `revisar.sh`, RPC y SDK), 14 (advisor), 19 (`.omp/config.yml` del equipo y modos de aprobación), 20 (sin `/trust`; lo que carga una carpeta) y 5 (contenedores).
 
 ## Transcripción
 
