@@ -18,117 +18,90 @@ Los dos sentidos de «harness» y sus cinco piezas: instrucciones, herramientas,
 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
-- **El punto de partida:** El modelo recibe texto y devuelve texto — No lee tu repositorio, no ejecuta pruebas, no recuerda.
-- **En una frase:** El modelo decide qué . El harness, cuándo, dónde y cómo. — Un buen harness no vuelve más listo al modelo: vuelve fiable lo que produce.
-- **Por eso:** Mismo modelo, resultados distintos — Cambia lo que ve, lo que puede hacer y cuándo se da por terminado.
-- **Primer sentido:** El harness como programa — Ejecuta el bucle: sesión, herramientas, permisos y compactación. Pi y oh my pi.
-- **Cómo los recorre el curso**
-  - `B·C` · Pi y oh my pi: el harness como programa
-  - `D` · Método: el harness de tu proyecto
+- **Definición:** el harness es todo lo que no son los pesos del modelo: las instrucciones que recibe, las herramientas que usa, el entorno donde se ejecutan, el estado que se conserva entre turnos y el feedback que dice si el trabajo está bien.
+- **En una frase:** el modelo decide qué código escribir; el harness, cuándo, dónde y cómo. Un buen harness no vuelve más listo al modelo: vuelve fiable lo que produce.
+- **Por eso** dos agentes con el mismo modelo dan resultados distintos: cambia lo que el modelo ve, lo que puede hacer y cuándo se da por terminado.
+- **Dos sentidos de la palabra.** Uno: el programa que ejecuta el bucle del agente (sesión, herramientas, permisos, compactación); Pi y oh my pi lo son. Dos: el andamiaje que pones en tu repositorio para que cualquier agente trabaje mejor (AGENTS.md, scripts de arranque, listas de tareas, documentos de traspaso, rúbricas). El segundo es portable.
+- **Cómo lo recorre el curso:** las etapas «Pi a fondo» (vídeos 02–10) y «oh my pi» (11–21) tratan el primer sentido; «Diseñar tu harness» (22–26), el segundo.
 
 ### 2 · Las cinco piezas del harness
 
 <p><button type="button" class="ir-a" data-t="151">▶ Ir a 2:31</button></p>
 
-- **01 · Instrucciones:** Un mapa, no un manual — Prompt de sistema · AGENTS.md · skills · plantillas de prompt
+La taxonomía viene del curso abierto Learn Harness Engineering. Se usa porque es neutral: sirve para lo que escribes tú y para lo que trae cada agente.
+
+| Pieza | Qué es | Regla | Ejemplo |
+|---|---|---|---|
+| 1 · Instrucciones | Prompt de sistema, AGENTS.md, skills, plantillas de prompt | Un mapa, no un manual | Un AGENTS.md de diez líneas: pruebas, carpetas vetadas, commits |
+| 2 · Herramientas | Leer, editar, ejecutar, buscar, consultar servicios | Mínimo privilegio; cada herramienta declarada viaja en cada petición y cuesta contexto | Pi: 4 activas. oh my pi en las demos: 12 activas de 24 |
+| 3 · Entorno | Tu máquina, un contenedor, una VM, un servidor remoto | Quien decide no debería ser quien ejecuta | `npm install` en un contenedor solo ve lo que montas |
+| 4 · Estado | Conversación, ficheros leídos, decisiones, tareas pendientes | Lo que no está en ficheros, no existe | Al llenarse el contexto: resumir, podar o traspasar |
+| 5 · Feedback | Pruebas, linters, revisiones, criterios de aceptación | Una forma objetiva de saber que ha terminado | `npm test`: tres pruebas, una falla |
+
+- **Estado y contexto lleno:** resumir (Pi compacta solo, con unos 16 000 tokens de reserva), podar (quitar resultados pesados de herramientas) o traspasar (documento de traspaso y sesión limpia). Cada estrategia pierde algo distinto.
+- **Separa a quien hace de quien revisa:** otra persona, otro agente o una batería de pruebas, pero no el mismo turno que escribió el código.
 - *En terminal:* AGENTS.md · instrucciones del proyecto (más abajo, en «Código y comandos»)
-- **02 · Herramientas:** Las manos del agente, con mínimo privilegio — Qué hace sin preguntar · qué necesita aprobación · qué está prohibido
-- *En la demo:* Cada herramienta viaja, descrita, en cada petición
-- **03 · Entorno:** Quien decide no debería ser quien ejecuta — Tu máquina · un contenedor · una máquina virtual · un servidor remoto
-- **Cuando se llena el contexto:** Resumir (Pi compacta solo) → Podar (fuera resultados pesados) → Traspasar (documento y sesión limpia)
-- **Estado fuera de la conversación:** Lo que no está en ficheros, no existe — Repositorio · lista de tareas · documento de traspaso
-- **05 · Feedback:** Una forma objetiva de saber que ha terminado — Pruebas · linters · revisiones · criterios de aceptación
 - *En terminal:* harness-demo · el feedback es una orden (más abajo, en «Código y comandos»)
-- **Separa a quien hace de quien revisa:** Hace (el agente) → Revisa (persona, otro agente o pruebas)
 
 ### 3 · Un turno por dentro
 
 <p><button type="button" class="ir-a" data-t="446">▶ Ir a 7:26</button></p>
 
-- **Un turno, paso a paso:** Tu mensaje (a la rama activa) → La petición (prompt · rama · herramientas) → El proveedor (el modelo responde)
-- **Sesiones:** La sesión es un árbol — Rebobina y prueba otro camino sin perder el anterior.
-- **Lo que guarda la compactación:** Objetivo → Restricciones → Progreso → Decisiones → Siguientes pasos
-- **Todo esto es harness:** El modelo solo ve lo que el harness le envía — Lo que entra · lo que puede hacer · cuándo se para
+- **Un turno:** tu mensaje se añade a la conversación. El harness monta la petición (prompt de sistema, historial, herramientas, ajustes del modelo) y la envía al proveedor. El modelo responde con texto y llamadas a herramientas; el harness las ejecuta y registra los resultados. Si hace falta otra vuelta, empieza otro turno. Un encargo normal son muchos turnos.
+- **Intervenir mientras trabaja:** un mensaje de *steering* entra al acabar el turno en curso; uno de *follow-up* espera a que termine todo; y puedes abortar. Lo practicamos en el vídeo 02.
+- **La sesión es un árbol:** cada entrada apunta a su padre y el modelo solo ve la rama activa. Si vuelves atrás y sigues, nace una rama nueva sin perder la anterior.
+- **Compactación:** al acercarse al límite, Pi resume lo antiguo en un bloque con objetivo, restricciones, progreso, decisiones y siguientes pasos, y conserva lo reciente. El fichero original no se borra.
+- **Todo esto es harness:** el modelo solo ve lo que el harness le envía. Ahí influyes tú: en lo que entra, en lo que puede hacer y en cuándo se para.
 
 ### 4 · Dos filosofías: Pi y oh my pi
 
 <p><button type="button" class="ir-a" data-t="568">▶ Ir a 9:28</button></p>
 
-- **La escalera: el mecanismo más pequeño:** AGENTS.md → Plantilla → Skill → Extensión → Paquete
-- **Pi:** No pide permiso: te enseña cada paso — Aprobaciones y sandbox: con extensiones o con un contenedor.
-- **oh my pi · fork de Pi, 2026:** Baterías incluidas — Unas treinta herramientas y ochenta y cinco comandos de serie.
-- **Ingeniería pensada para el modelo**
-  - `#` · Hashline: edición anclada
-  - `TTSR` · Reglas: en mitad de la respuesta
-  - `◉` · Asesor: revisa cada turno
-  - `⇅` · Roles: barato o potente
-- **Seguridad:** Ninguno pide permiso por defecto — oh my pi: tools.approvalMode = yolo. La seguridad la decides tú.
-- **Las mismas piezas, otros agentes**
-  - `CC` · Claude Code: memoria por capas, permisos, hooks, subagentes
-  - `CX` · Codex: repo como registro, AGENTS.md, worktrees
-  - `pi` · Pi: núcleo mínimo con extensiones
-  - *Análisis de Learn Harness Engineering (MIT · © 2025 WalkingLab)*
-- **Compatibilidad:** oh my pi lee la configuración de Claude Code y Codex — Ficheros de contexto · servidores MCP · skills
+- **Pi, mínimo y extensible:** cuatro herramientas activas (read, write, edit, bash) y, a propósito, sin subagentes ni modo plan. Si necesitas más, sube por la escalera y usa el mecanismo más pequeño que resuelva el problema: AGENTS.md, plantilla de prompt, skill, extensión en TypeScript, paquete.
+- **oh my pi, baterías incluidas:** fork de Pi sobre el mismo núcleo, con muchas más herramientas y comandos de serie: subagentes, modo plan, memoria entre sesiones, servidor de lenguaje, depurador, navegador e interfaz de git. Corre sobre Bun con partes en Rust.
+- **Ingeniería pensada para el modelo (oh my pi):** *hashline*, edición anclada por hash para no estropear un fichero con referencias antiguas; reglas que se inyectan en mitad de la respuesta cuando el modelo escribe un patrón concreto (en omp se llaman TTSR); un modelo asesor que revisa cada turno; y roles para usar un modelo barato en lo fácil y uno potente en lo difícil.
+- **Ninguno pide permiso por defecto.** Pi te enseña cada paso pero no se detiene; aprobaciones y sandbox se añaden con extensiones o con un contenedor (vídeo 05). oh my pi arranca en modo *yolo* (`tools.approvalMode`: no pide permiso para nada); sus modos prudentes hay que activarlos.
+- **Las mismas piezas, otros agentes:** Learn Harness Engineering destaca de Claude Code la memoria por capas, los permisos, los hooks y los subagentes; de Codex, el repositorio como sistema de registro, con AGENTS.md como índice y aislamiento con worktrees; de Pi, el núcleo mínimo con extensiones. oh my pi lee la configuración de Claude Code y Codex: ficheros de contexto, servidores MCP y skills.
+
+> **Nota:** la locución habla de «unas treinta herramientas» en oh my pi; el número depende de la versión y la configuración. En la de las demos, `/tools` muestra 12 activas de 24 disponibles.
 
 ### 5 · La misma tarea: dos agentes
 
 <p><button type="button" class="ir-a" data-t="764">▶ Ir a 12:44</button></p>
 
-- *En terminal:* harness-demo · src/carrito.js y sus pruebas (más abajo, en «Código y comandos»)
-- **Dos agentes, dos modelos**
-  - `omp` · oh my pi: GPT-5.6 Luna
-  - `pi` · Pi: Qwen 3.8 27B · gratuito vía OpenRouter
-- *En la demo:* oh my pi planifica y busca un AGENTS.md que no existe
-- *En la demo:* Reproduce el fallo y corrige una línea
-- *En la demo:* Causa, cambio y evidencia
-- *En la demo:* Pi: el bucle al desnudo, con bash
-- *En la demo:* Un 429 del proveedor: el harness reintenta
-- *En la demo:* Pi desconfía de su propia edición y la comprueba
-- *En la demo:* Un dato inventado: el total era 22, no 23,58
-- *En terminal:* git diff · la corrección de una línea (más abajo, en «Código y comandos»)
-- *En la demo:* Dos agentes en la misma carpeta se pisan
-- *En la demo:* /context: el impuesto de las herramientas, medido
-- **Lo que tienen en común:** Los dos verifican porque se lo pedimos — «Ejecuta las pruebas al terminar» es feedback que pusimos nosotros.
-- **Lo que cambia**
-  - `01` · Planificación: lista de tareas o directo
-  - `02` · Contexto inicial: prompt y herramientas
-  - `03` · Herramientas: cuántas declara
-  - `04` · Recuperación: ante errores
+- **La tarea:** en `harness-demo`, un carrito con cupón y tres pruebas, una de ellas fallando. A los dos agentes se les pide lo mismo: encuentra por qué, corrígelo sin tocar otros archivos y ejecuta las pruebas al terminar.
+- **Ojo, dos modelos distintos:** oh my pi con GPT-5.6 Luna y Pi con Qwen 3.8 27B gratuito vía OpenRouter. No comparamos harnesses en igualdad, sino filosofías.
+- *En la demo:* oh my pi planifica (cuatro tareas), busca un AGENTS.md que no existe, reproduce el fallo, corrige una línea y entrega causa, cambio y evidencia. Ese es el formato que quieres de cualquier agente.
+- *En la demo:* Pi trabaja con bash a pelo, sobrevive a un error 429 porque el harness reintenta solo, y relee su propia edición. Pero su resumen inventa un dato (dice 23,58; el total era 22). La evidencia es la prueba que se ejecuta, no lo que el agente cuenta.
+- **Más lecciones:** dos agentes en la misma carpeta se pisan; para trabajar en paralelo, cada uno necesita su propio espacio (un worktree o una copia). Y `/context` en oh my pi mide el impuesto de las herramientas: 3,9K tokens de descripciones antes de escribir nada, más que toda la conversación.
+- **Lo que cambia entre ambos:** cómo planifican, cuánto contexto ocupan al empezar, cuántas herramientas declaran y cómo se recuperan de errores. Lo que comparten: verifican porque se lo pedimos. Ese «ejecuta las pruebas» es feedback que pusimos nosotros.
 
 ### 6 · Cuando falla: ¿qué pieza ha sido?
 
 <p><button type="button" class="ir-a" data-t="1017">▶ Ir a 16:57</button></p>
 
-- **Diagnóstico:** Antes de cambiar de modelo, arregla el harness — Cambiar de modelo a menudo solo esconde el problema.
-- **Caso 1 · «Ya está arreglado» y no lo está:** Síntoma (falsa victoria) → Pieza (feedback) → Solución (criterio comprobable)
-- **Caso 2 · Olvida una restricción:** Síntoma (sesión larga) → Pieza (estado) → Solución (a las instrucciones)
-- **Caso 3 · Lento y elige mal:** Síntoma (cuarenta herramientas) → Pieza (herramientas) → Solución (menos, o bajo demanda)
-- **Caso 4 · Pasa aquí, falla en CI:** Síntoma (resultados distintos) → Pieza (entorno) → Solución (versiones fijas, mismo arranque)
-- **Caso 5 · Toca lo que no debía:** Síntoma (archivos ajenos) → Pieza (instrucciones o políticas) → Solución (AGENTS.md y permisos)
-- **Ablación:** Quita piezas de una en una y mira qué se rompe — Lo que no cambia nada, sobra. Lo que lo rompe todo, hay que cuidarlo.
-- **Mantenimiento:** El harness se degrada como el código — Revísalo de vez en cuando, igual que refactorizas.
+- **Diagnóstico:** antes de cambiar de modelo, revisa el harness. Pregunta en orden: ¿instrucciones claras y a la vista? ¿herramientas adecuadas? ¿entorno correcto? ¿conservaba el estado? ¿sabía cuándo había terminado?
+
+| Síntoma | Pieza | Solución |
+|---|---|---|
+| «Ya está arreglado» y no lo está | Feedback | Un criterio de aceptación comprobable |
+| Olvida una restricción en una sesión larga | Estado | Moverla a las instrucciones del proyecto |
+| Lento y elige herramientas raras (cuarenta de varios MCP) | Herramientas | Declarar menos o cargarlas bajo demanda (Pi lo hace con *codemode*: el modelo escribe un script que llama a las herramientas sin que se declaren todas; vídeo 07) |
+| Pasa en local, falla en CI | Entorno | Versiones fijas y el mismo script de arranque |
+| Toca archivos que no debía | Instrucciones o políticas | AGENTS.md y permisos o un entorno que monte solo lo necesario |
+
+- **Ablación:** quita piezas de una en una y mira qué se rompe. Lo que no cambia nada, sobra; lo que lo rompe todo, cuídalo.
+- **Mantenimiento:** el harness se degrada como el código. Revísalo de vez en cuando, igual que refactorizas.
 
 ### 7 · El mapa del curso
 
 <p><button type="button" class="ir-a" data-t="1183">▶ Ir a 19:43</button></p>
 
-- **Bloque Pi · 9 vídeos**
-  - `02` · Empezar: instalar, por dentro, modelos
-  - `05` · Seguridad: y aislamiento
-  - `06` · Personalizar: sin código · MCP
-  - `08` · Extender: extensiones y scripts
-- **Bloque oh my pi · 11 vídeos**
-  - `11` · Sesiones: cambios, TUI, contexto
-  - `14` · Dirigir: modelos y planificación
-  - `16` · Subagentes: e IDE integrado
-  - `18` · Calidad: permisos y equipo
-- **Bloque de método · 5 vídeos**
-  - `22` · Diseñar: tu harness
-  - `23` · Registro: el repositorio
-  - `24` · Verificar: de verdad
-  - `25` · Orquestar: cuándo compensa
-  - `26` · Proyecto: de principio a fin
-- **Próximo vídeo:** Instalar Pi y primera tarea — El modelo pone la inteligencia; el harness, todo lo demás.
+- **Marco común:** 01 · Qué es un harness de agente (este vídeo).
+- **Pi a fondo (9 vídeos):** 02 · Instalar Pi y primera tarea · 03 · Pi por dentro · 04 · Modelos y proveedores · 05 · Seguridad y aislamiento · 06 · Personalizar Pi sin código · 07 · MCP y codemode · 08 · Extensiones I · 09 · Extensiones II · 10 · Pi programático.
+- **oh my pi (11 vídeos):** 11 · De Pi a oh my pi · 12 · La TUI y las sesiones · 13 · Contexto y memoria · 14 · Modelos, roles y razonamiento · 15 · Planificar y dirigir · 16 · Subagentes · 17 · El IDE integrado · 18 · Git, calidad y entrega · 19 · Aprobaciones, reglas y hooks · 20 · Extender oh my pi · 21 · oh my pi en equipo.
+- **Diseñar tu harness (5 vídeos):** 22 · Diseñar tu harness · 23 · El repo como sistema de registro · 24 · Verificar de verdad · 25 · El coste de orquestar · 26 · Proyecto final (en preparación).
+- **Práctica:** elige una tarea que hayas hecho con un agente y analízala con las cinco piezas. Apunta qué pieza mejorarías primero.
 
 ## Código y comandos
 
@@ -137,16 +110,14 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 ### AGENTS.md · instrucciones del proyecto
 
 ```text
-cat AGENTS.md
+$ cat AGENTS.md
 # harness-demo
 - Pruebas: npm test (deben pasar antes de terminar)
 - No tocar: dist/ ni ficheros .env
 - Commits: en español y en imperativo
 ```
 
-- `npm test`: Cómo se verifica
-- `- No tocar`: Dónde no entrar
-- `- Commits`: Cómo se entrega
+Tres líneas cubren lo esencial: cómo se verifica, dónde no entrar y cómo se entrega.
 
 ### harness-demo · el feedback es una orden
 
@@ -158,8 +129,7 @@ npm test
 ℹ pass 2 · fail 1
 ```
 
-- `npm test`: Señal objetiva
-- `✖ un cupón del 10 %`: Una prueba falla
+- `npm test`: una señal binaria y objetiva; el agente no opina, consigue que la prueba pase sin romper las demás.
 
 ### harness-demo · src/carrito.js y sus pruebas
 
@@ -169,8 +139,7 @@ npm test
   esperado: 26.1   obtenido: 22
 ```
 
-- `un cupón del 10 %`: Carrito con cupón
-- `obtenido: 22`: La prueba que falla
+- `obtenido: 22`: el valor que da el código con el fallo; la prueba espera 26,1.
 
 ### git diff · la corrección de una línea
 
@@ -180,7 +149,15 @@ git diff src/carrito.js
 + total += cupon ? linea - linea * (cupon.porcentaje / 100) : linea;
 ```
 
-- `* l.cantidad`: Se multiplicaba dos veces
+- `* l.cantidad`: el descuento se multiplicaba otra vez por la cantidad, que ya iba incluida en `linea`.
+
+## Fuentes
+
+- Learn Harness Engineering (MIT · © 2025 WalkingLab): curso abierto del que salen la taxonomía de cinco piezas y el análisis de Claude Code, Codex y Pi.
+- Vídeo 02 del curso: steering, follow-up y la primera tarea con Pi.
+- Vídeo 05 del curso: seguridad, aprobaciones y contenedores.
+- Vídeo 07 del curso: codemode y herramientas bajo demanda.
+- Vídeo 11 del curso: qué cambia de Pi a oh my pi.
 
 ## Transcripción
 

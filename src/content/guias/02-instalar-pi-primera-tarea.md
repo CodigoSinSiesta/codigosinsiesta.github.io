@@ -18,98 +18,85 @@ Instalación, inicio de sesión y elección de modelo. Primera tarea real: refer
 
 <p><button type="button" class="ir-a" data-t="17">▶ Ir a 0:17</button></p>
 
-- **Bloque B · Pi:** De la teoría a la terminal — Empezamos por Pi: el más pequeño, el más fácil de seguir.
-- **El plan de hoy:** Instalar (y comprobar) → Modelo (proveedor y selector) → Tarea (en un repo de juguete) → Dirigir (mientras trabaja) → Retomar (la sesión)
-- **El modelo de las demos:** Qwen 3.8 27B gratuito, vía OpenRouter — Un modelo modesto deja ver mejor lo que aporta el harness.
-- **Para grabar (y para experimentar):** Configuración aparte, repositorio de juguete — Ni claves, ni sesiones, ni skills personales en pantalla.
+- **Primer vídeo de la etapa «Pi a fondo»:** dejamos la teoría y empezamos por Pi, el agente más pequeño y el más fácil de seguir. Hoy: instalar y comprobar, elegir modelo, una tarea en un repositorio de juguete, dirigir al agente mientras trabaja y retomar la sesión.
+- **Antes de empezar necesitas tres cosas:**
+  1. Una terminal: la tuya en macOS o Linux; en Windows, nativa o dentro de WSL.
+  2. Node.js 22.19 o superior (los instaladores oficiales lo instalan si falta).
+  3. Acceso a un modelo: una suscripción que Pi soporta (ChatGPT, Claude, GitHub Copilot) con `/login`; una clave de API (OpenRouter, Anthropic, OpenAI, Google…); o un modelo local con Ollama o llama.cpp, sin cuenta.
+- **El modelo de las demos:** en los vídeos 01 y 02, Qwen 3.8 27B gratuito vía OpenRouter. Un modelo modesto deja ver mejor lo que aporta el harness, y lo gratuito se satura (veremos un 429). Desde el vídeo 03 usamos DeepSeek Flash, de pago y muy barato.
+- **Consejo:** experimenta con un directorio de agente aparte y un repositorio de juguete. Así tus pruebas no se mezclan con tu configuración, tus claves ni tus sesiones de trabajo.
+
+> **Nota:** antes de usar con Pi la suscripción de un proveedor (por ejemplo, la de Claude), revisa sus términos de uso: algunos limitan el uso de la suscripción en harnesses de terceros. Una clave de API es la vía más segura.
 
 ### 2 · Instalar y comprobar
 
 <p><button type="button" class="ir-a" data-t="143">▶ Ir a 2:23</button></p>
 
-- *En terminal:* Instalador oficial (más abajo, en «Código y comandos»)
-- *En terminal:* Con npm (más abajo, en «Código y comandos»)
-- *En terminal:* Con Nix (más abajo, en «Código y comandos»)
-- *En la demo:* pi --version: si responde, está instalado
-- *En la demo:* pi --help: cuatro herramientas y los subcomandos
-- *En la demo:* Tres opciones para hoy
-- *En terminal:* ~/.pi/agent · el directorio del agente (más abajo, en «Código y comandos»)
-- *En terminal:* Un directorio de agente aparte (más abajo, en «Código y comandos»)
-- **Configuración del proyecto**
-  - `.pi/` · Solo con confianza: ajustes, extensiones y prompts del repo
-  - `!` · Desinstalar no borra: ~/.pi/agent sigue ahí
+- **Cuatro formas de instalar:** el instalador oficial (recomendado en macOS, Linux y Windows con PowerShell; fija dependencias y se actualiza con `pi update`), npm (con `--ignore-scripts`; menos reproducible), Nix (se actualiza con `nix profile upgrade`) y Android vía Termux, con su propia guía.
+- **Comprueba:** si `pi --version` responde, está instalado. `pi --help` resume la filosofía (cuatro herramientas: read, bash, edit, write) y enseña los subcomandos.
+- **Tres opciones de arranque que usarás:** `--model` elige el modelo; `-p` / `--print` hace una petición y sale, sin interfaz (vídeo 10); `-c` / `--continue` retoma la última sesión de la carpeta.
+- **Dónde guarda Pi sus cosas:** en el directorio del agente, `~/.pi/agent` (ajustes, atajos, credenciales, sesiones y recursos). Lo cambias con `PI_CODING_AGENT_DIR`. Desinstalar Pi no lo borra.
+- **Configuración del proyecto:** un repo puede traer su carpeta `.pi/` con ajustes, extensiones o prompts, pero solo se carga si confías en el proyecto (vídeo 05).
+- *En terminal:* Instalador oficial · Con npm · Con Nix · ~/.pi/agent · Un directorio de agente aparte (más abajo, en «Código y comandos»)
 
 ### 3 · Primer arranque
 
 <p><button type="button" class="ir-a" data-t="326">▶ Ir a 5:26</button></p>
 
-- *En la demo:* pi, en la raíz del repositorio
-- *En la demo:* Historial, editor y pie
-- *En la demo:* Ctrl+O: ayuda completa y recursos cargados
-- **Aviso de confianza:** Confiar en un proyecto no es una frontera de seguridad — Solo decide qué configuración de .pi/ se carga. Más en el vídeo 05.
-- **/login · fuera de cámara:** /login (elige proveedor) → Navegador o clave (según el proveedor) → auth.json (en el directorio del agente)
-- *En terminal:* Credenciales por variable de entorno (más abajo, en «Código y comandos»)
-- *En la demo:* El menú «/»: la referencia exacta de tu instalación
-- *En la demo:* /model: filtrar, elegir y guardar
-- *En la demo:* Modelo y nivel de razonamiento
+- **Arranca en la raíz del repo:** Pi usa esa carpeta para descubrir ficheros, instrucciones y configuración, y agrupa las sesiones por carpeta.
+- **La pantalla:** historial arriba, editor abajo y, debajo, el pie (carpeta, rama de git, contexto y modelo). `Esc` interrumpe; `Ctrl+C` / `Ctrl+D` limpian o salen; `/` abre comandos; `!` ejecuta bash. `Ctrl+O` despliega lo plegado: aquí, la ayuda completa y los recursos cargados (AGENTS.md, skills, extensiones); más tarde, las salidas de herramientas.
+- **Conectar un proveedor:** `/login`, eliges proveedor y, según el caso, se abre el navegador o te pide una clave. Se guarda en `auth.json`, en el directorio del agente. Alternativa en servidores y CI: una variable de entorno por proveedor.
+- **Ojo con la prioridad de credenciales:** `--api-key` gana, después `auth.json`, después `models.json` y por último el entorno. La variable solo se usa si no hay clave en `auth.json` ni en `models.json`; un `auth.json` olvidado la tapa.
+- **Elegir modelo:** `/model` (o `Ctrl+L`) filtra y elige para esta sesión; `Ctrl+S` lo guarda por defecto. `Ctrl+P` rota entre favoritos. El pie muestra también el nivel de razonamiento (`medium`), que cambias con `/thinking` o `Shift+Tab`.
+- **Si vienes de Claude Code:** allí `Shift+Tab` cambia el modo de permisos; en Pi, el nivel de razonamiento.
 
 ### 4 · La primera tarea
 
 <p><button type="button" class="ir-a" data-t="548">▶ Ir a 9:08</button></p>
 
-- *En la demo:* @ busca ficheros; Tab completa
-- *En terminal:* @ · señalar ficheros (más abajo, en «Código y comandos»)
-- *En la demo:* El razonamiento visible del modelo, en inglés
-- *En la demo:* Primera herramienta: read
-- *En la demo:* Segunda herramienta: bash para explorar
-- *En la demo:* Detecta un posible redondeo y no se pierde en él
-- *En la demo:* La respuesta, en español
+- **`@` señala ficheros:** escribes `@carr`, Pi sugiere y `Tab` completa. Le dices al agente qué importa sin que lo busque. Funciona con imágenes si el modelo las admite, y desde la CLI: `pi @fichero "pregunta"`.
+- **Un turno real:** primero el razonamiento visible (a menudo en inglés; la respuesta llega en tu idioma), luego `read` y después `bash` para explorar las pruebas y el `package.json`. El modelo relee el fichero aunque se lo diste con `@`: es habitual y barato.
+- **Lo plegado se despliega:** Pi pliega las salidas largas. `Ctrl+O` despliega las de herramientas y `Ctrl+T` los bloques de razonamiento. Si quieres saber qué ha visto el modelo, despliega.
+- *En la demo:* el modelo detecta un posible problema de redondeo, lo menciona y no se pierde en él. Es criterio, no un fallo.
+- **En clave de harness:** instrucciones (prompt de sistema + tu petición con `@`), herramientas (dos lecturas y un bash), entorno (tu máquina), estado (la sesión). Feedback no hacía falta: solo pedías una explicación.
 
 ### 5 · Tú también tienes terminal
 
 <p><button type="button" class="ir-a" data-t="743">▶ Ir a 12:23</button></p>
 
-- **La exclamación**
-  - `!!` · Solo para ti: el modelo no ve la salida
-  - `!` · Para los dos: la salida entra en la conversación
-- *En la demo:* !!npm test · borde gris: solo para ti
-- *En la demo:* !git log · borde amarillo: viaja con el siguiente mensaje
-- *En la demo:* El pie no cambia: ninguno llama al modelo
-- **Un caso típico:** !npm test (ves el error) → «arregla esto» (sin copiar nada) → El modelo (ya tiene la salida)
+- **`!!comando`:** se ejecuta y ves la salida, pero el modelo no (borde gris). Para comprobaciones rápidas que no deben gastar contexto.
+- **`!comando`:** la salida se añade a la conversación y viaja con tu siguiente mensaje (borde amarillo).
+- **Ninguno llama al modelo:** los contadores del pie no cambian. Buen hábito: `!!` por defecto y `!` solo cuando quieras que el modelo vea el resultado.
+- **Caso típico:** `!npm test`, ves el error y escribes «arregla esto». El modelo ya tiene la salida sin que la copies.
+- **Si vienes de Claude Code:** allí `!` también ejecuta bash y la salida entra en la conversación.
 
 ### 6 · Cambiar el rumbo
 
 <p><button type="button" class="ir-a" data-t="847">▶ Ir a 14:07</button></p>
 
-- *En terminal:* La tarea, con feedback incluido (más abajo, en «Código y comandos»)
-- **Steering · Enter mientras trabaja:** Escribes (la corrección) → Enter (queda en espera) → Fin del turno (el modelo la lee)
-- *En la demo:* El diff: de 50 a 40 €
-- *En terminal:* Steering de verdad, a mitad de turno (más abajo, en «Código y comandos»)
-- *En la demo:* Un 429 del proveedor gratuito
-- **También es harness:** Los reintentos los decide Pi, no el modelo — Cuántos y con qué espera: ajustes retry.*
-- *En la demo:* Follow-up en cola: se entregará al terminar
-- *En la demo:* Decisión de diseño explicada · 7/7
-- *En la demo:* Y después, el follow-up: la línea del README
-- *En la demo:* Escape: para en el acto
+- **Pide el feedback en la tarea:** «escribe sus pruebas y ejecuta npm test». No basta con escribir el código; tiene que demostrar que funciona.
+- **Tres gestos para dirigir:**
+
+| Gesto | Qué hace | Cuándo entra |
+|---|---|---|
+| `Enter` mientras trabaja | Steering: corrige el rumbo | Al acabar el turno en curso |
+| `Alt+Enter` (`Ctrl+Q` en Windows y WSL) | Follow-up: encola trabajo | Cuando termina todo lo pendiente |
+| `Esc` | Para en el acto | Ya; los mensajes en cola vuelven al editor |
+
+- *En la demo:* el primer steering llegó tarde: en seis segundos el modelo ya había terminado, y la corrección (umbral de 50 a 40 €) entró como mensaje normal. El resultado fue bueno igualmente.
+- *En la demo:* con un 429 del proveedor gratuito, Pi reintentó solo y se rindió tras tres intentos. Los reintentos son política del harness, no del modelo, y se configuran en los ajustes `retry.*`.
+- **Mensajes en cola:** `Alt+↑` los devuelve al editor para editarlos o borrarlos. Por defecto se entregan de uno en uno; en modo «todos», juntos.
 
 ### 7 · Leer el pie y retomar la sesión
 
 <p><button type="button" class="ir-a" data-t="1115">▶ Ir a 18:35</button></p>
 
-- *En la demo:* El pie, después de las tareas
-- *En terminal:* El pie de Pi (más abajo, en «Código y comandos»)
-- **CH · acierto de caché:** 95 % ya estaba cacheado: más barato y más rápido — Cambiar el prompt de sistema o las herramientas puede invalidar la caché.
-- **El coste:** Con un modelo de pago, el pie suma lo gastado — Con el gratuito no aparece: es cero.
-- *En la demo:* /session: el detalle de la sesión
-- **La sesión es un fichero JSONL:** Una línea (una entrada) → id y parentId (forman un árbol) → Vídeo 03 (tree, fork y clone)
-- *En terminal:* Retomar la sesión (más abajo, en «Código y comandos»)
-- *En la demo:* pi -c: la conversación vuelve entera
-- **Recapitulando**
-  - `1` · Instalar: instalador, npm o Nix
-  - `2` · Configurar: agent dir · /login · /model
-  - `3` · Pedir: @ ficheros · ! y !!
-  - `4` · Dirigir: Enter · Alt+Enter · Esc
-- **Próximo vídeo:** Pi por dentro — Cómo monta cada petición y por qué la sesión es un árbol.
+- **El pie, pieza a pieza** (detalle en «Código y comandos»): tokens de entrada y salida, lecturas de caché, acierto de caché, uso de contexto y compactación automática.
+- **Caché:** el 95 % de la última petición ya estaba cacheado: más barato y más rápido. Cambiar el prompt de sistema o las herramientas puede invalidar la caché.
+- **Coste:** con un modelo de pago, el pie suma lo gastado. Con el gratuito no aparece, porque es cero.
+- **`/session`:** el detalle de la sesión (en la demo, 54 mensajes y 84 000 tokens, el 88 % servido desde caché). Es el total de la sesión; el `CH` del pie mide solo la última petición, por eso no coinciden.
+- **Retomar:** la sesión es un fichero JSONL donde cada línea es una entrada con `id` y `parentId` (forman un árbol, vídeo 03). `pi -c` abre la última de la carpeta; `pi -r` o `/resume` te deja elegir. Como `claude -c` y `claude --resume` en Claude Code.
+- **Práctica:** crea un repo pequeño con una función y sus pruebas, arranca Pi con un directorio de agente aparte y pide una mejora con verificación. Prueba un steering y un follow-up, sal, vuelve con `pi -c` y mira `/session`.
 
 ## Código y comandos
 
@@ -121,22 +108,20 @@ Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 curl -fsSL https://pi.dev/install.sh | sh
 # Windows (PowerShell)
 powershell -c "irm https://pi.dev/install.ps1 | iex"
-# después
+# para actualizar más adelante
 pi update
 ```
 
-- `install.sh`: macOS y Linux
-- `install.ps1`: Windows
+- `install.sh`: macOS y Linux. `install.ps1`: Windows.
 
 ### Con npm
 
 ```text
 npm install -g --ignore-scripts @earendil-works/pi-coding-agent
-# ya no se publica npm-shrinkwrap.json
 ```
 
-- `--ignore-scripts`: Ninguna dependencia ejecuta código
-- `npm-shrinkwrap`: Dependencias sin fijar
+- `--ignore-scripts`: ninguna dependencia ejecuta código durante la instalación.
+- Por npm, las dependencias transitivas no van fijadas: el instalador oficial es más reproducible.
 
 ### Con Nix
 
@@ -146,9 +131,8 @@ nix profile upgrade pi
 nix run github:earendil-works/pi/stable
 ```
 
-- `profile add`: Instalar
-- `upgrade`: Actualizar (no pi update)
-- `nix run`: Sin instalar
+- `nix profile upgrade`: con Nix se actualiza así, no con `pi update`.
+- `nix run`: lo ejecuta sin instalarlo.
 
 ### ~/.pi/agent · el directorio del agente
 
@@ -160,21 +144,21 @@ sessions/
 extensions/  skills/  prompts/  themes/
 ```
 
-- `settings.json`: Ajustes
-- `auth.json`: Credenciales
-- `sessions/`: Sesiones
-- `extensions/`: Recursos
+- `auth.json`: las credenciales que guarda `/login`. Privado; nunca va a un repositorio.
+- `keybindings.json`: tus atajos de teclado.
+- `models.json`: proveedores y modelos propios, como uno local (vídeo 04).
+- `sessions/`: una carpeta por proyecto con sus ficheros JSONL.
+- `extensions/`, `skills/`, `prompts/`, `themes/`: tus recursos globales.
 
 ### Un directorio de agente aparte
 
 ```text
-export PI_CODING_AGENT_DIR=/tmp/csn/pi-agent
-pi        # /login una vez, fuera de cámara
+export PI_CODING_AGENT_DIR=~/pruebas-pi/agent
+pi        # la primera vez, /login
 pi        # desde aquí, como recién instalado
 ```
 
-- `PI_CODING_AGENT_DIR`: Cambia el directorio
-- `/tmp/csn`: Carpeta temporal
+- `PI_CODING_AGENT_DIR`: Pi usa ese directorio en lugar de `~/.pi/agent`. Para probar sin tocar tu configuración de trabajo.
 
 ### Credenciales por variable de entorno
 
@@ -184,8 +168,7 @@ export ANTHROPIC_API_KEY=…
 # prioridad: --api-key → auth.json → models.json → entorno
 ```
 
-- `OPENROUTER_API_KEY`: Una por proveedor
-- `prioridad`: Quién gana
+- Una variable por proveedor. Es la última en la prioridad: si hay clave en `auth.json` o en `models.json`, la variable se ignora.
 
 ### @ · señalar ficheros
 
@@ -193,9 +176,6 @@ export ANTHROPIC_API_KEY=…
 pi @src/carrito.js "¿Qué hace este fichero?"
 # en la TUI: @carr → Tab → @src/carrito.js
 ```
-
-- `@src/carrito.js`: El fichero exacto
-- `pi @`: También desde la CLI
 
 ### La tarea, con feedback incluido
 
@@ -205,8 +185,7 @@ Añade src/envio.js con una función gastosEnvio(subtotal):
 Escribe sus pruebas en test/envio.test.js y ejecuta npm test.
 ```
 
-- `gastosEnvio`: Qué construir
-- `ejecuta npm test`: Cómo demostrarlo
+- `ejecuta npm test`: el feedback va en el encargo; el agente tiene que demostrar que funciona.
 
 ### Steering de verdad, a mitad de turno
 
@@ -217,19 +196,24 @@ Steering: Mejor: céntrate solo en src/envio.js y resúmelo en tres viñetas.
 ── Working ──
 ```
 
-- `Revisa todos`: Tarea larga
-- `Steering:`: En espera hasta el fin del turno
+- `Steering:`: la corrección queda en espera y el modelo la lee al acabar el turno.
 
 ### El pie de Pi
 
 ```text
-~/csn/tienda (master)
+~/tienda (master)
 ↑9.1k ↓3.5k R64k CH95.4% 2.6%/262k (auto)          qwen/qwen3.8-27b:free • medium
 ```
 
-- `↑9.1k`: Entrada
-- `↓3.5k`: Salida
-- `R64k`: Leído de caché
+| Pieza | Significado |
+|---|---|
+| `↑9.1k` | Tokens de entrada enviados en la sesión, sin contar la caché |
+| `↓3.5k` | Tokens generados por el modelo |
+| `R64k` | Tokens leídos de la caché del proveedor (si informa de escrituras, aparece también `W`) |
+| `CH95.4%` | Acierto de caché en la última petición |
+| `2.6%/262k` | Uso de la ventana de contexto: amarillo por encima del 70 %, rojo por encima del 90 % |
+| `(auto)` | Compactación automática activada |
+| `medium` | Nivel de razonamiento |
 
 ### Retomar la sesión
 
@@ -238,14 +222,15 @@ Steering: Mejor: céntrate solo en src/envio.js y resúmelo en tres viñetas.
 clear; pi -c
 ```
 
-- `/quit`: Salir
-- `pi -c`: La última sesión de esta carpeta
+- `pi -c`: abre la última sesión de esta carpeta. Para elegir entre varias, `pi -r`.
 
 ## Fuentes
 
-- Documentación instalada de Pi 1.0.1: `docs/quickstart.md`, `docs/usage.md`, `docs/keybindings.md`, `docs/providers.md`.
-- Código del pie: `dist/modes/interactive/components/footer.js` (significado de ↑, ↓, R, W, CH y `(auto)`).
-- Documentación oficial de Pi: [keybindings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/keybindings.md), [providers.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md), [quickstart.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/quickstart.md), [usage.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/usage.md)
+- Documentación oficial de Pi: [quickstart.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/quickstart.md) (instalación y primer arranque), [usage.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/usage.md) (uso de la TUI, `@`, `!` y sesiones).
+- [keybindings.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/keybindings.md): todos los atajos de teclado.
+- [providers.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md): proveedores, `/login` y variables de entorno.
+- Grabado con Pi 1.0.1.
+- Vídeos relacionados del curso: 03 (la sesión como árbol), 04 (modelos y proveedores), 05 (confianza de proyecto) y 10 (modo print).
 
 ## Transcripción
 
