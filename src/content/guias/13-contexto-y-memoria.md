@@ -1,6 +1,6 @@
 ---
 title: "Vídeo 13 · Contexto y memoria"
-description: "Medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación."
+description: "Medir el contexto, adelgazarlo, resumirlo y traspasarlo en la misma sesión. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación."
 ruta: "pi-oh-my-pi"
 orden: 13
 duracion: "25 min"
@@ -8,7 +8,7 @@ video: "13-contexto-y-memoria.mp4"
 subtitulos: "/subtitulos/pi-oh-my-pi/13-contexto-y-memoria.es.vtt"
 ---
 
-Medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación.
+Medir el contexto, adelgazarlo, resumirlo y traspasarlo en la misma sesión. Los sistemas de memoria de omp y las preguntas laterales sin ensuciar la conversación.
 
 <p class="guia__nota">Dura 25 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,107 +18,105 @@ Medir el contexto, adelgazarlo y traspasarlo a una sesión nueva. Los sistemas d
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Hoy:** Medir (/context) → Adelgazar (/shake · /compact) → Traspasar (/handoff) → Laterales (/btw · extended) → Memoria (entre sesiones)
-- **Perfil demo · DeepSeek V4.1 Flash:** Ventana de 1M tokens — Hoy sí editamos tests. /compact, /handoff y /btw gastan modelo.
+- Del vídeo 03: cada petición lleva el prompt de sistema con tus ficheros de contexto, las herramientas y la rama activa. Cuando no cabe, se compacta: se resume lo antiguo y se conservan los mensajes recientes. Y el resumen lo escribe un modelo, así que puede equivocarse.
+- omp lleva esa idea más lejos: cinco métodos de compactar encadenados en orden, adelgazar sin llamar al modelo, resumir en segundo plano antes de que haga falta y memoria entre sesiones.
+- El plan tiene tres verbos: medir (`/context`), adelgazar (`/shake`, `/compact`) y traspasar (`/handoff`). Después, preguntas laterales, contexto extendido y memoria.
+- Ojo con el coste: `/compact`, `/handoff` y las preguntas laterales llaman al modelo aunque el nombre no lo sugiera.
 
 ### 2 · Medir con /context
 
 <p><button type="button" class="ir-a" data-t="115">▶ Ir a 1:55</button></p>
 
-- *En la demo:* omp --profile demo --no-session · /context
-- *En la demo:* Una sesión vacía: 6,7K tokens
-- *En la demo:* Reserva: 15 % de la ventana
-- *En la demo:* --tools read,bash,edit,write
-- *En la demo:* /co: el estado en el menú
+- `/context` da un informe por categorías que no se queda en la conversación: System prompt, System tools (definiciones de herramientas), System context (tus ficheros de contexto), Skills y Messages, más el espacio libre y la reserva para compactar.
+- *En la demo:* en una sesión vacía, las herramientas son lo más grande de la petición (3,7K tokens, más que el prompt de sistema). Con `--tools read,bash,edit,write` bajan a 1,1K, y la sesión vacía pasa de 6,7K a 3,6K tokens.
+- No es una invitación a quitar herramientas: con un millón de tokens de ventana, 3K son poca cosa. Con una ventana pequeña o muchos servidores MCP, esta cuenta sí cambia decisiones.
+- `RULES.md` en `.omp/` es una regla fija que viaja completa en cada petición: para lo poco que debe seguir a la vista aunque la conversación se compacte.
+- Atajo: al escribir `/co`, el selector ya enseña el porcentaje de contexto usado.
 
 ### 3 · Cuándo compacta solo oh my pi
 
 <p><button type="button" class="ir-a" data-t="306">▶ Ir a 5:06</button></p>
 
-- **Limpieza previa, sin modelo**
-  - `truncar` · Resultados antiguos: protege los recientes
-  - `superadas` · Lecturas repetidas
-  - `una línea` · Resultados inútiles
-- **Vídeo 12:** Contexto lleno → compactar — No se reintenta tal cual: se compacta y se reintenta el turno.
-- **compaction.methodOrder:** remote (proveedor) → snapcompact (imágenes) → handoff (traspaso) → shake (sin modelo) → soft (resumen local)
+- Compacta al superar un umbral. La reserva es el mayor de dos valores: 16 384 tokens, como Pi, o el 15 % de la ventana. Con un millón, 150 000 tokens.
+- Prepara el resumen en segundo plano al acercarse al umbral, y lo comprueba también a mitad de un turno largo, entre herramientas.
+- Antes de resumir limpia sin modelo: trunca resultados antiguos de herramientas (protege los recientes), da por superadas las lecturas repetidas y deja en una línea los resultados inútiles.
+- Si el proveedor responde que la petición no cabe, omp no la reintenta tal cual: compacta y reintenta el turno. Es la recuperación por desbordamiento del vídeo 03.
+- `compaction.methodOrder` fija el orden de los métodos; de fábrica: `remote` (el del proveedor), `snapcompact` (historia en imágenes), `handoff` (traspaso), `shake` (sin modelo) y `soft` (resumen local). Si uno no está disponible o falla, pasa al siguiente.
+
+> **Nota:** la locución remite al «final del vídeo doce» para esta regla. El vídeo que la cuenta es el 03.
 
 ### 4 · Adelgazar sin modelo: /shake
 
 <p><button type="button" class="ir-a" data-t="437">▶ Ir a 7:17</button></p>
 
-- **Tres turnos:** T1 (leer y testear) → T2 (registro de 2000 líneas) → T3 (test de 40 €)
-- *En la demo:* grep en vez de leer 2000 líneas
-- *En la demo:* Messages: 13K
-- *En la demo:* /shake
-- *En la demo:* Messages: 8,1K
-- **La pantalla no cambia:** Lo que adelgaza es lo que ve el modelo — Cada resultado quitado queda como referencia artifact://, recuperable.
-- *En la demo:* Lo digerido puede irse
+- *En la demo:* para un registro de 2000 líneas, el agente usa `grep` y trae solo las 14 líneas con error. Es lo que hace un buen agente con un fichero grande.
+- `/shake` (modo elide) quita resultados de herramientas y bloques grandes. No llama al modelo: es instantáneo y gratis. *En la demo:* Messages baja de 13K a 8,1K tokens.
+- La pantalla no cambia: adelgaza lo que recibe el modelo. Cada resultado quitado queda como una referencia `artifact://` a una copia guardada junto a la sesión, que el modelo puede volver a leer.
+- Quita los resultados, no lo que el modelo concluyó a partir de ellos: lo ya digerido puede irse. `/shake images` y `/shake thinking` quitan imágenes y razonamiento.
+- En la lista automática, shake es prudente. El `/shake` manual es más agresivo: lánzalo cuando sepas qué sobra.
 
 ### 5 · /compact y sus modos
 
 <p><button type="button" class="ir-a" data-t="602">▶ Ir a 10:02</button></p>
 
-- **Gasta modelo:** /compact soft «foco» — conserva la decisión sobre el caso de 40 euros y el estado de los tests
-- *En la demo:* El divisor: 15K → 9,3K
-- *En la demo:* Control O y la rueda
-- *En la demo:* El resumen detecta el desliz
-- *En la demo:* Turno partido, ficheros y la huella de /shake
-- *En la demo:* Messages: 2,6K
-- *En la demo:* Distingue lo que sabe de lo que supone
-- **snapcompact:** La historia, en imágenes — Sin modelo, sin clave, sin red. Exige un modelo que lea imágenes: DeepSeek Flash las lee.
-- *En la demo:* Nada que archivar tras /compact soft
-- **Vídeo 04:** Adelgazar rompe la caché — La siguiente petición se paga casi entera. Adelgaza cuando compense.
+- `/compact [modo] [foco]`: sin modo recorre la lista; con modo lo fuerza. Los modos son `soft`, `remote` y `snapcompact`, no comandos sueltos.
+- `soft` es el resumen local de Pi, con secciones fijas (objetivo, restricciones, progreso, decisiones, siguientes pasos, contexto crítico). Gasta modelo. *En la demo:* el total baja de 15K a 9,3K tokens y Messages, de 8,1K a 2,6K. El resumen detecta un desliz del modelo y avisa de reverificarlo; luego el modelo distingue lo que sabe del resumen de lo que supone.
+- `remote` usa la compactación del proveedor (OpenAI, Anthropic o un servidor propio) y cae a local si falla. Con OpenAI, en tu fichero queda un marcador, no un resumen legible.
+- `snapcompact` imprime la historia en imágenes que el modelo lee de vuelta: sin modelo, sin clave, sin red. Solo con modelos que aceptan imágenes, y solo compensa con historias largas.
+- Todos, también shake, cambian el principio de la conversación y rompen la caché (vídeo 04): la siguiente petición se paga casi entera. Adelgaza cuando compense.
+
+| Necesitas… | Usa |
+|---|---|
+| Quitar resultados de herramientas que ya no sirven | `/shake` (gratis) |
+| Seguir con menos peso, conservando lo importante | `/compact soft` con foco |
+| Cambiar de fase o dejar el trabajo listo para retomarlo | `/handoff` con foco |
+| Una pregunta suelta que no ensucie la sesión | `/btw` |
 
 ### 6 · Traspasar con /handoff
 
 <p><button type="button" class="ir-a" data-t="873">▶ Ir a 14:33</button></p>
 
-- *En la demo:* Antes: 17 mensajes
-- **Gasta modelo:** /handoff «foco» — céntrate en el estado de los tests y en lo que falta por hacer
-- *En la demo:* Generating handoff…
-- *En la demo:* Compactado en el sitio
-- *En la demo:* Mismo ID, mismo fichero
-- **Vídeo 23:** Lo que importa va al repo — Código, tests y decisiones. Un traspaso es un resumen de un modelo.
+- `/handoff [foco]` resume la sesión en un documento de traspaso, pensado para que otra instancia del agente retome el trabajo: estado, decisiones y siguientes pasos. Gasta modelo.
+- No abre una sesión nueva: compacta en el sitio, con el mismo id y el mismo fichero. Versiones antiguas sí abrían sesión aparte; puede que lo leas en guías viejas.
+- Frente a `/compact`, el modelo recibe el documento como el contexto de trabajo de una instancia anterior, y la petición aprovecha la caché de tus turnos. No funciona mientras el agente responde; si cancelas, no se guarda nada.
+- El concepto de traspaso del vídeo 01 es un documento para empezar limpio; omp lo implementa como una compactación más dentro de la misma sesión.
+- Un traspaso es un resumen de un modelo. Lo que tiene que sobrevivir (código, tests, decisiones) va al repositorio: vídeo 23.
 
 ### 7 · Preguntas laterales y contexto extendido
 
 <p><button type="button" class="ir-a" data-t="1021">▶ Ir a 17:01</button></p>
 
-- **/btw:** Barra by the way — Una pregunta que no se queda en la sesión.
-- *En la demo:* /btw ¿qué ficheros hemos modificado hoy?
-- *En la demo:* f · seguimiento en el historial
-- *En la demo:* Las laterales no entran en Messages
-- *En la demo:* /extended-context status
-- **/extended-context on|off**
-  - `config` · Se guarda: no solo esta sesión
-  - `tokens` · No es gratis: el umbral sube con la ventana
+- `/btw <pregunta>` responde aparte, incluso con un turno en marcha, y la pregunta no entra en la conversación (Messages no crece por ella). `f` abre una pregunta de seguimiento; el historial sobrevive al retomar, pero no entra en las exportaciones.
+- No es gratis: cada pregunta envía el contexto actual al proveedor. Úsala para dudas de verdad, no como chat paralelo. Si la pregunta necesita trabajo, eso es `/tan`, una tarea en paralelo (vídeo 16).
+- `/extended-context on|off|status` cambia a la ventana grande en los modelos que tienen dos. `on` y `off` se guardan en tu configuración, no solo en la sesión.
+- Una ventana mayor tampoco es gratis: el umbral de compactación sube con ella y cada petición puede llevar muchos más tokens. Antes, pregúntate si te basta con adelgazar.
 
 ### 8 · Memoria entre sesiones
 
 <p><button type="button" class="ir-a" data-t="1162">▶ Ir a 19:22</button></p>
 
-- **memory.backend: off:** Memoria entre sesiones — Guarda lo aprendido y lo inyecta en sesiones futuras.
-- **Backend local, al arrancar:** Fase 1 (extraer de cada sesión) → Fase 2 (consolidar) → Inyectar (resumen corto)
-- *En terminal:* Memoria de la demo (perfil demo, fuera de cámara) (más abajo, en «Código y comandos»)
-- *En la demo:* /memory stats
-- *En la demo:* Herramienta descubrible: retain
-- *En la demo:* Working: 1
-- *En la demo:* Sesión nueva: recuerda y avisa
-- *En la demo:* /memory view
-- *En la demo:* Dos recuerdos: uno no lo pedimos
-- **Límite honesto:** Memoria = pista, no verdad — Si contradice al código o a ti, gana el código y ganas tú.
+- La memoria guarda lo aprendido y lo inyecta en sesiones futuras. Viene apagada (`memory.backend: off`). Backends: `local` (resume tus sesiones antiguas al arrancar, con modelo y sin que escribas nada), `mnemopi` (SQLite en tu máquina) y `hindsight` (servidor externo, pensado para equipos).
+- *En la demo:* mnemopi sin modelo ni embeddings. El modelo guarda un hecho con la herramienta descubrible `retain`; en una sesión nueva lo recuerda y avisa de que no es una verificación fresca.
+- `/memory view` enseña lo inyectado. Había dos recuerdos: el pedido y otro que mnemopi guardó solo, el turno entero con una errata. La retención automática guarda lo que pasa, no solo lo que pides, y sin corregir.
+- `/memory stats`, `queue`, `sync` y `clear` (o `reset`) gestionan la memoria; con Hindsight, `clear` no borra el banco del servidor.
+- Límite honesto: la memoria es una pista, no la verdad. Si contradice al código o a ti, gana el código y ganas tú.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1402">▶ Ir a 23:22</button></p>
 
-- **Próximo vídeo:** Modelos, roles y razonamiento — DeepSeek Flash para el trabajo, DeepSeek V4 Pro para revisar.
+- Medir: `/context` da categorías, espacio libre y reserva. Las herramientas cuestan contexto en cada petición, y ahora sabes cuánto.
+- Adelgazar: omp compacta solo, recorriendo `methodOrder`. `/shake` quita peso sin modelo y deja lo quitado recuperable; `/compact` resume (soft legible, remote del proveedor, snapcompact en imágenes).
+- Traspasar: `/handoff` escribe un traspaso y compacta en la misma sesión. `/btw` no ensucia la sesión, pero se paga. La memoria lleva lo aprendido a la siguiente sesión como pista.
+- Práctica: mide con `/context` antes de escribir nada, trabaja unos turnos, mide otra vez y lanza `/shake`. Compacta con soft y un foco concreto, busca un error en el resumen, termina con `/handoff` y compara qué conserva cada documento.
 
 ## Código y comandos
 
 Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
 
-### Memoria de la demo (perfil demo, fuera de cámara)
+### Memoria de la demo
+
+No aparece en el vídeo; está aquí como referencia.
 
 ```text
 omp --profile demo config set memory.backend mnemopi
@@ -126,87 +124,20 @@ omp --profile demo config set mnemopi.noEmbeddings true
 omp --profile demo config set mnemopi.llmMode none
 ```
 
-- `noEmbeddings`: Solo texto, sin descargas
-- `llmMode none`: Sin modelo
-- `memory.backend`: De fábrica: off
+- `noEmbeddings` busca solo por texto y no descarga un modelo de embeddings. Si quieres búsqueda por significado, actívalos; para recuerdos en castellano existe la variante multilingüe.
+- `llmMode none` hace que mnemopi no llame a ningún modelo: la memoria no cuesta nada.
+
+En el perfil demo también se bajó `keepRecentTokens` (los tokens recientes que la compactación conserva siempre) de 20 000 a 3000, para que una sesión pequeña tenga algo que compactar. En tu trabajo real no lo toques.
 
 ## Fuentes
 
-- Documentación de omp 18.5.1 (la documentación de omp (omp.sh); `omp read omp://…` en 18.6.1 da
-  `compaction.md`, `handoff-generation-pipeline.md`, `memory.md`, `mnemosyne-memory-backend.md` y `magic-keywords.md`
-  idénticos):
-  - `compaction.md`: entradas `compaction` y `branch_summary`; qué ve el modelo (sistema, resumen, mensajes desde
-    `firstKeptEntryId`); seis disparadores (manual, desbordamiento, salida incompleta, umbral, a mitad de turno, inactivo);
-    promoción de contexto antes de compactar; el desbordamiento salta `handoff`; método `shake` (local, `artifact://`,
-    ventana reciente protegida) y «Manual `/shake` is a separate, more aggressive command»; `snapcompact` (historial en
-    PNG con fuente de píxeles, sin modelo, sin clave, sin red; exige modelo con entrada de imagen; rechaza foco; evals de
-    recuerdo a menor coste); modos remotos (V2 streaming de Responses, V1 `/responses/compact`, beta de Anthropic,
-    endpoint propio) y que en los carriles de OpenAI el `summary` guardado es un marcador; *display transcript* con el
-    divisor «compacted · ctrl+o» y el scrollback intacto; poda previa (protege 40 000 tokens recientes de herramientas,
-    exige 20 000 de ahorro, `[Output truncated - N tokens]`); `dropUseless` (`[Uneventful result elided]`);
-    `supersedeReads`; ficheros leídos y modificados en `<files>`; recompactación con `compaction-update-summary.md` y
-    `<previous-summary>`; modo experimental de notas (`compaction.experimentalContextManagement`, `context_notes`,
-    `new_context`, `history://current/full`); `/handoff` compacta en el sitio (mismo id, mismo
-    fichero, misma clave de caché); valores por defecto (`methodOrder` `remote, snapcompact, handoff, shake, soft`,
-    `asyncEnabled` con banda previa `clamp(umbral × 0,125; 8192; 32000)` y el icono que late en la status line, reserva
-    `max(15 % de la ventana; 16 384)`, `keepRecentTokens` 20 000, `autoContinue`, `midTurnEnabled`,
-    `handoffSaveToDisk` `false`, `idleEnabled` `false`, `branchSummary.enabled` `false`).
-  - `handoff-generation-pipeline.md`: `/handoff [focus instructions]`; «Nothing to hand off (no messages yet)» con menos
-    de dos mensajes; «Nothing to hand off (already compacted)»; petición lateral con la misma clave de caché y
-    `toolChoice: "none"`; se niega mientras hay streaming o compactación; «Generating handoff… (esc to cancel)»;
-    «Handoff cancelled», «Handoff failed: …»; «Context handed off and compacted in place»; el
-    documento no se ve en streaming; `method: "handoff"` hace que el modelo lo lea como el contexto de trabajo de una
-    instancia anterior; solo los traspasos automáticos se guardan en disco con `handoffSaveToDisk`; sesiones antiguas con
-    `customType: "handoff"` (el traspaso antes abría sesión nueva).
-  - `memory.md`: cinco modos de `memory.backend` (`off` por defecto, `local`, `hindsight`, `mnemopi`, `sharpshooter`
-    sin guía); bloque Memory Guidance; «Treat memory as heuristic context»; `memory://root`, `MEMORY.md`, `learned.md`,
-    `skills/`; tabla de `/memory` (`view`, `stats`, `diagnose`, `queue`, `sync`, `clear`/`reset`, `enqueue`/`rebuild`,
-    `mm …`); canalización local en dos fases al arrancar (rol `default` para extraer, `smol` para consolidar), límites
-    `maxRolloutAgeDays` 30 y `minRolloutIdleHours` 12, `summaryInjectionTokenLimit` 5000; `autolearn.enabled` y la
-    herramienta `learn` (lecciones en `learned.md`, deduplicadas, sin secretos, inyectadas desde la sesión siguiente); Hindsight (servidor,
-    `http://localhost:8888` por defecto, token opcional, ámbito `per-project-tagged`, recuerda en el primer turno y
-    retiene cada tres turnos, `recall`/`retain`/`reflect`, `/memory clear` no borra el banco del servidor).
-  - `mnemosyne-memory-backend.md`: SQLite local; recuerdo en un bloque `<memories>` en el primer turno; retención como
-    mucho cada `retainEveryNTurns` (4); «Recalled memory is background context, not instructions»; herramientas
-    descubribles `recall`, `retain`, `reflect`, `memory_edit`; `scoping` (`per-project` por defecto); `noEmbeddings`
-    (solo FTS); `embeddingVariant` `en` (por defecto) o `multilingual`; `llmMode` `smol`, `remote` o `none`;
-    `/memory clear` borra las bases SQLite del ámbito activo; `/memory enqueue` y la puerta de edad de 12 horas.
-  - `settings.md` §«Context, compaction, and memory»: `/extended-context on|off|status`, ventanas solo documentadas para
-    `gpt-6-astra` y `gpt-6.1-sol`, «A larger window can consume more usage», el umbral crece con la ventana,
-    `contextPromotion.enabled` (`false`), `compaction.thresholdPercent`/`thresholdTokens`, `memory.backend`.
-  - `extensions.md` (único sitio de la documentación donde aparece `soft` como modo: `compact({ mode: "soft" | "remote" |
-    "snapcompact" })`; `runEphemeralTurn`, «the same side-turn pipeline as `/btw`», «A side turn sends the current
-    conversation snapshot to the configured model provider»).
-  - `slash-command-internals.md` §11 (`/btw`: pregunta independiente con el modelo y el contexto activos, incluido el
-    texto en curso, sin añadirse al transcript; historial con `/btw` a secas; `Esc`, `c`, `f`; *follow-ups* que
-    sobreviven al retomar; historial en `btw-history/` junto a los artefactos de la sesión; no entra en export ni share;
-    caché «depends on the provider»). `session-operations-export-share-fork-resume.md` («BTW history»).
-  - `context-files.md` (`RULES.md` en `.omp/` como regla fija que viaja completa en cada petición; perfiles en
-    `~/.omp/profiles/<name>/agent`), `non-compaction-retry-policy.md` (el
-    desbordamiento de contexto no se reintenta: va a compactación). `magic-keywords.md` consultado (avisos ocultos por
-    turno; no se usa en la locución).
-- **Binario de omp 18.6.1** (`strings ~/.bun/bin/omp`), solo para lo que la documentación no cuenta:
-  - `/context`: informe «Context Usage» (cabecera con modelo y ventana) con categorías `System prompt`, `System tools`,
-    `System context`, `Skills` y `Messages`, más «Free space», «Autocompact buffer» (rayado) y una marca
-    «Auto-compaction at N%»; «Snapcompact: inactive (model has no image input)» solo aparece si
-    `snapcompact.systemPrompt` o `snapcompact.toolResults` están activos.
-  - `/compact`: modos con su descripción («Summarize locally with the active model (skip server compaction)» para `soft`,
-    «Summarize via OpenAI-compatible server compaction, then fall back to a local summary» para `remote`, «Archive history
-    onto dense bitmap images the model reads back (no LLM call)» para `snapcompact`), error «/compact snapcompact does
-    not take focus instructions…», mensaje «Compaction complete. Tokens: A -> B (saved C).» (ruta no TUI).
-  - `/shake`: «Shook N tool results + M blocks (~T tokens freed).», «Nothing to shake.», «Dropped N thinking blocks…».
-  - `/memory` en la TUI: `sync` llama al mismo `enqueue` que `enqueue` y muestra «Memory consolidation ran.»; con
-    `local`, `enqueue` solo marca trabajo pendiente. `/memory view` vacío: «Memory payload is empty (memory backend off,
-    disabled, or no memory available).» `clear`: «Memory data cleared and system prompt refreshed.»
-  - `/extended-context`: «Extended context is off.», y `on`/`off` escriben el ajuste con `.set`.
-- `omp --help` (18.6.1): `--tools`, `--no-tools`, `--no-session`, `--profile`; `omp config --help` (`path`, `get`, `set`).
-- Vídeos anteriores: 03 (cómo Pi monta el contexto; reserva fija de 16 384 y 20 000 tokens recientes; «Nothing to
-  compact (session too small)» y `keepRecentTokens: 3000` en la demo; resumen estructurado y sus errores; caché que cae
-  tras compactar; «las decisiones de verdad tienen que vivir en ficheros»), 04 (caché), 07 (coste de las herramientas en
-  el contexto), 11 (perfil `--profile demo`, «o eme pe», DeepSeek V4.1 Flash; promete: «Cada herramienta tiene un coste en
-  contexto, y lo mediremos en el vídeo trece»), 12 (cierra anunciando «barra shake para adelgazar sin modelo, barra
-  handoff para traspasar, el contexto extendido, la memoria entre sesiones y barra btw»; «el contexto lleno no se
-  reintenta: eso es compactación»; las sesiones del 12 se quedan en el perfil demo).
+- Documentación de oh my pi ([omp.sh](https://omp.sh)). Grabado con omp 18.6.1.
+- `compaction.md`: cuándo y cómo compacta, `methodOrder`, shake, snapcompact, los modos remotos y qué ve el modelo después.
+- `handoff-generation-pipeline.md`: cómo se genera el traspaso y por qué compacta en el sitio.
+- `memory.md` y `mnemosyne-memory-backend.md`: los backends de memoria, `/memory` y «Treat memory as heuristic context».
+- `settings.md`, sección «Context, compaction, and memory»: umbrales, reserva y `/extended-context`.
+- `slash-command-internals.md`: cómo funciona `/btw`.
+- Vídeos relacionados del curso: 03 (contexto y compactación en Pi), 04 (caché), 07 (coste de las herramientas), 16 (`/tan`) y 23 (el traspaso en el repositorio).
 
 ## Transcripción
 

@@ -18,93 +18,88 @@ Asignar modelos por rol (rápido, lento, planificador, revisor) y usar un «advi
 
 <p><button type="button" class="ir-a" data-t="19">▶ Ir a 0:19</button></p>
 
-- **La estrategia del vídeo 04:** Uno hace, otro más capaz revisa — Funcionó, pero a mano: cambiando de modelo y pagando la caché en cada cambio.
-- **Hoy:** Roles (qué y cómo) → Cambiar (/model · /switch · Ctrl+P) → Effort (y presets) → Prewalk (y advisor) → Coste (y /usage)
+- La estrategia del vídeo 04 era «uno hace, otro más capaz revisa». Funcionó, pero a mano: cambiando de modelo y pagando la caché en cada cambio.
+- omp cambia la pregunta. En Pi te preguntas qué modelo tienes activo; en omp, qué modelo hace cada trabajo. Un rol es un nombre de trabajo (`default`, `smol`, `advisor`…) que apunta a un modelo.
+- Sobre los roles monta dos piezas que en Pi tendrías que programar: un traspaso automático entre modelos (`/prewalk`) y un segundo modelo que revisa cada turno (`/advisor`).
+- Modelos de la demo, con la misma clave: DeepSeek V4.1 Flash (`deepseek/deepseek-flash`), el rápido, y DeepSeek V4 Pro (`deepseek/deepseek-v4-pro`), el capaz. Pro tiene una tarifa de lista unas cuatro veces mayor, aunque durante la grabación DeepSeek le aplicaba la de Flash. Comprueba la tarifa actual con `omp models deepseek`.
 
 ### 2 · Qué es un rol
 
 <p><button type="button" class="ir-a" data-t="141">▶ Ir a 2:21</button></p>
 
-- *En terminal:* config.yml del perfil (más abajo, en «Código y comandos»)
-- **Roles por tipo de modelo:** judge, imagen, web, voz… — No conversan, pero también hacen llamadas.
-- **Herencia:** smol · slow (→ default) → tiny (→ smol) → memory (→ tiny)
-- **smol en otro proveedor:** Los títulos de sesión también se van allí — Un rol mal pensado mueve trabajo de fondo sin que lo veas en pantalla.
-- **Advisor sin asignar:** slow, o una cadena potente — No hereda el modelo de la conversación. Asígnalo a mano y compruébalo.
-- *En terminal:* Selectores (más abajo, en «Código y comandos»)
+- Los roles se guardan en `modelRoles`, dentro del `config.yml` del perfil (no lo confundas con `models.yml`, que define proveedores y modelos). Cada rol lleva un selector: proveedor e id, un nombre aproximado o una lista separada por comas, de la que se usa el primero disponible. *En terminal:* config.yml del perfil (más abajo, en «Código y comandos»).
+- Roles de chat: `default` (con el que conversas), `smol` (rápido), `slow` (razonamiento profundo), `plan` (modo plan, vídeo 15), `vision`, `commit`, `tiny` y `memory` (trabajo de fondo, como títulos y memoria), `task` (subagentes) y `advisor` (revisor). Hay además roles por tipo de modelo (imagen, web, voz, `judge`…) que también hacen llamadas.
+- Los roles sin asignar heredan: `smol` y `slow` toman el `default`; `tiny` toma lo que tenga `smol`, y `memory` lo que tenga `tiny`. Si pones `smol` en otro proveedor, los títulos de sesión también se van allí, sin que lo veas.
+- El `advisor` sin asignar no hereda el modelo de la conversación: usa `slow` o una cadena interna de modelos potentes, que puede ser cara. Asígnalo a mano y compruébalo.
+- Sintaxis: `@slow` es un alias del modelo que tenga ese rol; `:low` al final fija el esfuerzo. Así, Flash ocupa dos roles con distinto esfuerzo.
 
 ### 3 · /model, /switch y Ctrl+P
 
 <p><button type="button" class="ir-a" data-t="283">▶ Ir a 4:43</button></p>
 
-- *En la demo:* /mo
-- *En la demo:* /ad
-- *En la demo:* /model · filtrado por deepseek
-- *En la demo:* Enter sobre Pro: ¿qué rol?
-- *En la demo:* Esfuerzo por rol
-- *En la demo:* omp --profile demo config get modelRoles
-- *En la demo:* /switch @slow
-- *En la demo:* Ctrl+P · smol → default → slow
-- *En terminal:* Desde la línea de comandos (más abajo, en «Código y comandos»)
-- **Vídeo 04:** Cambiar de modelo paga la caché — La costumbre nueva: cada trabajo a un rol.
+- Antes de cambiar nada, el selector de comandos te dice gratis el modelo activo, los presets y si el advisor está encendido.
+- `/model` (Alt+M) abre el centro de modelos, con velocidad, ventana y precio de cada uno. Al asignar un modelo a un rol pregunta el esfuerzo para ese rol. En Pi elegías y luego guardabas; aquí asignar es guardar, en la configuración del perfil.
+- `/switch` (Alt+P) cambia el modelo solo en esta sesión y acepta lo mismo que un rol: `/switch @slow`.
+- Ctrl+P ya no rota por tus modelos favoritos, sino por roles, en el orden de `cycleOrder` (de fábrica, `smol`, `default`, `slow`).
+- Cambiar de modelo sigue pagando la caché (vídeo 04). La costumbre nueva es asignar cada trabajo a un rol y dejar que omp cambie en el momento justo. *En terminal:* Desde la línea de comandos.
 
 ### 4 · Cuánto piensa: /effort
 
 <p><button type="button" class="ir-a" data-t="484">▶ Ir a 8:04</button></p>
 
-- *En la demo:* /effort medium
-- **auto, que Pi no tiene:** Tu petición (antes del turno) → judge (estima la dificultad · otra llamada) → Esfuerzo (elegido para el turno)
-- **Con auto activo:** ultrathink — Escrito en tu mensaje, ese turno sube al tope del modelo.
+- `/effort` fija el razonamiento de la sesión; Shift+Tab los recorre, como en Pi. Las sesiones nuevas arrancan con `defaultThinkingLevel` (de fábrica, `high`).
+- Cada modelo admite solo algunos niveles. *En la demo:* Pro rechaza `medium` y lista los que acepta: off, auto, low, high y max.
+- `auto`, que Pi no tiene: antes de cada turno el rol `judge` estima la dificultad y elige el esfuerzo. Es otra llamada a un modelo. Con `auto` activo, escribir `ultrathink` en tu mensaje sube ese turno al tope del modelo.
+- Regla del vídeo 04: más esfuerzo al depurar y revisar, menos en ediciones bien especificadas. La novedad es que el esfuerzo viaja con el rol: `smol` con low para lo mecánico, `slow` y `advisor` con high para pensar y revisar.
 
 ### 5 · Presets y nivel de servicio
 
 <p><button type="button" class="ir-a" data-t="600">▶ Ir a 10:00</button></p>
 
-- *En la demo:* /modelpreset save · list
-- *En la demo:* /fast status · /slow status
-- *En la demo:* Tarifa valle: flecha ↓
+- `/modelpreset save <nombre>` guarda todos los roles y el nivel de razonamiento por defecto; `list`, `delete` y `switch` los gestionan.
+- `save` escribe en la configuración global del perfil. `switch` reescribe los roles, quita los que el preset no tiene y cambia el modelo activo al `default` del preset. Guarda el preset cuando tengas todos los roles asignados.
+- Uso práctico: un preset para el día a día, con el modelo rápido en casi todo, y otro para diseño o depuración difícil, con modelos más capaces.
+- `/fast` pide el carril prioritario del proveedor (más rápido y, normalmente, más caro) y `/slow` el carril flex (más barato y con más espera), donde existan. Cambian el carril, no el modelo. Con DeepSeek, el segmento de coste marca con una flecha si estás en hora punta.
 
 ### 6 · /prewalk: planifica el capaz, ejecuta el rápido
 
 <p><button type="button" class="ir-a" data-t="716">▶ Ir a 11:56</button></p>
 
-- **Prewalk:** Explora (el activo) → Todo (lista de tareas) → 1.ª edición (traspaso) → smol (ejecuta)
-- *En la demo:* /switch @slow · /prewalk
-- *En la demo:* El plan de Pro para el traspaso
-- *En la demo:* Todo · 5 tareas
-- *En la demo:* Prewalk: switched to deepseek-flash
-- *En la demo:* Flash comprueba
-- *En la demo:* Flash termina
-- **Riesgo:** Un plan malo se ejecuta con disciplina — Lee la lista de tareas antes de dejarle seguir.
+- Prewalk es un traspaso único: el modelo activo explora, escribe la lista de tareas y hace la primera edición; en ese momento omp pasa la sesión al modelo de `smol`. Viene apagado.
+- Requisitos: `smol` tiene que ser otro modelo u otro nivel de esfuerzo que el activo, y su proveedor necesita credenciales.
+- El disparador: con la herramienta `todo` activa, primero tiene que existir la lista de tareas; luego cambia en la primera edición o escritura. Leer, buscar o ejecutar no lo dispara. Tras el traspaso se desarma; `/prewalk restart` lo rearma y `prewalk.enabled` lo deja armado en sesiones nuevas.
+- *En la demo:* Pro planifica el recargo urgente y hace la primera edición; Flash comprueba con `grep` quién llama a la función, pasa los tests y cierra las tareas.
+- Riesgo: un plan malo se ejecuta con disciplina. Lee la lista de tareas antes de dejarle seguir. Y la primera petición de Flash no aprovecha la caché de Pro.
 
 ### 7 · /advisor: un segundo modelo que revisa
 
 <p><button type="button" class="ir-a" data-t="891">▶ Ir a 14:51</button></p>
 
-- **/advisor:** Un segundo modelo que revisa — No aprueba ni cambia nada: revisa y avisa.
-- *En terminal:* ~/.omp/profiles/demo/agent/WATCHDOG.md (más abajo, en «Código y comandos»)
-- *En la demo:* /advisor status
-- *En la demo:* /advisor on · status
-- *En la demo:* Flash trabaja con el advisor encendido
-- *En la demo:* Revisó y no encontró nada
-- *En la demo:* Flash avisa; el advisor calla
-- **El advisor no garantiza notas:** Pensado para no hacer ruido — Un filtro descarta las notas vacías y no repite lo ya dicho.
-- *En la demo:* Un gasto aparte
-- **Límites:** No es una frontera de seguridad — Una segunda opinión, no la verdad. Con permisos extra, actúa como tú.
+- El advisor lee cada turno del modelo principal y, si ve algo, inyecta una nota. No aprueba ni cambia nada: revisa y avisa. Es el «uno hace, otro revisa» del vídeo 04, automático.
+- Antes de encenderlo: si usa otro proveedor, tu código viaja a los dos. Comprueba con `/advisor status` qué modelo usa antes de dar la tarea, y enciéndelo antes de la tarea, porque solo lee desde ese momento.
+- Recibe `AGENTS.md` y además `WATCHDOG.md`, un fichero solo para él con lo que debe vigilar. Ve solo lo nuevo desde su última revisión, con secretos ofuscados, y se reinicia al compactar (vídeo 13). *En terminal:* WATCHDOG.md (más abajo, en «Código y comandos»).
+- No garantiza notas: un filtro descarta las vacías y no repite lo ya dicho. *En la demo:* calla dos veces, porque Flash ya avisa por su cuenta de lo que él habría dicho. Cuando habla, usa tres niveles: `nit`, `concern` y `blocker`, y el modelo principal los recibe como consejo, no como orden.
+- Límites: es un gasto aparte, con su propio contexto. No es una frontera de seguridad, y si `WATCHDOG.yml` le concede editar o ejecutar, actúa con tus permisos. Es una segunda opinión, no la verdad.
+
+> **Nota:** en la demo, Flash calcula 55,34 € para un carrito de 39,99 € con envío urgente. La cifra cuadra si se aplica un IVA del 21 % a los productos (39,99 × 1,21 = 48,39 €) y se suman el envío de 4,95 € y el recargo urgente de 2 €.
 
 ### 8 · Lo que cuesta, los fallos y /usage
 
 <p><button type="button" class="ir-a" data-t="1166">▶ Ir a 19:26</button></p>
 
-- *En la demo:* Sesión + advisor en el pie
-- *En la demo:* Cadenas de reserva
-- *En terminal:* Uso de cuentas, fuera de la TUI (más abajo, en «Código y comandos»)
+- Qué gasta cada pieza: `/switch`, Ctrl+P y prewalk pagan la caché al cambiar de modelo; `/effort` cambia los tokens de razonamiento; `/fast` suele costar más y `/slow` menos; el advisor es una conversación entera aparte; `tiny` y `judge` hacen llamadas que no ves.
+- Para saber quién gastó qué: el pie da el coste de la sesión, con el del advisor aparte, y `/advisor status` da el detalle del revisor.
+- Si un modelo falla por cuota o por una caída, omp puede pasar a otro: las cadenas de reserva se configuran por rol o por modelo, y al terminar la espera cada uno vuelve a su modelo original.
+- `/usage` enseña uso y límites de cada cuenta, con identidades. *En terminal:* Uso de cuentas, fuera de la TUI. `/usage reset` gasta un reinicio de límite que no se recupera.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1280">▶ Ir a 21:20</button></p>
 
-- **/usage:** Enseña cuentas — Por eso se queda en la diapositiva.
-- **Próximo vídeo:** Planificar y dirigir — /plan, /goal, /loop, la cola y la lista de tareas.
+- Asignas modelos a trabajos con roles, y cada rol lleva su esfuerzo. `/model` guarda roles, `/switch` cambia solo la sesión y Ctrl+P recorre `smol`, `default` y `slow`.
+- `/effort` ajusta el razonamiento y te dice qué niveles admite el modelo; `/modelpreset` guarda combinaciones; `/fast` y `/slow` cambian el carril de servicio.
+- `/prewalk` planifica con el capaz y pasa al rápido en la primera edición. `/advisor` añade un revisor con su propio modelo y su criterio en `WATCHDOG.md`, que avisa cuando hace falta y calla cuando no.
+- Práctica: asigna un modelo rápido a `smol` y uno capaz al `advisor`, y comprueba con `/advisor status` cuál usa de verdad. Escribe un `WATCHDOG.md` con dos reglas de tu proyecto, arma `/prewalk` con una tarea pequeña y compara lo que gastó cada modelo con lo que aportó.
 
 ## Código y comandos
 
@@ -120,9 +115,8 @@ modelRoles:
   advisor: deepseek/deepseek-v4-pro:high
 ```
 
-- `modelRoles`: Roles
-- `models.yml`: Otra cosa: proveedores
-- `a, b, c`: El primero disponible
+- `/model` escribe esto al asignar roles. Compruébalo con `omp --profile demo config get modelRoles`.
+- Flash ocupa dos roles con distinto esfuerzo: `default` sin sufijo y `smol` con `:low`.
 
 ### Selectores
 
@@ -132,10 +126,6 @@ deepseek/deepseek-flash:low          # modelo y esfuerzo
 deepseek/deepseek-v4-pro:high
 ```
 
-- `@slow`: Alias de rol
-- `:low`: Esfuerzo fijo
-- `:high`: Otro rol, otro esfuerzo
-
 ### Desde la línea de comandos
 
 ```text
@@ -144,9 +134,8 @@ omp --profile demo --smol … --slow … --plan …   # solo esta ejecución
 omp --profile demo models deepseek
 ```
 
-- `--model`: Modelo activo
-- `--plan`: Roles sin guardar
-- `omp models`: Catálogo
+- `--smol`, `--slow` y `--plan` sustituyen esos roles solo para esa ejecución, sin guardarlos.
+- `omp models` con un trozo del nombre consulta el catálogo, con precios.
 
 ### ~/.omp/profiles/demo/agent/WATCHDOG.md
 
@@ -156,9 +145,8 @@ omp --profile demo models deepseek
 - Los tests se ejecutan con node --test y deben pasar antes de terminar.
 ```
 
-- `WATCHDOG.md`: Solo para el advisor
-- `redondeo`: Regla 1
-- `tests`: Regla 3
+- Solo lo lee el advisor; el modelo principal no lo ve. En la demo está en la carpeta del perfil, no en el repositorio.
+- Cada regla es comprobable: un importe se recalcula, una firma se compara y los tests se ejecutan.
 
 ### Uso de cuentas, fuera de la TUI
 
@@ -167,82 +155,15 @@ omp usage --redact      # acorta correos e identificadores
 # revisa la salida antes de compartirla
 ```
 
-- `omp usage`: Fuera de la TUI
-- `--redact`: Acorta identidades
-- `revisa`: Siempre
-
 ## Fuentes
 
-- Documentación de omp 18.5.1 (la documentación de omp (omp.sh)):
-  - `models.md`: §«Role aliases and settings» (roles de chat `default`, `smol`, `slow`, `vision`, `plan`, `commit`,
-    `tiny`, `memory`, `task`, `advisor`; roles de tipo `image`, `web`, `speech`, `dictation`, `judge`; `tiny` resuelve
-    por `@smol`, `memory` por `@tiny`; `smol` y `slow` sin asignar heredan un `default` configurado; el advisor usa un
-    `slow` configurado o su propia cadena de modelos potentes, «rather than inheriting the active conversation model»;
-    asignar un rol en `/models` guarda sin cambiar el modelo activo, salvo `default`; «The session-only model picker
-    changes the active model without rewriting role assignments»; `@rol`, sufijo `:nivel`, listas con comas = primer
-    disponible, no reintento); §«Model presets» (`/modelpreset save|switch|list|delete`; tecla `s` en la vista Roles;
-    `switch` reescribe roles en el ámbito de `modelRoleStorage`, borra los que el preset no tiene, escribe
-    `defaultThinkingLevel` en la configuración global y cambia el modelo activo; la capa que gana se nombra en el
-    aviso; `save` escribe siempre en global); §«CLI and pattern parsing» (selectores, `:thinkingLevel` con `auto` e
-    `inherit`); §«`/model` and `omp models`» (`omp models`, `omp models find`); §«Usage costs and time-based pricing»
-    (tarifa punta y valle de DeepSeek, flechas ↑/↓ en el segmento `cost` de la status line; `deepseek-flash` y el alias
-    retirado `deepseek-v4-flash`). §«Context promotion» consultado (no se usa en la locución).
-  - `settings.md`: §«Where settings live» y «Where writes go» (perfiles con nombre en `~/.omp/profiles/<name>/agent`;
-    `modelRoleStorage: project` solo escribe `modelRoles` en `.omp/config.yml`); §«Precedence» (`--smol`, `--slow`,
-    `--plan`, `--advisor` son overrides de runtime, no se guardan); §«Models» (`modelRoles`, `modelRoleStorage`,
-    `modelPresets`, `cycleOrder` `["smol","default","slow"]`, `enabledModels`); §«Advisor» (`advisor.enabled` `false`,
-    `syncBacklog`, `immuneTurns` 3, `reviewMode`, `reviewInterval`, `maxNotesPerUpdate` 4, `evictStaleResults`);
-    §«Thinking» (`defaultThinkingLevel` `high`, `thinkingBudgets` solo en transportes por presupuesto,
-    `providers.autoThinkingMaxEffort` `xhigh`, solo `ultrathink` llega a `max`); §«Sampling» (`tier.openai`,
-    `tier.anthropic`, `tier.google`, `tier.advisor`, `ultrafast` con `/fast ultra`); §«Retry and fallback»
-    (`retry.fallbackChains`, `fallbackRevertPolicy: cooldown-expiry`, `retry.usageAwareFallback` `false`).
-  - `advisor-watchdog.md`: activación y resolución del modelo; `:auto`; *backup reviewer*; tabla de `/advisor`
-    (`on`/`off`/toggle «session-scoped; not persisted», `status`, `dump`, `dump raw`, `configure`); qué ve (solo el
-    delta, con razonamiento y herramientas, secretos ofuscados; `AGENTS.md` en `<project-context>`; se reinicia al
-    compactar, cambiar de sesión o bifurcar; activado a mitad de sesión, empieza desde ese punto); herramientas por
-    defecto `read`, `grep`, `glob` (+ `recall`) y la advertencia sobre conceder `edit`/`bash`; severidades `nit`,
-    `concern`, `blocker`; `<advisory … guidance="weigh, don't blindly obey">`; Esc detiene la reanudación; *emission
-    guard* (frases vacías, dedupe, 4 notas por revisión); `WATCHDOG.md` (solo para el advisor; usuario en
-    `<active agent dir>/WATCHDOG.md`, proyecto subiendo hasta la raíz del repo); `WATCHDOG.yml` (lista de advisors);
-    coste aparte y transcripción en `__advisor.jsonl` que `omp stats` atribuye a la sesión; `omp -p --advisor` (espera
-    hasta diez minutos las revisiones finales); subagentes por agente desde `/agents`.
-  - `prewalk.md`: traspaso único al rol `@smol`; apagado por defecto; `prewalk.enabled`, `--prewalk`,
-    `--no-prewalk`, `--prewalk-into`; puerta de `todo` y cambio al final del turno con la primera edición/escritura;
-    se desarma; `/prewalk` y `/prewalk restart`; prewalk de subagentes aparte.
-  - `providers.md` (disponibilidad = no deshabilitado + credenciales; orden de credenciales; `DEEPSEEK_API_KEY`;
-    `/usage` y `omp usage` con ventanas de cuota y créditos), `provider-quirks.md` §DeepSeek (esfuerzos
-    `low`/`high`/`max` para Flash; `DEEPSEEK_API_KEY`) y §OpenAI Codex (cuotas de 5 h y 7 d, créditos de reinicio),
-    `keybindings.md` (`Ctrl+P` «Cycle role models forward», `Alt+P` «Pick a model temporarily for this session»,
-    `Alt+M` «Open the model selector and set roles», `Shift+Tab` «Cycle thinking level»), `magic-keywords.md`
-    (`ultrathink` con thinking automático), `environment-variables.md` y `local-models.md` §«Integration notes» (el
-    clasificador de `auto` usa el rol `judge`), `cli-reference.md` (`--thinking`). `config-usage.md` consultado (perfiles;
-    no trata `/usage`). `local-models.md` consultado (modelos `tiny` locales; no se usa).
-- **Binario de omp 18.6.1** (`strings ~/.bun/bin/omp`), solo para textos de interfaz que la documentación no cuenta:
-  - `/switch`: «Session-only model: …»; acepta «fuzzy ids, provider/id, @role, :level».
-  - `/effort`: «Thinking set to <nivel>.», «Unknown thinking level: <x>. Available: …», «<modelo> has no adjustable
-    thinking level.»; descripción del menú «Thinking: <nivel>».
-  - `/fast`: `on|ultra|off|status`, «Fast mode is <estado>.», «Fast mode is unavailable for the current model.».
-  - `/slow`: «Slow mode is off.», «Slow mode on: requests use the flex tier (lower cost, higher latency).», «The current
-    model has no slow mode: /slow uses the flex tier on OpenAI/Google models and low priority on Anthropic
-    subscriptions.».
-  - `/modelpreset`: «No model presets saved. Use /modelpreset save <name> to create one.», «Model presets: …»,
-    nombres válidos (letra, luego letras, dígitos, `-` o `_`).
-  - `/prewalk`: «Prewalk on: switching to <proveedor/id> at the next edit/write (todo-gated).», «No API key for …»,
-    «Prewalk reset: … @smol resolves to the same model and thinking level, so no handoff was armed.».
-  - `/advisor`: «Advisor enabled.», «Advisor disabled.», «Advisor is disabled.», «Advisor setting enabled, but no model
-    is assigned to the 'advisor' role.», «Advisor is enabled (<proveedor/id>). Context: … Spend: … $…»; el estado
-    on/off vive en memoria (coincide con la doc: no se guarda). Descripción del menú «Advisor: on (<proveedor/id>)».
-  - `/usage`: `show` y `reset [provider/credential-id|provider/active]`, «Spend a saved provider rate-limit reset».
-- `omp --help` y `omp usage --help` (18.6.1): `--model`, `--smol`, `--slow`, `--plan`, `--models`, `--thinking`,
-  `--service-tier`, `--prewalk`, `--no-prewalk`, `--prewalk-into`, `--advisor`; `omp usage --redact` («Redact account
-  emails/ids … for sharing screenshots»).
-- Vídeos anteriores: 04 (en Pi: `/model` + `Ctrl+L`, `Ctrl+S` para guardar por defecto, `/scoped-models` y `Ctrl+P`,
-  siete niveles de thinking y `Shift+Tab`, `deepseek-flash:low`; Flash hace y Pro `max` revisa; la caché cae al cambiar
-  y `/session` enseña «Cache Re-billed»; «agrupa el trabajo»), 11 (perfil `--profile demo`, «o eme pe», GPT-5.6-Luna,
-  `Alt+M` «selector de modelos y roles», `Shift+Tab`), 12 (título automático con un rol para tareas pequeñas; las
-  descripciones del menú enseñan estado), 13 (cierra prometiendo «cambiar de modelo a mitad de tarea, los roles como
-  smol, slow o advisor, el esfuerzo de razonamiento y cómo repartir el trabajo entre un modelo barato y uno que revisa»;
-  la compactación reinicia lo que ve el advisor).
+- Documentación de oh my pi ([omp.sh](https://omp.sh)). Grabado con omp 18.6.1.
+- `models.md`: roles, herencia, selectores (`@rol`, `:nivel`), presets y precios por horas.
+- `settings.md`: `modelRoles`, `cycleOrder`, `defaultThinkingLevel`, ajustes del advisor y cadenas de reserva.
+- `advisor-watchdog.md`: qué ve el advisor, `WATCHDOG.md` y `WATCHDOG.yml`, niveles de las notas y sus límites.
+- `prewalk.md`: cuándo se dispara el traspaso y cómo se rearma.
+- `providers.md` y `provider-quirks.md` (DeepSeek): credenciales, niveles de esfuerzo admitidos y `/usage`.
+- Vídeos relacionados del curso: 04 (modelos en Pi y la caché), 13 (compactación), 15 (rol `plan`) y 21 (`omp -p --advisor` y `/stats`).
 
 ## Transcripción
 
