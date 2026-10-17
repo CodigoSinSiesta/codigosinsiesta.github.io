@@ -23,6 +23,8 @@ const pasos =
         titulo: g.data.title,
         href: `/rutas/${ruta.slug}/${g.id}`,
         meta: g.data.duracion,
+        // Si la ruta empieza en el orden 0 (un tráiler), el número del paso es el del vídeo.
+        numero: guias[0].data.orden === 0 ? g.data.orden : undefined,
         key: g.id,
       }))
     : ruta.pasos.map((p) => ({ ...p, key: p.href }));

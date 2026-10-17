@@ -24,6 +24,10 @@ const hermanas = (await getCollection('guias', (g) => g.data.ruta === guia.data.
 const idx = hermanas.findIndex((g) => g.id === guia.id);
 const anterior = idx > 0 ? hermanas[idx - 1] : null;
 const siguiente = idx < hermanas.length - 1 ? hermanas[idx + 1] : null;
+// Si la ruta empieza en el orden 0 (un tráiler), se numera por vídeo: el tráiler no cuenta.
+const conTrailer = hermanas[0]?.data.orden === 0;
+const numero = conTrailer ? guia.data.orden : idx + 1;
+const totalNumerados = conTrailer ? hermanas.length - 1 : hermanas.length;
 
 // TOC: solo H2/H3 con slug (los H1 son el título de página).
 // Quita el emoji inicial del texto; en el contenido se sustituye por un icono SVG.
@@ -59,7 +63,7 @@ const secciones = headings.filter((h) => h.depth === 2 && h.text !== 'Resumen po
           <a href={`/rutas/${guia.data.ruta}`} style="color: inherit;">
             {rutaInfo?.titulo ?? guia.data.ruta}
           </a>
-          · módulo {idx + 1}/{hermanas.length}
+          {numero === 0 ? ' · tráiler' : ` · módulo ${numero}/${totalNumerados}`}
           {guia.data.duracion && ` · ${guia.data.duracion}`}
         </p>
         <h1 style="font-size: clamp(1.9rem, 4.5vw, 2.8rem);">{guia.data.title}</h1>

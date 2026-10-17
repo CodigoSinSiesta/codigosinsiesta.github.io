@@ -199,9 +199,11 @@ export const RUTAS: Ruta[] = [
       { concepto: 'Instrucciones del proyecto', aqui: 'AGENTS.md', otros: 'Codex y opencode leen AGENTS.md; Claude Code usa CLAUDE.md' },
       { concepto: 'Herramientas externas', aqui: 'Servidores MCP y codemode', otros: 'Claude Code, Codex y opencode también conectan servidores MCP' },
       { concepto: 'Sesiones y contexto', aqui: 'La sesión como árbol, compactación, /tree y /fork', otros: 'Todos guardan y retoman sesiones, y compactan el contexto cuando se llena' },
-      { concepto: 'Modo sin interfaz', aqui: 'pi -p', otros: 'claude -p, codex exec, opencode run' },
-      { concepto: 'Permisos y aislamiento', aqui: 'Sin aprobaciones ni sandbox: los pones tú', otros: 'Cada agente trae los suyos: permisos, modos de aprobación o sandbox' },
+      { concepto: 'Modo sin interfaz', aqui: 'pi -p y omp -p (con salida JSON)', otros: 'claude -p, codex exec, opencode run' },
+      { concepto: 'Permisos y aislamiento', aqui: 'Pi: ni aprobaciones ni sandbox, los pones tú. oh my pi: modos de aprobación, pero arranca en yolo', otros: 'Cada agente trae los suyos: permisos, modos de aprobación o sandbox' },
       { concepto: 'Extender y automatizar', aqui: 'Extensiones, skills y paquetes', otros: 'Hooks, plugins, skills o comandos propios, según el agente' },
+      { concepto: 'Modelos por tarea', aqui: 'oh my pi: roles (barato o potente) y niveles de razonamiento', otros: 'Varios agentes dejan elegir modelo por subagente o por tarea' },
+      { concepto: 'Planificar antes de ejecutar', aqui: 'oh my pi: modo plan y objetivos con presupuesto', otros: 'Claude Code tiene modo plan; en cualquier agente, un plan escrito en el repo' },
       { concepto: 'Subagentes y paralelo', aqui: 'oh my pi: tareas, Hub y segundo plano', otros: 'Varios agentes ofrecen subagentes o tareas en paralelo' },
     ],
     equivalenciasNota:
@@ -211,7 +213,7 @@ export const RUTAS: Ruta[] = [
       { titulo: 'Ponerle límites y hacerlo tuyo', videos: 'Vídeos 05 a 07', descripcion: 'Seguridad y aislamiento, instrucciones del proyecto, skills y MCP.' },
       { titulo: 'Extenderlo y automatizarlo', videos: 'Vídeos 08 a 10', descripcion: 'Extensiones, paquetes y uso programático en scripts y CI.' },
       { titulo: 'Ver lo que añade un agente completo', videos: 'Vídeos 11 a 21', descripcion: 'oh my pi: aprobaciones, planificación, subagentes, IDE integrado… y lo que cuesta cada capa.' },
-      { titulo: 'Diseñar tu propio harness', videos: 'Vídeos 22 a 26', descripcion: 'Metodología: diseño, estado en el repositorio, verificación y orquestación, hasta un proyecto final.' },
+      { titulo: 'Diseñar tu propio harness', videos: 'Vídeos 22 a 26 (el 26, en producción)', descripcion: 'Metodología: diseño, estado en el repositorio, verificación y orquestación, hasta un proyecto final.' },
     ],
     aprenderas: [
       'Leer cualquier agente de programación: qué recibe el modelo, qué herramientas tiene y cómo se gobierna',
