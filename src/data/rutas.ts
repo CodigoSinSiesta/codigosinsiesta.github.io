@@ -168,9 +168,9 @@ export const RUTAS: Ruta[] = [
     titulo: 'Pi y oh my pi',
     claim: 'Aprende un agente por dentro y sabrás usar cualquiera',
     descripcion:
-      'Un curso en vídeo para dejar de usar tu agente de programación como una caja negra. Empezamos por Pi, el más pequeño y transparente, vemos qué añade un agente completo como oh my pi y terminamos diseñando tu propio harness. Lo que aprendes sirve igual en Claude Code, Codex u opencode. En publicación: 25 de 26 vídeos.',
+      'Un curso en vídeo para dejar de usar tu agente de programación como una caja negra. Empezamos por Pi, el más pequeño y transparente, vemos qué añade un agente completo como oh my pi y terminamos diseñando tu propio harness. Lo que aprendes sirve igual en Claude Code, Codex u opencode. Son 26 vídeos, con sus guías y sus materiales.',
     nivel: 'intermedio',
-    duracion: '~10 horas hasta ahora',
+    duracion: '~10 horas',
     paraQuien:
       'Developers que ya usan Claude Code, Codex, opencode u otro agente y quieren entender qué recibe el modelo, qué puede hacer y cómo gobernarlo, en lugar de depender de lo que cada herramienta decide por ti.',
     porQue: {
@@ -213,7 +213,7 @@ export const RUTAS: Ruta[] = [
       { titulo: 'Ponerle límites y hacerlo tuyo', videos: 'Vídeos 05 a 07', descripcion: 'Seguridad y aislamiento, instrucciones del proyecto, skills y MCP.' },
       { titulo: 'Extenderlo y automatizarlo', videos: 'Vídeos 08 a 10', descripcion: 'Extensiones, paquetes y uso programático en scripts y CI.' },
       { titulo: 'Ver lo que añade un agente completo', videos: 'Vídeos 11 a 21', descripcion: 'oh my pi: aprobaciones, planificación, subagentes, IDE integrado… y lo que cuesta cada capa.' },
-      { titulo: 'Diseñar tu propio harness', videos: 'Vídeos 22 a 26 (el 26, en producción)', descripcion: 'Metodología: diseño, estado en el repositorio, verificación y orquestación, hasta un proyecto final.' },
+      { titulo: 'Diseñar tu propio harness', videos: 'Vídeos 22 a 26', descripcion: 'Metodología: diseño, estado en el repositorio, verificación y orquestación, hasta un proyecto final.' },
     ],
     aprenderas: [
       'Leer cualquier agente de programación: qué recibe el modelo, qué herramientas tiene y cómo se gobierna',
@@ -229,7 +229,6 @@ export const RUTAS: Ruta[] = [
     noIncluye: [
       'Un manual de Claude Code, Codex u opencode: usamos Pi para entender los conceptos y te señalamos dónde reaparecen',
       'Entrenar o ajustar modelos',
-      'El vídeo 26 (en producción): el proyecto final',
     ],
     pasos: [],
   },
