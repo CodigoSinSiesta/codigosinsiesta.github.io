@@ -18,102 +18,101 @@ Endurecer omp para un repositorio de equipo con modos de aprobación, reglas que
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Una promesa larga:** Vídeo 05 (omp sí tiene modos) → Vídeo 08 (permisos.ts a mano) → Vídeo 18 (serán límites) → Hoy (cumplirlo)
-- **De fábrica:** yolo — oh my pi aprueba todo sin preguntar.
-- **Pieza a pieza:** De serie, distinto o a mano — Qué trae oh my pi y qué tienes que seguir escribiendo tú.
+- Este vídeo cumple una promesa: en el 05 dijimos que omp sí trae modos de aprobación, en el 08 escribimos `permisos.ts` a mano para Pi y en el 18 anunciamos que las instrucciones pasarían a ser límites.
+- **De fábrica, omp va en yolo:** aprueba todo sin preguntar. Así han corrido los subagentes, el reviewer con `bash` y el navegador de los vídeos anteriores.
+- El objetivo: un fichero de configuración dentro del repositorio, versionado con el código, para que todo el equipo trabaje con las mismas reglas. Cuatro piezas: el modo de aprobación (con políticas por herramienta y patrones de bash), un hook, las reglas TTSR y la redacción de secretos.
+- El hilo del vídeo: pieza a pieza, qué de `permisos.ts` trae omp de serie, qué hace distinto y qué tienes que seguir escribiendo tú.
 
 ### 2 · Niveles, modos y el fichero del proyecto
 
 <p><button type="button" class="ir-a" data-t="128">▶ Ir a 2:08</button></p>
 
-- *En la demo:* ~/csn/omp-equipo/config.yml
-- *En la demo:* .omp/config.yml en la tienda
-- *En la demo:* /settings · Interaction · Approvals
-- *En la demo:* Shell
-- *En la demo:* Providers · Privacy
-- *En la demo:* Context · Rules (TTSR)
+- Cada herramienta declara un **nivel**: `read` (solo lee), `write` (modifica el espacio de trabajo sin ejecutar código, como editar) o `exec` (ejecuta código: `bash`, `eval`, el navegador, el depurador o `task`, que lanza subagentes). La que no declara nada cuenta como `exec`.
+- **Ojo con MCP:** sus herramientas cuentan siempre como `write`, digan lo que digan sus anotaciones. Si una borra o publica, ponle `prompt` o `deny` en las políticas por herramienta.
+- El **modo** decide qué se aprueba solo: `always-ask` solo la lectura, `write` lectura y escritura (pregunta por lo que ejecuta) y `yolo` todo. Para un equipo, `write` es un buen punto de partida: las ediciones quedan en git y lo que ejecuta pasa por ti.
+- *En la demo:* el fichero del equipo lleva `tools.approvalMode: write`, las políticas `bash: prompt` y `eval: prompt`, una lista de `bash.patterns` y `secrets.enabled: true`. Copiado a `.omp/config.yml`, `omp config get tools.approvalMode` pasa de `yolo` a `write`: la configuración del proyecto gana a la de tu perfil (vídeo 11).
+- `/settings` enseña lo que manda el proyecto, pero escribe en tu perfil. Lo que quieres compartir va en el fichero del repositorio.
 
 ### 3 · Aprobaciones en acción
 
 <p><button type="button" class="ir-a" data-t="281">▶ Ir a 4:41</button></p>
 
-- *En terminal:* La petición (más abajo, en «Código y comandos»)
-- *En la demo:* Allow tool: bash · Approve / Deny
-- *En la demo:* allow no cubre líneas compuestas
-- *En la demo:* bash.allowCompoundCommands: false
-- *En la demo:* edit sin preguntar (modo write)
-- *En la demo:* textoEnvio
+- *En terminal:* La petición (más abajo, en «Código y comandos»).
+- *En la demo:* `npm test` se ejecuta sin preguntar porque un patrón `allow` lo cubre, aunque la política de `bash` sea `prompt`. En cambio, `git status && git log` abre el diálogo: **un `allow` tiene que encajar con el comando entero y nunca aprueba una línea compuesta.**
+- `bash.allowCompoundCommands` (apagado) trocea cadenas sencillas unidas solo por `&&`, con argumentos literales; si todos los trozos están permitidos, pasa. Nada de variables, redirecciones ni tuberías. Lo dejamos apagado: mejor una pregunta de más.
+- **Diferencia con `permisos.ts`:** el diálogo solo tiene Approve y Deny, sin «permitir siempre en esta sesión». Lo permanente se escribe como patrón: más trabajo la primera vez, pero no se olvida y lo comparte el equipo.
+- Las lecturas y las ediciones pasan sin preguntar (en modo `write`, la escritura se aprueba sola). Un modo que pregunta por todo acaba con la persona aprobando sin leer.
 
 ### 4 · Patrones, políticas y subagentes
 
 <p><button type="button" class="ir-a" data-t="432">▶ Ir a 7:12</button></p>
 
-- *En terminal:* bash.patterns (.omp/config.yml) (más abajo, en «Código y comandos»)
-- *En la demo:* Dos diálogos más
-- *En la demo:* Blocked by bash pattern: git push*
-- *En la demo:* Commit sí, push no
-- **deny:** No depende de la buena voluntad — Es absoluto: no lo salta ni el modo yolo.
-- *En la demo:* omp --profile demo -p "Ejecuta node --version…"
-- **Vídeo 18:** Ya no es una petición: es un límite — Afecta a todos los subagentes, y cubre solo lo que nombra.
+- `bash.patterns` es una lista ordenada de reglas, cada una con un patrón y una decisión: `allow`, `prompt` o `deny`. **Gana la primera regla que encaja.** El único comodín es `*` y los espacios repetidos cuentan como uno.
+- *En la demo:* el commit pasa tras aprobarlo, pero `git push` se bloquea sin diálogo por la regla `deny`. El modelo se plantea escribirlo de otra forma y decide no saltarse la política. Bien por él, pero **un `deny` no depende de su buena voluntad:** es absoluto, no lo salta ni yolo, y sí mira cada trozo de una línea compuesta (`&&`, `;`, tuberías, subshells).
+- Los **patrones críticos** de bash (borrar desde la raíz, fork bomb, descargar y ejecutar, apagar) obligan a preguntar en `write` y `always-ask`, aunque un `allow` tuyo los cubra. En yolo se ignoran.
+- **Políticas por herramienta:** `bash: prompt` no es redundante, porque `--yolo` y `--auto-approve` fuerzan yolo pero respetan las políticas y los `deny`. `eval: prompt` cierra un hueco: los patrones solo gobiernan `bash`, y `eval` puede abrir una shell desde Python o JavaScript.
+- Qué gana a qué, según lo que se ve en el vídeo:
+  1. Un `deny` (patrón o política) bloquea siempre, en cualquier modo.
+  2. Un patrón crítico obliga a preguntar en `write` y `always-ask`, aunque haya un `allow`.
+  3. Un patrón `allow` que cubre el comando entero gana a la política de la herramienta (`npm test` pasa con `bash: prompt`).
+  4. La política de la herramienta gana al modo, también con `--yolo`.
+  5. Si nada de lo anterior decide, decide el modo.
+- **Sin interfaz** (modo print), una llamada que necesita aprobación no se ejecuta. omp sugiere poner yolo; no le hagas caso: añade un `allow` para ese comando.
+- **Subagentes:** van en yolo (vídeo 16), pero un `deny` tuyo se aplica dentro de ellos y lo que se resuelve como `prompt` se rechaza. Con nuestro fichero, el reviewer del vídeo 18 puede ejecutar `git diff`, `git log` y `git show`, y nada más. Ya no es una petición, es un límite; afecta a todos los subagentes y cubre solo lo que nombra.
+- **Ojo en modo `write`:** `task` es `exec`, así que cada reparto de subagentes (también el que lanza `/review`) te pregunta.
 
 ### 5 · Hooks: lo que la configuración no alcanza
 
 <p><button type="button" class="ir-a" data-t="645">▶ Ir a 10:45</button></p>
 
-- **Hace falta código:** Por herramienta, no por fichero — Para esto hacen falta código y un hook.
-- *En terminal:* Un hook de oh my pi (más abajo, en «Código y comandos»)
-- *En la demo:* .omp/hooks/pre/rutas-protegidas.ts
-- *En la demo:* .omp/ y ~/csn/datos
-- *En la demo:* Bloqueado sin diálogo
-- *En la demo:* Propone, no insiste
-- **Como en el vídeo 08**
-  - `error` · Bloquea
-  - `hasUI` · ¿Hay alguien?
-  - `tool_result` · Reescribe la salida
+- Las políticas son por herramienta, no por fichero. En modo `write`, una edición de `AGENTS.md` pasaría sin preguntar. Para proteger rutas hace falta código: un hook.
+- En omp, un hook es un módulo TypeScript con la forma de una extensión del vídeo 08 (una función que recibe la API y se engancha con `pi.on`). Lo que lo hace hook es dónde vive: `.omp/hooks/pre/` o `.omp/hooks/post/`, del proyecto o de tu perfil. Directamente en `.omp/hooks/` no se descubre.
+- `rutas-protegidas.ts` traslada el bloque de rutas de `permisos.ts`: en `tool_call`, si la herramienta es `edit`, `write` o `ast_edit` y la ruta es `AGENTS.md` o está en `.git/`, devuelve `block: true` con el motivo. Borrar y mover van dentro de `edit`, así que también quedan cubiertos.
+- Añadimos dos rutas: `.omp/` (sin ella, en modo `write` el modelo podría cambiar el modo a yolo editando el fichero que lo limita) y la carpeta de datos del vídeo 17, cuyo «solo lectura» pasa de petición a barrera.
+- *En la demo:* la edición de `AGENTS.md` se bloquea sin diálogo y el modelo propone la línea para que la añadas tú. Funciona con DeepSeek, que edita en modo replace (vídeo 17). Si lo intentara con `sed` por bash, saltaría el diálogo: **hacen falta las dos capas**, el hook para la edición y la política de bash para el atajo.
+- Como en el vídeo 08: un handler de `tool_call` que lanza un error bloquea la herramienta, `ctx.hasUI` dice si hay alguien para responder y `tool_result` reescribe la salida antes de que la vea el modelo.
 
 ### 6 · Reglas TTSR
 
 <p><button type="button" class="ir-a" data-t="810">▶ Ir a 13:30</button></p>
 
-- *En terminal:* .omp/rules/ .md (más abajo, en «Código y comandos»)
-- **Time traveling stream rules:** Vigila (el stream) → Corta (antes de ejecutar) → Inyecta (la regla) → Reintenta
-- *En la demo:* Ajustes de TTSR
-- *En la demo:* omp --profile demo ttsr list
+- Una convención en `AGENTS.md` o `RULES.md` (vídeo 13) viaja en cada petición, gasta contexto y el modelo puede olvidarla. **TTSR** (*time traveling stream rules*) es otra forma: una regla que solo actúa cuando el modelo está a punto de hacer lo que no debe.
+- Una regla TTSR es un Markdown en `.omp/rules/`: la cabecera dice qué vigilar y el cuerpo qué debería haber hecho el modelo.
+- **El mecanismo:** omp vigila el texto de la respuesta y los argumentos de las herramientas mientras el modelo escribe. Si aparece el patrón, corta antes de que la herramienta se ejecute, descarta lo escrito, inyecta el cuerpo de la regla como aviso del sistema y le pide reintentar.
+- Tres disparos: `condition` (una expresión regular), `astCondition` (un patrón de ast-grep) y `question` (una pregunta que responde un modelo juez al terminar; no puede cortar nada y necesita el rol `judge`). `scope` acota dónde mira, por ejemplo solo ediciones de `*.js`.
+- omp trae 27 reglas incluidas, de Go, Rust y TypeScript (`omp ttsr list`). Ninguna mira `*.js`, así que en la tienda no hacen nada.
+- *En terminal:* `.omp/rules/<nombre>.md` (más abajo, en «Código y comandos»).
 
 ### 7 · /omfg: de la queja a la regla
 
 <p><button type="button" class="ir-a" data-t="930">▶ Ir a 15:30</button></p>
 
-- **/omfg:** De la queja a la regla — Le das una queja y te propone una regla TTSR.
-- *En la demo:* Lo que nos molesta
-- *En terminal:* /omfg (más abajo, en «Código y comandos»)
-- *En la demo:* Save TTSR rule where?
-- *En la demo:* Registered live
-- *En la demo:* .omp/rules/no-tofixed-importes.md · ttsr test
-- *En la demo:* La regla, desde el principio
-- *En la demo:* Cambios
+- `/omfg <queja>` escribe una regla TTSR por ti. Comprueba que se habría disparado con algo que el modelo hizo antes en la conversación; si no encaja, reintenta hasta tres veces o te pregunta si guardarla igualmente.
+- *En la demo:* la queja es el `toFixed` de `textoEnvio`. La regla generada vigila `toFixed` y el cambio de punto por coma, solo en ficheros `.js`. La guardamos en el proyecto (para el equipo) y queda activa sin reiniciar.
+- `omp ttsr test` prueba la regla sin gastar modelo: simula una edición con `toFixed` y confirma que la condición encaja.
+- *En terminal:* /omfg (más abajo, en «Código y comandos»).
+- *En la demo:* al pedir `textoTotal`, la regla no se dispara: Pro la sigue desde el principio y además corrige `textoEnvio`. **Esto no demuestra el mecanismo** de cortar, inyectar y reintentar, que se describe pero no se ve en el vídeo: el modelo conocía la regla porque `/omfg` acababa de escribirla en esta conversación. Para ver un disparo de verdad, prueba en una sesión nueva (`/new`) pidiendo un formato con `toFixed`.
 
 ### 8 · Secretos y redacción
 
 <p><button type="button" class="ir-a" data-t="1084">▶ Ir a 18:04</button></p>
 
-- **secrets.enabled:** Marcadores en lugar de valores — Antes de enviar al proveedor. Apagado de fábrica.
-- **Ida y vuelta:** Valor (local) → $$marcador$$ (al proveedor) → Comando (con el marcador) → Valor real (al ejecutar)
-- *En la demo:* echo $TOKEN_DEMO
-- *En la demo:* Local: el valor · modelo: $$…$$
-- *En la demo:* Restaurado en la vista local
-- **Los huecos**
-  - `system prompt` · Sin redactar: AGENTS.md, RULES.md
-  - `exportar` · Sin redactar
-  - `secrets.yml` · Solo regex: se versiona
-  - `forma rara` · Sale tal cual
+- Todo lo que el modelo lee viaja al proveedor. Con `secrets.enabled` (apagado de fábrica), omp sustituye los valores sensibles por un marcador `$$…$$` antes de enviarlos.
+- Reúne secretos de tres sitios: variables de entorno con nombre de secreto (`KEY`, `TOKEN`, `PASSWORD`…) y al menos ocho caracteres; los `secrets.yml` de tu perfil y del proyecto; y expresiones incluidas para formatos conocidos (tokens de GitHub, claves de proveedores, claves privadas).
+- El marcador se calcula con una clave que solo está en tu máquina. Si el modelo usa el marcador en un comando, omp pone el valor real justo antes de ejecutarlo: **el modelo usa un secreto que nunca ha visto.**
+- *En la demo:* con un valor falso en `TOKEN_DEMO`, tú ves el texto en pantalla (omp restaura los marcadores en la vista local) y el modelo cuenta 18 caracteres que empiezan por `$`, no los 26 del valor real.
+- **Los huecos:** el system prompt no se redacta (nunca pongas secretos en `AGENTS.md` ni `RULES.md`); la exportación de sesiones tampoco; el `secrets.yml` del proyecto se versiona, así que ahí solo van expresiones regulares, nunca valores; y un secreto con forma desconocida en una variable de nombre inocente sale tal cual. Si el modelo pide `env` o `printenv`, deniégalo.
 
 ### 9 · Límites, repaso y cierre
 
 <p><button type="button" class="ir-a" data-t="1240">▶ Ir a 20:40</button></p>
 
-- **Vídeo 08:** Aprobar no es aislar — Los patrones comparan texto: «git -C . push» no empieza por «git push».
-- **Vídeo 20:** Extender oh my pi — Extensiones, skills, plugins, MCP y comandos del proyecto.
+- **Aprobar no es aislar** (vídeo 08). Los patrones son una política de aprobación, no un confinamiento: un comando aprobado tiene todo el acceso de tu shell, y los patrones comparan texto (`git -C . push` no empieza por `git push`).
+- **La capa del proyecto gana a la tuya**, y un repositorio ajeno puede traer un `.omp/` que ponga yolo o cargue hooks. Qué carga omp al abrir una carpeta, y por qué no hay `/trust`, se explica en el vídeo 20. Para lo que no conoces, la respuesta sigue siendo la del vídeo 05: un contenedor.
+- **Coste:** la demo costó tres céntimos. El coste real de esta capa es la atención: cada pregunta que sobra te entrena para aprobar sin leer. Cada una que te sobre es un patrón `allow` que te falta.
+- **Práctica:** en una rama de tu proyecto, con tu perfil de pruebas, escribe un `.omp/config.yml` con modo `write`, `bash: prompt`, una lista corta de comandos permitidos y un `deny` para lo que nunca debe pasar. Trabaja con él una tarde y apunta cada pregunta que te sobra. La próxima vez que el modelo haga algo que te moleste, prueba `/omfg` y comprueba la regla con `omp ttsr test`.
+- **En otros agentes:** los cuatro conceptos son transferibles. Claude Code tiene modos de permiso, reglas allow y deny en su configuración y hooks que se ejecutan antes de cada herramienta; la lección «aprobar no es aislar» vale igual.
+- **Vídeo 20:** extender oh my pi: extensiones, skills, plugins, MCP y comandos del proyecto.
 
 ## Código y comandos
 
@@ -127,22 +126,31 @@ los gastos de envío como texto, con coma decimal y el símbolo del euro,
 por ejemplo 4,95 €. Añade su prueba y ejecuta npm test.
 ```
 
-- `textoEnvio`: La función
-- `4,95 €`: Formato
-- `npm test`: Patrón allow
+`npm test` pasará sin preguntar porque lo cubre un patrón `allow`.
 
 ### bash.patterns (.omp/config.yml)
 
-```text
-- match: "git push*"     approval: deny
-- match: "git status"     approval: allow
-- match: "git diff*" · "git log*" · "git show*"   approval: allow
-- match: "npm test" · "node --test*"   approval: allow
+```yaml
+bash:
+  patterns:
+    - match: "git push*"
+      approval: deny
+    - match: "git status"
+      approval: allow
+    - match: "git diff*"
+      approval: allow
+    - match: "git log*"
+      approval: allow
+    - match: "git show*"
+      approval: allow
+    - match: "npm test"
+      approval: allow
+    - match: "node --test*"
+      approval: allow
 ```
 
-- `deny`: Absoluto
-- `primera`: Gana
-- `*`: Único comodín
+- Gana la primera regla que encaja; por eso el `deny` va arriba.
+- `*` es el único comodín. Un `allow` tiene que cubrir el comando entero y no aprueba líneas compuestas; un `deny` sí mira cada trozo.
 
 ### Un hook de oh my pi
 
@@ -153,11 +161,10 @@ export default function (pi) {
 // .omp/hooks/pre/*.ts  ·  ~/.omp/agent/hooks/post/*.ts
 ```
 
-- `pi.on`: Como en Pi
-- `pre / post`: Dónde vive
-- `hooks/`: Ahí no
+- Se descubre en `.omp/hooks/pre/` o `.omp/hooks/post/` (o en las de tu perfil). Directamente en `.omp/hooks/` no se carga.
+- `return { block: true, reason }` bloquea la llamada sin diálogo y el modelo recibe el motivo.
 
-### .omp/rules/ .md
+### .omp/rules/&lt;nombre&gt;.md
 
 ```text
 ---
@@ -167,9 +174,8 @@ scope: ["tool:edit(*.js)", "tool:write(*.js)"]
 Redondea con Math.round(x * 100) / 100 y muestra con Intl.NumberFormat.
 ```
 
-- `---`: Metadatos
-- `condition`: Qué vigilar
-- `cuerpo`: Qué hacer
+- La cabecera, entre `---`, dice qué vigilar (`condition`) y dónde (`scope`: solo ediciones y escrituras de `.js`).
+- El cuerpo es lo que se inyecta al modelo cuando la regla se dispara.
 
 ### /omfg
 
@@ -178,97 +184,17 @@ Redondea con Math.round(x * 100) / 100 y muestra con Intl.NumberFormat.
 como dice AGENTS.md y para mostrar usa Intl.NumberFormat con es-ES.
 ```
 
-- `queja`: Tú
-- `valida`: Con la conversación
-- `3 intentos`: Como mucho
+omp valida el borrador contra la conversación, con tres intentos como mucho, y te pregunta dónde guardarlo: en el proyecto (`.omp/rules`) o global.
 
 ## Fuentes
 
-- Documentación instalada de omp 18.6.1 (`omp read omp://…`; coincide con la copia de
-  la documentación de omp (omp.sh) en `approval-mode.md`, `hooks.md`, `secrets.md`,
-  `ttsr-injection-lifecycle.md`, `rulebook-matching-pipeline.md`, `bash-tool-runtime.md` y `config-usage.md`;
-  `settings.md` solo difiere porque `omp read` corta la salida a 49,4 KB):
-  - `approval-mode.md`: niveles `read`/`write`/`exec`; herramientas sin nivel → `exec`; **las herramientas MCP son
-    `write` sea cual sea su anotación**; tabla de modos (`always-ask`, `write`, `yolo` por defecto); `--approval-mode`;
-    `--auto-approve` y `--yolo` fuerzan yolo pero respetan los `deny` y las políticas explícitas; `tools.approval` en
-    todos los modos; orden de resolución (deny de herramienta → deny de usuario → …); en `yolo` se ignora el aviso
-    crítico «a secas»; patrones críticos de bash (`rm -rf /`, fork bomb, descargar y ejecutar, `/etc/passwd`, apagado);
-    `bash.patterns` no cubre `eval` («add a `tools.approval.eval` policy»); sin interfaz, una llamada que requiere
-    pregunta **falla**; ACP conserva la puerta de permisos del cliente; **subagentes** en `yolo`, pero «user `deny`
-    remains absolute, and any call that resolves to `prompt` rejects».
-  - `settings.md` §«Bash command approval patterns»: primera regla que encaja gana; solo `*` como comodín; espacios
-    colapsados; `allow` debe cubrir el comando entero y no aprueba comandos compuestos; `deny` y `prompt` también miran
-    cada segmento (`&&`, `||`, `;`, `|`, `&`, subshells, saltos de línea); `bash.allowCompoundCommands` (apagado):
-    solo cadenas planas con `&&`, argumentos literales y shell POSIX identificada; «`bash.patterns` is an approval
-    policy, not containment». §«Where settings live» y precedencia (proyecto por encima de global; el proyecto se lee
-    solo si el cwd tiene un `.omp/` no vacío; `/settings` y `omp config set` escriben en la global).
-    §«Subcommands»: `omp config get` imprime el valor efectivo.
-  - `bash-tool-runtime.md` §«Approval policy» (lo mismo, visto desde la herramienta).
-  - `hooks.md`: módulos `.ts`/`.js` que se cargan **con el runner de extensiones**; solo se descubren en
-    `.omp/hooks/pre|post/` y `~/.omp/agent/hooks/pre|post/` (no directamente en `hooks/`); `--hook` es alias de
-    `--extension`; `tool_call` puede bloquear o cambiar la entrada; `tool_result` puede reescribir la salida (ejemplo
-    de redacción de `API_KEY=`); un handler de `tool_call` que lanza un error **bloquea**; la entrada de `edit` trae
-    `path`/`paths` derivados para políticas.
-  - `ttsr-injection-lifecycle.md`: `condition` (regex), `astCondition` (ast-grep), `question` (rol `judge`); vigila
-    texto y argumentos de herramientas, no el razonamiento; aborta, descarta la salida parcial (`contextMode:
-    discard`), inyecta la regla como `<system-interrupt>` y reintenta; `interruptMode`, `repeatMode` (`once`),
-    `repeatGap`; las reglas `question` no interrumpen y solo se juzgan con un juez disponible (`ttsr.judge: auto`
-    exige TypeSafe jev); §«/omfg and CLI».
-  - `rulebook-matching-pipeline.md`: fuentes de reglas (`.omp/rules/`, `~/.omp/agent/rules/`, `RULES.md`, Cursor,
-    Windsurf, Cline, Copilot, incluidas); tres cubos (TTSR, siempre aplicada, rulebook con `rule://`); `globs`,
-    `scope`, `agents`; «This is advisory/contextual» para el rulebook.
-  - `secrets.md`: **desactivado por defecto**; recoge variables de entorno con `KEY`, `SECRET`, `TOKEN`, `PASSWORD`…
-    y valor de al menos 8 caracteres, `secrets.yml` global y de proyecto (`plain`/`regex`, `obfuscate`/`replace`,
-    `friendlyName`), expresiones incluidas para tokens conocidos; marcadores `$$…$$` reversibles con una clave local
-    (`secret-placeholder.key`); se restauran en los argumentos de las herramientas antes de ejecutar y en la vista
-    local; **no se redactan el system prompt estático, las definiciones estáticas de herramientas ni los binarios**.
-- **Código 18.5.1** (`~/orca/oh-my-pi`, `git show v18.5.1:…`, solo lectura):
-  - `extensibility/extensions/wrapper.ts`: el diálogo es `select(prompt, ["Approve", "Deny"])`; «Tool call denied by
-    user: …»; sin interfaz: «Tool "…" requires approval but no interactive UI available. Options: 1. Set
-    tools.approvalMode: yolo in /settings 2. Add tools.approval.<tool>: allow to config 3. Use an interactive UI…».
-  - `tools/approval.ts`: cuerpo del diálogo «Allow tool: <nombre>», «Reason: …» y los detalles de cada herramienta;
-    `resolveApprovalFromContext`: con `--auto-approve`/`--yolo` el modo pasa a `yolo` **pero conserva las políticas
-    del usuario** (`tools.approval`), que en yolo ganan (paso 3 de la resolución); `cli/args.ts`: `--yolo` es alias de
-    `--auto-approve`.
-  - `internal-urls/router.ts` `writeTier`: una ruta normal (no `scheme://`) es `write`, así que en modo `write` una
-    edición de `.omp/config.yml`, de un hook o de una regla se aprueba sola.
-  - `tools/bash.ts`: `CRITICAL_BASH_PATTERNS`; razones «Blocked by bash pattern: …», «Prompt required by bash
-    pattern: …», «Critical pattern detected»; `allow` → nivel `write` con política `allow`; detalle «Command: …».
-  - `tools/settings.ts`: `tools.approvalMode` (pestaña *interaction*, grupo *Approvals*, «Tool Approval»: Always ask,
-    Write, Yolo), `tools.approval` («Tool Approval Policies»); `exec/settings.ts`: `bash.patterns` («Bash Approval
-    Patterns», pestaña *shell*), `bash.allowCompoundCommands`; `secrets/settings.ts`: `secrets.enabled` («Hide
-    Secrets», pestaña *providers*, grupo *Privacy*); `export/ttsr-settings.ts`: `ttsr.*` en la pestaña *context*.
-  - `lsp/tool.ts` (acciones no de lectura → `write`), `edit/index.ts`, `write.ts`, `read.ts`, `task/index.ts`
-    (`exec`), `eval.ts` (`exec`), `mcp/tool-bridge.ts` (`write`).
-  - `extensibility/tool-event-input.ts`: en modo hashline, `path`/`paths` salen de las cabeceras `[RUTA#TAG]`.
-  - `modes/controllers/omfg-controller.ts`, `omfg-rule.ts`, `prompts/system/omfg-user.md`: tres intentos («Attempt
-    n/3 · generating…»), validación contra las salidas anteriores del asistente, «Couldn't confirm this rule matches
-    the conversation. Save anyway?», «Save TTSR rule where?» con «This project (.omp/rules)», «Global — all projects
-    (~/.omp/agent/rules)» y «Amend with feedback…»; confirma antes de sobrescribir; registra la regla en vivo; el
-    prompt pide preferir `condition`/`astCondition`.
-  - `discovery/builtin-rules/`: 27 reglas incluidas (8 de Go, 6 de Rust, 13 de TypeScript; p. ej. `ts-no-any` con
-    `interruptMode: never`); `prompts/system/ttsr-interrupt.md`.
-  - `examples/hooks/protected-paths.ts` y `permission-gate.ts`.
-  - `internal-urls/cfg-protocol.ts`: el modelo puede pedir cambiar un ajuste (`cfg://`), siempre con diálogo «Allow
-    once / Always for this session / Deny» y 10 s de espera.
-- **Binario 18.6.1** (`~/.bun/bin/omp`, `grep -a`): siguen «["Approve", "Deny"]», «requires approval but no
-  interactive UI», «Save TTSR rule where?», «Couldn't confirm this rule matches», «Usage: /omfg», «Hide Secrets», «Bash
-  Approval Patterns», «Critical pattern detected», «Blocked by bash pattern», las mismas 27 reglas incluidas y
-  «Always for this session». Changelog 18.5.1–18.6.1: nada que cambie aprobaciones, TTSR ni hooks; «Sped up secret
-  redaction on long conversations» (18.6.0).
-- CHANGELOG de Pi instalado (1.0.1 → 1.0.4): nada sobre aprobaciones, permisos, `tool_call` ni confianza; lo dicho
-  en los vídeos 05 y 08 sigue valiendo.
-- `omp --help` (`--approval-mode`, `--auto-approve`, `--hook`, `--no-rules`) y `omp ttsr --help` (`list`, `test`,
-  `scan`, `--rule`, `--source`, `--tool`, `--path`, `--agent`), 18.6.1, ejecutados (solo ayuda).
-- Vídeos anteriores: 01 y 11 (yolo por defecto; `config get tools.approvalMode` → `yolo`; capas de configuración; sin
-  `/trust`), 05 (promete los modos de omp para este vídeo), 08 (`permisos.ts`: listas de lectura, bash troceado,
-  Permitir / Permitir siempre en esta sesión / Bloquear, rutas protegidas, bloqueo sin interfaz, el `chmod`, «aprobar
-  no es aislar»), 13 (`RULES.md`), 14 (rol `judge`), 16 (subagentes en yolo), 17 (`eval` y el navegador piden
-  `exec`; la carpeta `~/csn/datos` añadida con `/add-dir`: «Imponer permisos de verdad es el tema del vídeo
-  diecinueve»), 18 (reviewer con `bash`; «pasarán a ser límites»; redacción apagada; cierre que anuncia este vídeo).
-- Tienda (`~/csn/tienda`, leída): ramas `master`, `iva-antes`, `iva-despues`; sin remoto; sin `.omp/`; `AGENTS.md`
-  («Al empezar: `git status` y `git log --oneline -5`», «redondeados a céntimos con `Math.round(x * 100) / 100`»,
-  commits «tienda:»).
+- Documentación de oh my pi (omp.sh): `approval-mode.md` (niveles, modos, MCP como `write`, patrones críticos, subagentes y modo sin interfaz) y `settings.md` § «Bash command approval patterns» (orden de reglas, comodín, comandos compuestos, «an approval policy, not containment»).
+- `hooks.md`: dónde se descubren los hooks, `tool_call` y `tool_result`, y el ejemplo que tacha claves de API.
+- `ttsr-injection-lifecycle.md` (disparos, cortar e inyectar, `/omfg`) y `rulebook-matching-pipeline.md` (de dónde salen las reglas).
+- `secrets.md`: qué se redacta, cómo se restauran los marcadores y qué no se redacta.
+- `omp --help` (`--approval-mode`, `--auto-approve`, `--hook`, `--no-rules`) y `omp ttsr --help` (`list`, `test`, `scan`).
+- Grabado con omp 18.6.1.
+- Vídeos relacionados del curso: 05 (seguridad y contenedores), 08 (`permisos.ts` en Pi), 11 (capas de configuración), 13 (`RULES.md`), 16 (subagentes en yolo), 18 (el reviewer con `bash`), 20 (lo que carga una carpeta).
 
 ## Transcripción
 

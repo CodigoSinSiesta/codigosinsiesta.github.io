@@ -18,95 +18,93 @@ Extensiones, skills, plugins y comandos propios del proyecto, y hasta qué punto
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Extender Pi, bloque B:** 06 (sin código) → 07 (MCP) → 08 (extensiones) → 09 (paquetes)
-- **Hoy no repetimos nada de eso:** ¿Qué cambia en oh my pi? — Si ya sabes extender Pi.
-- **De lo ligero a lo potente:** Comando (texto) → Skill (Pi y omp) → Registro → Extensiones (de Pi) → Panel (plugins) → MCP (SSH)
-- *En terminal:* Dónde vive cada cosa (más abajo, en «Código y comandos»)
-- **Vídeo 11:** Sin /trust — ¿Qué se carga al abrir una carpeta? Lo cerramos al final.
+- En la etapa «Pi a fondo» extendimos Pi en cuatro vídeos: sin código (06), MCP (07), extensiones (08) y paquetes (09). Hoy no repetimos nada: la pregunta es qué cambia en oh my pi si ya sabes extender Pi.
+- **Las piezas son las mismas, pero viven en otros sitios y llegan por más caminos.** Comandos de proyecto en el repositorio, skills compartidas con Pi, un registro público de skills, tus extensiones de Pi casi sin cambios, y dos piezas que Pi no tiene: plugins y marketplaces, compatibles con los de Claude Code.
+- omp lee mucho más de lo que escribe: además de `.omp/` y tu perfil, recoge las carpetas de otras herramientas, como `.claude` o `.agents`.
+- *En terminal:* Dónde vive cada cosa (más abajo, en «Código y comandos»).
+- El hilo del vídeo: qué se carga al abrir una carpeta. Se cierra en el capítulo 8.
 
 ### 2 · Comandos de proyecto
 
 <p><button type="button" class="ir-a" data-t="148">▶ Ir a 2:28</button></p>
 
-- *En la demo:* .omp/commands/triage.md del repositorio de oh my pi
-- *En terminal:* .omp/commands/ .md (más abajo, en «Código y comandos»)
-- *En la demo:* .omp/commands/repaso.md
-- *En la demo:* /rep, antes
-- *En la demo:* /reload-plugins y /rep
-- *En la demo:* /repaso las pruebas del envío
-- *En la demo:* Tres viñetas, sin editar
+- Un comando de proyecto es un fichero `.md` en `.omp/commands/`. El nombre del fichero es el nombre del comando; `description` es lo que ves en el menú y `argument-hint`, la pista de argumentos. El resto es el prompt: `$ARGUMENTS` recibe todo lo que escribas detrás y `$1`, `$2`, cada palabra.
+- *En la demo:* el `/triage` del propio repositorio de omp parece incluido y no lo es: es un fichero de su `.omp/commands`. No lo ejecutamos porque escribe en GitHub.
+- omp no vigila esas carpetas: tras crear el fichero, `/reload-plugins` vuelve a buscar comandos, skills, agentes y servidores MCP.
+- *En la demo:* `/repaso las pruebas del envío` envía el prompt con el foco sustituido, y el modelo responde en tres viñetas sin editar nada, como pide el comando.
+- **Frente al prompt template del vídeo 06:** aquel vivía en tu máquina; este se versiona con el código y todo el equipo tiene el mismo. Gana el del proyecto sobre el de tu perfil, y los incluidos reservan su nombre antes (un `review.md` propio queda tapado por `/review`, vídeo 18).
+- omp también recoge los comandos de `.claude`, `.codex`, OpenCode y `.agents`: los de Claude Code de un repositorio aparecen sin hacer nada.
 
 ### 3 · Skills que comparten Pi y oh my pi
 
 <p><button type="button" class="ir-a" data-t="329">▶ Ir a 5:29</button></p>
 
-- **.agents/skills:** Una skill, dos agentes — La de notas de versión del vídeo 06, sin cambiar una coma.
-- *En la demo:* /skill:
-- *En la demo:* read SKILL.md · git log
-- *En la demo:* Con el formato de la skill
-- *En terminal:* skill:// (más abajo, en «Código y comandos»)
-- *En la demo:* /skillful status · /context
-- *En la demo:* /skillful off · /context
-- *En la demo:* Pi en la misma tienda
-- *En la demo:* Do not trust (this session only)
-- *En la demo:* Pi: recursos del proyecto ignorados
+- Las skills funcionan como en el vídeo 06: una carpeta con un `SKILL.md`; nombre y descripción viajan en el system prompt y el contenido se lee solo cuando hace falta. omp las busca en `.omp/skills`, el perfil, el registro, los plugins, `.claude`, `.codex` y `.agents/skills`.
+- **`.agents/skills` lo leen los dos agentes.** La skill de notas de versión del vídeo 06, copiada ahí sin cambiar una coma, funciona en omp como `/skill:notas-de-version`.
+- `skill://<nombre>` es la dirección interna de una skill: le deja apuntar a sus scripts o referencias con rutas relativas, sin salir de su carpeta.
+- `/skillful` decide si la lista de skills viaja en el system prompt. Es el coste de contexto de tener skills: aquí, veinte tokens en `/context`. Con `off` baja a cero, pero el modelo ya no sabe qué skills hay y solo las usa si las invocas tú.
+- **La diferencia que importa:** Pi pregunta si confías en la carpeta antes de cargar `.agents/skills`; si dices que no, ignora los recursos del proyecto. omp carga la misma carpeta sin preguntar. Una skill es texto que tu modelo obedece, y puede pedirle que ejecute scripts.
 
 ### 4 · El registro de skills
 
 <p><button type="button" class="ir-a" data-t="500">▶ Ir a 8:20</button></p>
 
-- *En terminal:* skills.omp.sh (diapositiva) (más abajo, en «Código y comandos»)
-- **Lo que no hace:** Revisar el contenido — La huella garantiza que recibes lo publicado, no que sea inofensivo.
+- omp tiene un registro público en skills.omp.sh. Desde la sesión, `/skills` con cuatro verbos: `search`, `install`, `installed` y `update`. Desde la terminal, `omp skill`, que añade publicar y versionar.
+- Por defecto instala en el proyecto, con un `skills.json` y un fichero lock con la versión exacta para todo el equipo; con `-g`, para tu usuario.
+- Lo que hace bien: comprueba la huella del paquete antes de desempaquetar, y si la skill trae scripts o ejecutables, pregunta. `-y` salta esa pregunta: no lo uses con paquetes que no hayas leído.
+- **Lo que no hace: revisar el contenido.** La huella garantiza que recibes lo publicado, no que sea inofensivo. Léela como leerías un script de instalación.
 
 ### 5 · Tus extensiones de Pi en oh my pi
 
 <p><button type="button" class="ir-a" data-t="615">▶ Ir a 10:15</button></p>
 
-- **Vídeo 11:** La promesa — ¿Funcionan en oh my pi las extensiones de Pi de los vídeos 08 y 09?
-- *En la demo:* omp --profile demo -e ~/csn/extensiones
-- *En la demo:* /hola Ana
-- *En la demo:* permisos.ts no conoce glob
-- *En la demo:* node --test, en la lista segura
-- *En la demo:* Rutas protegidas del vídeo 08
-- **Límite 1:** Conoce las herramientas de Pi — glob, lsp, ast_grep, task… acaban en el diálogo. Revisa las listas.
-- **Límite 2:** Varias rutas en un edit — oh my pi entrega una lista; la extensión solo mira una.
-- *En terminal:* Una extensión pensando en oh my pi (más abajo, en «Código y comandos»)
+- Pueden funcionar porque omp reescribe los imports de los paquetes de Pi hacia sus propias copias, redirige TypeBox a una versión compatible y acepta el manifiesto `pi.extensions` del vídeo 09.
+- *En la demo:* cargamos con `-e` la carpeta de extensiones en su estado del vídeo 09 (con `permisos.ts` guardando decisiones por rama). `/hola Ana` funciona sin tocar una línea, el pie de `permisos.ts` aparece y las rutas protegidas bloquean la edición de `AGENTS.md`.
+- **Límite 1:** la extensión conoce las herramientas de Pi. omp trae muchas más (`glob`, `lsp`, `ast_grep`, `task`…), y las que no están en sus listas acaban en el diálogo. *En la demo:* `glob` abre el diálogo «permitir siempre en esta rama». Revisa las listas.
+- **Límite 2:** si el modelo edita varios ficheros en una llamada, omp entrega una lista de rutas; nuestra comprobación solo mira una y no lo vería.
+- **Límite 3:** rebobinar con `/branch` (vídeo 12) lanza `session_branch`, que nuestra extensión no escucha (reconstruye en `session_start` y `session_tree`). La documentación recomienda reconstruir en los tres.
+- **Límite 4:** las herramientas que no declaran nivel cuentan como `exec`; en modo `write` (vídeo 19), nuestra herramienta de tests pediría aprobación. **Límite 5:** no hay `/reload`; `/restart` relanza omp con los mismos flags y retoma la sesión.
+- Para una extensión nueva pensada para omp: la misma factoría, `pi.zod` para los parámetros y un nivel declarado en cada herramienta (`read`, `write` o `exec`). Una herramienta que dice `read` no necesita listas como la nuestra.
 
 ### 6 · El panel y los plugins
 
 <p><button type="button" class="ir-a" data-t="843">▶ Ir a 14:03</button></p>
 
-- *En la demo:* Extension Control Center
-- *En la demo:* notas-de-version
-- *En la demo:* repaso
-- **Lo que no sale:** Los módulos de -e — El panel enseña lo que omp descubre en sus carpetas.
-- *En la demo:* /plugins
-- *En la demo:* /marketplace list
+- `/extensions` abre el Extension Control Center: una pestaña por origen (incluidos, Claude Code, carpetas de agentes, Codex, Cursor, MCP…) con cada skill, comando, regla o servidor, si está activo y de dónde viene. Cuando algo no hace lo que esperas, mira aquí primero. Cada interruptor se guarda en la configuración.
+- No enseña los módulos que cargas con `-e`: solo lo que omp descubre en sus carpetas.
+- **Lo que se cuela:** `~/.agents/skills` se carga siempre, con cualquier perfil, aunque desactives esa fuente. *En la demo:* dos skills personales aparecían activas pese a haberla apagado. Revísalo en `/extensions`.
+- Un **plugin** es un paquete que declara extensiones y puede traer skills, comandos, hooks, herramientas, agentes, reglas y MCP. `omp plugin install` lo instala desde npm o git y `omp plugin link` enlaza una carpeta local. Al instalar, omp ejecuta la extensión para comprobar que carga: **instalar ya es ejecutar su código.**
+- Un **marketplace** es un repositorio con un catálogo `marketplace.json` (formato de omp o de Claude Code). `/marketplace` con `add`, `discover` e `install`; `/plugins` lista los instalados.
 
 ### 7 · MCP y SSH
 
 <p><button type="button" class="ir-a" data-t="992">▶ Ir a 16:32</button></p>
 
-- *En la demo:* /mcp help
-- **Vídeo 07 y 11:** codemode → xd:// — Las herramientas MCP como dispositivos que el modelo descubre.
-- *En terminal:* .omp/mcp.json del proyecto (diapositiva) (más abajo, en «Código y comandos»)
-- *En la demo:* /ssh help
+- `/mcp` gestiona servidores: `add`, `list`, `test`, `enable`, `disable`, `reload`, inicio de sesión de remotos y búsqueda en un registro.
+- omp lee sus servidores de `.omp/mcp.json` (proyecto o perfil) y traduce los de Claude Code, Codex, Gemini, Cursor, Windsurf, OpenCode, VS Code y un `mcp.json` en la raíz. **No lee la configuración de Pi**: el servidor `tienda-fs` del vídeo 07 se puede copiar, pero el codemode se queda fuera.
+- Donde Pi tenía codemode, omp puede montar las herramientas MCP como dispositivos `xd://` que el modelo descubre cuando las necesita (vídeo 11).
+- **Seguridad:** un servidor MCP local en el `mcp.json` del proyecto arranca al abrir la carpeta, y un valor que empieza por `!` se ejecuta como comando de shell. En Pi, `.pi/mcp.json` esperaba a tu confianza.
+- `/ssh add|list|remove` registra máquinas; después, `read`, `write` y la búsqueda aceptan direcciones `ssh://host/ruta`.
 
 ### 8 · Lo que carga una carpeta
 
 <p><button type="button" class="ir-a" data-t="1120">▶ Ir a 18:40</button></p>
 
-- **oh my pi:** isProjectTrusted() → true — No pide confianza por carpeta antes de cargar lo que trae el proyecto.
-- **No has escrito ni un prompt:** Ya ha pasado — En Pi, con la confianza de fábrica, no se habría cargado hasta que dijeras que sí.
-- *En terminal:* Antes de abrir un repositorio ajeno (más abajo, en «Código y comandos»)
-- **Vídeos 5 y 19:** Extender no es aislar — Para código que no conoces: un contenedor.
+- **omp no tiene `/trust`.** En Pi, `/trust` decide si se carga lo que trae un proyecto. En omp, una extensión que pregunta si el proyecto es de confianza (`isProjectTrusted()`) recibe siempre `true`: no pide confianza por carpeta antes de cargar nada.
+- Al abrir omp en un repositorio se cargan sus comandos y skills (de `.omp`, `.claude` y `.agents`), sus reglas, sus agentes (vídeo 16), su configuración (que puede poner yolo, vídeo 19), sus hooks y extensiones (código), sus servidores MCP (programas) y los plugins instalados para ese proyecto.
+- **El caso concreto:** clonas un repositorio para revisar una contribución. Su `.omp` trae un hook que lee tus variables de entorno al arrancar y un MCP local que manda lo que quiera a donde quiera. No has escrito ni un prompt y ya ha pasado. En Pi, con la confianza de fábrica, no se habría cargado hasta que dijeras que sí.
+- **Qué puedes hacer:** mira antes sus carpetas `.omp`, `.claude` y `.agents` y su `mcp.json`. Arranca con opciones que el repositorio no puede cambiar (`--no-extensions`, `--no-skills`, `--trusted-extension`). Ninguna es un sandbox. Los ajustes ayudan, pero la capa del proyecto gana a la tuya: para un repositorio ajeno, confía en los flags, no en la configuración.
+- *En terminal:* Antes de abrir un repositorio ajeno (más abajo, en «Código y comandos»).
+- **Extender no es aislar.** Para código que no conoces, la respuesta es la de los vídeos 05 y 19: un contenedor.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1246">▶ Ir a 20:46</button></p>
 
-- **Lo que no cambia:** Sin /trust — Todo lo que extiende oh my pi desde una carpeta se carga al abrirla.
-- **Vídeo 21:** oh my pi fuera de la terminal — omp -p, JSON, RPC, SDK y ACP.
+- **Lo que cuesta cada capa:** en dinero, un par de céntimos toda la demo. Lo que de verdad cuesta es otra cosa: contexto (la lista de skills en cada petición), reinicios (`/reload-plugins` para comandos y skills, `/restart` para extensiones) y superficie de ataque, porque cada capa del proyecto se carga al abrir la carpeta.
+- **Práctica:** en una rama de tu proyecto, convierte el prompt que más repites en un comando de `.omp/commands` con `$ARGUMENTS`, y una de tus skills en `.agents/skills` para que la vean Pi y omp. Carga tu extensión de Pi con `-e` y apunta qué herramientas de omp le faltan en sus listas. Abre `/extensions` para ver qué más se carga en tu máquina.
+- **En otros agentes:** si tu equipo ya usa Claude Code, sus comandos, skills y MCP de proyecto se cargan en omp sin hacer nada. Vale para lo bueno y para lo malo (capítulo 8).
+- **Vídeo 21:** oh my pi fuera de la terminal: `omp -p`, JSON, RPC, SDK y ACP.
 
 ## Código y comandos
 
@@ -123,11 +121,9 @@ MCP             .pi/mcp.json                   .omp/mcp.json · Claude, Cursor, 
 confianza       /trust                         no hay
 ```
 
-- `Pi`: Agente y .pi
-- `oh my pi`: .omp y perfil
-- `.claude · .agents`: Otras herramientas
+En Pi, las piezas viven en el directorio del agente y en `.pi/`. En omp, en `.omp/`, en tu perfil y en las carpetas de otras herramientas. Los comandos incluidos, como `/review`, tapan a uno propio del mismo nombre (vídeo 18).
 
-### .omp/commands/ .md
+### .omp/commands/&lt;nombre&gt;.md
 
 ```text
 ---
@@ -137,9 +133,8 @@ argument-hint: "[foco]"
 El prompt… $ARGUMENTS · $1 $2
 ```
 
-- `<nombre>.md`: El comando
-- `description`: Menú
-- `$ARGUMENTS`: Argumentos
+- El nombre del fichero es el nombre del comando: `repaso.md` se invoca con `/repaso`.
+- `$ARGUMENTS` recibe todo lo que escribes detrás; `$1`, `$2`, cada palabra.
 
 ### skill://
 
@@ -149,11 +144,11 @@ read skill://notas-de-version/scripts/…   # rutas relativas, sin salir de la c
 read ~/csn/tienda/.agents/skills/notas-de-version/SKILL.md   # lo que hizo Pro
 ```
 
-- `skill://`: Dirección interna
-- `relativas`: Dentro de la skill
-- `ruta`: También vale
+`skill://` no deja salir de la carpeta de la skill. Leer el fichero por su ruta, como hizo el modelo en la demo, también vale.
 
-### skills.omp.sh (diapositiva)
+### skills.omp.sh
+
+No se ejecuta en el vídeo; está aquí como referencia.
 
 ```text
 /skills search <texto>        /skills install @scope/nombre [-g]
@@ -161,9 +156,8 @@ read ~/csn/tienda/.agents/skills/notas-de-version/SKILL.md   # lo que hizo Pro
 omp skill publish · version · …   # para quien mantiene skills
 ```
 
-- `/skills`: En la sesión
-- `install`: Cuatro verbos
-- `omp skill`: Terminal
+- `/skills` trabaja desde la sesión con cuatro verbos: `search`, `install`, `installed` y `update`.
+- `omp skill` es la versión de terminal, con publicar y versionar para quien mantiene skills.
 
 ### Una extensión pensando en oh my pi
 
@@ -175,11 +169,12 @@ export default function (pi) {
 }
 ```
 
-- `factoría`: Como en Pi
-- `pi.zod`: Parámetros
-- `approval`: Su nivel
+- Es la misma factoría que en Pi; `pi.zod` define los parámetros.
+- `approval` declara el nivel. Si no lo declaras, la herramienta cuenta como `exec`.
 
-### .omp/mcp.json del proyecto (diapositiva)
+### .omp/mcp.json del proyecto
+
+No se ejecuta en el vídeo; está aquí como referencia.
 
 ```text
 { "mcpServers": {
@@ -187,9 +182,8 @@ export default function (pi) {
     "otro": { "url": "…", "headers": { "Authorization": "!cat ~/.token" } } } }
 ```
 
-- `command`: Se arranca
-- `al abrir`: Sin preguntar
-- `!`: Comando de shell
+- `command`: el programa que omp arranca al abrir la carpeta, sin preguntar.
+- `!`: un valor que empieza así se ejecuta como comando de shell.
 
 ### Antes de abrir un repositorio ajeno
 
@@ -200,109 +194,19 @@ omp --trusted-extension /ruta/absoluta/mi-ext.ts
 # ninguna de estas opciones es un sandbox
 ```
 
-- `mira`: Lo más barato
-- `--no-extensions`: Flags
-- `sandbox`: No lo es
+- Mirar las carpetas es lo más barato, y lo primero.
+- Los flags no los puede cambiar el repositorio; la configuración del proyecto, sí.
 
 ## Fuentes
 
-- Documentación instalada de omp 18.6.1 (`omp read omp://…`). Comparada con la copia de
-  la documentación de omp (omp.sh): **idénticas** `extension-loading.md`, `skills.md`, `marketplace.md`,
-  `plugin-manager-installer-plumbing.md`, `user-facing-packages.md`, `gemini-manifest-extensions.md`, `mcp-config.md`,
-  `mcp-runtime-lifecycle.md`, `custom-tools.md`, `slash-command-internals.md`, `omptype-guide.md` y `hooks.md`;
-  `extensions.md` solo difiere porque `omp read` corta a 50 KB (se leyó entero en la copia).
-  - `extension-loading.md`: raíces nativas `.omp/extensions` (solo el cwd) y `<agentDir>/extensions` (con
-    `--profile`, la del perfil); `-e`/`--hook` como rutas explícitas; un directorio con `package.json` usa
-    `omp.extensions` o el legado **`pi.extensions`**; `loadLegacyPiModule()` reescribe `@mariozechner/*`,
-    `@earendil-works/*` y `@sinclair/typebox`/`typebox` hacia las copias del host; `--no-extensions`,
-    `--trusted-extension <ruta absoluta>` («not a sandbox»), `disabledExtensions` (`extension-module:<nombre>`,
-    `skill:<nombre>`, `slash-command:<nombre>`…); cambios de `extensions` a mitad de sesión suspenden módulos ya
-    cargados, pero «newly enabled modules… require a restart»; «Extensions are **not sandboxed**»; `tool_call` falla
-    cerrado (30 s, pausados durante los diálogos).
-  - `extensions.md`: `ctx.isProjectTrusted()` «always `true`; OMP does not ask for per-directory trust before loading
-    project inputs»; `ctx.hasUI`, `ctx.mode`; en modo interactivo funcionan diálogos, `notify` y estado, y `setFooter`
-    y `setHeader` no hacen nada; eventos `session_start`, `session_branch`, `session_tree`…; patrón de estado:
-    `appendEntry` con `customType` con espacio de nombres y reconstruir en `session_start`, **`session_branch`** y
-    `session_tree`; nombres de comando que chocan con los incluidos se descartan con diagnóstico.
-  - `skills/authoring-extensions.md`: `pi.zod`, `pi.typebox` (compatible con el legado), `approval` de una herramienta
-    `"exec"` por defecto, `loadMode: "discoverable"` por defecto.
-  - `slash-command-internals.md`: proveedores y prioridades (`native` 100 > `omp-plugins` 90 > `claude` 80 >
-    `claude-plugins`, `agents`, `codex` 70 > `opencode` 55); `.omp/commands/*.md` del proyecto gana a los del usuario
-    (del perfil); `description` del frontmatter o primera línea; `argument-hint`; `$1`, `$@`, `$ARGUMENTS`; sin
-    vigilante de ficheros, se refresca con `/reload-plugins`; los incluidos reservan su nombre antes; el dashboard
-    enseña los comandos tapados («shadowed»).
-  - `skills.md`: `<raíz>/skills/<nombre>/SKILL.md` (un nivel); `description` obligatoria en `.omp`; proveedores
-    (`native` 100, `skillshare` 95, `omp-plugins` 90, `claude` 80, `agent-plugins` 75, `claude-plugins`/`agents`/`codex`
-    70…); `skill://<nombre>[/ruta]` con guardas de `..` y rutas absolutas; `/skill:<nombre>` (Enter = steer, Ctrl+Q =
-    follow-up); `hide`/`disable-model-invocation`; colisiones → espacio de nombres `<ns>/<nombre>`.
-  - `marketplace.md`: catálogos `.omp-plugin/marketplace.json` o `.claude-plugin/marketplace.json` (compatibles con
-    Claude Code); `/marketplace` (sin argumentos abre el navegador de plugins), `add`, `discover`, `install
-    nombre@marketplace`, ámbitos `user`/`project`; `/plugins list|enable|disable`; equivalentes `omp plugin …`; **los
-    cambios desde la TUI no refrescan la sesión: `/reload-plugins` para agentes, skills, comandos y MCP; reiniciar para
-    herramientas, hooks y módulos de extensión nuevos**; `marketplace.autoUpdate` (`notify` solo escribe en el log).
-  - `plugin-manager-installer-plumbing.md`: manifiesto `package.json#omp` con respaldo `#pi`; `omp plugin install`
-    (npm/git) valida importando y ejecutando la factoría contra una superficie desechable; `link` para rutas locales;
-    las operaciones npm/git/link son de ámbito usuario; «Named profiles use their own roots» (sin detalle fuera de XDG).
-  - `mcp-config.md` y `mcp-runtime-lifecycle.md`: `.omp/mcp.json` y `<agentDir>/mcp.json` (por perfil); lee también
-    Claude Code, Codex, Gemini, OpenCode, Cursor, Windsurf, VS Code y `mcp.json`/`.mcp.json` en la raíz (las de usuario
-    de herramientas ajenas, con opt-in); **no lee `.pi/mcp.json`**; valores `!comando` en `env`/`headers` se ejecutan
-    en el proyecto; `mcp.enableProjectConfig: false` excluye todo lo del proyecto; `disabledServers`; `/mcp reload`;
-    las herramientas MCP pueden montarse en `xd://` (`settings.md`: `tools.xdev`, `true`).
-  - `gemini-manifest-extensions.md`: `.gemini/extensions` del proyecto, solo metadatos (no se menciona en la locución).
-- **Código 18.5.1** (`~/orca/oh-my-pi`, `git show v18.5.1:…`, solo lectura):
-  - `extensibility/extensions/runner.ts` y `session/agent-session.ts`: `isProjectTrusted: () => true`; no hay evento
-    `project_trust` en `src/`.
-  - `extensibility/plugins/legacy-pi-compat.ts`: alias de scope `oh-my-pi`, `mariozechner`, `earendil-works`; filtro
-    `^(?:@sinclair\/typebox|typebox)$` hacia un shim.
-  - `extensibility/tool-event-input.ts`: en hashline, un `edit` de un fichero recibe `path` y `paths`; de varios, solo
-    `paths`.
-  - `tools/builtin-names.ts`: `read`, `bash`, `edit`, `ast_grep`, `ast_edit`, `ask`, `debug`, `eval`, `glob`, `grep`,
-    `find`, `lsp`, `task`, `todo`, `web_search`, `write`… (no hay `ls`).
-  - `slash-commands/builtin-marketplace.ts`: `/reload-plugins` («Reload all plugins (skills, commands, hooks, tools,
-    agents, MCP)», pero `reloadTuiPluginState` solo refresca agentes, skills, comandos de fichero, capacidades y MCP;
-    mensaje «Plugins reloaded.»); `builtin-session.ts`: `/extensions` (alias `/status`, «Open Extension Control Center
-    dashboard»); `builtin-modes.ts`: `/skillful [on|off|status]` («session only»; ajuste `skillful`, por defecto
-    `true`, «List Skills in Prompt»); `builtin-lifecycle.ts`: `/restart` («Restart omp with the same launch flags,
-    resuming this session»), `/ssh add|list|remove|help`; `builtin-skills.ts`: `/skills search|install|installed|update`
-    (instala en el proyecto, `-g` en el usuario; «Install skill with scripts?»). No hay `/reload`.
-  - `skillshare/installer.ts`: integridad `sha512` comprobada antes de desempaquetar, `skills.json` y
-    `skills.lock.json`, aprobación si el paquete trae `scripts/` o ejecutables.
-  - `modes/components/extensions/state-manager.ts` y `dashboard-runtime.ts`: el Control Center carga skills, reglas,
-    tools, módulos de extensión (**solo los del proveedor `native`**), MCP, prompts, comandos, hooks y ficheros de
-    contexto, con `includeDisabled: true` (estados active, disabled, shadowed, «user-opt-in»); los interruptores
-    escriben `disabledExtensions`.
-  - `extensibility/settings.ts` y `extensibility/skills.ts`: `skills.enableAgentsUser` y `enableAgentsProject`
-    (`true`), `enableClaudeUser`/`enableCodexUser` (`false`); `capability/index.ts`: `agents` **no** está entre los
-    proveedores ajenos de opt-in, así que `~/.agents/skills` y `~/.agent/skills` se cargan siempre, con cualquier perfil.
-  - `discovery/agents.ts`: `.agent/` y `.agents/` del proyecto (subiendo hasta la raíz del repo) y de la carpeta
-    personal: skills, reglas, prompts, comandos y `AGENTS.md`.
-  - `discovery/ssh.ts`, `internal-urls/ssh-protocol.ts`, `prompts/internal-urls/ssh.md`: hosts en `.omp/ssh.json` y
-    `<agentDir>/ssh.json`; `ssh://host/ruta` para `read`, `write` y `grep` (texto UTF-8 de hasta 1 MiB).
-- **Binario 18.6.1** (`~/.bun/bin/omp`, `grep -a`): siguen `isProjectTrusted: () => true`, «Plugins reloaded.», «Open
-  Extension Control Center dashboard», «Install skill with scripts?», «Toggle listing available skills in the system
-  prompt (session only)» y «Restart omp with the same launch flags, resuming this session». Changelog 18.5.1–18.6.1:
-  cargador de extensiones más rápido (18.6.0), búsquedas `skill://` concurrentes (18.6.1), `pi.exec()` devuelve `-1`
-  si se mata el proceso (18.6.1). Nada cambia lo que cuenta este vídeo.
-- `omp --help`, `omp skill --help`, `omp plugin --help`, `omp install --help`, `omp ssh --help` (18.6.1, solo ayuda):
-  `-e`, `--hook`, `--no-extensions`, `--no-skills`, `--skills`, `--plugin-dir`; `omp skill` contra skills.omp.sh
-  (`install`, `search`, `publish`…, `-y` instala con scripts sin preguntar); `omp install` = `plugin install`/`link`.
-- Pi 1.0.4 instalado: `docs/security.md` §«Understand project trust» (**`.agents/skills` del proyecto exige confianza**,
-  igual que `.pi/mcp.json`, `.pi/extensions`…; `defaultProjectTrust: "ask"`), `docs/skills.md` (Pi lee
-  `~/.agents/skills/` y `.agents/skills/`), `docs/mcp.md` (`~/.pi/agent/mcp.json` y `.pi/mcp.json`). CHANGELOG
-  1.0.1 → 1.0.4: nada sobre extensiones, skills, paquetes ni confianza.
-- Vídeos anteriores: 06 (skill `notas-de-version`, template `/review`, «revisa las skills de un proyecto ajeno antes de
-  concederle confianza»), 07 (`tienda-fs`, `codemode`/`deferred`/`direct`, `.pi/mcp.json` solo con confianza), 08
-  (`hola.ts`, `tests.ts`, `permisos.ts`, `/reload`), 09 (borrador: paquete `csn-extensiones` con `pi.extensions`,
-  `appendEntry`, reconstrucción en `session_start` y `session_tree`, «Permitir siempre en esta rama»), 11 (sin
-  `/trust`; `.claude/commands/resumen-envio.md`; `/tools` con `~ xd://`; promete este vídeo), 12 (`/branch` rebobina
-  en el mismo fichero, `/tree`, `/restart`), 13 (`/context` con la categoría Skills), 16 (`.omp/agents/`), 18
-  (`/review` incluido tapa un `review.md` propio), 19 (`.omp/config.yml`, hooks en `.omp/hooks/pre/`, «aprobar no es
-  aislar», nivel `exec` para herramientas sin nivel; cierra anunciando este vídeo). `/ssh` no aparece en 12–18.
-- Tienda (`~/csn/tienda`, leída): `master` limpio, ramas `iva-antes` e `iva-despues`, sin `.omp/`, `.agents/` ni
-  remoto. `~/csn/extensiones` (leída): **sigue en el estado del vídeo 08** (`hola.ts`, `tests.ts`, `permisos.ts`, sin
-  `package.json`; `permisos.ts` con `LECTURA = ["read", "grep", "find", "ls", "ejecutar_tests"]` y rutas protegidas
-  `AGENTS.md` y `.git/`).
-- Documentación oficial de Pi: [mcp.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md), [security.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md), [skills.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md)
+- Documentación de oh my pi (omp.sh): `extension-loading.md` y `extensions.md` (de dónde se cargan las extensiones, compatibilidad con Pi, `isProjectTrusted()`, eventos de sesión, «not sandboxed»).
+- `slash-command-internals.md` (comandos de proyecto, prioridades y comandos tapados) y `skills.md` (dónde se buscan, `skill://`, `/skill:`).
+- `marketplace.md` y `plugin-manager-installer-plumbing.md` (plugins, marketplaces y cuándo hace falta `/reload-plugins` o reiniciar).
+- `mcp-config.md` y `mcp-runtime-lifecycle.md` (de dónde lee los servidores, valores `!comando`, `mcp.enableProjectConfig`).
+- Registro de skills: skills.omp.sh.
+- Documentación de Pi: [mcp.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md), [security.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md) (confianza de proyecto) y [skills.md](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md).
+- Grabado con omp 18.6.1 y Pi 1.0.4.
+- Vídeos relacionados del curso: 06 (skills y prompt templates), 07 (MCP), 08 y 09 (`permisos.ts`), 11 (sin `/trust`), 19 (aprobaciones y hooks).
 
 ## Transcripción
 

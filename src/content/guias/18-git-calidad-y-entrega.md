@@ -12,118 +12,104 @@ Revisar, preparar y hacer commits desde omp, trabajar en worktrees y pasar el c�
 
 <p class="guia__nota">Dura 25 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
+> **Seguridad:** las demos de este vídeo corren con approvalMode yolo (todo se aprueba solo); en tu proyecto, configura las aprobaciones antes (vídeo 19).
+
 ## Resumen por capítulos
 
 ### 1 · Cerrar el ciclo del cambio
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **La idea del vídeo:** Las herramientas proponen; tú decides — Y algunas hacen más de lo que su nombre sugiere.
-- **El montaje**
-  - `V4 Pro` · Conversación
-  - `Flash` · Rol smol: mensajes de commit
-  - `demo-18` · Rama de usar y tirar
-  - `sin remoto` · Nada sale
-- *En terminal:* Rama demo-18 · sin commitear (más abajo, en «Código y comandos»)
-- *En la demo:* git status · git log
-- *En la demo:* /security
-- *En la demo:* review · bundled
+- Un cambio no está terminado cuando pasan los tests. Lo está cuando alguien lo ha revisado, sabes qué entra en el commit y el mensaje cuenta lo que pasó.
+- **La idea del vídeo:** las herramientas proponen; tú decides qué entra en la historia. Y algunas hacen más de lo que su nombre sugiere: un modo de prueba que prepara ficheros, un consentimiento que envía datos, una opción que publica.
+- El montaje: DeepSeek V4 Pro lleva la conversación, Flash (rol `smol`) escribe los mensajes de commit, y trabajamos en una rama de usar y tirar (`demo-18`) de un repositorio sin remoto: nada sale de la máquina.
+- En la rama hay un cambio sin commitear (un envío urgente de +3 €) con un fallo sembrado que los tests no detectan, y una línea en el README que no tiene nada que ver. Separar lo que va en cada commit es parte del oficio.
+- *En terminal:* Rama demo-18 · sin commitear (más abajo, en «Código y comandos»).
 
 ### 2 · /review: una revisión con método
 
 <p><button type="button" class="ir-a" data-t="176">▶ Ir a 2:56</button></p>
 
-- *En la demo:* Review Mode
-- *En la demo:* 4: con gh y tu cuenta · 2: sin commitear
-- **El diff congelado:** Lee (el diff) → Lo congela (en el mensaje) → Tabla (de ficheros) → Sin ruido (locks, generado)
-- *En la demo:* task · 1 agente
-- *En la demo:* El encargo al reviewer
-- *En la demo:* ReviewTiendaChanges · 38,2 s · $0.01
-- *En la demo:* Pro comprueba antes de contarlo
-- *En la demo:* Bloqueante: el umbral con IVA
-- *En la demo:* Menores · y pregunta
-- **Vídeo 16:** El reviewer tiene bash — «Solo lectura» es una instrucción, no un permiso. Con yolo nada lo para.
+- `/review` es un comando incluido en omp, escrito en TypeScript, no una plantilla de prompt como la del vídeo 06. Su menú ofrece cinco opciones: contra una rama base, cambios sin commitear, un commit, una pull request (necesita `gh` y tu cuenta) o instrucciones a medida. Usamos la segunda.
+- **El diff congelado:** lee el diff una vez y lo mete en el mensaje, con una tabla de ficheros. Si el árbol cambia mientras tanto, la revisión sigue siendo sobre lo que había. Deja fuera ficheros de bloqueo y código generado.
+- No revisa el modelo de la conversación: reparte con `task` entre agentes `reviewer` (vídeo 16), de uno a dieciséis según el tamaño del diff. El reviewer solo informa de fallos con impacto demostrable, arreglables, no intencionados e introducidos por el parche. Usa el rol `slow`; sin asignar, hereda tu modelo por defecto (vídeo 14).
+- *En la demo:* en 38 segundos y un céntimo, el reviewer devuelve hallazgos y un veredicto que pide cambios. Pro no se fía: lee el código, confirma el fallo sembrado (el umbral de envío gratis se evalúa con IVA) y lo explica con un carrito de 35 €. Después lista tres hallazgos menores y pregunta antes de tocar nada.
+- **Trampa:** el reviewer tiene `bash`. «Solo lectura» en sus instrucciones es una instrucción, no un permiso; con yolo nada lo para. Y si copias tu plantilla `review.md` de Pi a los comandos de omp, el `/review` incluido la tapa: ponle otro nombre.
+
+> **Nota:** la locución dice que el veredicto es «changes requested». En la tarjeta de omp, el veredicto se expresa como `correct` o `incorrect`, con un grado de confianza; `correct` significa que no se encontraron fallos ni bloqueos. Aquí, por tanto, el parche no era correcto: había que cambiar algo antes de entregarlo.
 
 ### 3 · Arreglar y mirar el diff con /git
 
 <p><button type="button" class="ir-a" data-t="457">▶ Ir a 7:37</button></p>
 
-- *En terminal:* La petición (más abajo, en «Código y comandos»)
-- *En la demo:* edit · edit · npm test
-- *En la demo:* «Antes habría dado 45.35»
-- **Vídeo 24:** La revisión señala las pruebas — No las sustituye.
-- *En la demo:* /git
-- *En la demo:* ? · hoja de atajos
-- *En la demo:* Stage
-- *En la demo:* Unstaged README.md
-- *En la demo:* x · Supr · q
+- *En terminal:* La petición (más abajo, en «Código y comandos»).
+- Pro arregla el cálculo y añade la prueba del carrito de 35 €: con el código viejo habría dado 45,35 en lugar de 50,30. **La revisión no sustituye a las pruebas; las señala.** Lo retoma el vídeo 24.
+- `/git` (igual que `omp git`) abre una interfaz a pantalla completa: a la derecha, cambios sin preparar y preparados; a la izquierda, el diff. Las teclas `1`–`4` cambian la vista (fichero, partida, en línea, por hunk) y `?` abre la hoja de atajos.
+- Preparar: la barra espaciadora prepara o quita la fila; dentro del diff, `s` prepara el hunk y `u` lo quita, y con mayúsculas y flechas eliges líneas sueltas.
+- *En la demo:* pulsamos espacio sobre la cabecera de la sección y se prepararon los cinco ficheros, README incluido. Lo arreglamos quitando su hunk con `u`. Mira dónde está el cursor antes de pulsar.
+- **Teclas que borran:** `x` descarta el hunk o las líneas y `Supr` el fichero entero. Piden una segunda pulsación, pero lo descartado no estaba en ningún commit: no se recupera. `q` sale sin commitear.
 
 ### 4 · omp commit en modo de prueba
 
 <p><button type="button" class="ir-a" data-t="609">▶ Ir a 10:09</button></p>
 
-- *En la demo:* omp --profile demo commit --dry-run
-- *En la demo:* Modelo · changelogs · contexto
-- *En la demo:* El agente de commit
-- *En la demo:* Presente → pasado
-- *En terminal:* Conventional commits (validado) (más abajo, en «Código y comandos»)
-- *En la demo:* Generated commit message
-- *En terminal:* omp commit (sin --dry-run, diapositiva) (más abajo, en «Código y comandos»)
+- `omp --profile demo commit --dry-run` genera un mensaje sin commitear. El perfil también se aplica a los subcomandos.
+- Por pasos: resuelve el modelo (rol `commit`, que sin asignar cae a `smol`), busca changelogs, descubre los ficheros de contexto (lee nuestro `AGENTS.md`) y arranca un agente de commit con sus propias herramientas; si los cambios no tienen relación, puede proponer dividirlos.
+- **Gana el validador.** El formato es conventional commits: tipo, ámbito y un resumen que empieza por un verbo en pasado, de 72 caracteres como mucho. Un validador del código lo exige: la primera propuesta (*add*) no pasa y la segunda (*added*) sí. Nuestro `AGENTS.md` pide español, imperativo y el prefijo `tienda:`; el agente lo leyó, pero no lo cumplió.
+- **Trampa del dry-run:** si no hay nada preparado, `omp commit` prepara todos los cambios antes de generar el mensaje, también en modo de prueba. Por eso pasamos primero por `/git`.
+- Sin `--dry-run` crea el commit y actualiza el CHANGELOG si lo hay (`--no-changelog` para no tocarlo); con `--push` publica. No lo ejecutamos.
+- *En terminal:* Conventional commits y omp commit sin --dry-run (más abajo, en «Código y comandos»).
 
 ### 5 · El commit desde /git
 
 <p><button type="button" class="ir-a" data-t="779">▶ Ir a 12:59</button></p>
 
-- *En la demo:* c · compositor
-- *En la demo:* «empty: generate one»
-- *En terminal:* Nuestro mensaje (más abajo, en «Código y comandos»)
-- *En la demo:* Created commit
-- *En la demo:* git log --oneline -2
-- *En la demo:* Amend · Stage all & commit
+- La tecla `c` abre el compositor: resumen, descripción y el botón de commitear lo preparado. Con los campos vacíos, genera un mensaje con la misma tubería de `omp commit`; si no hay nada preparado, además lo prepara todo.
+- Escribimos nosotros el mensaje, con las reglas de la tienda. `git log --oneline` confirma el commit. **El generador sirve de borrador; el mensaje final lo decides tú**, que conoces las reglas del equipo.
+- *En terminal:* Nuestro mensaje (más abajo, en «Código y comandos»).
+- «Stage all & commit» solo cuando de verdad quieres todo. «Amend» reescribe el commit anterior: úsalo solo en commits que no hayas compartido. «Stage by description» usa el rol `judge` (un modelo que decide qué hunks preparar); no lo tenemos asignado.
 
 ### 6 · /wt: la sesión a un worktree
 
 <p><button type="button" class="ir-a" data-t="888">▶ Ir a 14:48</button></p>
 
-- **Nos queda:** El README — En otra rama, sin perder la conversación.
-- *En la demo:* /wt demo-18-wt
-- *En la demo:* ~/.omp/profiles/demo/wt/…
-- *En la demo:* /git en el worktree
-- *En la demo:* Stage all & commit
-- *En la demo:* En la carpeta original
-- **Cuidado:** worktree.cleanSource — Limpia el origen con reset --hard y clean. Déjalo apagado.
+- Un worktree es una segunda carpeta de trabajo del mismo repositorio, con otra rama. `/wt <rama>` (o `/worktree`) lo crea y se lleva la sesión allí, con los cambios sin commitear y sin perder la conversación. Sin nombre, la rama lleva fecha y hora.
+- La carpeta la gestiona omp (con un perfil, dentro del perfil). En macOS se clona con APFS, una copia instantánea que no duplica datos en el disco.
+- *En la demo:* commiteamos el README en el worktree. En la carpeta original el README sigue modificado: `/wt` se lleva una copia y, por defecto, no limpia el origen.
+- **Cuidado:** `worktree.cleanSource` limpia el origen con `reset --hard` y `clean`, y borra lo no commiteado. Déjalo apagado.
+- Úsalo cuando la conversación ya tiene el contexto de un trabajo y quieres seguirlo en su rama. No funciona mientras el modelo responde ni en vibe (vídeo 15). Para cambiar de carpeta sin crear rama, `/move` (vídeo 12).
 
 ### 7 · Auto-QA y omp grievances
 
 <p><button type="button" class="ir-a" data-t="1055">▶ Ir a 17:35</button></p>
 
-- **Auto-QA:** No revisa tu código — Es un buzón de quejas del modelo sobre las herramientas.
-- *En terminal:* Auto-QA (lo escribe el modelo) (más abajo, en «Código y comandos»)
-- **Texto libre:** La queja la escribe el modelo — Puede citar una ruta o un comando. En el perfil demo, denegado de antemano.
-- *En la demo:* config get dev.autoqa · dev.autoqaConsent
-- *En la demo:* omp grievances --help
-- *En la demo:* omp --profile demo grievances
+- **Auto-QA no es QA de tu código.** Es un buzón de quejas del modelo sobre las herramientas de omp: si una herramienta no hace lo que dice su descripción, el modelo lo apunta. Es información para los autores de omp.
+- Viene activado, pero nada se guarda hasta que das tu consentimiento. Si dices que sí, cada queja se guarda en local y se envía sola a un servidor de omp. La queja la escribe el modelo y puede citar una ruta o un comando.
+- Para que no salga nada, deja el consentimiento denegado (`dev.autoqaConsent`), apaga `dev.autoqa` o pon `PI_AUTO_QA=0`. Manda el consentimiento.
+- `omp grievances` lista, limpia (`clean`) o envía (`push`) las quejas. Te sirve para ver si el modelo también ha notado que una herramienta falla.
 
 ### 8 · /security y los límites
 
 <p><button type="button" class="ir-a" data-t="1218">▶ Ir a 20:18</button></p>
 
-- **Por qué no lo activamos**
-  - `OAuth` · Exige cuenta: o Bedrock
-  - `coste` · Mucho modelo
-  - `cloud` · Codex Security: fuera de tu máquina
-- **Diseño:** Un plan inmutable — Lo revisado es exactamente lo que pediste. Como el diff congelado.
-- **Límite 5 · el de siempre:** Solo lectura no es una barrera — El reviewer tiene bash y el modo yolo no pregunta.
-- *En la demo:* Revisión y arreglo: $0.01
+- `/security` hace escaneos de seguridad con agentes `security-reviewer`. Viene apagado (`security.enabled`) y no lo activamos: exige una cuenta OAuth guardada en omp (o Amazon Bedrock), gasta mucho modelo y su variante en la nube envía el trabajo a Codex Security.
+- Su idea útil: el plan es inmutable. Si el código o el alcance cambian antes del escaneo, se niega a empezar, igual que el diff congelado de `/review`.
+- Los cinco límites del vídeo:
+  1. **Dry-run no es solo lectura:** `omp commit --dry-run` y el mensaje generado en `/git` preparan todo si el índice está vacío. Prepara tú antes y mira `git status` después.
+  2. **Las convenciones de la herramienta pueden ganar a tu `AGENTS.md`:** usa el mensaje generado como borrador.
+  3. **Lo que publica:** `--push`, la opción de PR de `/review`, el envío de Auto-QA y `/security` en la nube mandan algo fuera, a veces con tu cuenta. Y el diff de `/review` viaja entero al proveedor; la redacción de secretos viene apagada (vídeo 19).
+  4. **Las teclas que borran:** `x` y `Supr` en `/git`, y `worktree.cleanSource`.
+  5. **Solo lectura no es una barrera:** el reviewer tiene `bash` y yolo no pregunta.
+- **Coste:** la revisión y el arreglo costaron un céntimo; los mensajes de Flash, menos. Con diffs grandes, `/review` lanza más revisores y el coste crece.
 
 ### 9 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1380">▶ Ir a 23:00</button></p>
 
-- **Lo demás**
-  - `Auto-QA` · Quejas sobre herramientas: con consentimiento
-  - `/security` · Apagado: exige OAuth
-- **Vídeo 19:** De instrucciones a límites — Aprobaciones, patrones de bash, TTSR, hooks y secretos.
+- El flujo recomendado: `/review` (congela el diff) → arreglo con la prueba que lo habría detectado → `/git` (preparas tú, por hunk) → `omp commit --dry-run` como borrador → tu mensaje → `/wt` para lo que va aparte.
+- **Práctica:** en tu perfil de pruebas y una rama de usar y tirar, haz un cambio que mezcle dos cosas. Lanza `/review` sobre los cambios sin commitear. En `/git`, prepara solo una, lanza `omp commit --dry-run` y compara el mensaje con las reglas de tu repositorio. Escribe tú el mensaje final. Al terminar, comprueba con `git status` y `git worktree list` que no queda nada suelto.
+- **En otros agentes:** la lección vale igual. Revisa el diff tú, prepara a mano y no dejes que el agente publique. Cualquier herramienta trae sus convenciones, y pueden ganar a tu `AGENTS.md`.
+- **Vídeo 19:** de instrucciones a límites: aprobaciones, patrones de bash, TTSR, hooks y secretos.
 
 ## Código y comandos
 
@@ -138,9 +124,7 @@ export function envioUrgente(subtotal) { … gastosEnvio(subtotal) + 3 … }
 const envio = envioUrgente(aplicarIVA(totalCupon, tipoIVA));   // ✗ con IVA
 ```
 
-- `envioUrgente`: +3 €
-- `aplicarIVA`: El fallo
-- `npm test`: Pasa
+El fallo sembrado: `totalUrgente` calcula el envío sobre el total con IVA, al revés que el resto de la tienda. `npm test` pasa igualmente.
 
 ### La petición
 
@@ -151,11 +135,7 @@ que lo habría detectado. Ejecuta npm test.
 No hagas commit ni toques el README.
 ```
 
-- `sin IVA`: El arreglo
-- `35 €`: La prueba
-- `README`: Fuera
-
-### Conventional commits (validado)
+### Conventional commits
 
 ```text
 feat(envio): added urgent shipping total calculation
@@ -163,11 +143,11 @@ tipo: feat · ámbito: envio · verbo en pasado
 en inglés · 72 caracteres como mucho
 ```
 
-- `feat`: Tipo
-- `(envio)`: Ámbito
-- `added`: Pasado
+El validador de `omp commit` exige el verbo en pasado y 72 caracteres como mucho. El inglés es lo que escribió el agente en la demo; la documentación no dice que el validador lo exija.
 
-### omp commit (sin --dry-run, diapositiva)
+### omp commit sin --dry-run
+
+No se ejecuta en el vídeo; está aquí como referencia.
 
 ```text
 omp --profile demo commit                  # crea el commit (y el CHANGELOG si hay)
@@ -175,9 +155,7 @@ omp --profile demo commit --no-changelog   # no toca el CHANGELOG
 omp --profile demo commit --push           # publica ⚠
 ```
 
-- `commit`: Crea
-- `--no-changelog`: Sin changelog
-- `--push`: Publica
+- `--push`: sube los commits al terminar. Publica.
 
 ### Nuestro mensaje
 
@@ -187,9 +165,7 @@ tienda: añade el envío urgente
 El envío urgente suma 3 € y se calcula sin IVA, como el normal.
 ```
 
-- `Resumen`: tienda:
-- `Descripción`: Una línea
-- `Commit`: Created commit
+Sigue las reglas del `AGENTS.md` de la tienda: español, imperativo y el prefijo `tienda:`.
 
 ### Auto-QA (lo escribe el modelo)
 
@@ -199,97 +175,16 @@ write xd://report_issue
   report: «no hace lo que dice su descripción»
 ```
 
-- `Desajuste`: Herramienta
-- `xd://`: Dispositivo
-- `omp`: Para sus autores
+`xd://report_issue` es un dispositivo virtual: el modelo escribe ahí la queja, y solo se guarda y se envía a los autores de omp si diste tu consentimiento.
 
 ## Fuentes
 
-- Documentación instalada de omp 18.6.1 (`omp read omp://…`; la copia de la documentación de omp (omp.sh)
-  coincide en lo citado):
-  - `cli-reference.md`: tabla de subcomandos (`commit`: «Generate a commit message and update changelogs»; `git`:
-    «Interactive fullscreen git UI: split diff viewer, staging sidebar, and commit composer»; `grievances`: «View, clean,
-    or push reported tool issues (auto-QA grievances)»; `worktree`, `wt`); `--profile` se aplica antes de enrutar el
-    subcomando, así que también afecta a `config`, `commit`…
-  - `settings.md`: `PI_AUTO_QA` → `dev.autoqa`; roles de chat (`commit` entre ellos); el catálogo detallado de ajustes
-    de 18.6.1 no lista `git.*`, `worktree.*`, `commit.*` ni `security.*` (solo los nombra en «Execution and content»):
-    sus valores por defecto salen del esquema embebido (ver [bin]).
-  - `tools/security_scan.md`: `security.enabled` `false`; herramienta `exec`; `preflight` exige repositorio git,
-    modelo activo y **credencial OAuth** guardada (o Bedrock); «Ordinary API-key-only providers are not accepted»;
-    plan inmutable con huella («Security scan plan is stale… Run security preflight again»); fases `queued → preparing
-    → reviewing → publishing → completed`; sesión restringida con solo `security-reviewer`; acciones `cloud_*` contra
-    Codex Security de ChatGPT («never a fallback»).
-  - `secrets.md`: la redacción de secretos viene **desactivada** (`secrets.enabled`); se cita solo para el apunte de
-    que el diff viaja entero al proveedor (el tema es del 19).
-  - `slash-command-internals.md` §«Name-collision» y publicación de comandos: built-ins, skills, extensiones, comandos
-    TypeScript/MCP (aquí está el `/review` incluido) y después los comandos de fichero, **primero gana**.
-- Web: https://omp.sh/docs/review (cuatro opciones del menú, P0–P3, confianza, veredicto «correct»/«incorrect»,
-  «Correct means no correctness bugs or blockers were established», hasta 16 porciones en paralelo, «intentionally
-  read-only», excluye ficheros de bloqueo, minificados y generados) y https://omp.sh/docs/commit (con el índice vacío
-  «behaves like `git add -A`»; `--dry-run` «may automatically stage all changes… stage the intended files yourself
-  first»; resumen en pasado, 72 caracteres; rol `commit`; changelog en «unreleased»; *split* con confirmación).
-- `omp commit --help`, `omp git --help`, `omp worktree --help`, `omp grievances --help` (18.6.1, ejecutados; solo
-  ayuda).
-- **Código 18.5.1** (`~/orca/oh-my-pi`, `git show v18.5.1:…`, solo lectura). **Ojo:** el paquete global de bun
-  (`~/.bun/install/global/node_modules/@oh-my-pi/pi-coding-agent`) es **17.4.1**, no la versión instalada; no se cita.
-  - `commit/agentic/index.ts`: «No staged changes detected, staging all changes...» **también con `--dry-run`**;
-    pasos «● Resolving model...», «● Detecting changelog targets...», «● Discovering context files...» (lista
-    `AGENTS.md`/`CLAUDE.md`), «● Starting commit agent...», «Generated commit message:»; *split* con «Split commit plan
-    (dry run):» y confirmación `y/yes` fuera del *dry-run*; `--push` con `pushOrAbort`.
-  - `commit/model-selection.ts`: modelo = `--model` o roles `commit` → `smol` → resto de roles de chat.
-  - `commit/agentic/prompts/system.md` y `agentic/validation.ts`: herramientas `git_overview`, `git_file_diff`,
-    `git_hunk`, `recent_commits`, `analyze_files` (subagentes `sonic`), `propose_changelog`, `propose_commit`,
-    `split_commit`; «Summary line: past-tense verb, ≤ 72 chars»; error «Summary must start with a past-tense verb».
-  - `commit/changelog/detect.ts`: busca el `CHANGELOG.md` más cercano a cada fichero preparado.
-  - `extensibility/custom-commands/bundled/review/*` y `prompts/review-request.md`: menú «Review Mode» (PR citadas en
-    la conversación, «1. Review against a base branch (PR Style)», «2. Review uncommitted changes», «3. Review a
-    specific commit», «4. Review a specific PR» con `gh pr list`, «5. Custom review instructions» solo sin argumentos);
-    el diff se congela en el prompt; «Use the `task` tool with `agent: "reviewer"`»; número de revisores por tamaño
-    (1 si menos de 100 líneas o hasta 2 ficheros… hasta 16).
-  - `prompts/agents/reviewer.md`: `tools: read, find, grep, glob, bash, lsp, web_search, ast_grep`, `spawns: scout`,
-    `model: "@slow"`; «Bash read-only: git diff, git log, git show… NEVER edit files or trigger builds» (instrucción,
-    no barrera); criterios (impacto demostrable, accionable, no intencionado, introducido en el parche…); P0–P3.
-  - `session/session-worktree.ts`: rama por defecto `wt/AAAAMMDD-hhmmss`; carpeta bajo `~/.omp/wt`; `keepChanges:
-    true`; `worktree.cleanSource` hace `reset --hard` y `clean` en el origen; «Moved to worktree … on branch …
-    (…, uncommitted changes carried over).»
-  - `tools/report-tool-issue.ts`, `cli/grievances-cli.ts`, `prompts/system/system-prompt.md`: Auto-QA = el modelo
-    escribe `<herramienta>: <descripción>` en `xd://report_issue` cuando una herramienta no se comporta como dice;
-    nada se graba hasta el consentimiento; con «Yes» se graba en `autoqa.db` **y se envía solo** a
-    `dev.autoqaPush.endpoint`; con «No» se apaga; `autoqa.db` en `~/.omp/` (raíz, no perfil).
-  - `cli/git-tui/ai-stage.ts`: «Stage by description» juzga cada hunk con el rol `judge`.
-- **Binario de omp 18.6.1** (`strings ~/.bun/bin/omp`, que lleva el código fuente empaquetado):
-  - `/git`: «Open the git UI (split diff viewer, staging, commit composer)», `[revision]`, abre `showGitTui`. Hoja de
-    atajos (`?`): Move (`↑↓`, `←→`, `Enter`, `Tab`, `]`/`[`, `Alt+↑↓`, `g`/`G`), Stage (`espacio`, `s`/`u`,
-    `Shift+↑↓`, `x` y `Supr` descartan «press twice»), View (`v`, `1`–`4` «File, split, inline or hunk view», `w`,
-    `b`, `t`, `r`), Commit (`c` «Write the commit message (empty: generate one)», `Esc`, `q`). Botones «Stage all»,
-    «Stage by description» («What should we stage?»), «Unstage all», «Generate message», «Stage all & commit»,
-    «Commit the staged changes», «Amend the previous commit». Avisos «Created commit», «Amended commit», «Generating
-    commit message…», «Staged all changes and generated commit message», «Generated message needs review: …»,
-    «Discard changes to …? Press Supr again to confirm». Con el resumen y la descripción vacíos, el botón de commit
-    **genera** en lugar de commitear; si no hay nada preparado, `stageAll`.
-  - `/wt` (alias `/worktree`): «Move this session into a new worktree, changes included», `[<branch>]`, «Creating
-    worktree on …», «Worktree creation failed: …», «Branch '…' already exists; pick another name.», «Wait for the
-    current response to finish or abort it before creating a worktree.».
-  - `/review`: «Launch interactive code review»; tarjeta del revisor «Patch is <correct|incorrect> … (NN%
-    confidence)», resumen y hallazgos `[P]` título `fichero:línea` (tres plegados, todos al desplegar).
-  - `/security`: «Plan, run, inspect, import, and compare OMP-native security scans»; subcomandos `plan`, `scan`,
-    `status`, `cancel`, `scans`, `show`, `import`, `export`, `validate`, `compare`, `disposition`; con el ajuste
-    apagado: «Security is disabled. Enable security.enabled before using /security.».
-  - Auto-QA: descripción del ajuste «On by default; the first report asks for consent, and denying it disables
-    reporting until re-enabled explicitly»; endpoint por defecto `https://qa.omp.sh/v1/grievances`; diez textos de
-    consentimiento («Your agent drafted a strongly worded letter to one of its tools… Mail it to the devs?»); «No
-    grievances recorded yet.».
-  - Valores por defecto (esquema embebido): `git.enabled` `true`, `worktree.clone` `true`, `worktree.cleanSource`
-    `false`, `security.enabled` `false`, `github.enabled` `false`, `dev.autoqa` `true`, `dev.autoqaConsent` `unset`,
-    `commit.mapReduceThreshold` 5000.
-  - Changelog 18.5.1–18.6.1: nada nuevo en `/git`, `/review` ni `/wt`; «Fixed `omp commit` never closing its
-    credential store»; `omp worktree add` ejecuta el hook `post-checkout` (18.5.1).
-- Vídeos anteriores: 06 (template `/review` de Pi: Markdown, foco opcional, tres viñetas, mismo modelo), 11 (el
-  template del 06 no se traslada; «oh my pi ya trae su propio barra review»), 12 (`/move`), 14 (rol `commit`; `slow`
-  sin asignar hereda `default`), 15 (no se puede mover a un worktree en vibe), 16 (agente `reviewer` con `bash`;
-  `/agents`), 17 (cierre que anuncia este vídeo; `pr://` solo en diapositiva; la tienda no tiene remoto).
-- Tienda (`~/csn/tienda`, leída): ramas `master`, `iva-antes`, `iva-despues`; sin remoto; sin `CHANGELOG.md`;
-  `AGENTS.md` dice «Mensajes de commit en español y en imperativo, empezando por `tienda:`».
+- Documentación de oh my pi: https://omp.sh/docs/review (menú, prioridades P0–P3, confianza, veredicto `correct`/`incorrect`, revisión de solo lectura) y https://omp.sh/docs/commit (dry-run, validación, rol `commit`, changelog).
+- `cli-reference.md` (`omp commit`, `omp git`, `omp grievances`, `omp worktree`) y `settings.md` (`dev.autoqa`, roles).
+- `tools/security_scan.md` (por qué `/security` exige OAuth, plan inmutable) y `secrets.md` (la redacción de secretos viene apagada).
+- `omp commit --help`, `omp git --help`, `omp worktree --help` y `omp grievances --help`.
+- Grabado con omp 18.6.1.
+- Vídeos relacionados del curso: 06 (la plantilla `/review` de Pi), 12 (`/move`), 14 (roles `commit`, `slow` y `judge`), 16 (el agente `reviewer`), 19 (aprobaciones y secretos), 24 (verificar de verdad).
 
 ## Transcripción
 

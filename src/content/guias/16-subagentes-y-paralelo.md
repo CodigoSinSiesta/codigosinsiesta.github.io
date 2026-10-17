@@ -12,100 +12,102 @@ Repartir una tarea entre varios agentes, seguirlos desde el Hub y definir agente
 
 <p class="guia__nota">Dura 23 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
+> **Seguridad:** las demos de este vídeo corren con approvalMode yolo (todo se aprueba solo); en tu proyecto, configura las aprobaciones antes (vídeo 19).
+
 ## Resumen por capítulos
 
 ### 1 · De dirigir a repartir
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Vídeo 15 → hoy:** Un agente (paso a paso) → Varios agentes (a la vez) → Seguirlos (mientras trabajan)
-- **Repartir no es gratis**
-  - `contexto` · Cada uno el suyo: relee lo que necesita
-  - `tiempo` · Antes: pero no más barato
-- **Terminar no es acertar:** Qué encargar, a quién y cómo comprobarlo — Que diga que ha terminado no demuestra que lo haya hecho bien.
-- **Hoy:** task (y sus agentes) → /agents (y los tuyos) → Agent Hub (seguir) → /tan · /jobs → /cleanse
-- *En la demo:* /ag
-- *En la demo:* /j
+- En el vídeo 15 dirigías a un solo agente, paso a paso. Hoy repartes una tarea entre varios agentes que trabajan a la vez, y los sigues mientras trabajan.
+- **Repartir no es gratis.** Cada subagente es una conversación entera, con su propio contexto, que vuelve a leer los ficheros que necesita. Tres agentes en paralelo terminan antes, pero no gastan menos.
+- **Terminar no es acertar.** Que un agente diga que ha terminado no demuestra que lo haya hecho bien. Repartir bien es saber qué encargar, a quién y cómo comprobarlo.
+- La regla de la demo: DeepSeek V4 Pro (el capaz) reparte y revisa; Flash (el rápido) hace los encargos.
+- El recorrido: la herramienta `task` y sus agentes, el panel `/agents` y tus propios agentes, el Agent Hub para seguirlos, y tres comandos: `/tan`, `/jobs` y `/cleanse`.
 
 ### 2 · La herramienta task y sus agentes
 
 <p><button type="button" class="ir-a" data-t="127">▶ Ir a 2:07</button></p>
 
-- *En terminal:* Una llamada a task (más abajo, en «Código y comandos»)
-- **Dos detalles**
-  - `reviewer` · Tiene bash: no es solo lectura
-  - `task` · Sin rol task: usa el modelo activo: Pro
+- `task` es la herramienta que lanza subagentes: sesiones hijas con su propio modelo, herramientas e instrucciones. Cada una trabaja sola y entrega su resultado con una herramienta oculta, `yield`; al agente principal le llega un resumen.
+- Trabaja por lotes: en una llamada van un contexto común y una lista de encargos (texto, nombre y tipo de agente). Un encargo, un subagente, y todos arrancan a la vez, en segundo plano si los trabajos asíncronos están activos (lo normal). La salida de cada uno se lee en `agent://<id>` y un resumen de lo que hizo en `history://<id>`.
+- **El subagente no hereda la conversación.** Recibe el árbol de trabajo, los ficheros de contexto (como `AGENTS.md`) y el contexto común del lote. Por eso cada encargo tiene que explicarse solo: qué ficheros, qué restricciones y cómo se sabe que está hecho.
+- Cinco agentes de serie: `task` (generalista, todas las herramientas), `sonic` (trabajo mecánico, rol `smol`), `scout` (explora en solo lectura, rol `smol`), `reviewer` (revisa código, rol `slow`) y `security-reviewer` (busca vulnerabilidades).
+- Dos detalles: `reviewer` tiene `bash`, así que no es de solo lectura. Y `task` pide el rol `task`; si no lo has asignado, usa el modelo activo de la sesión (aquí, Pro).
+- Para que el modelo reparta, pídelo explícitamente: que use `task`, cuántos agentes y qué hace cada uno. La palabra mágica `orchestrate` (en minúsculas, en tu mensaje) le pide delegar en paralelo durante ese turno, pero con ella decides menos cuántos agentes salen.
 
 ### 3 · /agents y tus propios agentes
 
 <p><button type="button" class="ir-a" data-t="291">▶ Ir a 4:51</button></p>
 
-- *En la demo:* /agents
-- *En la demo:* task hereda Pro
-- *En la demo:* model → pattern…
-- *En la demo:* task → @smol → Flash
-- *En la demo:* scout
-- *En la demo:* config get task.agentModelOverrides
-- **Más en /agents**
-  - `espacio` · Activar / desactivar
-  - `New agent` · Un arquitecto lo redacta: sin modelo: hereda
-- *En terminal:* Dónde viven los agentes (más abajo, en «Código y comandos»)
-- *En la demo:* .omp/agents/revisor-tests.md
-- **Trampa:** «Solo lectura» con bash es una instrucción — Si no debe escribir, no le des bash ni edición.
+- `/agents` abre el **panel de agentes**: qué agentes existen y cómo están configurados (modelo efectivo, prewalk, advisor y de dónde sale cada uno). No es el **Agent Hub** (`Alt+A`), que enseña quién está trabajando ahora.
+- Recordatorio del vídeo 14: el **prewalk** hace que el capaz planifique y el rápido ejecute; el **advisor** es un segundo modelo que revisa el trabajo de uno más barato. Aquí se activan por agente.
+- *En la demo:* asignamos a `task` el patrón `@smol` y pasa a resolver a Flash. Usar el rol en vez del modelo tiene una ventaja: si mañana cambias `smol`, el agente le sigue. El ajuste se guarda en el perfil (`task.agentModelOverrides`), no en la sesión, así que al terminar hay que deshacerlo.
+- Con la barra espaciadora activas o desactivas un agente; uno desactivado no se puede lanzar. **New agent** deja que un modelo «arquitecto» redacte la definición, pero el fichero sale sin modelo y heredaría el de la sesión. Por eso el nuestro lo escribimos a mano.
+- Un agente propio es un Markdown con cabecera (`name`, `description`, `tools`, `model`…). Los del proyecto viven en `.omp/agents/`, los tuyos en la carpeta de agentes de tu configuración de usuario; `.claude/agents` se ignora. Si dos se llaman igual, gana el del proyecto, luego el de usuario y al final los incluidos.
+- Más campos: `spawns` (a quién puede lanzar), `output` (esquema de respuesta), `blocking` (el principal le espera), `prewalk` y `advisor`. `omp agents unpack` copia los incluidos para que los edites.
+- **Trampa:** «solo lectura» en la descripción es una instrucción, no una barrera. Si un agente no debe escribir, no le des `bash` ni herramientas de edición.
 
 ### 4 · Repartir y seguir en el Agent Hub
 
 <p><button type="button" class="ir-a" data-t="536">▶ Ir a 8:56</button></p>
 
-- *En la demo:* Una llamada, tres agentes
-- *En la demo:* En segundo plano
-- *En la demo:* Alt+A · Agent Hub
-- *En la demo:* El inspector
-- *En la demo:* Teclas del Hub
-- *En la demo:* Actividad de los tres
-- *En la demo:* Quien reparte, verifica
+- *En la demo:* Pro escribe una sola llamada a `task` con tres agentes (un `scout`, nuestro `revisor-tests` y un `sonic`). Los tres van en segundo plano y Pro espera sus resultados.
+- `Alt+A` abre el Agent Hub: coste total, tokens y una fila por agente con su rol y su modelo. Ninguno usaba Pro: la regla se cumplió. También se llega con `Ctrl+S` o `/hub`.
+- El inspector marca **shared workspace**: todos trabajan sobre el mismo árbol de ficheros y omp no puede atribuir cada línea cambiada a un agente. Por eso pedimos encargos que no toquen los mismos ficheros.
+- Teclas: `1`/`2` cambian entre lista y actividad, `j`/`k` seleccionan, `Enter` abre la conversación del agente para dirigirlo, `t` alterna lista plana y árbol, `r` revive un agente aparcado y `x` lo mata. Si falta una cifra de uso, verás una raya: el Hub no estima.
+- Al terminar, un agente pasa a `idle` y conserva su contexto; a los siete minutos sin actividad se aparca. Para una corrección, escríbele al agente que ya hizo el trabajo antes que lanzar otro.
+- **Quien reparte, verifica.** Pro comprueba el diff y ejecuta los tests (15 de 15) antes de resumir el resultado de cada agente.
 
 ### 5 · /tan y /jobs
 
 <p><button type="button" class="ir-a" data-t="779">▶ Ir a 12:59</button></p>
 
-- *En la demo:* /tan · /jobs
-- *En la demo:* Nadie lo ha verificado todavía
-- *En la demo:* Seguimos en la sesión principal
-- *En la demo:* git diff README.md
-- **Aviso:** El clon comparte tu carpeta — Cancelar para el trabajo, pero no deshace lo escrito. Trabaja en una rama descartable.
-- *En terminal:* /jobs y proc:// (más abajo, en «Código y comandos»)
+- `/tan <encargo>` lanza un agente completo en segundo plano para un trabajo lateral, mientras tú sigues en la sesión principal. A diferencia de `task`, **clona tu sesión**: el clon sabe de qué va el proyecto y usa el mismo modelo y herramientas.
+- Como el clon hereda el modelo, antes cambiamos el de la sesión con `/switch @smol` (vídeo 14). **Ojo:** `/switch` cambia el modelo de la sesión principal, así que a partir de ahí tú también vas con Flash. Al terminar, vuelve a cambiarlo.
+- `/jobs` lista los trabajos en segundo plano: subagentes, clones de `/tan` y comandos de bash largos.
+- *En la demo:* el clon añade una sección al README y la sesión principal no lo revisa porque «es de otra sesión». Nadie lo había verificado: lo comprobamos nosotros con `git diff`.
+- **Aviso:** el clon comparte tu carpeta. Si los dos tocáis el mismo fichero, os pisáis. Cancelar un trabajo lo para, pero no deshace lo escrito. Trabaja en una rama descartable.
+- *En terminal:* /jobs y proc:// (más abajo, en «Código y comandos»).
 
 ### 6 · /cleanse
 
 <p><button type="button" class="ir-a" data-t="946">▶ Ir a 15:46</button></p>
 
-- **/cleanse:** Comprobadores (descubre) → Diagnósticos (agrupa y pesa) → Subagentes (reparte) → Verifica (vuelve a ejecutar)
-- *En terminal:* /cleanse (más abajo, en «Código y comandos»)
-- *En la demo:* Romper a mano
-- *En la demo:* /cleanse --tests
-- *En la demo:* El tablero
-- *En la demo:* Verificado
-- *En la demo:* git diff
-- *En la demo:* La actividad de CleanseA1
-- *En la demo:* 5 agentes · 83K tokens
+- `/cleanse` es un reparto ya montado para arreglar diagnósticos: descubre los comprobadores del proyecto (eslint, TypeScript, tests…), ejecuta los que elijas, agrupa los errores por fichero, reparte los arreglos entre subagentes con el modelo de `smol` y vuelve a ejecutar los comprobadores para verificar.
+- *En terminal:* /cleanse (más abajo, en «Código y comandos»).
+- *En la demo:* rompemos el umbral de envío gratis (de 40 a 45 €) y lanzamos `/cleanse --tests`. Como la salida de los tests no trae fichero y línea, cleanse la convierte en un solo diagnóstico y lanza un único trabajador. En veinte segundos el tablero dice «Clean».
+- **Un tablero en verde no dice cómo se arregló.** Un agente con prisa puede hacer pasar un test cambiándolo. Revisa el diff de los tests, no solo el verde: aquí el umbral volvió a 40 y los tests no se tocaron.
+- El total de la sesión: cinco agentes, 83 000 tokens y 1,6 céntimos, porque los encargos eran pequeños y todos usaron Flash.
 
 ### 7 · Límites, riesgos y coste
 
 <p><button type="button" class="ir-a" data-t="1125">▶ Ir a 18:45</button></p>
 
-- **Permisos:** Los subagentes van en yolo — No pueden preguntarte. Su barrera: las herramientas que les das. Vídeo 19.
-- **El coste:** Tres agentes leen tres veces — El Hub te enseña lo que gasta cada uno: míralo.
-- **Hoy, tres reglas**
-  - `pequeños` · Encargos separados
-  - `barato` · Modelo de smol: para los subagentes
-  - `uno` · Verifica uno solo
+- **Permisos:** los subagentes no tienen a quién preguntar, así que omp les fuerza el modo **yolo** (aprobar todo sin preguntar), aunque hayas configurado aprobaciones en la sesión principal. Su barrera principal son las herramientas que les das. En el vídeo 19, qué endurecimiento sí les llega.
+- **Espacio de trabajo compartido.** Existe un modo aislado (`task.isolation.enabled`): cada agente trabaja en una copia y sus cambios vuelven como parche o rama. Viene apagado.
+- **Modo plan:** los subagentes lanzados en modo plan solo leen y buscan. Explorar en paralelo, sí; cambiar algo, no.
+- **Frenos de serie:** hasta 32 subagentes a la vez, profundidad 2 (un subagente puede lanzar otros, pero esos ya no) y un presupuesto blando de peticiones por agente.
+- **Coste:** tres agentes leen tres veces. Mira en el Hub lo que gasta cada uno. Tres reglas para contenerlo: encargos pequeños y separados, modelo barato para los subagentes y verificación final en uno solo. Cuándo compensa repartir, en el vídeo 25.
 
 ### 8 · Repaso, práctica y cierre
 
 <p><button type="button" class="ir-a" data-t="1235">▶ Ir a 20:35</button></p>
 
-- **Próximo vídeo:** El entorno de desarrollo integrado — read, LSP, depurador, ast grep, hashline, eval y el navegador.
+- Qué usar en cada caso:
+
+| | `task` | `/tan` | `/cleanse` |
+|---|---|---|---|
+| Hereda la conversación | No | Sí (clona la sesión) | No |
+| Modelo | El del rol de cada agente | El de la sesión | `@smol` por defecto |
+| Espacio de trabajo | Compartido | Compartido | Compartido |
+| Cuándo | Partes que no se pisan y quieres el resultado aquí | Encargo lateral que necesita saber del proyecto | Errores de un comprobador |
+
+- Si es una sola tarea pequeña, ninguno: hazla en la sesión principal, que repartir también cuesta.
+- **Práctica:** en tu perfil de pruebas, escribe un agente propio con un modelo barato y solo las herramientas que necesite. Pide un reparto de tres encargos que no compartan ficheros, uno para tu agente. Síguelos en el Agent Hub, apunta lo que gasta cada uno y revisa el diff antes de dar nada por bueno.
+- **En otros agentes:** Claude Code también define subagentes en Markdown con frontmatter. La idea es la misma: no heredan la conversación y su barrera son las herramientas que les das.
+- **Próximo vídeo:** el entorno de desarrollo integrado: read, LSP, depurador, ast grep, hashline, eval y el navegador.
 
 ## Código y comandos
 
@@ -120,9 +122,8 @@ task({
 })
 ```
 
-- `context`: Común
-- `tasks`: Un encargo por agente
-- `agent`: Tipo
+- `context`: lo que comparten todos los encargos; cada subagente no sabe nada más de la conversación.
+- `tasks`: un encargo por subagente, con su nombre, el tipo de agente (`agent`) y el texto de la tarea.
 
 ### Dónde viven los agentes
 
@@ -132,9 +133,7 @@ task({
 .claude/agents  → se ignora
 ```
 
-- `.omp/agents`: Proyecto
-- `usuario`: Todos
-- `.claude`: Ignorado
+Si dos agentes se llaman igual, gana el del proyecto, luego el de usuario y al final los incluidos.
 
 ### /jobs y proc://
 
@@ -144,9 +143,8 @@ task({
 read proc://<id>  · write proc://<id>/kill
 ```
 
-- `full`: Completo
-- `proc://`: Inspeccionar
-- `kill`: Cancelar
+- `read proc://<id>`: inspecciona un trabajo sin consumir su resultado.
+- `write proc://<id>/kill`: lo cancela. Lo que ya escribió en disco se queda.
 
 ### /cleanse
 
@@ -157,70 +155,16 @@ read proc://<id>  · write proc://<id>/kill
 /cleanse --tests         # añade los tests
 ```
 
-- `--all`: Todos
-- `-n`: Agentes
-- `--tests`: Tests
+- `-n` limita el número de agentes (por defecto, hasta 32); `-m` elige el modelo (por defecto, `@smol`).
+- Con una petición en texto («errores de tipos»), un agente de descubrimiento averigua qué comando ejecutar.
 
 ## Fuentes
 
-- Documentación de omp 18.5.1 (la documentación de omp (omp.sh)):
-  - `tools/task.md`: forma por lotes (`task.batch`, `context` obligatorio, `tasks[]` con `name`, `agent`, `task`,
-    `solutionSpace`, `model`…), `async.enabled` (en segundo plano, «Spawned N background agents…»),
-    `task.speculativeLaunch`, cierre con `yield` (tres recordatorios), `agent://<id>`, `history://<id>`, `proc://`,
-    paso 12 (**`tools.approvalMode` forzado a `yolo`** en los hijos; advisor apagado salvo opt-in), paso 8 y «plan mode»,
-    «Child sessions do not inherit conversation history» (sí árbol de trabajo, skills, ficheros de contexto, `local://` y
-    plan aprobado), `todo` del padre no se hereda; límites: `task.maxConcurrency` 32, `task.maxRecursionDepth` 2,
-    `task.softRequestBudget` 200 (scout/sonic menos), `task.maxRuntimeMs` 0, `task.agentIdleTtlMs` 420 000 (aparcado);
-    `task.isolation.enabled` (apagado) con backends y fusión por patch o rama.
-  - `task-agent-discovery.md`: campos del frontmatter (`name`, `description`, `tools`, `spawns`, `model`,
-    `thinking-level`, `output`, `blocking`, `autoloadSkills`, `read-summarize`, `prewalk`, `advisor`), nombres reservados
-    `main` y `sub`, `tools` siempre añade `yield`; raíces `.omp/agents` (proyecto) y `~/.omp/agent/agents` (usuario),
-    extensiones, plugins de Claude, incluidos; **primero gana** por nombre exacto; `.claude/agents`, `.codex/agents` y
-    `.gemini/agents` se ignoran; precedencia de modelo (llamada → `task.agentModelOverrides` → frontmatter → modelo
-    activo del padre); `task.disabledAgents`; «Plan mode behavior»; modelos etiquetados con `^` (no se usa).
-  - `agent-hub.md`: `Alt+A` (`app.agents.hub`), `Ctrl+S` (`app.session.observe`, heredada), doble `←`; columnas de la
-    lista (estado `running`/`idle`/`parked`/`aborted`, modelo, rol, coste, peticiones, herramientas, tokens; `usage —`
-    sin datos); teclas `j`/`k`, `Enter`, `t`, `/`, `1`/`2`, `Tab`, `r`, `x`, `Esc`; registro de actividad (`f`, `s`,
-    espacio); dirigir un subagente enfocado (Esc vuelve sin interrumpirlo); bloque fijo «Subagents»
-    (`display.pinnedAgents`, `display.subagentLivePreview`, `tui.mouse`); `/agents` es otra cosa; `/jobs`.
-  - `magic-keywords.md`: `orchestrate` (contrato: abarcar la tarea, delegar en paralelo, verificar cada fase, seguir hasta
-    terminar; exige `task`), minúsculas exactas, palabra suelta, solo ese turno, `magicKeywords.orchestrate`.
-  - `settings.md` (`async.enabled` `true`, `async.maxJobs` 100, `task.agentAdvisor` desde `/agents`, `tui.mouse`,
-    `display.*`), `bash-tool-runtime.md` (trabajos de bash en segundo plano, autobackground a los 60 s), `extensions.md`
-    (los clones de `/tan` son subagentes de profundidad cero), `cli-reference.md` (`cleanse`).
-- `omp cleanse --help` y `omp agents --help` (18.6.1, ejecutados).
-- **Código 18.5.1** (`~/orca/oh-my-pi`, `git show v18.5.1:…/prompts/agents/*.md`): `scout` (`read, find, grep, glob,
-  web_search`, `@smol`, salida estructurada), `reviewer` (**incluye `bash`**, `spawns: scout`, `@slow`),
-  `security-reviewer` (solo lectura).
-- **Binario de omp 18.6.1** (`strings ~/.bun/bin/omp`):
-  - Registro: `/hub` llama a `showAgentHub({ initialSection: "activity" })` (Alt+A, sin argumentos); `/agents` →
-    `showAgentsDashboard`; `/jobs [full]` con «Jobs: none» / «Jobs: N running, N recent», «Background Jobs», «Running
-    Jobs», «Recent Jobs» y el aviso de que los terminados se ven «at most ~5 minutes»; `/tan <work>`; `/cleanse` con
-    «Usage: /cleanse [request] [--all] [--tests] [-n <agents>] [-m <model>]».
-  - Agentes incluidos: `task` («General-purpose subagent…», `spawns: *`, `model: @task`) y `sonic` («Low-reasoning agent
-    for strictly mechanical updates or data collection only», `@smol`, `medium`); presupuesto interno 100 para scout y
-    sonic.
-  - `/agents`: lista con fuentes «All agents / project / user / bundled»; espacio activa o desactiva; «configure» abre
-    tiras de modelo, prewalk y advisor (`task.agentModelOverrides`, `task.agentPrewalk`, `task.agentAdvisor`,
-    `task.disabledAgents`); `Ctrl+R` recarga; «New agent — describe it and let the architect draft it» (genera con el
-    modelo activo o `default`, ámbito por defecto `project`, `Tab` cambia el ámbito; guarda solo `name`, `description`
-    y el prompt, **sin `model`**).
-  - `/tan`: «Usage: /tan <work>», «/tan requires a persisted session.», «Background jobs are disabled; enable async jobs
-    to use /tan.», «Dispatched background tan <id>»; bifurca la sesión (`Tan-N`, coste heredado a cero), mismo modelo,
-    thinking, prompt de sistema y herramientas, sin MCP propio, nota de «cambio de contexto», trabajo `task`; al acabar
-    queda `parked`.
-  - `/cleanse`: modelo por defecto **`@smol`**, hasta 32 agentes; descubrimiento con el agente `task`
-    («CleanseDiscovery») si hay petición; trabajadores `sonic` («CleanseA1…») por grupos de ficheros con peso, con
-    seguimientos por IRC; verificación final («Verification: N diagnostics remaining», «Clean: all detected diagnostics
-    are resolved.»); sesión propia «Cleanse»; checkers detectados (eslint, biome, TypeScript, oxlint… y, con tests,
-    `<gestor> test` desde `package.json`).
-  - Changelog embebido 18.5.x–18.6.1: `/jobs` abre la hoja viva de trabajos; respuestas de seguimiento de subagentes
-    como trabajos en segundo plano (18.6.1); `task` con varios subagentes ya no da éxito si uno falla; `model` por
-    elemento de `task`.
-- Vídeos anteriores: 11 (`Alt+A` abre el hub; `.claude/agents` se ignora, los de omp en `.omp/agents`), 13 (`/btw`
-  efímera; «si necesita trabajo de verdad, eso es barra tan»), 14 (roles, `smol` = Flash, prewalk, advisor; «los
-  subagentes se revisan por agente, desde barra agents»), 15 (subagentes en modo plan «lo veremos en el dieciséis»;
-  vibe; `orchestrate`).
+- Documentación de oh my pi (omp.sh): `tools/task.md` (lotes, segundo plano, qué heredan los subagentes, límites y modo aislado), `task-agent-discovery.md` (campos del frontmatter, dónde se buscan los agentes y precedencia de modelo) y `agent-hub.md` (columnas, teclas y registro de actividad).
+- `magic-keywords.md` (la palabra `orchestrate`), `settings.md` (`async.*`, `task.*`, `display.*`) y `cli-reference.md` (`omp cleanse`).
+- `omp cleanse --help` y `omp agents --help`.
+- Grabado con omp 18.6.1 (documentación de la 18.5.1).
+- Vídeos relacionados del curso: 13 (`/btw` frente a `/tan`), 14 (roles, `/switch`, prewalk y advisor), 15 (modo plan y `orchestrate`), 19 (aprobaciones) y 25 (cuándo compensa repartir).
 
 ## Transcripción
 
