@@ -2,7 +2,7 @@
 title: "La escalera de confianza: por qué el 99% de los developers no usa orquestación"
 description: "El 84% de developers usa herramientas de IA. Solo el 29% confía en lo que producen. Y apenas el 1% ha llegado al nivel donde los agentes trabajan en paralelo mientras tú revisas el resultado. Eso no es un problema tecnológico."
 fecha: 2026-06-14
-tags: ["ia", "agentes", "adopcion", "orquestacion", "cultura"]
+tags: ["ia", "agentes", "adopcion", "orquestación", "cultura"]
 autor: "Alejandro de la Fuente"
 ---
 
@@ -112,7 +112,7 @@ Este cambio requiere un músculo diferente. Developers que llevan años en modo 
 
 El dato del 1% no implica que el 99% restante está haciendo algo mal. Implica que la escalera es larga y que nadie sube varios peldaños de golpe.
 
-**No onboardes directamente al peldaño 4.** Un developer que nunca ha hecho la travesía completa no tiene la confianza acumulada para trabajar con orquestación de forma efectiva. El ataño, los intentos fallidos de delegación, los errores que sí los marcaron y los que no — todo eso es parte del aprendizaje. Sin esa historia personal, el peldaño 4 se convierte en fuente de frustración, no de productividad.
+**No onboardes directamente al peldaño 4.** Un developer que nunca ha hecho la travesía completa no tiene la confianza acumulada para trabajar con orquestación de forma efectiva. El atajo, los intentos fallidos de delegación, los errores que sí los marcaron y los que no — todo eso es parte del aprendizaje. Sin esa historia personal, el peldaño 4 se convierte en fuente de frustración, no de productividad.
 
 **Mide la confianza como métrica de producto.** Tasa de aceptación de autocompletes. Porcentaje de respuestas de chat que se convierten en código real. Porcentaje de agent runs que se llevan a término sin abortar. Estas métricas dicen más sobre si tu equipo está subiendo la escalera que cualquier survey de satisfacción.
 
