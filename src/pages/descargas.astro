@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Descargas from '../components/Descargas.svelte';
+import { getCollection } from 'astro:content';
+import { RUTAS } from '../data/rutas';
+import { VIDEOS_BASE_URL } from '../data/site';
+
+const guias = (await getCollection('guias', (g) => Boolean(g.data.video))).sort(
+  (a, b) => a.data.orden - b.data.orden
+);
+
+const grupos = RUTAS.map((ruta) => ({
+  ruta: ruta.slug,
+  titulo: ruta.titulo,
+  videos: guias
+    .filter((g) => g.data.ruta === ruta.slug)
+    .map((g) => ({
+      id: g.id,
+      titulo: g.data.title,
+      duracion: g.data.duracion,
+      url: `${VIDEOS_BASE_URL}/${g.data.video}`,
+      href: `/rutas/${g.data.ruta}/${g.id}`,
+      subtitulos: g.data.subtitulos,
+    })),
+})).filter((g) => g.videos.length > 0);
+---
+
+<Base
+  title="Vídeos sin conexión"
+  description="Descarga los vídeos del curso para verlos sin conexión: elige cuáles, mira cuánto espacio ocupan y síguelos desde cualquier sitio."
+  activeHref="/rutas"
+>
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow">sin conexión</p>
+      <h1>Vídeos para llevar</h1>
+      <p class="lead" style="max-width: 42rem;">
+        Elige los vídeos que quieras guardar en este dispositivo. Verás cuánto ocupan antes de descargar y podrás verlos sin
+        internet, con sus capítulos y subtítulos.
+      </p>
+      <Descargas client:load grupos={grupos} />
+    </section>
+  </div>
+</Base>

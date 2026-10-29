@@ -89,6 +89,9 @@ const secciones = headings.filter((h) => h.depth === 2 && h.text !== 'Resumen po
                 </p>
               </video>
             </figure>
+            <p class="guia__offline">
+              <a href="/descargas" data-offline-enlace>Descargar para ver sin conexión →</a>
+            </p>
 
             {capitulos.length > 0 && (
               <>
@@ -155,6 +158,21 @@ const secciones = headings.filter((h) => h.depth === 2 && h.text !== 'Resumen po
     </article>
   </div>
 </Base>
+
+<script>
+  // Si este vídeo ya está descargado, el enlace a /descargas pasa a avisarlo.
+  const enlaceOffline = document.querySelector<HTMLAnchorElement>('[data-offline-enlace]');
+  const videoSrc = document.querySelector<HTMLVideoElement>('.guia__video video')?.getAttribute('src');
+  if (enlaceOffline && videoSrc && 'caches' in window) {
+    caches
+      .open('csi-videos-v1')
+      .then((c) => c.match(videoSrc, { ignoreVary: true }))
+      .then((guardado) => {
+        if (guardado) enlaceOffline.textContent = '✓ Disponible sin conexión · gestionar descargas →';
+      })
+      .catch(() => {});
+  }
+</script>
 
 <script>
   // Vídeo de la guía: los capítulos (lista junto al vídeo y botones «Ir a m:ss» del texto) saltan a su
