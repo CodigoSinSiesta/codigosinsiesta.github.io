@@ -1,0 +1,20 @@
+{
+  "name": "Código Sin Siesta",
+  "short_name": "Sin Siesta",
+  "description": "Guías, artículos y talleres para developers que construyen con IA. Vídeos disponibles sin conexión.",
+  "lang": "es",
+  "start_url": "/?origen=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Vídeos sin conexión", "url": "/descargas", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Guías", "url": "/rutas", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

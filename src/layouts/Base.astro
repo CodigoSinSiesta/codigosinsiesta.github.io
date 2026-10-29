@@ -25,6 +25,9 @@ const ogImage = new URL('/og-card.png', Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <meta name="theme-color" content="#0f172a" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link
       rel="alternate"
@@ -48,5 +51,14 @@ const ogImage = new URL('/og-card.png', Astro.site);
       <slot />
     </main>
     <SiteFooter copyright={FOOTER.copyright} tagline={FOOTER.tagline} links={FOOTER.links} />
+    <script>
+      // Service worker: páginas sin conexión y vídeos descargados. Solo en producción para no
+      // servir cachés viejas mientras se desarrolla.
+      if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
