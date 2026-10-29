@@ -1,6 +1,6 @@
 {
   "name": "Código Sin Siesta",
-  "short_name": "Sin Siesta",
+  "short_name": "Código Sin Siesta",
   "description": "Guías, artículos y talleres para developers que construyen con IA. Vídeos disponibles sin conexión.",
   "lang": "es",
   "start_url": "/?origen=pwa",
