@@ -11,7 +11,9 @@ const PAGINAS = 'csi-paginas-v1';
 const VIDEOS = 'csi-videos-v1';
 
 const PREFIJOS_PAGINA = ['/rutas', '/ensayos', '/talleres', '/descargas'];
-const PREFIJOS_ESTATICOS = ['/_astro/', '/icons/', '/subtitulos/', '/favicon.svg', '/manifest.webmanifest'];
+// /_astro/ lleva hash en el nombre (inmutable); el resto puede cambiar sin cambiar de URL.
+const PREFIJOS_INMUTABLES = ['/_astro/'];
+const PREFIJOS_REVALIDAR = ['/icons/', '/subtitulos/', '/favicon.svg', '/manifest.webmanifest'];
 const TIEMPO_RED_MS = 4000;
 
 self.addEventListener('install', (event) => {
@@ -50,8 +52,12 @@ self.addEventListener('fetch', (event) => {
 
   if (url.origin !== self.location.origin) return;
 
-  if (PREFIJOS_ESTATICOS.some((p) => url.pathname.startsWith(p))) {
+  if (PREFIJOS_INMUTABLES.some((p) => url.pathname.startsWith(p))) {
     event.respondWith(cachePrimero(request));
+    return;
+  }
+  if (PREFIJOS_REVALIDAR.some((p) => url.pathname.startsWith(p))) {
+    event.respondWith(revalidar(request, event));
     return;
   }
 
@@ -68,6 +74,23 @@ async function cachePrimero(request) {
   const respuesta = await fetch(request);
   if (respuesta.ok) cache.put(request, respuesta.clone());
   return respuesta;
+}
+
+// Sirve lo guardado al instante y actualiza la copia en segundo plano.
+async function revalidar(request, event) {
+  const cache = await caches.open(PAGINAS);
+  const guardada = await cache.match(request);
+  const actualizada = fetch(request)
+    .then((res) => {
+      if (res.ok) cache.put(request, res.clone());
+      return res;
+    })
+    .catch(() => undefined);
+  if (guardada) {
+    event.waitUntil(actualizada);
+    return guardada;
+  }
+  return (await actualizada) ?? Response.error();
 }
 
 async function redPrimero(request) {
