@@ -1,0 +1,639 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.250 --> 00:00:12.930
+Código Sin Siesta. IA desde cero.
+
+2
+00:00:12.970 --> 00:00:15.850
+Vídeo uno: qué es la IA
+con la que vas a programar.
+
+3
+00:00:21.284 --> 00:00:24.036
+Si nunca has usado inteligencia
+artificial para programar,
+
+4
+00:00:24.076 --> 00:00:27.734
+este es tu sitio. En esta ruta
+vamos a empezar desde cero,
+
+5
+00:00:27.774 --> 00:00:29.714
+y lo primero no es instalar nada.
+
+6
+00:00:29.754 --> 00:00:34.024
+Lo primero es entender qué hay al
+otro lado cuando le escribes a una IA.
+
+7
+00:00:34.064 --> 00:00:37.404
+Porque casi todos los problemas que vas
+a tener al trabajar con ella vienen de
+
+8
+00:00:37.444 --> 00:00:39.284
+imaginarla como algo que no es.
+
+9
+00:00:39.773 --> 00:00:42.253
+Piensa en el teclado de tu móvil.
+
+10
+00:00:42.293 --> 00:00:46.873
+Cuando escribes «nos vemos», te
+sugiere «mañana», «luego» o «el lunes».
+
+11
+00:00:46.974 --> 00:00:50.983
+No sabe nada de tu agenda. Ha visto
+muchísimos mensajes y sabe qué palabras
+
+12
+00:00:51.023 --> 00:00:52.513
+suelen venir después de otras.
+
+13
+00:00:53.227 --> 00:00:56.627
+Un modelo de lenguaje hace lo
+mismo, a una escala enorme.
+
+14
+00:00:56.667 --> 00:00:59.527
+Lo han entrenado con cantidades
+gigantescas de texto:
+
+15
+00:00:59.567 --> 00:01:04.177
+libros, páginas web, documentación
+y mucho, mucho código.
+
+16
+00:01:04.217 --> 00:01:07.301
+De todo eso ha aprendido qué
+suele venir después de qué.
+
+17
+00:01:07.341 --> 00:01:10.747
+Y cuando le haces una pregunta,
+lo que hace es continuar tu texto.
+
+18
+00:01:12.277 --> 00:01:16.874
+Funciona así. Recibe lo que has escrito,
+calcula cuál es la siguiente pieza más
+
+19
+00:01:16.914 --> 00:01:21.374
+adecuada, la añade al final y
+vuelve a empezar, ahora con esa
+
+20
+00:01:21.943 --> 00:01:24.584
+pieza incluida. Pieza a pieza,
+va construyendo la respuesta.
+
+21
+00:01:24.624 --> 00:01:27.694
+Por eso, cuando usas una de estas
+herramientas, ves el texto aparecer poco a
+
+22
+00:01:27.734 --> 00:01:29.904
+poco, como si alguien
+lo estuviera tecleando.
+
+23
+00:01:30.452 --> 00:01:35.462
+Fíjate en lo que no hace. No busca
+la respuesta en una base de datos.
+
+24
+00:01:35.502 --> 00:01:38.512
+No consulta internet, salvo que
+una herramienta lo haga por él,
+
+25
+00:01:38.552 --> 00:01:40.294
+y eso lo veremos más adelante.
+
+26
+00:01:40.334 --> 00:01:43.292
+Tampoco ejecuta tu código
+para comprobar si funciona.
+
+27
+00:01:43.332 --> 00:01:46.962
+Escribe lo que, según todo lo que ha
+visto, tiene más sentido escribir a
+
+28
+00:01:47.002 --> 00:01:48.112
+continuación.
+
+29
+00:01:48.680 --> 00:01:52.080
+Y aun así, escribe código
+sorprendentemente bueno.
+
+30
+00:01:52.120 --> 00:01:55.260
+Ha visto tanto que, para la
+mayoría de problemas habituales,
+
+31
+00:01:55.300 --> 00:01:59.520
+lo que «tiene más sentido escribir»
+coincide con una solución correcta.
+
+32
+00:01:59.560 --> 00:02:02.660
+La clave está en esa palabra: la mayoría.
+
+33
+00:02:08.009 --> 00:02:11.292
+Antes hemos dicho «pieza».
+Esas piezas tienen nombre:
+
+34
+00:02:11.332 --> 00:02:15.299
+tokens. Un token no es
+exactamente una palabra.
+
+35
+00:02:15.339 --> 00:02:18.619
+Las palabras cortas y frecuentes
+suelen ser un solo token.
+
+36
+00:02:18.659 --> 00:02:21.369
+Las largas o raras se parten en varios.
+
+37
+00:02:21.409 --> 00:02:25.689
+Los signos de puntuación, los espacios y
+los símbolos del código también cuentan.
+
+38
+00:02:26.261 --> 00:02:30.001
+Por ejemplo, una palabra como
+«programación» puede partirse en dos o
+
+39
+00:02:30.041 --> 00:02:31.948
+tres trozos, según el modelo.
+
+40
+00:02:31.988 --> 00:02:35.641
+Y una línea de código, con sus
+paréntesis, puntos y comas,
+
+41
+00:02:35.681 --> 00:02:38.821
+gasta bastantes más tokens de
+lo que parece a simple vista.
+
+42
+00:02:38.861 --> 00:02:42.871
+Cada modelo parte el texto a su manera,
+así que la misma frase no mide lo mismo en
+
+43
+00:02:42.911 --> 00:02:43.811
+todos.
+
+44
+00:02:44.256 --> 00:02:47.876
+¿Por qué te importa esto, si
+nunca vas a contar tokens a mano?
+
+45
+00:02:47.916 --> 00:02:50.636
+Por dos motivos que veremos
+con calma en esta ruta.
+
+46
+00:02:50.676 --> 00:02:54.600
+El primero: todo lo que el modelo puede
+tener delante a la vez se mide en tokens,
+
+47
+00:02:54.640 --> 00:02:58.236
+y tiene un límite. A eso lo
+llamaremos la ventana de contexto,
+
+48
+00:02:58.276 --> 00:03:01.676
+y tiene vídeo propio. El segundo:
+cuando un modelo es de pago,
+
+49
+00:03:01.716 --> 00:03:05.196
+se paga por tokens, tanto los que
+le envías como los que te devuelve.
+
+50
+00:03:05.802 --> 00:03:10.653
+Así que, cuando leas «este modelo admite
+tantos miles de tokens» o «cuesta tanto
+
+51
+00:03:10.693 --> 00:03:12.917
+por millón de tokens»,
+ya sabes de qué hablan:
+
+52
+00:03:12.957 --> 00:03:15.953
+de piezas de texto, no de
+palabras ni de peticiones.
+
+53
+00:03:21.313 --> 00:03:25.133
+Vamos con la segunda idea. En cada
+paso, el modelo no tiene una única pieza
+
+54
+00:03:25.173 --> 00:03:29.413
+posible. Tiene varias candidatas,
+cada una con su probabilidad.
+
+55
+00:03:29.453 --> 00:03:34.993
+Después de «nos vemos», «mañana» puede
+ser muy probable, «luego» algo menos,
+
+56
+00:03:35.033 --> 00:03:37.143
+y «el lunes», menos todavía.
+
+57
+00:03:37.557 --> 00:03:41.121
+Si eligiera siempre la más
+probable, respondería siempre igual,
+
+58
+00:03:41.161 --> 00:03:44.287
+y sus respuestas sonarían
+repetitivas y rígidas.
+
+59
+00:03:44.371 --> 00:03:46.983
+Por eso, normalmente,
+elige con un poco de azar:
+
+60
+00:03:47.023 --> 00:03:50.697
+casi siempre una de las más
+probables, pero no siempre la misma.
+
+61
+00:03:50.786 --> 00:03:55.252
+Ese grado de azar se puede ajustar, y a
+menudo verás que lo llaman temperatura.
+
+62
+00:03:55.651 --> 00:03:57.871
+La consecuencia práctica es importante.
+
+63
+00:03:57.911 --> 00:04:02.419
+Si le haces la misma pregunta dos veces,
+puedes recibir dos respuestas distintas.
+
+64
+00:04:02.459 --> 00:04:04.181
+A veces cambian solo las palabras.
+
+65
+00:04:04.221 --> 00:04:08.991
+Otras, cambia la solución entera: una vez
+usa un bucle y otra una función de una
+
+66
+00:04:09.031 --> 00:04:12.911
+librería. Y a veces una de las
+dos es correcta y la otra no.
+
+67
+00:04:13.435 --> 00:04:16.520
+Eso no es un fallo. Es
+su forma de funcionar.
+
+68
+00:04:16.560 --> 00:04:19.335
+Pero cambia cómo debes trabajar con él.
+
+69
+00:04:19.375 --> 00:04:22.715
+Una respuesta del modelo es
+un intento, no un veredicto.
+
+70
+00:04:22.755 --> 00:04:24.385
+Si algo importa, se
+
+71
+00:04:24.904 --> 00:04:27.995
+comprueba. Y en programación tenemos
+una forma muy buena de comprobar:
+
+72
+00:04:28.035 --> 00:04:30.045
+ejecutar el código y sus pruebas.
+
+73
+00:04:35.597 --> 00:04:39.067
+Y llegamos a la tercera idea,
+la más importante de todas.
+
+74
+00:04:39.107 --> 00:04:41.247
+El modelo no sabe cuándo no sabe.
+
+75
+00:04:41.706 --> 00:04:45.899
+Imagina un arquitecto que, cuando
+no conoce una normativa concreta,
+
+76
+00:04:45.939 --> 00:04:50.650
+en lugar de decir «no lo sé», se inventa
+una que suena perfectamente razonable.
+
+77
+00:04:50.690 --> 00:04:53.804
+El plano parece impecable,
+hasta que llega el inspector.
+
+78
+00:04:53.844 --> 00:04:57.266
+Eso es, más o menos, lo que
+llamamos una alucinación:
+
+79
+00:04:57.306 --> 00:05:00.705
+una respuesta que suena correcta,
+escrita con total seguridad,
+
+80
+00:05:00.745 --> 00:05:01.645
+y que es falsa.
+
+81
+00:05:02.409 --> 00:05:06.299
+En código, las alucinaciones
+tienen formas muy reconocibles.
+
+82
+00:05:06.339 --> 00:05:09.239
+Una función que no existe en
+la librería que estás usando,
+
+83
+00:05:09.279 --> 00:05:12.609
+pero cuyo nombre encaja
+perfectamente con las demás.
+
+84
+00:05:12.649 --> 00:05:14.816
+Una opción de un comando
+que nunca ha existido.
+
+85
+00:05:14.856 --> 00:05:17.509
+Un parámetro con el
+nombre de otra versión.
+
+86
+00:05:17.549 --> 00:05:21.019
+Todo con el mismo tono tranquilo con
+el que te explica algo verdadero.
+
+87
+00:05:21.841 --> 00:05:26.601
+¿Por qué pasa? Porque el modelo escribe lo
+que tiene sentido escribir a continuación,
+
+88
+00:05:26.641 --> 00:05:30.578
+y una función inventada con buen
+nombre tiene muchísimo sentido.
+
+89
+00:05:30.618 --> 00:05:34.411
+No hay ninguna parte del modelo que
+compruebe si esa función existe de verdad.
+
+90
+00:05:34.993 --> 00:05:37.068
+Hay otra causa, más sencilla.
+
+91
+00:05:37.108 --> 00:05:42.043
+Un modelo aprende con textos hasta una
+fecha, y después no se entera de nada más.
+
+92
+00:05:42.083 --> 00:05:44.553
+A eso se le llama su fecha de corte.
+
+93
+00:05:44.593 --> 00:05:48.293
+Si una librería cambió después de esa
+fecha, el modelo seguirá escribiendo la
+
+94
+00:05:48.333 --> 00:05:50.083
+versión antigua, sin avisarte.
+
+95
+00:05:51.482 --> 00:05:55.609
+Y fíjate en cuándo se equivoca
+más: cuando le falta información.
+
+96
+00:05:55.649 --> 00:05:58.549
+Si no ha visto tu proyecto,
+se imagina cómo es.
+
+97
+00:05:58.589 --> 00:06:01.929
+Si no conoce tu versión de
+la librería, supone una.
+
+98
+00:06:01.969 --> 00:06:05.459
+Cuanto menos contexto real tiene, más
+rellena los huecos con lo que le parece
+
+99
+00:06:05.499 --> 00:06:06.459
+probable.
+
+100
+00:06:06.908 --> 00:06:10.984
+De aquí salen las dos defensas que
+vamos a usar durante toda la ruta.
+
+101
+00:06:11.024 --> 00:06:15.943
+La primera: darle información real, tus
+ficheros, tus versiones y tus reglas,
+
+102
+00:06:15.983 --> 00:06:17.853
+para que no tenga que imaginarlas.
+
+103
+00:06:17.893 --> 00:06:22.319
+La segunda: verificar lo que hace, sin
+fiarte del tono con el que lo dice.
+
+104
+00:06:22.359 --> 00:06:24.998
+Y las dos son justo lo que
+añade un agente de programación,
+
+105
+00:06:25.038 --> 00:06:29.348
+que veremos dentro de poco: puede leer
+tus ficheros y puede ejecutar tus pruebas.
+
+106
+00:06:34.705 --> 00:06:37.245
+Una última cosa antes de
+ponernos manos a la obra.
+
+107
+00:06:37.285 --> 00:06:42.169
+No hay una sola IA. Hay muchos modelos,
+de muchas empresas y proyectos distintos,
+
+108
+00:06:42.209 --> 00:06:44.305
+y salen versiones nuevas cada pocos meses.
+
+109
+00:06:44.793 --> 00:06:49.663
+En general, los modelos grandes razonan
+mejor, cometen menos errores y resuelven
+
+110
+00:06:49.703 --> 00:06:53.033
+tareas más largas, pero
+son más lentos y más caros.
+
+111
+00:06:53.073 --> 00:06:56.013
+Los pequeños son rápidos y
+baratos, y se equivocan más.
+
+112
+00:06:56.053 --> 00:06:58.753
+No hay uno mejor para todo:
+se elige según la tarea.
+
+113
+00:06:59.239 --> 00:07:03.269
+En esta ruta vamos a usar OpenCode, una
+herramienta de código abierto que hoy
+
+114
+00:07:03.309 --> 00:07:05.869
+ofrece modelos gratuitos,
+sin cuenta ni tarjeta.
+
+115
+00:07:05.909 --> 00:07:09.764
+Son más que suficientes para
+aprender y para seguir los ejemplos.
+
+116
+00:07:09.804 --> 00:07:12.168
+Eso sí, no vamos a nombrar
+ninguno en concreto:
+
+117
+00:07:12.208 --> 00:07:16.439
+la lista de modelos gratuitos cambia casi
+cada semana, y te enseñaremos a elegir uno
+
+118
+00:07:16.479 --> 00:07:17.679
+cuando lo instales.
+
+119
+00:07:23.048 --> 00:07:27.643
+Repasemos. Un modelo de lenguaje
+completa texto, pieza a pieza.
+
+120
+00:07:27.683 --> 00:07:31.938
+Esas piezas se llaman tokens, y
+con ellos se miden sus límites
+
+121
+00:07:32.678 --> 00:07:36.098
+y su precio. No responde siempre lo
+mismo, porque elige con algo de azar.
+
+122
+00:07:36.205 --> 00:07:40.048
+Y se equivoca con la misma seguridad con
+la que acierta, sobre todo cuando le falta
+
+123
+00:07:40.088 --> 00:07:40.988
+información.
+
+124
+00:07:41.458 --> 00:07:44.258
+Con estas tres ideas ya puedes
+entender todo lo que viene.
+
+125
+00:07:44.298 --> 00:07:46.718
+En el próximo vídeo
+prepararemos tu laboratorio:
+
+126
+00:07:46.758 --> 00:07:50.334
+un entorno aislado de tu ordenador donde
+el agente pueda trabajar sin riesgo,
+
+127
+00:07:50.374 --> 00:07:52.458
+con OpenCode instalado dentro.
+
+128
+00:07:52.498 --> 00:07:56.168
+Y en el siguiente recorreremos OpenCode
+y le haremos la primera pregunta.
+
+129
+00:07:56.568 --> 00:07:59.168
+Te propongo una pequeña
+práctica antes de seguir.
+
+130
+00:07:59.208 --> 00:08:03.268
+Si tienes a mano cualquier chat de IA,
+hazle la misma pregunta de programación
+
+131
+00:08:03.308 --> 00:08:07.516
+dos veces, en dos conversaciones
+nuevas, y compara las respuestas.
+
+132
+00:08:07.556 --> 00:08:11.071
+Y si no lo tienes, no pasa nada: lo
+haremos juntos en el laboratorio.
+
+133
+00:08:11.111 --> 00:08:12.608
+Nos vemos en el siguiente vídeo.

@@ -9,7 +9,7 @@ const guias = (await getCollection('guias', (g) => Boolean(g.data.video))).sort(
   (a, b) => a.data.orden - b.data.orden
 );
 
-const grupos = RUTAS.map((ruta) => ({
+const grupos = RUTAS.filter((ruta) => !ruta.oculta).map((ruta) => ({
   ruta: ruta.slug,
   titulo: ruta.titulo,
   videos: guias

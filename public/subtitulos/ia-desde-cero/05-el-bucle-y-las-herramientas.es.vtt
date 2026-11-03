@@ -1,0 +1,831 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.260 --> 00:00:13.431
+Código Sin Siesta. IA desde cero.
+
+2
+00:00:13.471 --> 00:00:18.180
+Vídeo cinco: de chat a agente,
+el bucle y las herramientas.
+
+3
+00:00:23.582 --> 00:00:27.702
+Hasta ahora hemos visto qué es un
+modelo, hemos montado el laboratorio,
+
+4
+00:00:27.742 --> 00:00:32.255
+hemos recorrido OpenCode y hemos visto
+qué le cabe en la ventana de contexto.
+
+5
+00:00:32.295 --> 00:00:36.127
+En este vídeo vamos a responder
+a la pregunta que lo une todo:
+
+6
+00:00:36.167 --> 00:00:39.642
+cómo un modelo que solo escribe texto
+acaba cambiando ficheros y ejecutando
+
+7
+00:00:39.682 --> 00:00:40.792
+pruebas por ti.
+
+8
+00:00:42.260 --> 00:00:44.979
+Empecemos por lo que ya
+conoces, aunque sea de oídas:
+
+9
+00:00:45.019 --> 00:00:48.329
+un chat. Le pegas tu código
+y le pides un cambio.
+
+10
+00:00:48.369 --> 00:00:52.509
+Te contesta con código. Tú lo copias
+en tu editor, ejecutas las pruebas y,
+
+11
+00:00:52.549 --> 00:00:55.470
+si fallan, copias el error
+y se lo pegas de vuelta.
+
+12
+00:00:55.510 --> 00:00:56.499
+Y vuelta a empezar.
+
+13
+00:00:57.037 --> 00:01:00.047
+Fíjate en quién hace qué. El chat escribe.
+
+14
+00:01:00.087 --> 00:01:03.757
+Todo lo demás lo haces tú: buscar
+los ficheros, aplicar el cambio,
+
+15
+00:01:03.797 --> 00:01:06.847
+ejecutar, mirar el resultado y contárselo.
+
+16
+00:01:06.887 --> 00:01:08.982
+Tú eres sus ojos y sus manos.
+
+17
+00:01:09.383 --> 00:01:12.496
+Un agente hace ese mismo
+recorrido sin ti en medio.
+
+18
+00:01:12.536 --> 00:01:16.803
+Lee los ficheros que necesita, aplica el
+cambio, ejecuta las pruebas y mira qué ha
+
+19
+00:01:16.843 --> 00:01:20.237
+pasado. La frase que lo
+resume es esta: un chat habla;
+
+20
+00:01:20.277 --> 00:01:24.663
+un agente actúa. Y lo curioso es que,
+por dentro, el modelo puede ser el mismo.
+
+21
+00:01:24.703 --> 00:01:26.529
+Lo que cambia es lo que hay alrededor.
+
+22
+00:01:31.788 --> 00:01:34.046
+Piensa en cómo haces una salsa.
+
+23
+00:01:34.086 --> 00:01:38.708
+La pruebas, piensas qué le falta,
+le echas sal y vuelves a probar.
+
+24
+00:01:38.748 --> 00:01:42.478
+No echas toda la sal de golpe y te vas:
+das vueltas, y cada una aprovecha lo que
+
+25
+00:01:42.518 --> 00:01:44.228
+has aprendido en la anterior.
+
+26
+00:01:45.023 --> 00:01:48.271
+Un agente trabaja igual,
+en cuatro tiempos.
+
+27
+00:01:48.311 --> 00:01:51.796
+Primero lee: qué le has pedido
+y qué ha pasado hasta ahora.
+
+28
+00:01:51.836 --> 00:01:54.748
+Luego razona: qué hace
+falta a continuación.
+
+29
+00:01:54.788 --> 00:01:59.592
+Después actúa: pide leer un fichero,
+cambiarlo o ejecutar un comando.
+
+30
+00:01:59.632 --> 00:02:03.653
+Y por último observa: recibe
+el resultado de esa acción.
+
+31
+00:02:03.693 --> 00:02:07.283
+Con ese resultado vuelve a leer,
+y el bucle empieza otra vez.
+
+32
+00:02:07.802 --> 00:02:09.799
+Cada vuelta es una llamada al modelo.
+
+33
+00:02:09.839 --> 00:02:11.962
+Y recuerda lo que vimos
+en el vídeo anterior:
+
+34
+00:02:12.002 --> 00:02:16.972
+el modelo no recuerda nada. En cada
+vuelta, OpenCode le envía otra vez toda la
+
+35
+00:02:17.012 --> 00:02:21.122
+conversación, ahora con el resultado
+de la última acción añadido al final.
+
+36
+00:02:21.162 --> 00:02:22.562
+Así es como se entera de lo que ha pasado.
+
+37
+00:02:23.087 --> 00:02:25.007
+Por eso un agente puede corregirse.
+
+38
+00:02:25.047 --> 00:02:27.807
+Si las pruebas fallan, el error
+entra en la siguiente vuelta,
+
+39
+00:02:27.847 --> 00:02:30.687
+y el modelo lo tiene delante
+para decidir qué hacer.
+
+40
+00:02:30.727 --> 00:02:32.991
+En el chat, ese error se
+lo tenías que pegar tú.
+
+41
+00:02:38.251 --> 00:02:41.071
+Ahora, una idea que
+conviene tener muy clara.
+
+42
+00:02:41.111 --> 00:02:44.001
+El modelo no ejecuta nada. No puede.
+
+43
+00:02:44.041 --> 00:02:47.463
+Como vimos en el primer vídeo, lo
+único que sabe hacer es escribir texto,
+
+44
+00:02:47.503 --> 00:02:48.451
+pieza a pieza.
+
+45
+00:02:49.157 --> 00:02:52.498
+Imagina a alguien que te ayuda
+por teléfono con tu ordenador.
+
+46
+00:02:52.538 --> 00:02:56.297
+Te dice: «abre tal fichero y
+léemelo», «cambia esta línea»,
+
+47
+00:02:56.337 --> 00:02:58.013
+«ahora ejecuta las pruebas».
+
+48
+00:02:58.053 --> 00:03:02.352
+Él no toca nada. Las manos son
+tuyas, y si una orden no te convence,
+
+49
+00:03:02.392 --> 00:03:03.414
+no la haces.
+
+50
+00:03:03.912 --> 00:03:09.263
+En un agente, el modelo es la voz del
+teléfono y OpenCode son las manos.
+
+51
+00:03:09.493 --> 00:03:13.623
+Cuando el modelo quiere actuar, escribe
+una petición con un formato especial:
+
+52
+00:03:13.663 --> 00:03:16.533
+qué herramienta quiere
+usar y con qué datos.
+
+53
+00:03:16.573 --> 00:03:21.693
+OpenCode la lee, decide si la ejecuta, la
+ejecuta en el laboratorio y le devuelve el
+
+54
+00:03:21.733 --> 00:03:23.393
+resultado como un mensaje más.
+
+55
+00:03:24.567 --> 00:03:28.796
+Esto lo hemos comprobado. Le pedimos al
+agente una tarea sin nadie delante para
+
+56
+00:03:28.836 --> 00:03:32.270
+aprobar los permisos. El modelo
+pidió ejecutar un comando,
+
+57
+00:03:32.310 --> 00:03:37.034
+y OpenCode lo rechazó. El modelo recibió
+el rechazo como resultado y probó por otro
+
+58
+00:03:37.074 --> 00:03:39.594
+camino: buscar los ficheros con otra
+
+59
+00:03:40.224 --> 00:03:42.814
+herramienta. Pidió editar,
+y también se lo rechazaron.
+
+60
+00:03:42.854 --> 00:03:46.314
+Al final se paró y explicó que
+no podía aplicar el cambio.
+
+61
+00:03:46.354 --> 00:03:48.974
+No tocó ni un fichero,
+porque quien toca no es él.
+
+62
+00:03:49.441 --> 00:03:52.741
+Y aquí está la razón de lo
+que hicimos en el vídeo dos.
+
+63
+00:03:52.781 --> 00:03:56.591
+Las peticiones de permiso funcionan porque
+hay un programa en medio que puede decir
+
+64
+00:03:56.631 --> 00:04:02.341
+que no. Y el laboratorio importa
+porque lo que OpenCode ejecuta es real.
+
+65
+00:04:07.659 --> 00:04:10.259
+¿Y cómo sabe el modelo qué puede pedir?
+
+66
+00:04:10.299 --> 00:04:12.105
+Piensa en la carta de un restaurante.
+
+67
+00:04:12.145 --> 00:04:15.619
+Cada plato tiene un nombre, una
+descripción y unas opciones:
+
+68
+00:04:15.659 --> 00:04:18.099
+el punto de la carne, la guarnición.
+
+69
+00:04:18.139 --> 00:04:21.099
+Tú no entras en la cocina:
+lees la carta y pides.
+
+70
+00:04:21.139 --> 00:04:22.389
+La cocina hace el resto.
+
+71
+00:04:22.822 --> 00:04:25.531
+Una herramienta es un plato de esa carta.
+
+72
+00:04:25.571 --> 00:04:28.120
+Tiene un nombre, por ejemplo edit.
+
+73
+00:04:28.212 --> 00:04:32.204
+Tiene una descripción, escrita para el
+modelo, que explica para qué sirve y
+
+74
+00:04:32.244 --> 00:04:36.402
+cuándo usarla. Y tiene unos parámetros:
+los datos que hay que darle.
+
+75
+00:04:36.442 --> 00:04:41.067
+Para edit, le das tres: la ruta del
+fichero, el texto que hay que buscar y el
+
+76
+00:04:41.107 --> 00:04:42.522
+texto que lo sustituye.
+
+77
+00:04:43.453 --> 00:04:46.577
+OpenCode le manda al modelo esa
+carta entera en cada petición,
+
+78
+00:04:46.617 --> 00:04:49.593
+junto con sus instrucciones
+y la conversación.
+
+79
+00:04:49.633 --> 00:04:53.553
+El modelo lee las descripciones, elige la
+que encaja con lo que hace falta y rellena
+
+80
+00:04:53.593 --> 00:04:57.633
+los parámetros. No hay magia,
+solo texto bien escrito.
+
+81
+00:04:57.673 --> 00:04:59.973
+En nuestras pruebas, antes de
+que el agente hiciera nada,
+
+82
+00:05:00.013 --> 00:05:03.273
+ya iban unos miles de tokens solo
+en instrucciones y en la carta.
+
+83
+00:05:04.118 --> 00:05:06.478
+Y cada resultado también ocupa sitio.
+
+84
+00:05:06.518 --> 00:05:10.028
+Cuando el agente lee un fichero, su
+contenido entra en la conversación y viaja
+
+85
+00:05:10.068 --> 00:05:12.034
+en todas las vueltas siguientes.
+
+86
+00:05:12.074 --> 00:05:15.028
+Es la ventana de contexto del vídeo
+anterior, que ahora se va llenando con lo
+
+87
+00:05:15.068 --> 00:05:16.498
+que hacen las herramientas.
+
+88
+00:05:21.917 --> 00:05:24.197
+Vamos con la carta de OpenCode.
+
+89
+00:05:24.237 --> 00:05:26.728
+Hay tres herramientas
+para mirar sin tocar.
+
+90
+00:05:26.768 --> 00:05:30.467
+read lee un fichero, o lista
+lo que hay en una carpeta.
+
+91
+00:05:30.507 --> 00:05:35.677
+glob busca ficheros por su nombre, por
+ejemplo todos los que acaban en punto js.
+
+92
+00:05:35.827 --> 00:05:38.497
+Y grep busca un texto
+dentro de los ficheros.
+
+93
+00:05:39.393 --> 00:05:44.263
+Hay dos para cambiar cosas. edit
+cambia un trozo concreto de un fichero:
+
+94
+00:05:44.303 --> 00:05:47.293
+busca un texto y lo sustituye por otro.
+
+95
+00:05:47.333 --> 00:05:50.683
+write escribe un fichero entero,
+nuevo o en lugar del que había.
+
+96
+00:05:51.186 --> 00:05:53.456
+Y hay una para ejecutar: shell.
+
+97
+00:05:53.496 --> 00:05:57.316
+Con ella el agente lanza cualquier
+comando en la terminal del laboratorio,
+
+98
+00:05:57.356 --> 00:06:00.456
+como ene pe eme test. Es la
+más potente y la más delicada,
+
+99
+00:06:00.496 --> 00:06:03.386
+porque un comando puede hacer todo
+lo que pueda hacer tu usuario.
+
+100
+00:06:04.146 --> 00:06:09.566
+Mirar, cambiar y ejecutar. Además, hay
+otras para salir fuera o pedir ayuda:
+
+101
+00:06:09.606 --> 00:06:14.086
+webfetch descarga una página web,
+websearch busca en internet y subagent le
+
+102
+00:06:14.126 --> 00:06:16.738
+pasa una parte del trabajo a otro agente.
+
+103
+00:06:16.778 --> 00:06:18.482
+Esta última la nombraremos al final.
+
+104
+00:06:18.883 --> 00:06:22.811
+En el laboratorio, las herramientas
+que solo miran no piden permiso.
+
+105
+00:06:22.851 --> 00:06:26.599
+Las que cambian ficheros, ejecutan
+comandos o descargan de la web,
+
+106
+00:06:26.639 --> 00:06:30.403
+sí. Así ves cada cambio y cada
+comando antes de que pase.
+
+107
+00:06:30.443 --> 00:06:33.444
+Recuerda que esto es la
+configuración del laboratorio:
+
+108
+00:06:33.484 --> 00:06:35.963
+OpenCode, tal como
+viene, casi no pregunta.
+
+109
+00:06:41.344 --> 00:06:44.984
+Juntémoslo todo con una
+tarea real en el laboratorio.
+
+110
+00:06:45.024 --> 00:06:49.624
+Le pedimos esto: añade a compra
+punto js una función quitar,
+
+111
+00:06:49.664 --> 00:06:55.244
+que devuelva la lista sin ese producto,
+añade su prueba y ejecuta ene pe eme test.
+
+112
+00:06:55.284 --> 00:06:57.604
+Y miramos qué herramienta
+pide en cada vuelta.
+
+113
+00:06:58.663 --> 00:07:02.026
+En la primera vuelta, el agente
+aún no sabe cómo es el proyecto,
+
+114
+00:07:02.066 --> 00:07:06.345
+así que mira qué hay: pide listar
+las carpetas y los ficheros.
+
+115
+00:07:06.385 --> 00:07:09.175
+En la segunda, lee
+cuatro ficheros a la vez:
+
+116
+00:07:09.215 --> 00:07:14.245
+el README, el package punto json,
+las pruebas y compra punto js.
+
+117
+00:07:14.285 --> 00:07:18.265
+En una misma vuelta puede pedir varias
+herramientas, y OpenCode las ejecuta todas
+
+118
+00:07:18.305 --> 00:07:20.225
+antes de volver a llamar al modelo.
+
+119
+00:07:21.679 --> 00:07:25.149
+En la tercera vuelta ya
+sabe lo que hay, y actúa.
+
+120
+00:07:25.189 --> 00:07:29.423
+Hace dos ediciones: añade la
+función quitar a compra punto js,
+
+121
+00:07:29.463 --> 00:07:33.199
+y la añade también a la línea de las
+pruebas que importa las funciones.
+
+122
+00:07:33.239 --> 00:07:37.389
+En la cuarta, otra edición más: escribe
+la prueba nueva, que comprueba que el
+
+123
+00:07:37.429 --> 00:07:40.179
+producto desaparece y que
+la lista original no cambia.
+
+124
+00:07:41.002 --> 00:07:43.382
+En la quinta vuelta comprueba su trabajo:
+
+125
+00:07:43.422 --> 00:07:46.862
+pide la herramienta shell
+para ejecutar ene pe eme test.
+
+126
+00:07:46.902 --> 00:07:50.442
+Las pruebas pasan, y ese
+resultado vuelve al modelo.
+
+127
+00:07:50.482 --> 00:07:52.702
+En la sexta ya no pide
+ninguna herramienta:
+
+128
+00:07:52.742 --> 00:07:55.122
+responde con un resumen
+de lo que ha hecho.
+
+129
+00:07:55.162 --> 00:07:57.004
+Todo, en unos veinte segundos.
+
+130
+00:07:57.404 --> 00:08:01.244
+Ahora mírala en el tiempo, con
+los permisos del laboratorio.
+
+131
+00:08:01.284 --> 00:08:04.524
+Listar es un comando: te
+habría pedido permiso.
+
+132
+00:08:04.564 --> 00:08:07.964
+Las cuatro lecturas, no.
+Las tres ediciones, sí.
+
+133
+00:08:08.004 --> 00:08:09.992
+Y el comando de las pruebas, también.
+
+134
+00:08:10.032 --> 00:08:14.174
+Cinco preguntas en total. Y
+la respuesta final, ninguna:
+
+135
+00:08:14.214 --> 00:08:16.394
+escribir texto no necesita permiso.
+
+136
+00:08:17.768 --> 00:08:20.406
+Y una cosa que ya te
+sonará del primer vídeo.
+
+137
+00:08:20.474 --> 00:08:23.926
+Lo repetimos con la misma
+petición, y el camino fue otro.
+
+138
+00:08:24.053 --> 00:08:28.596
+Esta vez leyó y listó a la vez, y
+escribió dos pruebas en lugar de una.
+
+139
+00:08:28.746 --> 00:08:31.246
+El bucle es el mismo;
+los pasos, no siempre.
+
+140
+00:08:36.621 --> 00:08:38.621
+¿Y cómo sabe el agente que ha terminado?
+
+141
+00:08:38.661 --> 00:08:42.091
+Fíjate en la sexta vuelta. Mientras
+el modelo pide herramientas,
+
+142
+00:08:42.131 --> 00:08:44.861
+OpenCode las ejecuta y vuelve a llamarle.
+
+143
+00:08:44.901 --> 00:08:48.411
+Cuando responde solo con texto, sin
+pedir ninguna, el bucle se acaba.
+
+144
+00:08:49.608 --> 00:08:51.815
+En lo que registra
+OpenCode se ve muy claro.
+
+145
+00:08:51.855 --> 00:08:55.597
+Las cinco primeras vueltas terminan con
+el motivo «llamadas a herramientas».
+
+146
+00:08:55.637 --> 00:08:58.117
+La última termina con otro motivo, stop:
+
+147
+00:08:58.157 --> 00:09:00.007
+el modelo ha dado su respuesta.
+
+148
+00:09:00.534 --> 00:09:03.084
+Es decir, para cuando el
+modelo cree que ha terminado.
+
+149
+00:09:03.124 --> 00:09:05.334
+No cuando ha comprobado
+que todo está bien.
+
+150
+00:09:05.374 --> 00:09:07.774
+Por eso le pedimos que
+ejecutara las pruebas:
+
+151
+00:09:07.814 --> 00:09:11.414
+sin eso, podría decirte que
+funciona sin haberlo probado.
+
+152
+00:09:11.454 --> 00:09:13.974
+Y si ves que va por mal
+camino, no hace falta esperar:
+
+153
+00:09:14.014 --> 00:09:16.094
+con la tecla escape lo interrumpes.
+
+154
+00:09:17.034 --> 00:09:19.127
+Dos nombres más, solo para que te suenen.
+
+155
+00:09:19.237 --> 00:09:23.437
+El primero, los subagentes: con la
+herramienta subagent, el agente encarga
+
+156
+00:09:23.477 --> 00:09:27.306
+una parte del trabajo a otro
+agente, con su propia conversación.
+
+157
+00:09:27.346 --> 00:09:31.077
+OpenCode trae uno llamado
+explore, que solo lee y busca.
+
+158
+00:09:31.117 --> 00:09:35.147
+El segundo, MCP: una forma estándar
+de enchufar herramientas de otros,
+
+159
+00:09:35.187 --> 00:09:38.909
+como un cargador universal.
+Con él, la carta crece.
+
+160
+00:09:38.949 --> 00:09:40.347
+En esta ruta no hacen falta.
+
+161
+00:09:40.898 --> 00:09:44.441
+Repasemos. Un agente es un
+modelo dentro de un bucle:
+
+162
+00:09:44.481 --> 00:09:48.778
+lee, razona, actúa y
+observa, vuelta tras vuelta.
+
+163
+00:09:48.818 --> 00:09:52.058
+El modelo solo pide;
+quien ejecuta es OpenCode.
+
+164
+00:09:52.098 --> 00:09:55.868
+Lo que puede pedir son herramientas,
+con su nombre, su descripción y sus
+
+165
+00:09:55.908 --> 00:09:58.618
+parámetros. Y para cuando
+responde sin pedir ninguna.
+
+166
+00:09:59.474 --> 00:10:03.750
+La práctica de este vídeo. En el
+laboratorio, cambia a la rama guía cero
+
+167
+00:10:03.790 --> 00:10:06.972
+cinco y, con el agente
+build, pídele la misma tarea:
+
+168
+00:10:07.012 --> 00:10:10.460
+la función quitar, su
+prueba y ene pe eme test.
+
+169
+00:10:10.550 --> 00:10:14.730
+Aprueba cada permiso una sola vez y, en
+cada paso, apunta qué herramienta usa y si
+
+170
+00:10:14.770 --> 00:10:18.090
+te ha preguntado. Al final,
+ejecuta tú las pruebas.
+
+171
+00:10:18.130 --> 00:10:21.960
+Si quieres repetirla, barra undo
+deja los ficheros como estaban.
+
+172
+00:10:22.601 --> 00:10:27.271
+Las guías siete, ocho y nueve, en
+texto, cuentan qué le dices al agente,
+
+173
+00:10:27.311 --> 00:10:29.518
+qué cuesta y qué puede romper.
+
+174
+00:10:29.558 --> 00:10:33.401
+Y en el próximo vídeo veremos qué
+puede romper un agente que actúa,
+
+175
+00:10:33.441 --> 00:10:35.661
+y qué te protege. Nos vemos allí.

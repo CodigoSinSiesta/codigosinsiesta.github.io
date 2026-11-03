@@ -9,7 +9,7 @@
     { type: 'cmd', text: 'whoami' },
     { type: 'out', text: 'código sin siesta — devs que no se duermen' },
     { type: 'cmd', text: 'ls rutas/' },
-    { type: 'out', text: 'agentes-ia/    agentic-engineering/' },
+    { type: 'out', text: 'ia-desde-cero/    pi-oh-my-pi/' },
     { type: 'cmd', text: 'cat manifiesto.md' },
     { type: 'out', text: 'sin conceptos sólidos, la IA solo amplifica el ruido.' },
     { type: 'ok', text: '✓ disciplina > velocidad' },

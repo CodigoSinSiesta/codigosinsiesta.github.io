@@ -5,7 +5,7 @@ import { RUTAS } from '../../data/rutas';
 
 <Base
   title="Guías de aprendizaje"
-  description="Itinerarios curados de Código Sin Siesta: de cero a tu primer agente, y de vibe coding a agentic engineering."
+  description="Itinerarios de Código Sin Siesta: IA desde cero, para programar con agentes paso a paso, y el curso en vídeo de Pi y oh my pi, de lo mínimo a tu propio harness."
   activeHref="/rutas"
 >
   <div class="container">
@@ -18,7 +18,7 @@ import { RUTAS } from '../../data/rutas';
       </p>
       <div class="grid-2" style="margin-top: 2.5rem;">
         {
-          RUTAS.map((ruta) => (
+          RUTAS.filter((ruta) => !ruta.oculta).map((ruta) => (
             <a class="card" href={`/rutas/${ruta.slug}`}>
               <span class={`badge ${ruta.nivel === 'inicial' ? 'badge--ok' : ''}`}>
                 {ruta.nivel}

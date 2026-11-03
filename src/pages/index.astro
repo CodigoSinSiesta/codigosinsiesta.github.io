@@ -9,13 +9,14 @@ const todosEnsayos = (await getCollection('ensayos')).sort(
   (a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf()
 );
 const ensayos = todosEnsayos.slice(0, 4);
+const rutas = RUTAS.filter((r) => !r.oculta);
 
 const fmtFecha = (d: Date) =>
   d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: '2-digit' });
 
 const proof = [
   { n: `${todosEnsayos.length}`, label: 'artículos publicados' },
-  { n: `${RUTAS.length}`, label: 'rutas guiadas' },
+  { n: `${rutas.length}`, label: 'rutas guiadas' },
   { n: `${TALLERES.length}`, label: 'talleres hands-on' },
 ];
 ---
@@ -98,10 +99,10 @@ const proof = [
     <section class="section">
       <p class="eyebrow">guías</p>
       <h2>Guías de aprendizaje</h2>
-      <p>Itinerarios curados, de cero a producción. Cada paso es un artículo, un deck o un taller.</p>
+      <p>Cursos en vídeo con su guía, para entender tu agente por dentro. Tu progreso se guarda en este navegador.</p>
       <div class="grid-2" style="margin-top: 2rem;">
         {
-          RUTAS.map((ruta) => (
+          rutas.map((ruta) => (
             <a class="card card--ruta" href={`/rutas/${ruta.slug}`}>
               <span class={`badge ${ruta.nivel === 'inicial' ? 'badge--ok' : ''}`}>
                 {ruta.nivel}
