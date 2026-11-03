@@ -1,0 +1,76 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { RUTAS } from '../../../data/rutas';
+import { indexarGuias } from '../../../lib/guias';
+import { resolverRutaCorta } from '../../../lib/ruta-corta';
+import { horasYMinutos } from '../../../lib/capitulos';
+
+// Ruta corta del curso. La selección vive en src/data/ruta-corta-pi-oh-my-pi.ts.
+const ruta = RUTAS.find((r) => r.slug === 'pi-oh-my-pi')!;
+if (!ruta.rutaCorta) throw new Error('La ruta pi-oh-my-pi no tiene ruta corta');
+const rc = ruta.rutaCorta;
+const { paradas, minutos } = resolverRutaCorta(rc, await indexarGuias(ruta.slug));
+---
+
+<Base
+  title={`La ruta corta · ${ruta.titulo}`}
+  description={`Seis vídeos del curso de Pi y oh my pi para una tarde (${horasYMinutos(minutos)}): por qué cada uno y qué te saltas.`}
+  activeHref="/rutas"
+>
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow">
+        <span><a href={`/rutas/${ruta.slug}`} style="color: inherit;">{ruta.titulo}</a> · {paradas.length} vídeos · {horasYMinutos(minutos)}</span>
+      </p>
+      <h1>¿Poco tiempo? La ruta corta</h1>
+      <p class="lead" style="max-width: 44rem;">{rc.intro}</p>
+      <p class="meta" style="max-width: 44rem;">
+        Total: {horasYMinutos(minutos)} de vídeo, frente a {ruta.duracion} del curso completo. Si una palabra no te suena,
+        búscala en el <a href={ruta.glosario}>glosario</a>.
+      </p>
+
+      <ol class="paradas">
+        {
+          paradas.map((p, i) => (
+            <li class="parada">
+              <span class="parada__n" aria-hidden="true">{i + 1}</span>
+              <div>
+                <p class="meta" style="margin: 0;">vídeo {p.video} · {p.duracion}</p>
+                <h2>
+                  <a href={p.href}>{p.titulo}</a>
+                </h2>
+                <p>{p.porQue}</p>
+                <div class="profundizar">
+                  <p class="profundizar__t">Qué te saltas</p>
+                  <ul>
+                    {p.saltos.map((s) => (
+                      <li>
+                        {s.tema} ·{' '}
+                        {s.enlaces.map((e, k) => (
+                          <>
+                            {k > 0 && ', '}
+                            <a href={e.href}>{e.texto}</a>
+                          </>
+                        ))}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p style="margin-top: 2.5rem;">
+        <a href={`/rutas/${ruta.slug}`}>← El curso completo</a>
+        {ruta.glosario && (
+          <>
+            {' · '}
+            <a href={ruta.glosario}>Glosario</a>
+          </>
+        )}
+      </p>
+    </section>
+  </div>
+</Base>
