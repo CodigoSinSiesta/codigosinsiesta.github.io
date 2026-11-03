@@ -1,7 +1,7 @@
 ---
 title: "Agent sprawl: el problema de gobernanza que nadie ve venir"
 description: "El 96% de las empresas ya ejecuta agentes de IA. Solo el 12% tiene una plataforma centralizada para gestionarlos. Y apenas el 18% sabe qué agentes están corriendo ahora mismo dentro de su organización."
-fecha: 2026-06-14
+fecha: 2026-06-13
 tags: ["ia", "agentes", "enterprise", "gobernanza", "seguridad", "arquitectura"]
 autor: "Alejandro de la Fuente"
 ---
@@ -60,7 +60,7 @@ El gateway hace cinco cosas:
 
 5. **MCP servers con governance** — catálogo central de MCP servers disponibles, tokens encriptados con rotación automática, sin plain text en variables de entorno locales.
 
-Databricks expandió Unity AI Gateway en abril de 2026 para incluir ejecutución on-behalf-of (el gateway actúa en nombre del usuario con sus permisos, no con los del sistema) y tracing completo con MLflow. Cada interacción tiene audit trail. Compliance deja de ser teatro.
+Databricks expandió Unity AI Gateway en abril de 2026 para incluir ejecución on-behalf-of (el gateway actúa en nombre del usuario con sus permisos, no con los del sistema) y tracing completo con MLflow. Cada interacción tiene audit trail. Compliance deja de ser teatro.
 
 ---
 

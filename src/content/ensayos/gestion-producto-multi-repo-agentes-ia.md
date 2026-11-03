@@ -9,8 +9,7 @@ tags:
   - knowledge-graph
   - multi-repo
   - especificaciones
-tipo: ensayo
-autor: Alejandro de la Fuente
+autor: "Alejandro de la Fuente"
 ---
 
 # Del caos al conocimiento: gestionando productos multi-repo con agentes de IA
@@ -262,7 +261,7 @@ El artículo usa "knowledge graph" decenas de veces. Conviene definirlo antes de
 | Fase | Implementación | Consultas posibles |
 |---|---|---|
 | Crawl/Walk | Repo `product-specs/` con referencias cruzadas en markdown | "Lee el requisito REQ-IDEM-001 y dime qué repos lo implementan" |
-| Run inicial | SQLite + embeddings (Turso, zvec) + `codebase-memory-mcp` | "¿Qué servicios dependen de payment-service?" |
+| Run inicial | SQLite + embeddings (Turso, zvec) + [codebase-memory-mcp](/ensayos/codebase-memory-mcp-motor-grafos-agentes) | "¿Qué servicios dependen de payment-service?" |
 | Run avanzado | Neo4j + GraphRAG | "Si cambio el campo `amount` de integer a decimal, ¿qué repos necesitan ajustes y qué tests se rompen?" |
 
 > **GraphRAG** es una técnica de Microsoft Research (2024) que combina grafos de conocimiento con retrieval-augmented generation. A diferencia del RAG vectorial tradicional, GraphRAG modela explícitamente las relaciones entre entidades (comunidades, dependencias, jerarquías), lo que permite consultas de impacto global como "¿qué servicios se ven afectados si cambio este campo?". El paper original: [From Local to Global: A Graph RAG Approach to Query-Focused Summarization](https://arxiv.org/abs/2404.16130).
@@ -756,7 +755,7 @@ Cuando alguien propone un cambio en el contrato (vía PR al repo de producto), e
 **Cómo generar y mantener los mocks.** No necesitas montar el servicio real. Herramientas maduras lo resuelven desde el mismo fichero OpenAPI que define el contrato:
 
 - **[Prism](https://github.com/stoplightio/prism)** (Stoplight, open source). `prism mock payment-api-v2.yaml` levanta un servidor que responde con datos sintéticos pero válidos según el contrato. Se ejecuta en CI como paso previo a los tests del consumidor (~10 segundos).
-- **[MockLoop MCP](https://mockloop.dev)**. Mock de APIs vía MCP, diseñado para agentes de IA. Si tus tests los genera un agente SDD, MockLoop le permite validar sin desplegar.
+- **[MockLoop MCP](https://github.com/mockloop/mockloop-mcp)**. Mock de APIs vía MCP, diseñado para agentes de IA. Si tus tests los genera un agente SDD, MockLoop le permite validar sin desplegar. (El dominio mockloop.dev no resuelve a la fecha de redacción — el repo canónico es el GitHub.)
 - **Patrón general**: un job en CI levanta el mock → ejecuta tests → apaga el mock. El mock se regenera del mismo fichero que define el contrato. Si el contrato cambia, el mock cambia automáticamente. Sin sincronización manual.
 
 ### 4.7. Herramientas reales que ya implementan SDD
@@ -791,7 +790,7 @@ Filosofía: *"fluid not rigid, iterative not waterfall, easy not complex, built 
 | **[Kiro](https://kiro.dev)** | Tercer framework SDD, similar a OpenSpec y Spec-Kit | Alternativa; elegir según ecosistema |
 | **GSD Core** | Ciclo completo con subagentes: planificar → ejecutar → verificar → ship | Fase Run, como motor del agente SDD |
 | **El artículo (product-specs)** | Lo que ninguno cubre: contratos cross-repo, trazabilidad, extracción de decisiones, knowledge graph de producto | El sistema por encima de los repos |
-| **[Graphify](https://github.com/talops/graphify)** (22K ⭐) | Convierte código, docs, PDFs y APIs en un knowledge graph consultable vía lenguaje natural | Fase Walk/Run, como alternativa o complemento a codebase-memory-mcp |
+| **[Graphify](https://github.com/Graphify-Labs/graphify)** (Safi Shamsi / Graphify-Labs) | Convierte código, docs, PDFs y APIs en un knowledge graph consultable vía lenguaje natural | Fase Walk/Run, como alternativa o complemento a [codebase-memory-mcp](/ensayos/codebase-memory-mcp-motor-grafos-agentes), que cubrimos en otro ensayo |
 
 OpenSpec, Spec-Kit y GSD no compiten con el sistema del artículo. Lo complementan. Son el "cómo" dentro de cada repo. El artículo aporta el "qué" y el "por qué" a nivel de producto: los contratos entre servicios, la trazabilidad end-to-end, y el knowledge graph que conecta todo.
 
@@ -901,7 +900,7 @@ POST /v2/orders/bulk
 Esto no es un lujo. Es lo que permite que un desarrollador nuevo entienda el código en horas en lugar de semanas. Y es lo que permite que un refactoring no sea un salto de fe.
 
 **Herramientas para trazabilidad**:
-- `codebase-memory-mcp` (9.6k ⭐): indexa el código de múltiples repos en un knowledge graph vía MCP. Cada símbolo (función, clase, endpoint) es un nodo. Las referencias entre ellos son aristas. Conecta con las specs de producto.
+- [`codebase-memory-mcp`](/ensayos/codebase-memory-mcp-motor-grafos-agentes) (9.6k ⭐): indexa el código de múltiples repos en un knowledge graph vía MCP. Cada símbolo (función, clase, endpoint) es un nodo. Las referencias entre ellos son aristas. Conecta con las specs de producto.
 - `microsoft/markitdown`: convierte documentos de especificación (PDFs, DOCs, MDs) en texto estructurado que el grafo puede ingerir.
 - `GraphRAG`: construye el grafo de entidades y relaciones desde las specs, permitiendo consultas globales como "¿qué partes del sistema asumen que el usuario siempre tiene email?"
 
@@ -1114,9 +1113,9 @@ Ningún sistema automático es infalible. Estos son los fallos más probables y 
 
 **Fallo 6: Specs contradictorias entre agentes.** Dos agentes trabajando simultáneamente en repos distintos introducen cambios incompatibles. El agente SDD genera tipos para `amount: integer` mientras otro agente ya cambió el contrato a `amount: decimal`. No hay un árbitro automático que resuelva la contradicción. **Mitigación**: este problema es largely unsolved (Daniel Sogl, enterJS 2026), pero hay estrategias prácticas: (a) serializar los PRs que afectan al mismo contrato — solo uno a la vez; (b) usar `git worktrees` para aislar el trabajo de cada agente (herramientas como [Armada](https://armada.sh) lo automatizan); (c) para equipos con 3+ agentes activos, existen agentes árbitro (arXiv 2606.10747) que monitorean conflictos y notifican antes del merge. Lo más pragmático: en fase Walk, ejecuta los agentes secuencialmente. En fase Run, dedica un humano a revisar las intersecciones entre PRs de agentes.
 
-**Fallo 7: Código generado sin revisión de seguridad.** Los agentes SDD generan tipos, validadores y código de infraestructura en múltiples lenguajes. Un validador mal generado puede introducir una vulnerabilidad de inyección, un endpoint expuesto sin autenticación, o una dependencia desactualizada con CVEs conocidos. **Mitigación**: el CI debe incluir escaneo SAST (Semgrep, CodeQL) en todos los PRs, incluidos los generados por agentes. Y revisión de dependencias (`npm audit`, `pip-audit`, Dependabot). El agente no escribe código de negocio — pero el scaffolding que genera también necesita auditoría de seguridad.
+**Fallo 7: Código generado sin revisión de seguridad.** Los agentes SDD generan tipos, validadores y código de infraestructura en múltiples lenguajes. Un validador mal generado puede introducir una vulnerabilidad de inyección, un endpoint expuesto sin autenticación, o una dependencia desactualizada con CVEs conocidos. **Mitigación**: el CI debe incluir escaneo SAST (Semgrep, CodeQL) en todos los PRs, incluidos los generados por agentes. Y revisión de dependencias (`npm audit`, `pip-audit`, Dependabot). El agente no escribe código de negocio — pero el scaffolding que genera también necesita auditoría de seguridad. Para los problemas de gobernanza que aparecen cuando estos agentes proliferan (catálogo central de MCP servers, quién autoriza qué, audit trail), cubrimos el patrón en [agent sprawl: el problema de gobernanza que nadie ve venir](/ensayos/agent-sprawl-gobernanza).
 
-**Fallo 8: Confianza ciega en el agente de drift.** El agente de drift es el guardián del sistema: si él falla, el resto del castillo se viene abajo sin que nadie se entere. Pero a diferencia del agente de reuniones (§3) y del agente SDD (§4), no tiene una sección dedicada que detalle su arquitectura, pipeline y modos de fallo. **Mitigación**: dedicamos la sección completa a continuación.
+**Fallo 8: Confianza ciega en el agente de drift.** El agente de drift es el guardián del sistema: si él falla, el resto del castillo se viene abajo sin que nadie se entere. Su arquitectura, pipeline y modos de fallo propios están detallados en la sección 5.6. **Mitigación**: el riesgo principal aquí no es de diseño sino de operación — un agente de drift que nadie mira o cuyas alertas se ignoran se convierte en un sensor muerto. Asignar ownership explícito del agente, revisar semanalmente el log de detecciones, y medir la tasa de falsos positivos como cualquier otra métrica de observabilidad.
 
 ### 6.7. Roadmap incremental: crawl → walk → run
 
@@ -1380,4 +1379,4 @@ La horquilla de Run depende de si usas Neo4j cloud ($65) o te quedas con SQLite+
 
 ---
 
-*Este artículo es el marco de trabajo. El pipeline con herramientas concretas está descrito en las secciones 5.6 (agente de drift), 6.1 (arquitectura) y 8.1 (stack de herramientas). Queda como contribución abierta construir un ejemplo ejecutable sobre un producto multi-repo real. Si lo haces, abre un PR contra `product-specs/` en el repo de este artículo y lo referenciamos.*
+*Este artículo es el marco de trabajo. El pipeline con herramientas concretas está descrito en las secciones 5.6 (agente de drift), 6.1 (arquitectura) y 8.1 (stack de herramientas). Queda como contribución abierta construir un ejemplo ejecutable sobre un producto multi-repo real; si lo construyes, compártelo en los comentarios o como issue en el repo de Código Sin Siesta.*
