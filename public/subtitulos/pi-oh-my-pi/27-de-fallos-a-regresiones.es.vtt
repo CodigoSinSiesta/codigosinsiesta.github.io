@@ -1,0 +1,1693 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.240 --> 00:00:14.360
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.400 --> 00:00:17.760
+Vídeo veintisiete: de
+fallos a regresiones.
+
+3
+00:00:23.163 --> 00:00:26.358
+El proyecto final del veintiséis
+dejó una pregunta abierta.
+
+4
+00:00:26.398 --> 00:00:31.023
+La revisión con el modelo más caro del día
+aprobó el cupón de importe fijo sin ver un
+
+5
+00:00:31.063 --> 00:00:35.763
+borde: un cupón con el importe sin
+definir devolvía algo que no es un número.
+
+6
+00:00:35.803 --> 00:00:39.723
+La integración continua, con Pi
+y un modelo barato, sí lo vio.
+
+7
+00:00:39.763 --> 00:00:41.443
+Lo apuntamos como riesgo y seguimos.
+
+8
+00:00:42.201 --> 00:00:45.481
+Hoy vamos a hacer con ese fallo lo
+que haces con un fallo de tu programa:
+
+9
+00:00:45.521 --> 00:00:49.641
+convertirlo en una prueba que se
+ejecuta sola, para enterarte si vuelve.
+
+10
+00:00:49.681 --> 00:00:51.551
+Pero lo que falló no es la tienda.
+
+11
+00:00:51.591 --> 00:00:54.377
+Es el agente, o mejor dicho, el harness:
+
+12
+00:00:54.417 --> 00:00:58.381
+el modelo, sus instrucciones, sus
+herramientas y la forma de lanzarlo.
+
+13
+00:00:58.863 --> 00:01:02.643
+La idea viene de otro curso abierto,
+Building a Coding Agent From Scratch,
+
+14
+00:01:02.683 --> 00:01:06.343
+de Decoding AI, con licencia
+Apache dos punto cero.
+
+15
+00:01:06.383 --> 00:01:09.993
+Construyen un agente desde cero, y sus
+últimas lecciones tratan justo esto:
+
+16
+00:01:10.033 --> 00:01:13.843
+medir el agente con un banco de pruebas,
+y convertir sus ejecuciones fallidas en
+
+17
+00:01:13.883 --> 00:01:17.223
+casos de regresión que se
+reproducen con otro modelo.
+
+18
+00:01:17.263 --> 00:01:20.619
+Nosotros no partimos de cero:
+usamos lo que Pi y oh my pi traen,
+
+19
+00:01:20.659 --> 00:01:22.883
+y lo que falta, con scripts pequeños.
+
+20
+00:01:23.995 --> 00:01:27.569
+¿Por qué hace falta? Porque el
+harness cambia aunque no lo toques.
+
+21
+00:01:27.609 --> 00:01:31.573
+Durante este curso hemos actualizado
+Pi y oh my pi casi cada semana,
+
+22
+00:01:31.613 --> 00:01:33.563
+y alguna actualización
+cambió cosas que usábamos.
+
+23
+00:01:33.603 --> 00:01:35.563
+Cambias de modelo porque
+sale uno más barato.
+
+24
+00:01:35.603 --> 00:01:41.563
+Retocas el AGENTS punto md. Cada cambio
+puede arreglar algo y romper otra cosa,
+
+25
+00:01:41.603 --> 00:01:44.853
+y sin casos guardados solo te
+enteras cuando falla delante de ti.
+
+26
+00:01:45.307 --> 00:01:49.047
+El plan. Primero, dos preguntas
+que conviene no mezclar.
+
+27
+00:01:49.087 --> 00:01:53.417
+Después, qué guarda una sesión
+de Pi y de oh my pi, y qué no.
+
+28
+00:01:53.457 --> 00:01:57.547
+Buscaremos fallos en las sesiones del
+curso, convertiremos el del veintiséis en
+
+29
+00:01:57.587 --> 00:02:02.427
+un caso, lo reproduciremos con el mismo
+modelo, con otro y con un arreglo,
+
+30
+00:02:02.467 --> 00:02:05.067
+y al final dejaremos los
+casos ejecutándose solos.
+
+31
+00:02:10.401 --> 00:02:14.631
+El curso de Decoding AI separa
+dos preguntas, y cada una tiene su
+
+32
+00:02:14.671 --> 00:02:17.401
+herramienta. La primera: ¿funciona?
+
+33
+00:02:17.441 --> 00:02:22.041
+Le das al agente tareas con un resultado
+comprobable y un juez que el agente no ve,
+
+34
+00:02:22.081 --> 00:02:25.401
+y cuentas cuántas resuelve.
+Es un banco de pruebas.
+
+35
+00:02:25.441 --> 00:02:28.281
+La segunda: ¿funciona como lo diseñamos?
+
+36
+00:02:28.321 --> 00:02:31.041
+Ahí no miras solo el resultado,
+sino el comportamiento:
+
+37
+00:02:31.081 --> 00:02:35.791
+si usó la herramienta correcta, si respetó
+la puerta, si tocó solo lo que debía.
+
+38
+00:02:36.575 --> 00:02:39.635
+Lo primero ya lo tenemos,
+aunque no lo llamáramos así.
+
+39
+00:02:39.675 --> 00:02:44.098
+En el veinticinco, orquestar punto
+sh lanzaba la misma funcionalidad en
+
+40
+00:02:44.138 --> 00:02:46.850
+worktrees separados y
+la juzgaba desde fuera:
+
+41
+00:02:46.890 --> 00:02:51.960
+verificar punto sh desde la etiqueta de la
+rúbrica, y una prueba oculta fuera de la
+
+42
+00:02:52.000 --> 00:02:54.455
+tienda. Eso es un banco
+con una sola tarea.
+
+43
+00:02:54.495 --> 00:02:57.915
+Las tres funcionalidades con rúbrica,
+la tres, la cuatro y la cinco,
+
+44
+00:02:57.955 --> 00:02:59.355
+ya son un banco pequeño.
+
+45
+00:02:59.958 --> 00:03:02.798
+Del banco salen dos cifras
+que conviene distinguir.
+
+46
+00:03:02.838 --> 00:03:07.650
+Si repites cada tarea tres veces,
+puedes contar si pasó al menos una vez,
+
+47
+00:03:07.690 --> 00:03:11.148
+o si pasó las tres. La
+primera mide capacidad:
+
+48
+00:03:11.188 --> 00:03:14.658
+el agente sabe hacerlo. La
+segunda mide fiabilidad:
+
+49
+00:03:14.698 --> 00:03:19.198
+lo hace siempre. La distancia entre
+las dos dice lo inestable que es.
+
+50
+00:03:19.238 --> 00:03:22.128
+Para un agente que trabaja sin
+ti, la que importa es la segunda.
+
+51
+00:03:23.366 --> 00:03:25.595
+Y una distinción que ahorra discusiones.
+
+52
+00:03:25.672 --> 00:03:29.839
+Si una ejecución falla porque el proveedor
+no contesta, o porque faltaba la clave,
+
+53
+00:03:29.879 --> 00:03:33.244
+no es un fallo del agente: es
+un fallo de infraestructura.
+
+54
+00:03:33.284 --> 00:03:36.815
+El curso de Decoding AI las cuenta
+aparte y las saca de la media.
+
+55
+00:03:37.080 --> 00:03:40.280
+En el veintidós vimos el caso
+típico: sin la clave de DeepSeek,
+
+56
+00:03:40.320 --> 00:03:45.255
+oh my pi cae a otro modelo. Esa ejecución
+no mide al agente que querías medir.
+
+57
+00:03:45.831 --> 00:03:50.021
+Los casos de regresión responden a la
+segunda pregunta, y salen de otro sitio:
+
+58
+00:03:50.061 --> 00:03:53.661
+de fallos reales. Un caso
+es pequeño y concreto.
+
+59
+00:03:53.701 --> 00:03:58.531
+El estado de partida, la orden exacta,
+y unas comprobaciones que fallan con el
+
+60
+00:03:58.571 --> 00:04:01.381
+comportamiento malo que
+viste y pasan con el bueno.
+
+61
+00:04:01.421 --> 00:04:04.909
+Cuanto más baratas y más
+deterministas sean, mejor.
+
+62
+00:04:04.949 --> 00:04:08.061
+Un modelo que juzga, solo donde
+un programa no puede decidir.
+
+63
+00:04:08.853 --> 00:04:12.253
+Fíjate en que esto ya lo hicimos en
+el veinticuatro, con otro nombre:
+
+64
+00:04:12.293 --> 00:04:14.533
+convertir lo que se cuela en un criterio.
+
+65
+00:04:14.573 --> 00:04:18.353
+Allí, con la tienda: un fallo en la
+frontera del envío se convertía en una
+
+66
+00:04:18.393 --> 00:04:21.019
+prueba de aceptación. Hoy, con el harness:
+
+67
+00:04:21.059 --> 00:04:24.723
+un fallo del agente se convierte en un
+caso que se vuelve a ejecutar cada vez que
+
+68
+00:04:24.763 --> 00:04:25.663
+cambias algo.
+
+69
+00:04:31.007 --> 00:04:34.558
+Para convertir un fallo en un caso,
+primero tiene que estar grabado.
+
+70
+00:04:34.598 --> 00:04:39.713
+Pi y oh my pi guardan cada sesión como
+un fichero JSONL, una línea por entrada,
+
+71
+00:04:39.753 --> 00:04:41.928
+como vimos en los vídeos tres y doce.
+
+72
+00:04:41.968 --> 00:04:45.123
+Cada entrada apunta a su padre,
+y por eso la sesión es un árbol:
+
+73
+00:04:45.163 --> 00:04:47.921
+rebobinar o bifurcar no borra nada.
+
+74
+00:04:47.961 --> 00:04:50.815
+Un fallo no se pierde por haber
+seguido trabajando después.
+
+75
+00:04:51.837 --> 00:04:55.961
+Abrimos una copia de la sesión de la
+revisión del veintiséis y contamos sus
+
+76
+00:04:56.001 --> 00:05:00.411
+entradas con jota cu. Los mensajes,
+el cambio de modelo, el nivel de
+
+77
+00:05:00.451 --> 00:05:04.913
+razonamiento, el título. Y tres
+entradas propias de oh my pi:
+
+78
+00:05:04.953 --> 00:05:08.021
+el inicio de cada herramienta,
+una huella del system prompt,
+
+79
+00:05:08.061 --> 00:05:11.411
+que cambia si cambian las
+instrucciones, y el cierre del proceso.
+
+80
+00:05:11.988 --> 00:05:15.856
+Hay más. Cada entrada lleva la
+versión del harness que la escribió.
+
+81
+00:05:15.896 --> 00:05:19.866
+Y el subagente revisor guarda al empezar
+su system prompt entero y la lista de
+
+82
+00:05:19.906 --> 00:05:26.058
+herramientas que tenía: read,
+grep, glob, bash, búsqueda web,
+
+83
+00:05:26.098 --> 00:05:29.466
+task y wait. Así puedes saber
+con qué trabajó aquel revisor,
+
+84
+00:05:29.506 --> 00:05:31.126
+aunque hoy tengas otra configuración.
+
+85
+00:05:32.287 --> 00:05:37.646
+En Pi lo comprobamos con una sesión
+corta, dos preguntas sobre totalConCupon.
+
+86
+00:05:37.686 --> 00:05:41.001
+La cabecera tiene el identificador,
+la fecha y la carpeta.
+
+87
+00:05:41.041 --> 00:05:44.596
+Y el primer mensaje es de sistema:
+las secciones del system prompt y las
+
+88
+00:05:44.636 --> 00:05:48.086
+herramientas que se
+añadieron, read y grep.
+
+89
+00:05:48.126 --> 00:05:50.556
+Si cambian después, Pi
+guarda solo el cambio.
+
+90
+00:05:51.018 --> 00:05:53.549
+Y ahora lo que no hay,
+que es lo importante.
+
+91
+00:05:53.589 --> 00:05:58.098
+Ninguna de las dos guarda en qué commit
+estaba el repositorio cuando empezó la
+
+92
+00:05:58.138 --> 00:06:02.815
+sesión. Y la sesión principal de oh my
+pi no guarda con qué opciones lanzaste el
+
+93
+00:06:02.855 --> 00:06:05.318
+proceso: las herramientas
+permitidas, el modo de aprobación,
+
+94
+00:06:05.358 --> 00:06:09.967
+los hooks. Sin eso, no puedes repetir
+la ejecución en las mismas condiciones.
+
+95
+00:06:10.007 --> 00:06:12.818
+Esa información la tiene que
+guardar quien lanza al agente.
+
+96
+00:06:13.351 --> 00:06:17.331
+Por eso, desde hoy, cada ejecución que
+lancemos desde un script deja al lado de
+
+97
+00:06:17.371 --> 00:06:22.191
+su sesión un manifiesto: el commit
+de partida, la orden y sus opciones,
+
+98
+00:06:22.231 --> 00:06:25.311
+el modelo, la versión
+del harness y la fecha.
+
+99
+00:06:25.351 --> 00:06:29.271
+Es una línea más en el script, y es la
+diferencia entre un fallo que puedes
+
+100
+00:06:29.311 --> 00:06:31.621
+estudiar y uno que solo puedes recordar.
+
+101
+00:06:32.145 --> 00:06:34.215
+Un tropiezo que nos pasó a nosotros.
+
+102
+00:06:34.255 --> 00:06:37.525
+Las sesiones de Pi de los vídeos
+veintitrés a veintiséis vivían en una
+
+103
+00:06:37.565 --> 00:06:39.875
+carpeta temporal, y el Mac la vació.
+
+104
+00:06:39.915 --> 00:06:44.195
+Ya no existen. Las de oh my pi,
+en el perfil demo, siguen ahí.
+
+105
+00:06:44.235 --> 00:06:49.806
+Si una sesión puede acabar siendo un caso,
+guárdala en un sitio que no se borre solo.
+
+106
+00:06:51.115 --> 00:06:53.655
+Para leerlas sin navegador, o eme pe
+render con la opción plain dibuja la
+
+107
+00:06:53.695 --> 00:06:55.804
+conversación entera en la terminal.
+
+108
+00:06:55.844 --> 00:07:00.105
+Ahí está el encargo de revisión del
+veintiséis, con su tabla de ficheros
+
+109
+00:07:00.569 --> 00:07:04.545
+y el diff. Y para compartir un fallo, o
+eme pe anonymize escribe una copia con los
+
+110
+00:07:04.585 --> 00:07:08.355
+turnos tapados y las rutas
+sustituidas, pero conserva la forma:
+
+111
+00:07:08.395 --> 00:07:11.355
+qué herramientas, con qué
+modelo y cuánto costó.
+
+112
+00:07:11.395 --> 00:07:13.305
+Buscamos el nombre de usuario en la copia:
+
+113
+00:07:13.345 --> 00:07:14.315
+cero ficheros.
+
+114
+00:07:14.810 --> 00:07:19.760
+Dos más. O eme pe session pack empaqueta
+la sesión con su subagente para llevarla a
+
+115
+00:07:19.800 --> 00:07:23.876
+otra máquina: un manifiesto,
+la sesión y los adjuntos.
+
+116
+00:07:23.916 --> 00:07:28.760
+Y pi guion guion export convierte
+una sesión de Pi en una página
+
+117
+00:07:29.309 --> 00:07:33.810
+HTML. Con eso ya puedes leer, enseñar
+y mover cualquier sesión del curso.
+
+118
+00:07:39.148 --> 00:07:44.198
+El curso de Decoding AI llama minar trazas
+a buscar, entre todas las ejecuciones
+
+119
+00:07:44.238 --> 00:07:46.378
+grabadas, las que fueron mal.
+
+120
+00:07:46.418 --> 00:07:50.348
+Propone mirar las que acabaron en error,
+las más caras y las que chocaron con los
+
+121
+00:07:50.388 --> 00:07:53.028
+permisos. Y agrupa lo
+que encuentra por firma:
+
+122
+00:07:53.068 --> 00:07:55.545
+el tipo de error, la
+herramienta y el modelo.
+
+123
+00:07:55.585 --> 00:07:58.988
+Dos ejecuciones con la misma firma
+probablemente son el mismo fallo.
+
+124
+00:07:59.799 --> 00:08:02.729
+Nuestras sesiones no están en
+ningún servicio, están en ficheros,
+
+125
+00:08:02.769 --> 00:08:04.426
+así que la búsqueda es un script.
+
+126
+00:08:04.466 --> 00:08:08.169
+Minar punto sh recorre una carpeta
+de sesiones y, en cada una,
+
+127
+00:08:08.209 --> 00:08:11.809
+cuenta los resultados de herramienta con
+error, las respuestas que acabaron en
+
+128
+00:08:11.849 --> 00:08:15.007
+error o abortadas, y
+los tokens y el coste.
+
+129
+00:08:15.047 --> 00:08:16.759
+Agrupa los errores por firma.
+
+130
+00:08:16.799 --> 00:08:19.324
+No llama a ningún modelo, y
+tarda menos de un segundo.
+
+131
+00:08:19.734 --> 00:08:24.267
+Lo pasamos por el perfil demo, con las
+sesiones de todo el bloque de oh my pi:
+
+132
+00:08:24.307 --> 00:08:27.404
+cuarenta ficheros. Y salen
+firmas que reconoces.
+
+133
+00:08:27.444 --> 00:08:30.864
+El hook del diecinueve que
+protege el AGENTS punto md.
+
+134
+00:08:30.904 --> 00:08:33.694
+Bash bloqueado por la
+política de herramientas.
+
+135
+00:08:33.734 --> 00:08:36.846
+Requiere aprobación pero no hay
+interfaz, del script del veintiuno.
+
+136
+00:08:36.886 --> 00:08:41.365
+Una llamada a la lista de tareas con
+argumentos que no eran JSON válido.
+
+137
+00:08:41.405 --> 00:08:45.324
+Aserciones que fallan. Y una sesión
+de más de dos millones de tokens.
+
+138
+00:08:45.874 --> 00:08:50.004
+Ahora viene lo que no hace el
+script: decidir qué es un fallo.
+
+139
+00:08:50.044 --> 00:08:52.780
+Casi todas estas líneas
+son el harness funcionando.
+
+140
+00:08:52.820 --> 00:08:55.171
+El hook bloqueó lo que debía bloquear.
+
+141
+00:08:55.211 --> 00:08:59.565
+El script del veintiuno estaba hecho
+para que la edición fallara sin interfaz.
+
+142
+00:08:59.605 --> 00:09:03.425
+Y una aserción que falla mientras el
+agente arregla una prueba es trabajo
+
+143
+00:09:03.465 --> 00:09:07.106
+normal. Y la respuesta en error del
+modelo local es infraestructura:
+
+144
+00:09:07.146 --> 00:09:10.954
+una prueba en la que faltaba la
+clave y oh my pi cayó a otro modelo.
+
+145
+00:09:11.470 --> 00:09:13.350
+Quedan candidatas de verdad.
+
+146
+00:09:13.390 --> 00:09:16.980
+Los argumentos que no eran JSON válido
+son un tropiezo del modelo con una
+
+147
+00:09:17.020 --> 00:09:20.190
+herramienta. Y la sesión
+carísima merece una mirada:
+
+148
+00:09:20.230 --> 00:09:23.870
+puede ser una tarea grande
+o un agente dando vueltas.
+
+149
+00:09:23.910 --> 00:09:28.000
+Pero el fallo que más nos importa no sale
+en la tabla, porque no produjo ningún
+
+150
+00:09:28.040 --> 00:09:28.940
+error.
+
+151
+00:09:30.176 --> 00:09:34.250
+Es el del veintiséis. El revisor
+aprobó el cambio con todo a dos,
+
+152
+00:09:34.290 --> 00:09:37.916
+sin un solo error de herramienta
+y con una respuesta impecable.
+
+153
+00:09:37.956 --> 00:09:43.770
+La palabra undefined aparece ocho veces en
+su sesión, en el diff y en el código que
+
+154
+00:09:43.841 --> 00:09:46.321
+leyó. En su respuesta, ninguna.
+
+155
+00:09:46.361 --> 00:09:50.630
+Y el informe de la integración continua,
+con Pi y Flash, lo dice en la línea doce:
+
+156
+00:09:50.670 --> 00:09:54.440
+el importe sin definir cae en la
+rama del porcentaje y devuelve NaN.
+
+157
+00:09:54.916 --> 00:09:59.093
+Esa es la limitación de minar:
+encuentra los fallos que hacen ruido.
+
+158
+00:09:59.133 --> 00:10:04.551
+Los silenciosos, una revisión que aprueba
+lo que no debía o un ticket en pasa que no
+
+159
+00:10:04.591 --> 00:10:08.306
+pasa, los encuentra otra
+mirada: la integración continua,
+
+160
+00:10:08.346 --> 00:10:11.036
+una prueba oculta, tú leyendo.
+
+161
+00:10:11.186 --> 00:10:15.586
+El archivo se mina, pero los mejores casos
+suelen llegar de un informe que contradice
+
+162
+00:10:15.626 --> 00:10:16.526
+a otro.
+
+163
+00:10:21.895 --> 00:10:26.865
+Escribimos el caso. Cada caso es un
+fichero JSON en una carpeta de regresiones
+
+164
+00:10:26.905 --> 00:10:30.985
+que vive fuera de la tienda, como
+la prueba oculta del veinticinco.
+
+165
+00:10:31.025 --> 00:10:34.725
+Lo que juzga al agente no puede
+estar donde el agente trabaja.
+
+166
+00:10:34.765 --> 00:10:37.655
+El primero se llama así:
+revisión, borde, cupón.
+
+167
+00:10:38.657 --> 00:10:41.786
+Tiene cinco partes. El síntoma,
+
+168
+00:10:43.127 --> 00:10:46.284
+en una frase. El origen: el
+identificador de la sesión, la fecha,
+
+169
+00:10:46.324 --> 00:10:49.416
+el modelo y cómo se lanzó,
+para poder volver a ella.
+
+170
+00:10:49.456 --> 00:10:54.316
+El punto de partida: la rama ticket
+cero cero cinco comparada con final,
+
+171
+00:10:54.356 --> 00:10:55.496
+dos ramas
+
+172
+00:10:55.962 --> 00:10:57.376
+que siguen en la tienda.
+
+173
+00:10:57.951 --> 00:11:01.306
+La orden. Y las comprobaciones, con un
+tope de diez minutos y diez céntimos.
+
+174
+00:11:01.767 --> 00:11:03.987
+Un detalle honesto sobre la orden.
+
+175
+00:11:04.027 --> 00:11:08.007
+En el veintiséis la revisión se lanzó con
+barra review, que es interactivo y lanza
+
+176
+00:11:08.047 --> 00:11:12.027
+un subagente. Un caso tiene que
+poder ejecutarse sin nadie delante.
+
+177
+00:11:12.067 --> 00:11:15.396
+Así que sacamos de la sesión el
+encargo exacto que recibió el revisor,
+
+178
+00:11:15.436 --> 00:11:18.817
+le pegamos el diff y lo lanzamos con o
+eme pe guion pe, con el mismo modelo y sus
+
+179
+00:11:18.857 --> 00:11:21.287
+mismas herramientas de trabajo.
+
+180
+00:11:21.613 --> 00:11:24.345
+No es la misma ejecución;
+es la misma prueba.
+
+181
+00:11:24.385 --> 00:11:25.907
+Y lo dejamos escrito en el caso.
+
+182
+00:11:27.465 --> 00:11:30.014
+Las comprobaciones van de
+la más barata a la más cara.
+
+183
+00:11:30.054 --> 00:11:33.053
+Primero, las de código: que la
+revisión no ha tocado ningún fichero,
+
+184
+00:11:33.093 --> 00:11:36.402
+con git status; que oh
+my pi terminó sin error;
+
+185
+00:11:36.442 --> 00:11:38.473
+y que no pasó del tope de coste.
+
+186
+00:11:38.513 --> 00:11:41.682
+Son métricas de comportamiento, y
+un programa las decide sin dudar.
+
+187
+00:11:41.722 --> 00:11:45.080
+Si una falla, el caso falla, y no
+hace falta preguntar a nadie más.
+
+188
+00:11:45.747 --> 00:11:50.431
+La última no la decide un programa:
+¿la revisión señala el borde?
+
+189
+00:11:50.471 --> 00:11:54.547
+Podríamos buscar la palabra undefined,
+pero está en la propia condición del
+
+190
+00:11:54.587 --> 00:11:58.005
+código, y una revisión puede
+citarla sin ver el problema.
+
+191
+00:11:58.045 --> 00:12:02.507
+Así que usamos un juez: Pi sin
+herramientas, con Flash, que recibe solo
+
+192
+00:12:02.547 --> 00:12:05.661
+el texto de la revisión y una
+afirmación escrita en español,
+
+193
+00:12:05.701 --> 00:12:06.777
+y contesta pasa o falla.
+
+194
+00:12:08.697 --> 00:12:10.658
+¿Por qué Pi sin herramientas?
+
+195
+00:12:10.698 --> 00:12:13.925
+Porque el juez no necesita
+leer la tienda, solo un texto,
+
+196
+00:12:13.965 --> 00:12:17.858
+y en el vídeo veintidós medimos que
+es el prefijo más pequeño que tenemos:
+
+197
+00:12:17.898 --> 00:12:20.399
+unos ochocientos tokens antes de empezar.
+
+198
+00:12:20.439 --> 00:12:23.328
+Y porque es otro harness,
+distinto del que revisa.
+
+199
+00:12:23.648 --> 00:12:27.188
+Pero un juez también se equivoca, y
+el curso de Decoding AI lo dice claro:
+
+200
+00:12:27.228 --> 00:12:30.018
+un juez revisa una
+verificación, no la sustituye.
+
+201
+00:12:30.580 --> 00:12:33.380
+Por eso lo calibramos, como
+al revisor del veinticuatro.
+
+202
+00:12:33.420 --> 00:12:36.820
+Antes de fiarnos, le damos
+dos textos que ya conocemos.
+
+203
+00:12:36.860 --> 00:12:39.994
+El informe de la integración
+continua, que sí señala el borde,
+
+204
+00:12:40.034 --> 00:12:43.474
+tiene que dar pasa. La revisión
+de Pro, que no lo señala,
+
+205
+00:12:43.514 --> 00:12:48.100
+tiene que dar falla. Y acierta las dos a
+la primera, citando en cada caso la frase
+
+206
+00:12:48.140 --> 00:12:49.158
+que decide.
+
+207
+00:12:49.874 --> 00:12:52.104
+Es la regla de la
+rúbrica del veinticuatro:
+
+208
+00:12:52.144 --> 00:12:55.846
+una comprobación que no falla antes
+del arreglo no comprueba nada.
+
+209
+00:12:55.886 --> 00:13:00.987
+En el curso de Decoding AI, cada tarea del
+banco tiene una solución de referencia que
+
+210
+00:13:01.027 --> 00:13:04.237
+tiene que sacar un uno, y el
+estado sin tocar, un cero.
+
+211
+00:13:04.277 --> 00:13:08.307
+Aquí, el informe que acierta y la
+revisión que no hacen ese papel.
+
+212
+00:13:13.745 --> 00:13:17.003
+Con el caso escrito, la
+pregunta es: ¿se repite?
+
+213
+00:13:17.083 --> 00:13:19.876
+Antes de arreglar nada, hay
+que volver a ver el fallo.
+
+214
+00:13:19.916 --> 00:13:21.816
+Y hay dos formas de reproducir.
+
+215
+00:13:21.856 --> 00:13:25.603
+En el curso de Decoding AI, cada ejecución
+graba también lo que devolvió cada
+
+216
+00:13:25.643 --> 00:13:29.962
+herramienta, y al repetir puedes
+reutilizarlo y cambiar solo el modelo.
+
+217
+00:13:30.002 --> 00:13:34.153
+Pi y oh my pi no tienen nada parecido: si
+repites, las herramientas se ejecutan de
+
+218
+00:13:34.193 --> 00:13:35.093
+verdad.
+
+219
+00:13:35.879 --> 00:13:39.282
+La primera forma, la de nuestro
+caso, es empezar de cero.
+
+220
+00:13:39.322 --> 00:13:43.409
+Un worktree en el commit de partida,
+la misma orden y las mismas opciones,
+
+221
+00:13:43.449 --> 00:13:45.367
+y solo cambia lo que quieres probar.
+
+222
+00:13:45.407 --> 00:13:49.111
+Las herramientas trabajan sobre el
+mismo código que vio el agente original,
+
+223
+00:13:49.151 --> 00:13:52.399
+así que es una reproducción
+honesta, aunque no idéntica.
+
+224
+00:13:52.994 --> 00:13:56.873
+La segunda es volver a un punto de la
+conversación, porque repetir catorce
+
+225
+00:13:56.913 --> 00:13:59.953
+turnos para llegar al
+fallo del quince cuesta.
+
+226
+00:13:59.993 --> 00:14:03.807
+Lo probamos por RPC, sin
+modelo y sobre copias.
+
+227
+00:14:03.847 --> 00:14:08.623
+En Pi, get fork messages lista tus
+mensajes y fork crea una sesión nueva que
+
+228
+00:14:08.663 --> 00:14:13.513
+acaba justo antes del elegido, y te
+devuelve su texto para enviarlo otra vez.
+
+229
+00:14:13.553 --> 00:14:16.993
+En oh my pi, navigate tree
+hace lo mismo que barra tree:
+
+230
+00:14:17.033 --> 00:14:19.413
+vuelve antes del mensaje
+y lo deja en el editor.
+
+231
+00:14:19.879 --> 00:14:24.616
+Dos avisos. El primero: bifurcar la
+conversación no bifurca el disco.
+
+232
+00:14:24.656 --> 00:14:28.019
+La sesión nueva cree que los ficheros
+están como en el turno catorce,
+
+233
+00:14:28.059 --> 00:14:30.479
+pero tu carpeta está
+como la dejó el veinte.
+
+234
+00:14:30.519 --> 00:14:34.679
+Devuelve también el repositorio a ese
+punto, con el commit del manifiesto.
+
+235
+00:14:34.719 --> 00:14:37.669
+El segundo: abrir una sesión
+puede escribir en ella.
+
+236
+00:14:37.709 --> 00:14:40.769
+La copia de Pi quedó igual, pero
+la de oh my pi ganó una línea,
+
+237
+00:14:40.809 --> 00:14:44.199
+la del cierre del proceso.
+Trabaja siempre sobre una copia.
+
+238
+00:14:44.746 --> 00:14:48.021
+Ahora sí, reproducimos,
+y el orden importa.
+
+239
+00:14:48.061 --> 00:14:52.000
+Primero, una reproducción de
+control, sin cambiar nada:
+
+240
+00:14:52.040 --> 00:14:55.936
+Pro, tres veces. Si el fallo no se repite,
+todavía no tienes nada que arreglar,
+
+241
+00:14:55.976 --> 00:14:59.198
+y cualquier cambio parecerá que funciona.
+
+242
+00:14:59.238 --> 00:15:02.526
+Resultado: Pro señala
+el borde en dos de tres.
+
+243
+00:15:02.566 --> 00:15:06.142
+Unos tres minutos y cuatro
+céntimos y medio por revisión.
+
+244
+00:15:06.182 --> 00:15:10.866
+El fallo existe, pero no siempre: pasó
+al menos una vez, no pasó las tres.
+
+245
+00:15:12.161 --> 00:15:17.567
+Segunda tanda: el mismo caso con Flash,
+el modelo que en el veintiséis sí lo vio.
+
+246
+00:15:17.607 --> 00:15:20.945
+Una variable del script
+cambia el modelo y nada más.
+
+247
+00:15:20.985 --> 00:15:24.782
+Y antes de mirar el resultado, comprobamos
+en las sesiones grabadas qué modelo
+
+248
+00:15:24.822 --> 00:15:30.302
+respondió de verdad: Pro en las tres
+de control, Flash en las tres nuevas.
+
+249
+00:15:30.342 --> 00:15:33.257
+Un cambio de modelo que no se
+aplica es el error más tonto,
+
+250
+00:15:33.297 --> 00:15:34.472
+y el más fácil de no ver.
+
+251
+00:15:35.077 --> 00:15:38.357
+Flash señala el borde en tres
+de tres, en minuto y medio,
+
+252
+00:15:38.397 --> 00:15:41.227
+y por algo más de un
+céntimo cada revisión.
+
+253
+00:15:41.376 --> 00:15:44.983
+Cuidado con la conclusión rápida,
+pasar la revisión al modelo barato.
+
+254
+00:15:45.023 --> 00:15:47.397
+El caso mide una sola clase de fallo.
+
+255
+00:15:47.437 --> 00:15:50.607
+Que Flash vea este borde no
+dice nada de los que Pro sí ve.
+
+256
+00:15:50.777 --> 00:15:54.617
+El curso de Decoding AI lo avisa: un
+evaluador en verde solo dice que no volvió
+
+257
+00:15:54.657 --> 00:15:56.547
+ese fallo, no que el cambio funcione.
+
+258
+00:15:57.099 --> 00:16:00.285
+Tercera tanda: cambiar
+el harness, no el modelo.
+
+259
+00:16:00.325 --> 00:16:02.826
+El arreglo es una instrucción
+para quien revisa:
+
+260
+00:16:02.866 --> 00:16:06.219
+antes de aprobar una validación nueva,
+recorre las entradas límite contra la
+
+261
+00:16:06.259 --> 00:16:10.409
+condición exacta del código, y la
+propiedad presente pero sin valor está en
+
+262
+00:16:10.449 --> 00:16:13.789
+la lista. Va en un fichero aparte que se
+añade al system prompt con guion guion
+
+263
+00:16:13.829 --> 00:16:17.559
+append system prompt, sin tocar la tienda.
+
+264
+00:16:17.599 --> 00:16:20.249
+Comprobamos antes que la opción
+lee el contenido del fichero.
+
+265
+00:16:20.289 --> 00:16:22.269
+Pro otra vez, tres repeticiones.
+
+266
+00:16:22.707 --> 00:16:27.067
+Y aquí el resultado no es limpio,
+que es lo más útil del vídeo.
+
+267
+00:16:27.107 --> 00:16:30.357
+Una revisión señala el
+borde en cuatro minutos.
+
+268
+00:16:30.397 --> 00:16:33.390
+Otra se queda pensando hasta
+que la corta el tope de tiempo:
+
+269
+00:16:33.430 --> 00:16:37.627
+falla. Y en la tercera, el
+proveedor no devuelve ni un token:
+
+270
+00:16:37.667 --> 00:16:41.227
+el resumen la marca como
+infraestructura y la saca de la cuenta.
+
+271
+00:16:41.267 --> 00:16:44.587
+Uno de dos, más lento y más
+caro que sin la instrucción.
+
+272
+00:16:45.600 --> 00:16:48.940
+Junta las tres tandas y
+tienes una decisión con datos.
+
+273
+00:16:48.980 --> 00:16:51.419
+El fallo de Pro existe,
+pero es intermitente.
+
+274
+00:16:51.459 --> 00:16:53.880
+Flash lo ve siempre, en este caso.
+
+275
+00:16:53.920 --> 00:16:57.310
+Y la instrucción, con tres
+repeticiones, no demuestra nada:
+
+276
+00:16:57.350 --> 00:17:01.140
+ni que ayude ni que no. Lo honesto
+es apuntarlo como deuda y medir más,
+
+277
+00:17:01.180 --> 00:17:04.560
+en lugar de cambiar el harness
+porque una ejecución salió bien.
+
+278
+00:17:05.138 --> 00:17:08.378
+Recuerda barra ratchet,
+del vídeo veintiuno:
+
+279
+00:17:08.418 --> 00:17:12.340
+un cambio solo cuenta si mejora en
+casos que el agente no ha visto.
+
+280
+00:17:12.380 --> 00:17:15.688
+Nuestra instrucción la
+escribimos mirando este caso.
+
+281
+00:17:15.728 --> 00:17:19.385
+Para saber si generaliza hace
+falta otro caso, con otro borde,
+
+282
+00:17:19.425 --> 00:17:21.848
+que no hayamos usado para escribirla.
+
+283
+00:17:21.888 --> 00:17:24.648
+Un arreglo comprobado con el caso
+que lo inspiró es una promesa,
+
+284
+00:17:24.688 --> 00:17:25.708
+no una prueba.
+
+285
+00:17:31.083 --> 00:17:33.798
+El caso ya vale, así
+que entra en la batería.
+
+286
+00:17:33.838 --> 00:17:39.083
+Regresiones punto sh recorre la carpeta de
+casos, ejecuta cada uno tres veces en su
+
+287
+00:17:39.123 --> 00:17:43.783
+worktree, aplica sus comprobaciones
+y escribe una fila por ejecución.
+
+288
+00:17:43.823 --> 00:17:48.031
+Al final, por caso, si pasó al
+menos una vez y si pasó todas.
+
+289
+00:17:48.071 --> 00:17:53.243
+Y sale con cero o con uno, como verificar
+punto sh, según un umbral que eliges tú.
+
+290
+00:17:54.120 --> 00:17:57.031
+Añadimos un segundo caso,
+de la otra pregunta:
+
+291
+00:17:57.071 --> 00:18:01.128
+implementar el ticket cero cero
+cinco desde la rúbrica, con Flash,
+
+292
+00:18:01.168 --> 00:18:05.495
+juzgado por verificar punto sh desde
+la etiqueta y por la prueba oculta.
+
+293
+00:18:05.535 --> 00:18:07.719
+Es el banco del veinticinco en pequeño.
+
+294
+00:18:07.759 --> 00:18:11.370
+Así la batería mira las dos cosas:
+que el agente resuelve la tarea,
+
+295
+00:18:11.410 --> 00:18:13.795
+y que se comporta como lo diseñamos.
+
+296
+00:18:14.205 --> 00:18:19.925
+La ejecutamos entera: seis ejecuciones,
+veinticuatro minutos y unos doce céntimos.
+
+297
+00:18:19.965 --> 00:18:22.985
+El ticket pasa tres de
+tres, en un minuto cada vez.
+
+298
+00:18:23.025 --> 00:18:27.415
+La revisión, dos de tres, y la que
+falla es Pro sin ninguna instrucción,
+
+299
+00:18:27.455 --> 00:18:30.065
+pensando hasta que la
+corta el tope de tiempo.
+
+300
+00:18:30.105 --> 00:18:33.694
+Así que aquel corte de la tercera
+tanda no era culpa del arreglo:
+
+301
+00:18:33.734 --> 00:18:36.805
+Pro, con razonamiento
+alto, a veces no termina.
+
+302
+00:18:36.899 --> 00:18:40.445
+Y el tope de diez minutos
+tardó unos dieciséis en cortar.
+
+303
+00:18:40.485 --> 00:18:43.075
+Con el umbral en todas,
+la batería sale con uno.
+
+304
+00:18:44.426 --> 00:18:48.506
+¿Cuándo se ejecuta? No en cada
+commit: cada vuelta gasta modelo.
+
+305
+00:18:48.546 --> 00:18:53.241
+Tiene sentido antes de actualizar Pi u
+oh my pi, antes de cambiar de modelo o de
+
+306
+00:18:53.281 --> 00:18:56.811
+tocar el AGENTS punto md,
+y una vez por la noche.
+
+307
+00:18:56.851 --> 00:18:59.931
+Y sin nadie delante, que es
+el tema del próximo vídeo.
+
+308
+00:19:00.463 --> 00:19:03.703
+Hay además una forma de usar
+los casos sin gastar nada.
+
+309
+00:19:03.743 --> 00:19:07.183
+Las comprobaciones de código se pueden
+pasar por las sesiones que ya tienes
+
+310
+00:19:07.223 --> 00:19:11.893
+grabadas. Comprobar archivo punto sh
+aplica sin error a las cuarenta del perfil
+
+311
+00:19:11.933 --> 00:19:17.003
+demo: treinta pasan y diez no, y cada una
+de esas diez es una sesión que merece una
+
+312
+00:19:17.043 --> 00:19:18.954
+mirada antes de escribir un caso nuevo.
+
+313
+00:19:19.354 --> 00:19:21.604
+Y el aviso del veinticinco,
+que aquí vuelve.
+
+314
+00:19:21.644 --> 00:19:25.849
+En cuanto la batería decide si actualizas
+o no, se convierte en objetivo.
+
+315
+00:19:25.889 --> 00:19:28.819
+Si ajustas las instrucciones
+hasta que todos los casos pasan,
+
+316
+00:19:28.859 --> 00:19:32.234
+puedes acabar con un agente que
+aprueba estos casos y nada más.
+
+317
+00:19:32.274 --> 00:19:34.814
+Guarda casos que no hayas
+usado para escribir el arreglo,
+
+318
+00:19:34.854 --> 00:19:38.024
+y añade casos de fallos nuevos,
+no variantes de los mismos.
+
+319
+00:19:38.526 --> 00:19:41.210
+Y la otra cara, que
+dejamos en el veintiséis:
+
+320
+00:19:41.250 --> 00:19:45.666
+cada pieza del harness existe
+porque el modelo no hacía algo bien,
+
+321
+00:19:45.706 --> 00:19:48.956
+y de vez en cuando conviene
+apagar una y ver si empeora.
+
+322
+00:19:48.996 --> 00:19:50.769
+Hasta hoy no teníamos cómo verlo.
+
+323
+00:19:50.809 --> 00:19:54.711
+Ahora sí: apagas la puerta o la
+instrucción, ejecutas la batería,
+
+324
+00:19:54.751 --> 00:19:56.966
+y miras si algún caso se pone en rojo.
+
+325
+00:19:57.006 --> 00:19:59.686
+Si ninguno lo hace, esa
+pieza ya no hace falta.
+
+326
+00:20:00.205 --> 00:20:04.685
+Los límites. Tres repeticiones
+dan una pista, no una estadística:
+
+327
+00:20:04.725 --> 00:20:06.364
+hoy lo has visto con el arreglo.
+
+328
+00:20:06.404 --> 00:20:10.725
+El juez es un modelo y se equivoca: se
+calibra con ejemplos conocidos y se usa
+
+329
+00:20:10.765 --> 00:20:13.035
+solo donde el código no llega.
+
+330
+00:20:13.075 --> 00:20:17.378
+Las reproducciones ejecutan herramientas
+de verdad, así que no son idénticas.
+
+331
+00:20:17.418 --> 00:20:19.605
+Y la batería cuesta dinero cada vez.
+
+332
+00:20:20.211 --> 00:20:23.268
+Repasemos. Un banco pregunta si funciona;
+
+333
+00:20:23.308 --> 00:20:26.691
+los casos de regresión, si
+funciona como lo diseñaste.
+
+334
+00:20:26.731 --> 00:20:30.481
+Las sesiones guardan casi todo,
+pero no el commit ni las opciones:
+
+335
+00:20:30.521 --> 00:20:32.241
+guárdalos tú en un manifiesto.
+
+336
+00:20:32.281 --> 00:20:35.041
+Minar el archivo encuentra
+los fallos ruidosos;
+
+337
+00:20:35.081 --> 00:20:38.671
+los silenciosos aparecen cuando
+dos miradas no coinciden.
+
+338
+00:20:38.711 --> 00:20:43.601
+Y reproducir es control, otro modelo y
+arreglo, comprobando siempre qué modelo
+
+339
+00:20:43.641 --> 00:20:44.541
+respondió.
+
+340
+00:20:45.079 --> 00:20:48.811
+La práctica: busca en tus sesiones
+un fallo que te haya costado tiempo,
+
+341
+00:20:48.851 --> 00:20:50.709
+aunque no diera ningún error.
+
+342
+00:20:50.749 --> 00:20:55.279
+Escribe su caso con un manifiesto, la
+orden y al menos una comprobación de
+
+343
+00:20:55.647 --> 00:20:58.179
+código, y comprueba que
+falla con la sesión original.
+
+344
+00:20:58.219 --> 00:21:02.299
+Repítelo tres veces con el mismo modelo
+y tres con otro, y apunta si el fallo era
+
+345
+00:21:02.339 --> 00:21:04.189
+del modelo o del harness.
+
+346
+00:21:04.704 --> 00:21:07.394
+En el próximo vídeo, el último del curso:
+
+347
+00:21:07.434 --> 00:21:09.456
+agentes que trabajan sin ti.
+
+348
+00:21:09.496 --> 00:21:13.544
+oh my pi lanzado por cron o por un
+webhook, que te deja una rama y una
+
+349
+00:21:13.584 --> 00:21:17.284
+petición de cambios. Cómo
+aislarlo, dónde van las claves,
+
+350
+00:21:17.324 --> 00:21:20.272
+qué pasa con las aprobaciones
+cuando nadie puede aprobar,
+
+351
+00:21:20.312 --> 00:21:22.304
+y cuánto ha gastado mientras dormías.
+
+352
+00:21:22.344 --> 00:21:23.244
+Nos vemos allí.
