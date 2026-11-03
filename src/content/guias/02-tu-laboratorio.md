@@ -109,7 +109,7 @@ git reset --hard origin/guia-03
 
 ## Fuentes
 
-- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/empieza-aqui-laboratorio): el dev container, su `README` y el `opencode.json` con los permisos en «preguntar».
+- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/ia-desde-cero-laboratorio): el dev container, su `README` y el `opencode.json` con los permisos en «preguntar».
 - [permisos de OpenCode](https://opencode.ai/v2/docs/permissions/): qué hace OpenCode por defecto (lo permite todo salvo leer `.env`).
 - [Dev Containers](https://containers.dev/) y [GitHub Codespaces](https://docs.github.com/es/codespaces): las dos formas de abrir la caja.
 - [build.nvidia.com](https://build.nvidia.com/) y [GitHub Copilot](https://github.com/features/copilot): los proveedores para Codespaces.

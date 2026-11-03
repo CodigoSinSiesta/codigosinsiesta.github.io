@@ -108,7 +108,7 @@ npm test            # comprueba tú mismo que las pruebas pasan
 
 - [documentación de OpenCode](https://opencode.ai/v2/docs/): los agentes *build* y *plan*, Esc y `/undo`.
 - Presentaciones [IA Generativa: conceptos fundamentales](https://codigosinsiesta.com/ai-presentation/) (la fórmula: contexto, instrucción, reglas y ejemplos) y [Taller de OpenCode](https://codigosinsiesta.com/taller-opencode-presentation/) (el harness).
-- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/empieza-aqui-laboratorio): la lista de la compra y sus pruebas.
+- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/ia-desde-cero-laboratorio): la lista de la compra y sus pruebas.
 - Las dos peticiones, la mal pedida y la bien pedida, se hicieron de verdad en el laboratorio.
 
 ## Transcripción

@@ -96,5 +96,5 @@ Repite la tarea del vídeo 05 fijándote solo en las herramientas. Todo dentro d
 - [Permisos de OpenCode 2](https://opencode.ai/v2/docs/permissions/): las acciones, los efectos `allow`, `ask` y `deny`, y los valores por defecto.
 - [Agentes de OpenCode 2](https://opencode.ai/v2/docs/agents/): *build*, *plan* y los subagentes `general` y `explore`.
 - [Migrar de OpenCode 1](https://opencode.ai/v2/docs/migrate-v1/): los cambios de nombre, como `bash` a `shell` y `task` a `subagent`.
-- [Laboratorio de la ruta](https://github.com/CodigoSinSiesta/empieza-aqui-laboratorio): su `opencode.json` y la rama `guia-05`.
+- [Laboratorio de la ruta](https://github.com/CodigoSinSiesta/ia-desde-cero-laboratorio): su `opencode.json` y la rama `guia-05`.
 - [Vídeo 05 · De chat a agente: el bucle y las herramientas](/rutas/ia-desde-cero/05-el-bucle-y-las-herramientas): la tarea de esta práctica, vuelta a vuelta.
