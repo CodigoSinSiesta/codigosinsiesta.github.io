@@ -8,7 +8,7 @@ video: "02-tu-laboratorio.mp4"
 subtitulos: "/subtitulos/ia-desde-cero/02-tu-laboratorio.es.vtt"
 ---
 
-Por qué un agente sin aislar es arriesgado y cómo abrir el laboratorio, en tu ordenador o en Codespaces, comprobar que no ve tu máquina y tirarlo y volver a empezar.
+Un agente lee, cambia y ejecuta cosas en tu ordenador, y OpenCode, tal como viene, lo hace sin preguntar. Antes de la primera pregunta montamos el laboratorio: un contenedor aislado de tu máquina, en tu ordenador o en GitHub Codespaces. Comprobamos con cuatro órdenes que no ve nada tuyo, vemos qué secretos sí hay dentro en cada vía y aprendemos a tirarlo y volver a empezar.
 
 <p class="guia__nota">Dura 8 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,68 +18,94 @@ Por qué un agente sin aislar es arriesgado y cómo abrir el laboratorio, en tu 
 
 <p><button type="button" class="ir-a" data-t="18">▶ Ir a 0:18</button></p>
 
-- **Un agente:** Ahora le damos manos al modelo — Lee tus ficheros, los cambia y ejecuta comandos en tu ordenador
-- **Las llaves de tu casa**
-  - `casi siempre` · Te ordena el salón: capaz, rápido y con iniciativa
-  - `un día` · Se equivoca: y lo hace con tus llaves
-- **La regla de la ruta:** Todas las prácticas, dentro del laboratorio — Nunca en tu ordenador directamente, y nunca con código de tu empresa
+- **Agente de programación:** un programa que rodea al modelo y le deja leer tus ficheros, cambiarlos y ejecutar comandos en tu ordenador. Es como dejarle las llaves de casa a alguien muy capaz y con iniciativa que de vez en cuando se inventa cosas: casi siempre te ordena el salón, pero si un día se equivoca, lo hace con tus llaves.
+- **OpenCode, de serie, no pregunta:** ejecuta comandos, edita ficheros y sale de la carpeta del proyecto sin pedir permiso. Lo único que pregunta es antes de leer un fichero de secretos (`.env`). Su documentación lo avisa: los comandos se ejecutan con todos los permisos de tu usuario.
+- **La regla de la ruta:** todas las prácticas se hacen dentro del laboratorio. Nunca en tu ordenador directamente, y nunca con código de tu empresa.
 
 ### 2 · Una caja con su propio sistema
 
 <p><button type="button" class="ir-a" data-t="90">▶ Ir a 1:30</button></p>
 
-- **Una sola ventana**
-  - `se comparte` · La carpeta del proyecto: lo que cambie el agente lo ves también fuera
-  - `no entra` · Todo lo demás: se queda al otro lado
-- **Un usuario sin privilegios**
-  - `01` · No es administrador: ni puede llegar a serlo
-  - `02` · No instala en el sistema: ni lo deja roto para siempre
-  - `03` · Se tira y se crea otra: si algo sale mal
+- **Contenedor:** una caja con su propio sistema operativo, sus propios programas y su propio usuario. Lo que pasa dentro se queda dentro: el agente no ve tus documentos, ni tus claves, ni el resto de tu ordenador.
+- **Una sola ventana:** la carpeta del proyecto se comparte, así que lo que cambie el agente ahí lo ves también fuera. Todo lo demás se queda al otro lado.
+- **Un usuario sin privilegios:** dentro, el agente no puede hacerse administrador, ni instalar nada en el sistema, ni dejarlo en un estado sin vuelta atrás. Si algo sale mal, se tira la caja y se crea otra igual.
+- **Dos sitios para la misma caja:** en tu ordenador, si puedes instalar programas, o en una máquina de GitHub desde el navegador, lo que GitHub llama un *codespace*. Es el mismo laboratorio; cambia dónde corre y qué modelo usa el agente.
 
 ### 3 · Abrir el laboratorio en tu ordenador
 
 <p><button type="button" class="ir-a" data-t="153">▶ Ir a 2:33</button></p>
 
+- **Lo que necesitas:** Docker Desktop (el programa que crea las cajas), Visual Studio Code y su extensión Dev Containers. En Windows, Docker pide activar una vez un componente del sistema (WSL2), y para eso hacen falta permisos de administrador.
+- **Abrirlo:** clona el repositorio del laboratorio, ábrelo en VS Code y elige «Reopen in Container». La primera vez tarda un poco: descarga la imagen, crea la caja e instala OpenCode dentro.
+- **Cómo sabes que está listo:** salen dos mensajes, «Comprobado: sin sudo» (el usuario de la caja no puede hacerse administrador) y «Laboratorio listo». `opencode --version` responde con la versión que fija el laboratorio.
+- **El modelo:** en esta vía, los gratuitos de OpenCode, sin cuenta, clave ni tarjeta. Y como no hay clave, dentro de la caja no hay ningún secreto que proteger.
 
 ### 4 · Comprobar la caja
 
 <p><button type="button" class="ir-a" data-t="218">▶ Ir a 3:38</button></p>
 
-- **Comprobar la caja:** No te fíes: compruébalo — Cuatro órdenes, la primera vez que abras el laboratorio
-- **Al revés: el agente con todo aprobado**
-  - `le pedimos` · Administrador y /etc: aprobándole todo automáticamente
-  - `no pudo` · Lo frenó la caja: no el agente
+- **No te fíes: compruébalo.** Cuatro órdenes para la primera vez que abras el laboratorio (las tienes en «Código y comandos»):
+  1. `whoami` responde `node`: un usuario normal, sin privilegios.
+  2. `sudo -n true` falla: la bandera *no new privileges*, que pone el laboratorio, impide ejecutar sudo como administrador, y ningún programa de dentro de la caja puede quitarla.
+  3. `ls /Users` no encuentra la carpeta: en un Mac tus ficheros cuelgan de ella, y dentro de la caja no existe. El agente no puede leer lo que no ve.
+  4. `npm test` pasa las dos pruebas del proyecto de juguete, una lista de la compra.
+- **Al revés, con todo aprobado:** le pedimos al agente que intentara hacerse administrador y escribir en las carpetas del sistema, aprobándole todo automáticamente. No pudo. Lo que lo frenó no fue el agente, fue la caja.
 
 ### 5 · Si no puedes instalar nada: Codespaces
 
 <p><button type="button" class="ir-a" data-t="285">▶ Ir a 4:45</button></p>
 
-- **Otra opción:** Si ya tienes Copilot, también vale — Desde OpenCode te conectas a Copilot y usas sus modelos
-- **En Codespaces, dentro sí hay secretos**
-  - `secreto` · Tu clave de NVIDIA: o tu sesión de Copilot
-  - `secreto` · El permiso de GitHub: para escribir en tu repositorio
-  - `al terminar` · Borra el codespace: el agente puede leerlos
+- **Sin instalar nada:** desde la página del laboratorio en GitHub, «Use this template» y luego «Open in a codespace». Con una cuenta gratuita de GitHub tienes una cuota de horas cada mes. La caja es la misma y las comprobaciones dan lo mismo; aquí, además, ni siquiera corre en tu ordenador.
+- **Los gratuitos de OpenCode no sirven aquí:** en nuestras pruebas, desde Codespaces respondieron a la primera petición que se había alcanzado el límite gratuito. Por eso esta vía usa otro proveedor gratuito.
+- **NVIDIA, el que hemos probado:** te creas una cuenta en build.nvidia.com, verificas tu teléfono y generas una clave gratuita. La guardas en GitHub como secreto de Codespaces llamado `NVIDIA_API_KEY`: así entra en la caja como variable de entorno sin escribirla nunca en el repositorio. Dentro, eliges con `/models` el modelo `nvidia/poolside/laguna-xs-2.1` (Laguna XS 2.1), que funciona bien para programar.
+- **Si ya tienes GitHub Copilot:** en OpenCode escribes `/connect`, eliges GitHub Copilot y usas sus modelos.
+- **En esta vía sí hay secretos dentro:** tu clave de NVIDIA o tu sesión de Copilot, y el permiso que GitHub da al codespace para escribir en tu repositorio. El agente puede leerlos, así que al terminar conviene borrar el codespace.
 
 ### 6 · Tirar y volver a empezar
 
 <p><button type="button" class="ir-a" data-t="379">▶ Ir a 6:19</button></p>
 
-- **Lo más importante:** Se puede romper sin miedo — El proyecto se devuelve a como estaba; la caja se tira y se crea otra
-- **Si se estropea la caja**
-  - `en tu ordenador` · Rebuild Container: se crea de nuevo, idéntica
-  - `en Codespaces` · Borra y abre otro: desde la plantilla
+- **Se puede romper sin miedo:** si el agente deja el proyecto hecho un lío, lo devuelves a como estaba; si la caja entera se estropea, la tiras y creas otra.
+- **El proyecto:** cada guía tiene su rama en el repositorio (`guia-02`, `guia-03`…). Para dejar una guía como al principio, cambias a su rama y la devuelves al estado del repositorio con `git reset --hard` (en «Código y comandos»).
+- **La caja:** en tu ordenador, «Rebuild Container» la crea de nuevo, idéntica. En Codespaces, borras el codespace y abres otro desde la plantilla.
+- **Acostúmbrate:** no es un fracaso, es la forma normal de trabajar con agentes. Probar, ver qué pasa y, si no te gusta, volver atrás.
 
 ### 7 · Antes de la primera pregunta
 
 <p><button type="button" class="ir-a" data-t="429">▶ Ir a 7:09</button></p>
 
-- **Lo que escribes viaja al proveedor**
-  - `01` · Sale de la caja: todo lo que le escribes
-  - `02` · Unos no guardan nada: según lo que dicen
-  - `03` · Otros pueden usarlo: para mejorar sus modelos
-- **La regla, en dos partes**
-  - `01` · Todo en el laboratorio: todas las prácticas, ahí dentro
-  - `02` · Solo el proyecto de prácticas: nunca código de tu empresa, secretos ni datos personales
+- **Lo que escribes sale de la caja:** viaja al proveedor del modelo. Con los modelos gratuitos, algunos proveedores dicen que no guardan nada y otros pueden usar lo que les envías para mejorar sus modelos (en el vídeo 03 ves dónde comprobarlo).
+- **La regla, en dos partes:** todas las prácticas, en el laboratorio; y en el laboratorio, solo el proyecto de prácticas. Nunca código de tu empresa, ni secretos, ni datos personales.
+- **Práctica:** abre el laboratorio por la vía que te encaje y haz las cuatro comprobaciones: con qué usuario trabajas, que sudo falla, que no ves las carpetas de tu ordenador y que las pruebas pasan. Después, tíralo y vuelve a crearlo.
+
+**Siguiente:** [Vídeo 03 · Cómo funciona OpenCode](/rutas/ia-desde-cero/03-como-funciona-opencode)
+
+## Código y comandos
+
+Lo que aparece en las ventanas de terminal del vídeo, para copiarlo en la terminal del laboratorio.
+
+### Comprobar la caja
+
+```bash
+opencode --version   # la versión que fija el laboratorio
+whoami               # node
+sudo -n true         # falla: The "no new privileges" flag is set…
+ls /Users            # No such file or directory
+npm test             # pasan las dos pruebas (# fail 0)
+```
+
+- `sudo -n`: no pide contraseña; si no puede subir a administrador, falla al momento.
+- Lo que va detrás de `#` es lo que debería responder cada orden; no hace falta copiarlo.
+
+### Volver a empezar una guía
+
+```bash
+git checkout guia-03
+git reset --hard origin/guia-03
+```
+
+- Cambia `03` por el número de la guía.
+- `reset --hard origin/guia-03` deja la rama exactamente como en el repositorio: descarta tus cambios y tus commits locales. Aquí es lo que quieres; fuera del laboratorio, piénsalo dos veces.
 
 ## Fuentes
 

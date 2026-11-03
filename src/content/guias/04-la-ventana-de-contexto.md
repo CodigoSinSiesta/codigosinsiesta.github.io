@@ -8,7 +8,7 @@ video: "04-la-ventana-de-contexto.mp4"
 subtitulos: "/subtitulos/ia-desde-cero/04-la-ventana-de-contexto.es.vtt"
 ---
 
-Todo lo que el modelo tiene delante en cada petición, por qué no recuerda nada, por qué una sesión larga va peor y cuándo empezar otra o compactar.
+Por qué el agente «olvida», por qué una sesión larga acaba yendo peor y cuándo conviene empezar de cero. La ventana de contexto es todo lo que el modelo tiene delante al responder, y nada más. No recuerda nada entre peticiones: OpenCode le reenvía la conversación entera cada vez. Tiene un límite, pero el trabajo empeora antes de llenarla. Y para aligerarla hay dos herramientas: la sesión nueva y compactar. Lo medimos en el laboratorio.
 
 <p class="guia__nota">Dura 10 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,75 +18,83 @@ Todo lo que el modelo tiene delante en cada petición, por qué no recuerda nada
 
 <p><button type="button" class="ir-a" data-t="16">▶ Ir a 0:16</button></p>
 
-- **La ventana de contexto:** Por qué olvida, por qué empeora y cuándo empezar de cero — Todo lo que el modelo puede tener delante a la vez tiene un límite
-- **Un escritorio**
-  - `01` · El enunciado: de la tarea
-  - `02` · Un par de ficheros: abiertos a la vez
-  - `03` · Tus notas: a mano mientras trabajas
-  - *La mesa tiene un tamaño: si no cabe otro, hay que guardar alguno*
-- **La regla:** Lo que está en la mesa existe; lo que no está, no existe — Ni un cajón donde mire por su cuenta, ni una memoria aparte
-- **Si no está en el escritorio, no lo conoce**
-  - `en tu proyecto` · src/compra.js: existe en tu carpeta
-  - `en el escritorio` · No está: así que se imagina cómo es
+- **Ventana de contexto:** todo lo que el modelo tiene delante en el momento de escribir su respuesta, medido en tokens (vídeo 01). Piensa en un escritorio: caben varios documentos a la vez (el enunciado de la tarea, un par de ficheros, tus notas), pero la mesa tiene un tamaño, y si quieres abrir otro y no cabe, tienes que guardar alguno.
+- **La regla es estricta:** lo que está en la mesa existe para él; lo que no está, no existe. No hay un cajón donde mire por su cuenta ni una memoria aparte donde guarde lo de ayer.
+- **Si un fichero no está en el escritorio, no lo conoce**, por mucho que esté en tu proyecto. Y entonces se imagina cómo es: es la falta de información que, como vimos en el vídeo 01, hace que se equivoque más.
 
 ### 2 · No recuerda: se le reenvía todo
 
 <p><button type="button" class="ir-a" data-t="92">▶ Ir a 1:32</button></p>
 
-- **La idea que más sorprende:** Cada petición empieza con la mesa vacía — El modelo no guarda nada entre una petición y la siguiente
-- **Parece que recuerda:** Tu pregunta (una petición más) → OpenCode (pone toda la conversación) → El modelo (lee el expediente entero) → Responde (bien, porque lo ha leído otra vez)
-- **Una pregunta, varias peticiones:** Petición 1 (pide leer compra.js) → OpenCode (lee el fichero) → Petición 2 (con el fichero encima) → Respuesta (para ti)
-- **Dos consecuencias**
-  - `01` · Cada petición pesa más: lleva todo lo anterior
-  - `02` · Lo que no está, no lo sabe: sesión nueva: el expediente en blanco
+- **El modelo no guarda nada entre una petición y la siguiente:** cada vez que le llega una, empieza con la mesa vacía.
+- **Parece que recuerda porque OpenCode se lo reenvía todo:** en cada petición le vuelve a poner encima la conversación entera, lo que dijiste, lo que respondió y todo lo que leyó. Como un compañero sin memoria al que, antes de cada pregunta, le das el expediente desde la primera página: responde bien porque lo acaba de leer todo, pero lo ha leído otra vez.
+- **Una pregunta tuya pueden ser varias peticiones:** si le pides que lea un fichero, el modelo hace una petición para pedir la lectura, OpenCode lee el fichero y hace otra petición, con el fichero ya encima, para responderte. En cada una viaja todo.
+- **Dos consecuencias:** cuanto más larga es la conversación, más pesa cada petición, porque lleva todo lo anterior. Y lo que no esté en la conversación no lo sabe: si abres otra sesión, el expediente empieza en blanco.
 
 ### 3 · Qué hay encima de la mesa
 
 <p><button type="button" class="ir-a" data-t="173">▶ Ir a 2:53</button></p>
 
-- **1 · El manual del agente:** No lo escribes tú: lo trae OpenCode — Cómo debe trabajar y qué normas sigue · guía siete
-- **2 · La lista de herramientas**
-  - `read` · Leer un fichero: nombre + descripción
-  - `grep` · Buscar: nombre + descripción
-  - `edit` · Editar: nombre + descripción
-  - `shell` · Ejecutar un comando: nombre + descripción
-  - *Para pedir una herramienta tiene que saber que existe: la lista viaja en cada petición*
-- **3 · Las instrucciones de tu proyecto**
-  - `AGENTS.md` · Si existe, viaja: encima de la mesa en cada petición
-  - `laboratorio` · Todavía no hay: lo escribirás en la guía siete
+- **Cuatro cosas viajan en cada petición:**
+  1. **El manual del agente:** un texto largo que trae OpenCode y que le explica al modelo cómo debe trabajar y qué normas sigue (a menudo lo verás llamado *system prompt*). No lo escribes tú; se ve con calma en la guía 07.
+  2. **La lista de herramientas**, cada una con su descripción: leer un fichero, buscar, editar, ejecutar un comando. Para pedir una herramienta, el modelo tiene que saber que existe.
+  3. **Las instrucciones de tu proyecto:** si hay un fichero `AGENTS.md` (un texto con las normas de tu proyecto para el agente), OpenCode también lo pone en la mesa, en cada petición. El laboratorio todavía no tiene uno: lo escribirás en la guía 07.
+  4. **La conversación**, con tu mensaje nuevo al final. Es lo que más crece: tus mensajes, sus respuestas y, sobre todo, lo que leen las herramientas. Cada fichero que abre el agente entra y se queda; uno pequeño apenas se nota, pero uno grande, o la salida larga de un comando, ocupa mucho de golpe.
+- **Medido en el laboratorio:** en una sesión nueva le escribimos solo «hola», y al modelo le llegaron unos 5.500 tokens. Casi todo era el manual y las herramientas; el saludo, una parte diminuta. La mesa ya está ocupada cuando te sientas a trabajar.
 
 ### 4 · El límite y la mochila
 
 <p><button type="button" class="ir-a" data-t="270">▶ Ir a 4:30</button></p>
 
-- **El tamaño de la mesa:** El límite existe y depende del modelo — Sin cifras: cambian con cada versión
-- **Una mochila en la que solo se mete**
-  - `al principio` · Lo encuentras a la primera: poco dentro, todo a mano
-  - `con el tiempo` · Debajo de todo: y cargas con peso que ya no sirve
+- **El límite existe y depende del modelo:** unos admiten mucho más que otros, y las cifras cambian con cada versión. Una sesión con un agente se acerca a él antes de lo que crees, porque todo lo que lee se queda en la mesa.
+- **Más importante que el límite: el trabajo empeora antes de llegar a él.** Los estudios miden que el rendimiento de los modelos baja a medida que crece lo que les envías, aun sin llenar la ventana (en «Fuentes»). Como una mochila a la que solo se le mete: al principio encuentras lo que buscas a la primera; con el tiempo, lo que necesitas está debajo de todo y cargas con peso que ya no sirve.
+- **El ruido de una sesión larga:** ficheros que leyó y ya no importan, intentos que fallaron, caminos descartados. Todo compite por su atención con lo que importa ahora, y por eso a veces repite pasos que ya hizo, se contradice o pierde de vista lo que le pediste al principio.
+- **La lección:** más contexto no siempre es mejor. Lo que quieres es una mesa con lo que hace falta para la tarea de ahora.
 
 ### 5 · Sesión nueva o compactar
 
 <p><button type="button" class="ir-a" data-t="351">▶ Ir a 5:51</button></p>
 
-- **¿Cuándo conviene?**
-  - `01` · Cambias de tarea: lo que leyó para la anterior ya es peso
-  - `02` · La sesión se enreda: repite, se contradice o vuelve a lo descartado
-- **Lo importante, fuera de la conversación**
-  - `en un fichero` · Lo vuelve a leer: sigue en tu proyecto
-  - `solo en la sesión` · Se ha ido: la sesión nueva no lo recuerda
-- **Un resumen siempre pierde detalles**
-  - `cambia la tarea` · Sesión nueva: mesa despejada
-  - `mesa llena` · Compactar: misma tarea: te deja continuar
+- **Sesión nueva:** `/new`, o Ctrl+X y luego N. Despeja la mesa entera: el agente arranca otra vez solo con su manual, sus herramientas y las instrucciones de tu proyecto. La sesión anterior no se borra; vuelves a ella con `/sessions`.
+- **Cuándo conviene:** cada vez que cambias de tarea (lo que leyó para arreglar un fallo ya es peso cuando pasas a otra cosa) y cuando notas que la sesión se enreda: repite, se contradice o vuelve a proponer algo que ya descartaste.
+- **Lo que cuesta:** hay que volver a ponerla al día, y leerá otra vez los ficheros que necesite. Por eso, lo importante, guárdalo en ficheros del proyecto: lo que está en un fichero lo puede volver a leer; lo que solo estaba en la conversación se ha ido.
+- **Compactar:** con `/compact`, OpenCode le pide al modelo un resumen de la conversación hasta ese momento, y a partir de ahí viaja el resumen en lugar de toda la conversación. Es vaciar la mochila y quedarte con una nota de lo que llevabas. OpenCode también compacta solo, sin que se lo pidas, cuando la ventana se acerca al límite.
+- **Un resumen siempre pierde detalles:** un nombre exacto, un mensaje de error o una decisión tomada a mitad de camino pueden no sobrevivir. La regla: si cambia la tarea, sesión nueva; si sigues con la misma y la mesa está muy llena, compactar.
 
 ### 6 · Pruébalo: el pie de la pantalla
 
 <p><button type="button" class="ir-a" data-t="453">▶ Ir a 7:33</button></p>
 
-- **El pie de la pantalla:** Tokens y % de la ventana, siempre a la vista — El mismo número del que habla todo el vídeo
+- **El pie de la pantalla** enseña cuánto contexto llevas ocupado, en tokens y en porcentaje de la ventana. Es el número del que habla todo el vídeo: tenlo siempre a la vista.
+- **Lo que medimos** con el agente plan, en una sola sesión que lee ficheros uno detrás de otro (tokens que le llegan al modelo en la última llamada de cada petición):
+
+| Petición | Tokens de entrada, aproximados |
+|---|---|
+| «hola», en una sesión nueva | 5.500 |
+| + lee `src/compra.js` | 5.800 |
+| + lee las pruebas y el README | 7.350 |
+| + lee `.devcontainer/devcontainer.json` | 8.300 |
+
+- **Sube cada vez que lee algo, y no baja.** Son ficheros pequeños; con los de un proyecto real, el salto es mucho mayor. Las cifras exactas cambian con cada modelo y versión: lo que se repite es la forma.
+- **La misma pregunta, dos resultados:** «¿cómo se llama la función que suma el total de la lista?». En esa sesión responde al momento, sin abrir nada, porque el fichero sigue en la mesa (`total`, en `src/compra.js`). Tras `/new`, el pie vuelve casi al principio y tiene que buscar y leer el fichero otra vez. Si antes te pide permiso para ejecutar un comando, recházalo: no le hace falta.
+- **Práctica:** hazlo tú en el laboratorio con plan, que no edita ficheros. Abre una sesión nueva, pídele que lea ficheros uno a uno y apunta el pie después de cada petición; luego repite la pregunta en otra sesión.
+- **En resumen:** la ventana de contexto es el escritorio, todo lo que el modelo tiene delante y nada más; no recuerda, se le reenvía todo en cada petición; tiene un límite, pero el trabajo empeora antes de llenarla; y cuando la mochila pesa, sesión nueva o compactar.
+
+**Siguiente:** [Vídeo 05 · De chat a agente: el bucle y las herramientas](/rutas/ia-desde-cero/05-el-bucle-y-las-herramientas)
+
+## Código y comandos
+
+Los comandos de sesión del vídeo.
+
+| Comando | Qué hace |
+|---|---|
+| `/new` · Ctrl+X N | Empieza una sesión nueva, con la mesa despejada |
+| `/sessions` | Lista las sesiones para volver a una anterior |
+| `/compact` | Resume la conversación; desde ahí viaja el resumen |
 
 ## Fuentes
 
-- Presentaciones [Vibe coding vs software engineering](https://codigosinsiesta.com/ai-presentation/) (el escritorio) y [De agente a orquestador](https://codigosinsiesta.com/agente-a-orquestador-presentation/) (la mochila).
+- Presentaciones [IA Generativa: conceptos fundamentales](https://codigosinsiesta.com/ai-presentation/) (el escritorio) y [De agente a orquestador](https://codigosinsiesta.com/agente-a-orquestador-presentation/) (la mochila).
 - Hong, Troynikov y Huber, [*Context Rot: How Increasing Input Tokens Impacts LLM Performance*](https://www.trychroma.com/research/context-rot) (Chroma, 2025): el rendimiento baja a medida que crece la entrada, sin llegar al límite.
 - Liu et al., [*Lost in the Middle: How Language Models Use Long Contexts*](https://arxiv.org/abs/2307.03172) (2023): lo que está en medio de un contexto largo se aprovecha peor.
 - [documentación de OpenCode](https://opencode.ai/v2/docs/): sesiones, `/new`, `/sessions` y la compactación.

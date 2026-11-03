@@ -8,7 +8,7 @@ video: "01-que-es-la-ia.mp4"
 subtitulos: "/subtitulos/ia-desde-cero/01-que-es-la-ia.es.vtt"
 ---
 
-Qué es un modelo de lenguaje y qué no es: completa texto pieza a pieza (tokens), no responde siempre lo mismo y se equivoca con la misma seguridad con la que acierta.
+Antes de instalar nada, qué hay al otro lado cuando le escribes a una IA. Un modelo de lenguaje continúa tu texto pieza a pieza; esas piezas se llaman tokens, y con ellas se miden sus límites y su precio. Elige con algo de azar, así que no responde siempre lo mismo. Y se equivoca con la misma seguridad con la que acierta, sobre todo cuando le falta información. Con estas tres ideas se entiende todo lo que viene en la ruta.
 
 <p class="guia__nota">Dura 8 min. Los títulos de cada capítulo saltan a ese punto del vídeo.</p>
 
@@ -18,61 +18,41 @@ Qué es un modelo de lenguaje y qué no es: completa texto pieza a pieza (tokens
 
 <p><button type="button" class="ir-a" data-t="16">▶ Ir a 0:16</button></p>
 
-- **IA desde cero:** Antes de instalar nada, entender qué hay al otro lado — Casi todos los problemas vienen de imaginarla como algo que no es
-- **Lo que ha leído**
-  - `01` · Libros: cantidades enormes
-  - `02` · Páginas web: de todo tipo
-  - `03` · Documentación: de lenguajes y librerías
-  - `04` · Código: mucho, mucho código
-- **Y aun así:** Código sorprendentemente bueno, la mayoría de las veces — Lo que «tiene más sentido escribir» suele coincidir con una solución correcta
+- **Un modelo de lenguaje continúa tu texto.** Es como el teclado del móvil, que después de «nos vemos» te sugiere «mañana» sin saber nada de tu agenda, pero a una escala enorme: lo han entrenado con cantidades gigantescas de libros, páginas web, documentación y código, y ha aprendido qué suele venir después de qué.
+- **Pieza a pieza:** recibe lo que has escrito, calcula cuál es la siguiente pieza más adecuada, la añade al final y vuelve a empezar con ella incluida. Por eso ves la respuesta aparecer poco a poco, como si alguien la tecleara.
+- **Lo que no hace:** no busca la respuesta en una base de datos, no consulta internet (salvo que una herramienta lo haga por él, vídeo 05) y no ejecuta tu código para ver si funciona. Escribe lo que, según todo lo que ha visto, tiene más sentido escribir a continuación.
+- **Y aun así acierta mucho:** ha visto tanto que, en la mayoría de problemas habituales, lo que «tiene más sentido escribir» coincide con una solución correcta. La palabra importante es *la mayoría*.
 
 ### 2 · Las piezas se llaman tokens
 
 <p><button type="button" class="ir-a" data-t="123">▶ Ir a 2:03</button></p>
 
-- **Por qué te importa**
-  - `límite` · La ventana de contexto: todo lo que tiene delante a la vez se mide en tokens · vídeo 04
-  - `precio` · Lo que cuesta: se paga por tokens, los que envías y los que te devuelve · vídeo 08
-- **Tokens:** Piezas de texto, no palabras ni peticiones — «tantos miles de tokens» · «tanto por millón de tokens»
+- **Token:** la pieza de texto con la que trabaja el modelo. No es exactamente una palabra: las cortas y frecuentes suelen ser un token, y las largas o raras se parten en varios («programación» puede quedar en dos o tres trozos). Los signos de puntuación, los espacios y los símbolos del código también cuentan, así que una línea de código gasta más tokens de lo que parece.
+- **Cada modelo trocea a su manera:** la misma frase no mide lo mismo en todos.
+- **Por qué te importa:** con tokens se mide todo lo que el modelo puede tener delante a la vez, que tiene un límite (la *ventana de contexto*, vídeo 04). Y con tokens se paga en los modelos de pago, tanto los que envías como los que te devuelve (guía 08).
+- **Cómo leer las cifras:** «admite tantos miles de tokens» o «cuesta tanto por millón de tokens» hablan de piezas de texto, no de palabras ni de peticiones.
 
 ### 3 · Por qué no responde siempre lo mismo
 
 <p><button type="button" class="ir-a" data-t="196">▶ Ir a 3:16</button></p>
 
-- **La misma pregunta, dos veces**
-  - `1` · Una vez: resuelve la suma con un bucle
-  - `2` · Otra vez: usa una función de una librería
-- **Cómo trabajar con él:** Un intento, no un veredicto — Si algo importa, se comprueba: ejecutar el código y sus pruebas
+- **Varias candidatas en cada paso:** el modelo no tiene una única siguiente pieza posible, sino varias, cada una con su probabilidad. Después de «nos vemos», «mañana» puede ser muy probable; «luego», algo menos.
+- **Elige con un poco de azar:** casi siempre una de las más probables, pero no siempre la misma. Si eligiera siempre la primera, sonaría repetitivo y rígido. Ese grado de azar se puede ajustar, y a menudo lo verás llamado *temperatura*.
+- **Consecuencia:** la misma pregunta dos veces puede dar dos respuestas distintas. A veces cambian solo las palabras; otras, la solución entera (una vez un bucle, otra una función de una librería). Y a veces una es correcta y la otra no.
+- **La regla:** no es un fallo, es su forma de funcionar. Una respuesta del modelo es un intento, no un veredicto: si algo importa, se comprueba, y en programación se comprueba ejecutando el código y sus pruebas.
 
 ### 4 · Se equivoca con seguridad
 
 <p><button type="button" class="ir-a" data-t="271">▶ Ir a 4:31</button></p>
 
-- **La tercera idea:** El modelo no sabe cuándo no sabe
-- **El arquitecto que se inventa la normativa**
-  - `plano` · Parece impecable: escrito con total seguridad
-  - `alucinación` · Pero es falsa: suena correcta y no lo es
-- *En terminal:* Una alucinación en código (más abajo, en «Código y comandos»)
-- **Por qué pasa:** Escribe (lo que tiene sentido) → Nadie comprueba (si existe de verdad) → Sale (con total seguridad)
-- **Las dos defensas de toda la ruta**
-  - `01` · Darle información real: tus ficheros, tus versiones y tus reglas
-  - `02` · Verificar lo que hace: sin fiarte del tono con el que lo dice
+- **El modelo no sabe cuándo no sabe.** Como el arquitecto que, en lugar de decir «no lo sé», se inventa una normativa que suena razonable: el plano parece impecable hasta que llega el inspector.
+- **Alucinación:** una respuesta que suena correcta, escrita con total seguridad, y que es falsa. En código tiene formas reconocibles: una función que no existe en tu librería pero cuyo nombre encaja con las demás, una opción de un comando que nunca ha existido o un parámetro con el nombre de otra versión. Todo con el mismo tono tranquilo que cuando acierta.
+- **Por qué pasa:** escribe lo que tiene sentido escribir, y una función inventada con buen nombre tiene muchísimo sentido. Ninguna parte del modelo comprueba si existe de verdad.
+- **Fecha de corte:** un modelo aprende con textos hasta una fecha y después no se entera de nada más. Si una librería cambió después, seguirá escribiendo la versión antigua sin avisarte.
+- **Se equivoca más cuando le falta información:** si no ha visto tu proyecto, se imagina cómo es; si no conoce tu versión de la librería, supone una. Cuanto menos contexto real tiene, más rellena los huecos con lo probable.
+- **Las dos defensas de toda la ruta:** darle información real (tus ficheros, tus versiones y tus reglas) para que no tenga que imaginarla, y verificar lo que hace sin fiarte del tono con el que lo dice. Es justo lo que añade un *agente de programación* (vídeo 02): puede leer tus ficheros y ejecutar tus pruebas.
 
-### 5 · Hay muchos modelos
-
-<p><button type="button" class="ir-a" data-t="390">▶ Ir a 6:30</button></p>
-
-
-### 6 · Lo que te llevas
-
-<p><button type="button" class="ir-a" data-t="438">▶ Ir a 7:18</button></p>
-
-
-## Código y comandos
-
-Lo que aparece en las ventanas de terminal del vídeo, para copiarlo.
-
-### Una alucinación en código
+Una alucinación en código, como la del vídeo:
 
 ```text
 import { format } from 'date-fns';
@@ -81,14 +61,30 @@ format.enEspanolLargo(new Date());
 // TypeError: format.enEspanolLargo is not a function
 ```
 
-- `enEspanolLargo`: No existe: el nombre encaja con las demás, pero es inventado
-- `'date-fns'`: Una librería real: por eso suena creíble
-- `TypeError`: Te enteras al ejecutar, no al leer
+- `date-fns` es una librería real, y por eso suena creíble; `enEspanolLargo` no existe: el nombre encaja con los demás, pero es inventado.
+- Te enteras al ejecutar (el `TypeError`), no al leerlo.
+
+### 5 · Hay muchos modelos
+
+<p><button type="button" class="ir-a" data-t="390">▶ Ir a 6:30</button></p>
+
+- **No hay una sola IA:** hay muchos modelos, de muchas empresas y proyectos, y salen versiones nuevas cada pocos meses.
+- **Grandes y pequeños:** los grandes razonan mejor, se equivocan menos y resuelven tareas más largas, pero son más lentos y más caros. Los pequeños son rápidos y baratos, y se equivocan más. No hay uno mejor para todo: se elige según la tarea.
+- **En esta ruta, OpenCode:** una herramienta de código abierto que hoy ofrece modelos gratuitos, sin cuenta ni tarjeta, suficientes para aprender y seguir los ejemplos. No nombramos ninguno porque la lista de gratuitos cambia casi cada semana; en el vídeo 03 aprendes a elegirlo.
+
+### 6 · Lo que te llevas
+
+<p><button type="button" class="ir-a" data-t="438">▶ Ir a 7:18</button></p>
+
+- **Las tres ideas:** un modelo de lenguaje completa texto pieza a pieza, y esas piezas (tokens) miden sus límites y su precio; no responde siempre lo mismo, porque elige con algo de azar; y se equivoca con la misma seguridad con la que acierta, sobre todo cuando le falta información.
+- **Práctica:** si tienes a mano cualquier chat de IA, hazle la misma pregunta de programación dos veces, en dos conversaciones nuevas, y compara las respuestas. Si no lo tienes, lo harás en el laboratorio.
+
+**Siguiente:** [Vídeo 02 · Tu laboratorio: un sitio donde equivocarte](/rutas/ia-desde-cero/02-tu-laboratorio)
 
 ## Fuentes
 
 - Presentación [Coding agents](https://codigosinsiesta.com/coding-agents-presentation/): la analogía del arquitecto que se inventa la normativa.
-- Presentación [Vibe coding vs software engineering](https://codigosinsiesta.com/ai-presentation/): la ventana de contexto como un escritorio.
+- Presentación [IA Generativa: conceptos fundamentales](https://codigosinsiesta.com/ai-presentation/): la ventana de contexto como un escritorio.
 
 ## Transcripción
 
