@@ -54,6 +54,7 @@ const v22 = '22-disenar-tu-harness';
 const v23 = '23-el-repo-como-sistema-de-registro';
 const v24 = '24-verificar-de-verdad';
 const v25 = '25-bucles-grafos-y-coste';
+const v27 = '27-de-fallos-a-regresiones';
 
 const c = (guia: string, capitulo: number): RefCapitulo => ({ guia, capitulo });
 
@@ -607,5 +608,54 @@ export const GLOSARIO_PI: Termino[] = [
     definicion:
       'Una prueba que vive fuera del repositorio, con datos calculados a mano, y que ningún agente ve. Detecta lo que la verificación visible deja pasar.',
     explica: c(v25, 8),
+  },
+  {
+    termino: 'Banco de pruebas',
+    sinonimos: ['benchmark'],
+    definicion:
+      'Tareas con un resultado comprobable y un juez que el agente no ve, para contar cuántas resuelve. Responde a «¿funciona?». El orquestar.sh del vídeo 25 era un banco de una sola tarea.',
+    explica: c(v27, 2),
+  },
+  {
+    termino: 'Caso de regresión',
+    definicion:
+      'Un fallo real del agente convertido en una prueba que se vuelve a ejecutar cada vez que cambias algo: estado de partida, orden exacta y comprobaciones que fallan con lo malo y pasan con lo bueno. Responde a «¿funciona como lo diseñamos?».',
+    explica: c(v27, 5),
+    primera: c(v27, 2),
+    tambien: [c(v27, 7)],
+  },
+  {
+    termino: 'Pasó alguna vez, pasó todas',
+    sinonimos: ['pass@k', 'pass^k'],
+    definicion:
+      'Las dos cifras de repetir una tarea varias veces. «Pasó al menos una vez» mide capacidad; «pasó todas», fiabilidad. Para un agente que trabaja sin ti importa la segunda.',
+    explica: c(v27, 2),
+    tambien: [c(v27, 6)],
+  },
+  {
+    termino: 'Fallo de infraestructura',
+    definicion:
+      'Una ejecución que falla porque el proveedor no responde o falta la clave, no por el agente. Se cuenta aparte y fuera de la media.',
+    explica: c(v27, 2),
+    tambien: [c(v27, 6)],
+  },
+  {
+    termino: 'Manifiesto',
+    definicion:
+      'Lo que la sesión no guarda y deja al lado quien lanza al agente: commit de partida, orden y opciones, modelo, versión del harness y fecha. Sin él, una ejecución no se repite en las mismas condiciones.',
+    explica: c(v27, 3),
+  },
+  {
+    termino: 'Minar trazas',
+    sinonimos: ['firma'],
+    definicion:
+      'Buscar entre las sesiones grabadas las que acabaron en error, las más caras y las que chocaron con los permisos, y agruparlas por firma: herramienta, primera línea del error y modelo. Solo encuentra los fallos que hacen ruido.',
+    explica: c(v27, 4),
+  },
+  {
+    termino: 'Juez',
+    definicion:
+      'Un modelo que decide lo que un programa no puede, por ejemplo si un texto señala un problema. Se calibra antes con un ejemplo bueno y uno malo, y revisa una verificación: no la sustituye.',
+    explica: c(v27, 5),
   },
 ];
