@@ -116,7 +116,7 @@ Los atajos y comandos del vídeo, para tenerlos a mano.
 - [documentación de OpenCode](https://opencode.ai/v2/docs/): la interfaz, los agentes *build* y *plan*, las sesiones y `/undo`.
 - [permisos de OpenCode](https://opencode.ai/v2/docs/permissions/): «Allow once», «Always allow» y «Reject».
 - [modelos de OpenCode Console](https://opencode.ai/v2/docs/console/models/): qué modelos son gratuitos y qué hace cada uno con lo que le envías.
-- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/empieza-aqui-laboratorio), con los permisos en «preguntar».
+- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/ia-desde-cero-laboratorio), con los permisos en «preguntar».
 - Todas las pantallas del vídeo son capturas reales de OpenCode en el laboratorio.
 
 ## Transcripción

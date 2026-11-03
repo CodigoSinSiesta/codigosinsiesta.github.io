@@ -632,151 +632,156 @@ usarlo para mejorar sus modelos.
 Aquí solo va el proyecto de prácticas.
 
 136
-00:08:09.228 --> 00:08:13.188
+00:08:09.208 --> 00:08:13.344
 Algún día querrás usar un agente en tu
 propio código, fuera del laboratorio.
 
 137
-00:08:13.228 --> 00:08:16.568
+00:08:13.384 --> 00:08:16.988
 Antes de hacerlo, conviene llevarte
 contigo unas cuantas costumbres de esta
 
 138
-00:08:16.608 --> 00:08:17.508
+00:08:17.028 --> 00:08:17.928
 ruta.
 
 139
-00:08:18.054 --> 00:08:22.674
+00:08:18.054 --> 00:08:23.994
 La primera, los permisos. OpenCode, tal
 como viene, lo permite casi todo sin
 
 140
-00:08:22.714 --> 00:08:25.214
+00:08:24.034 --> 00:08:26.134
 preguntar. Copia la idea del laboratorio:
 
 141
-00:08:25.254 --> 00:08:29.764
+00:08:26.174 --> 00:08:30.825
 en el opencode punto json de tu
 proyecto, pon en preguntar la shell,
 
 142
-00:08:29.804 --> 00:08:33.547
-las ediciones, el acceso fuera
-del proyecto y las descargas.
+00:08:30.865 --> 00:08:35.384
+las ediciones, el acceso fuera del
+proyecto, las descargas y el código que
 
 143
-00:08:33.587 --> 00:08:35.864
-Y lee cada petición antes de aceptarla.
+00:08:35.424 --> 00:08:38.764
+ejecuta por su cuenta, lo
+que OpenCode llama execute.
 
 144
-00:08:36.314 --> 00:08:40.430
+00:08:38.804 --> 00:08:41.433
+Y lee cada petición antes de aceptarla.
+
+145
+00:08:41.882 --> 00:08:45.998
 La segunda, antes de abrir un agente
 en un repositorio que no es tuyo,
 
-145
-00:08:40.470 --> 00:08:44.306
+146
+00:08:46.038 --> 00:08:49.874
 mira su AGENTS punto md y su
 configuración de OpenCode.
 
-146
-00:08:44.346 --> 00:08:46.038
+147
+00:08:49.914 --> 00:08:51.606
 Ya sabes que se cargan solos.
 
-147
-00:08:46.078 --> 00:08:49.754
+148
+00:08:51.646 --> 00:08:55.322
 Haz un commit antes de pedir cambios
 grandes, y no tengas secretos en la
 
-148
-00:08:49.794 --> 00:08:50.944
+149
+00:08:55.362 --> 00:08:56.512
 carpeta donde trabaja.
 
-149
-00:08:51.400 --> 00:08:55.644
+150
+00:08:56.969 --> 00:09:01.213
 La tercera, cuidado con lo que
 entra en la caja sin que lo pidas.
 
-150
-00:08:55.684 --> 00:08:59.614
+151
+00:09:01.253 --> 00:09:05.183
 Visual Studio Code, por defecto, comparte
 con el contenedor tu configuración de git
 
-151
-00:08:59.654 --> 00:09:04.120
+152
+00:09:05.223 --> 00:09:09.689
 y tu agente de SSH. Mientras no lo tengas
 controlado, no abras ahí nada con claves
 
-152
-00:09:04.160 --> 00:09:05.930
+153
+00:09:09.729 --> 00:09:11.499
 que den acceso a algo importante.
 
-153
-00:09:06.448 --> 00:09:10.236
+154
+00:09:12.017 --> 00:09:15.805
 Y si quieres cerrar también la salida
 a internet, hay un paso opcional:
 
-154
-00:09:10.276 --> 00:09:14.178
+155
+00:09:15.845 --> 00:09:19.747
 un cortafuegos dentro del contenedor que
 solo deje pasar los dominios que el agente
 
-155
-00:09:14.218 --> 00:09:16.538
+156
+00:09:19.787 --> 00:09:22.107
 necesita para hablar con el modelo.
 
-156
-00:09:16.788 --> 00:09:19.568
+157
+00:09:22.357 --> 00:09:25.137
 Es lo que hace el contenedor
 de referencia de Anthropic.
 
-157
-00:09:19.608 --> 00:09:23.248
+158
+00:09:25.177 --> 00:09:28.817
 No viene en el laboratorio básico, porque
 necesita más permisos de red y complica el
 
-158
-00:09:23.288 --> 00:09:26.008
+159
+00:09:28.857 --> 00:09:31.577
 arranque. Lo dejamos en la
 guía como siguiente paso.
 
-159
-00:09:26.558 --> 00:09:28.921
+160
+00:09:32.126 --> 00:09:34.489
 Te propongo la práctica de este vídeo.
 
-160
-00:09:28.961 --> 00:09:33.638
+161
+00:09:34.529 --> 00:09:39.206
 Cambia a la rama guía cero nueve, abre
 OpenCode y pregúntale qué hace el código
 
-161
-00:09:33.678 --> 00:09:37.918
+162
+00:09:39.246 --> 00:09:43.486
 de la carpeta ajeno. Lee con
 atención cada petición de permiso.
 
-162
-00:09:37.958 --> 00:09:42.278
+163
+00:09:43.526 --> 00:09:47.846
 Después, mira git status y comprueba
 si NOTAS punto md ha cambiado.
 
-163
-00:09:42.318 --> 00:09:44.598
+164
+00:09:47.886 --> 00:09:50.166
 Repítelo con otro modelo
 gratuito y compara.
 
-164
-00:09:44.638 --> 00:09:46.659
+165
+00:09:50.206 --> 00:09:52.227
 Y al acabar, deja la rama como estaba.
 
-165
-00:09:47.059 --> 00:09:51.470
+166
+00:09:52.627 --> 00:09:57.038
 En el próximo y último vídeo juntamos
 todo lo de la ruta en una tarea completa:
 
-166
-00:09:51.510 --> 00:09:54.831
+167
+00:09:57.078 --> 00:10:00.399
 pedir bien, planificar,
 cambiar, probar y revisar.
 
-167
-00:09:54.871 --> 00:09:55.771
+168
+00:10:00.439 --> 00:10:01.339
 Nos vemos allí.

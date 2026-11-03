@@ -134,12 +134,12 @@ Los permisos del laboratorio, para llevarte a tu proyecto: piden permiso antes d
 
 En OpenCode 2 la clave es `permissions`, una lista de reglas; `effect` puede ser `allow`, `ask` o `deny`, y `edit` cubre también `write`.
 
-> **La regla de `execute` no sale en el vídeo y es importante.** Es el permiso del *Code Mode* de OpenCode, una forma de ejecutar código sin pasar por la shell. En nuestras pruebas, con la shell denegada, el agente usó esa vía para ejecutar las pruebas del proyecto. Si solo pones la shell en «preguntar», te queda esa puerta abierta. El laboratorio ya la incluye.
+> **La regla de `execute` es importante.** Es el permiso del *Code Mode* de OpenCode, una forma de ejecutar código sin pasar por la shell. En nuestras pruebas, con la shell denegada, el agente usó esa vía para ejecutar las pruebas del proyecto. Si solo pones la shell en «preguntar», te queda esa puerta abierta. El laboratorio ya la incluye.
 
 ## Fuentes
 
 - [permisos de OpenCode](https://opencode.ai/v2/docs/permissions/): lo que hace OpenCode por defecto y qué cubre cada respuesta.
-- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/empieza-aqui-laboratorio): la caja, el usuario sin privilegios y lo que no cubre.
+- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/ia-desde-cero-laboratorio): la caja, el usuario sin privilegios y lo que no cubre.
 - Simon Willison, [*The lethal trifecta for AI agents*](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/): datos privados, contenido no fiable y salida al exterior.
 - El [dev container de referencia de Claude Code](https://github.com/anthropics/claude-code/tree/main/.devcontainer), con su cortafuegos.
 - El vídeo [05 · Seguridad y aislamiento](/rutas/pi-oh-my-pi/05-seguridad-y-aislamiento) del curso de Pi, para ir más lejos.
@@ -218,7 +218,7 @@ Por eso, en Codespaces, al acabar cierras la sesión de Copilot con opencode aut
 
 Algún día querrás usar un agente en tu propio código, fuera del laboratorio. Antes de hacerlo, conviene llevarte contigo unas cuantas costumbres de esta ruta.
 
-La primera, los permisos. OpenCode, tal como viene, lo permite casi todo sin preguntar. Copia la idea del laboratorio: en el opencode punto json de tu proyecto, pon en preguntar la shell, las ediciones, el acceso fuera del proyecto y las descargas. Y lee cada petición antes de aceptarla.
+La primera, los permisos. OpenCode, tal como viene, lo permite casi todo sin preguntar. Copia la idea del laboratorio: en el opencode punto json de tu proyecto, pon en preguntar la shell, las ediciones, el acceso fuera del proyecto, las descargas y el código que ejecuta por su cuenta, lo que OpenCode llama execute. Y lee cada petición antes de aceptarla.
 
 La segunda, antes de abrir un agente en un repositorio que no es tuyo, mira su AGENTS punto md y su configuración de OpenCode. Ya sabes que se cargan solos. Haz un commit antes de pedir cambios grandes, y no tengas secretos en la carpeta donde trabaja.
 

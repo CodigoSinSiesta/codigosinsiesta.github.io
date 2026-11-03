@@ -128,4 +128,4 @@ Para ir más allá: en otra rama, borra tu `AGENTS.md`, ejecuta `/init` y compar
 - [Las instrucciones de `/init` en el código de OpenCode](https://github.com/anomalyco/opencode/blob/v2.2.5/packages/core/src/plugin/command/initialize.txt) (versión 2.2.5): qué lee antes de escribir el `AGENTS.md`.
 - [agents.md](https://agents.md): el formato `AGENTS.md`, compartido por muchos agentes.
 - Presentaciones [Agentes como compañeros de codificación](https://codigosinsiesta.com/coding-agents-presentation/) (diapositiva 04, el system prompt y los planos), [IA generativa: conceptos fundamentales](https://codigosinsiesta.com/ai-presentation/) (diapositiva 06, la fórmula) y [Agentes de codificación con OpenCode](https://codigosinsiesta.com/taller-opencode-presentation/) (`AGENTS.md`, el system prompt de tu repositorio).
-- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/empieza-aqui-laboratorio): la lista de la compra y sus pruebas.
+- El [laboratorio de la ruta](https://github.com/CodigoSinSiesta/ia-desde-cero-laboratorio): la lista de la compra y sus pruebas.

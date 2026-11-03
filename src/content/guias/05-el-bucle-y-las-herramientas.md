@@ -145,7 +145,7 @@ En la vuelta 3 también añadió `quitar` al `import` de `tests/compra.test.js`,
 ## Fuentes
 
 - [Herramientas de OpenCode](https://opencode.ai/v2/docs/tools/): `read`, `glob`, `grep`, `edit`, `write`, `shell`, `webfetch` y `subagent`.
-- [permisos de OpenCode](https://opencode.ai/v2/docs/permissions/) y el `opencode.json` del [laboratorio de la ruta](https://github.com/CodigoSinSiesta/empieza-aqui-laboratorio).
+- [permisos de OpenCode](https://opencode.ai/v2/docs/permissions/) y el `opencode.json` del [laboratorio de la ruta](https://github.com/CodigoSinSiesta/ia-desde-cero-laboratorio).
 - Presentaciones [Coding agents](https://codigosinsiesta.com/coding-agents-presentation/), [Taller de OpenCode](https://codigosinsiesta.com/taller-opencode-presentation/) y [De agente a orquestador](https://codigosinsiesta.com/agente-a-orquestador-presentation/): el bucle del agente.
 - La tarea del vídeo se ejecutó de verdad en el laboratorio; las llamadas que se ven son las reales.
 
