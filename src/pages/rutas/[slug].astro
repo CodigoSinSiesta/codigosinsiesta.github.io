@@ -61,7 +61,7 @@ const tieneContrato =
       <p class="lead" style="max-width: 42rem;">{ruta.descripcion}</p>
       {ruta.paraQuien && <p class="meta" style="max-width: 42rem;">Para ti si: {ruta.paraQuien}</p>}
       {
-        (ruta.glosario || rutaCorta) && (
+        (ruta.glosario || rutaCorta || ruta.materiales) && (
           <ul class="ruta-atajos">
             {rutaCorta && ruta.rutaCorta && (
               <li>
@@ -73,6 +73,13 @@ const tieneContrato =
               <li>
                 <a href={ruta.glosario}>Glosario del curso</a>
                 <span class="meta"> · cada término, con el vídeo y el minuto donde se explica</span>
+              </li>
+            )}
+            {ruta.materiales && (
+              <li>
+                <a href={ruta.materiales.problemas}>¿Algo no funciona? Problemas frecuentes</a>
+                <span class="meta"> · lo que ves, qué significa y cómo se arregla · </span>
+                <a href={ruta.materiales.preguntas}>pregunta tu duda</a>
               </li>
             )}
           </ul>

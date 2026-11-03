@@ -61,6 +61,7 @@ export interface Ruta {
   // Páginas de apoyo que se enlazan desde la portada de la ruta.
   glosario?: string; // href del glosario del curso
   rutaCorta?: RutaCorta; // selección para quien tiene poco tiempo
+  materiales?: { problemas: string; preguntas: string }; // problemas frecuentes y dudas, en el repo de materiales
   // Las rutas con guías propias (colección `guias`) dejan pasos vacío:
   // la página los genera desde la colección.
   pasos: Paso[];
@@ -220,6 +221,10 @@ export const RUTAS: Ruta[] = [
     ],
     glosario: '/rutas/pi-oh-my-pi/glosario',
     rutaCorta: RUTA_CORTA_PI,
+    materiales: {
+      problemas: 'https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/PROBLEMAS.md',
+      preguntas: 'https://github.com/CodigoSinSiesta/curso-pi-materiales/issues/new/choose',
+    },
     pasos: [],
   },
 ];
