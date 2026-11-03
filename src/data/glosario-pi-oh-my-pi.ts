@@ -54,6 +54,8 @@ const v22 = '22-disenar-tu-harness';
 const v23 = '23-el-repo-como-sistema-de-registro';
 const v24 = '24-verificar-de-verdad';
 const v25 = '25-bucles-grafos-y-coste';
+const v27 = '27-de-fallos-a-regresiones';
+const v28 = '28-agentes-que-trabajan-sin-ti';
 
 const c = (guia: string, capitulo: number): RefCapitulo => ({ guia, capitulo });
 
@@ -607,5 +609,109 @@ export const GLOSARIO_PI: Termino[] = [
     definicion:
       'Una prueba que vive fuera del repositorio, con datos calculados a mano, y que ningún agente ve. Detecta lo que la verificación visible deja pasar.',
     explica: c(v25, 8),
+  },
+  {
+    termino: 'Banco de pruebas',
+    sinonimos: ['benchmark'],
+    definicion:
+      'Tareas con un resultado comprobable y un juez que el agente no ve, para contar cuántas resuelve. Responde a «¿funciona?». El orquestar.sh del vídeo 25 era un banco de una sola tarea.',
+    explica: c(v27, 2),
+  },
+  {
+    termino: 'Caso de regresión',
+    definicion:
+      'Un fallo real del agente convertido en una prueba que se vuelve a ejecutar cada vez que cambias algo: estado de partida, orden exacta y comprobaciones que fallan con lo malo y pasan con lo bueno. Responde a «¿funciona como lo diseñamos?».',
+    explica: c(v27, 5),
+    primera: c(v27, 2),
+    tambien: [c(v27, 7)],
+  },
+  {
+    termino: 'Pasó alguna vez, pasó todas',
+    sinonimos: ['pass@k', 'pass^k'],
+    definicion:
+      'Las dos cifras de repetir una tarea varias veces. «Pasó al menos una vez» mide capacidad; «pasó todas», fiabilidad. Para un agente que trabaja sin ti importa la segunda.',
+    explica: c(v27, 2),
+    tambien: [c(v27, 6)],
+  },
+  {
+    termino: 'Fallo de infraestructura',
+    definicion:
+      'Una ejecución que falla porque el proveedor no responde o falta la clave, no por el agente. Se cuenta aparte y fuera de la media.',
+    explica: c(v27, 2),
+    tambien: [c(v27, 6)],
+  },
+  {
+    termino: 'Manifiesto',
+    definicion:
+      'Lo que la sesión no guarda y deja al lado quien lanza al agente: commit de partida, orden y opciones, modelo, versión del harness y fecha. Sin él, una ejecución no se repite en las mismas condiciones.',
+    explica: c(v27, 3),
+  },
+  {
+    termino: 'Minar trazas',
+    sinonimos: ['firma'],
+    definicion:
+      'Buscar entre las sesiones grabadas las que acabaron en error, las más caras y las que chocaron con los permisos, y agruparlas por firma: herramienta, primera línea del error y modelo. Solo encuentra los fallos que hacen ruido.',
+    explica: c(v27, 4),
+  },
+  {
+    termino: 'Juez',
+    definicion:
+      'Un modelo que decide lo que un programa no puede, por ejemplo si un texto señala un problema. Se calibra antes con un ejemplo bueno y uno malo, y revisa una verificación: no la sustituye.',
+    explica: c(v27, 5),
+  },
+  {
+    termino: 'Encargo desatendido',
+    definicion:
+      'Un agente que trabaja sin nadie delante y deja una rama y una petición de cambios. Tiene seis piezas: disparador, lanzador, agente aislado y con límites, juez, entrega y registro.',
+    explica: c(v28, 2),
+    primera: c(v28, 1),
+    tambien: [c(v28, 8)],
+  },
+  {
+    termino: 'Lanzador',
+    definicion:
+      'El script tuyo que valida el encargo, prepara un worktree, arranca al agente con sus topes, lo juzga desde fuera y entrega la rama. El agente nunca entrega su propio trabajo.',
+    explica: c(v28, 2),
+    tambien: [c(v28, 6)],
+  },
+  {
+    termino: 'Webhook',
+    definicion:
+      'Una dirección a la que otro sistema manda una petición para disparar algo. El del curso exige un token, solo acepta un identificador de ticket (nunca texto libre), contesta enseguida y lanza el trabajo en segundo plano.',
+    explica: c(v28, 3),
+    tambien: [c(v28, 7)],
+  },
+  {
+    termino: 'Idempotencia',
+    definicion:
+      'Que repetir la misma petición no repita el trabajo. Si el ticket ya tiene una rama del robot, el webhook contesta conflicto en lugar de lanzar otro encargo pagado.',
+    explica: c(v28, 3),
+    tambien: [c(v28, 7)],
+  },
+  {
+    termino: 'Lista blanca',
+    sinonimos: ['allowlist'],
+    definicion:
+      'Solo se permite lo que está en la lista; lo demás se rechaza. En el perfil robot, unos pocos patrones de bash (pruebas, verificación y git que lee o commitea). Lo contrario de una lista negra, que solo prohíbe lo que nombra.',
+    explica: c(v28, 4),
+  },
+  {
+    termino: 'Carpeta restringida',
+    definicion:
+      'Una carpeta de tools.restrictedFolders en oh my pi: cualquier acción dentro pide permiso en cualquier modo, y sin interfaz se rechaza. Para bash cuenta dónde se ejecuta la orden, no los ficheros que nombra.',
+    explica: c(v28, 4),
+  },
+  {
+    termino: 'Tope de coste',
+    sinonimos: ['--max-cost'],
+    definicion:
+      'Un límite de gasto que actúa solo. En oh my pi, --max-cost para la sesión al pasarlo (sale con 3); se comprueba al terminar cada respuesta, así que la última se paga entera. En Pi, una extensión como tope.ts.',
+    explica: c(v28, 6),
+  },
+  {
+    termino: 'Coste por entrega útil',
+    definicion:
+      'Lo que cuesta cada rama que pasa el juez, contando las ejecuciones que no entregaron nada. Si solo una de cada tres pasa, cada entrega cuesta tres.',
+    explica: c(v28, 6),
   },
 ];

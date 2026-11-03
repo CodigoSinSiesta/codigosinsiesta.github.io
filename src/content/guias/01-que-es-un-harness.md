@@ -100,7 +100,8 @@ La taxonomía viene del curso abierto Learn Harness Engineering. Se usa porque e
 - **Marco común:** 01 · Qué es un harness de agente (este vídeo).
 - **Pi a fondo (9 vídeos):** 02 · Instalar Pi y primera tarea · 03 · Pi por dentro · 04 · Modelos y proveedores · 05 · Seguridad y aislamiento · 06 · Personalizar Pi sin código · 07 · MCP y codemode · 08 · Extensiones I · 09 · Extensiones II · 10 · Pi programático.
 - **oh my pi (11 vídeos):** 11 · De Pi a oh my pi · 12 · La TUI y las sesiones · 13 · Contexto y memoria · 14 · Modelos, roles y razonamiento · 15 · Planificar y dirigir · 16 · Subagentes · 17 · El IDE integrado · 18 · Git, calidad y entrega · 19 · Aprobaciones, reglas y hooks · 20 · Extender oh my pi · 21 · oh my pi en equipo.
-- **Diseñar tu harness (5 vídeos):** 22 · Diseñar tu harness · 23 · El repo como sistema de registro · 24 · Verificar de verdad · 25 · El coste de orquestar · 26 · Proyecto final (en preparación).
+- **Diseñar tu harness (5 vídeos):** 22 · Diseñar tu harness · 23 · El repo como sistema de registro · 24 · Verificar de verdad · 25 · El coste de orquestar · 26 · Proyecto final.
+- **Operarlo (2 vídeos):** 27 · De fallos a regresiones · 28 · Agentes que trabajan sin ti.
 - **Práctica:** elige una tarea que hayas hecho con un agente y analízala con las cinco piezas. Apunta qué pieza mejorarías primero.
 
 ## Código y comandos
@@ -319,13 +320,13 @@ Y una advertencia: el harness se degrada como el código. Las instrucciones se q
 
 **7 · El mapa del curso**
 
-Con este vocabulario ya podemos recorrer el curso. Son veintiséis vídeos en cuatro bloques. Este es el primero, el marco común.
+Con este vocabulario ya podemos recorrer el curso. Son veintiocho vídeos en cinco bloques. Este es el primero, el marco común.
 
 El bloque de Pi tiene nueve vídeos. Empezamos instalando Pi y haciendo una primera tarea, vemos cómo funciona por dentro, cómo elegir modelos y proveedores, y cómo trabajar con seguridad. Después aprendemos a personalizarlo sin código, conocemos MCP y codemode, dos de sus piezas más recientes, escribimos extensiones propias y lo usamos desde scripts.
 
 El bloque de oh my pi tiene once vídeos: qué cambia respecto a Pi, la interfaz y las sesiones, el contexto y la memoria, los modelos y roles, la planificación, los subagentes, el entorno de desarrollo integrado, git y calidad, las aprobaciones y reglas, cómo extenderlo y cómo usarlo en equipo.
 
-El último bloque, de cinco vídeos, es de método: cómo diseñar tu propio harness, cómo convertir el repositorio en el sistema de registro, cómo verificar de verdad, cuándo compensa orquestar varios agentes, y un proyecto final de principio a fin.
+El bloque de método tiene cinco vídeos: cómo diseñar tu propio harness, cómo convertir el repositorio en el sistema de registro, cómo verificar de verdad, cuándo compensa orquestar varios agentes, y un proyecto final de principio a fin. Y el último bloque, de dos vídeos, es operarlo: convertir los fallos del agente en pruebas, y dejarlo trabajando sin ti.
 
 Antes del siguiente vídeo, una práctica breve. Elige una tarea que hayas hecho con un agente, cualquiera, y analízala con las cinco piezas. ¿Qué instrucciones tenía? ¿Qué herramientas usó? ¿Dónde se ejecutó? ¿Qué recordaba y qué olvidó? ¿Cómo supiste que había terminado? Apunta qué pieza mejorarías primero.
 

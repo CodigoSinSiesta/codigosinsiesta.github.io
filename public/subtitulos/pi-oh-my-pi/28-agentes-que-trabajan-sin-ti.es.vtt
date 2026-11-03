@@ -1,0 +1,1470 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.270 --> 00:00:14.110
+Código Sin Siesta. Curso de Pi y oh my pi.
+
+2
+00:00:14.150 --> 00:00:17.271
+Vídeo veintiocho: agentes
+que trabajan sin ti.
+
+3
+00:00:22.571 --> 00:00:26.409
+Último vídeo del curso. Hasta ahora,
+cada vez que un agente trabajaba,
+
+4
+00:00:26.449 --> 00:00:30.241
+había alguien mirando. Incluso en los
+scripts de los vídeos diez y veintiuno,
+
+5
+00:00:30.281 --> 00:00:34.620
+que llevaban Pi y oh my pi a la
+integración continua, el agente solo leía:
+
+6
+00:00:34.660 --> 00:00:37.085
+revisaba una rama y escribía un informe.
+
+7
+00:00:37.125 --> 00:00:40.802
+Hoy damos el paso que queda: un agente
+que escribe código sin nadie delante,
+
+8
+00:00:40.842 --> 00:00:43.731
+y que al terminar te deja una
+rama y una petición de cambios.
+
+9
+00:00:44.559 --> 00:00:48.474
+El curso de Decoding AI, el del vídeo
+anterior, le dedica una lección.
+
+10
+00:00:48.514 --> 00:00:51.873
+Su agente tiene un núcleo sin interfaz
+que se lanza desde la línea de comandos,
+
+11
+00:00:51.913 --> 00:00:56.079
+desde un webhook o con un cron, y que
+devuelve su trabajo como una rama.
+
+12
+00:00:56.119 --> 00:00:59.838
+La idea de fondo: que el agente siga
+trabajando cuando cierras el portátil.
+
+13
+00:01:00.278 --> 00:01:04.258
+Nosotros lo montamos en local, con la
+tienda, porque el curso tiene una regla:
+
+14
+00:01:04.298 --> 00:01:07.068
+no publicamos nada ni enseñamos cuentas.
+
+15
+00:01:07.108 --> 00:01:10.494
+Las piezas son las mismas que en la nube,
+y lo que importa no es dónde corre el
+
+16
+00:01:10.534 --> 00:01:12.918
+agente, sino lo que
+cambia cuando nadie mira.
+
+17
+00:01:13.534 --> 00:01:18.174
+Cambian cuatro cosas. Nadie puede aprobar
+nada, así que lo que pediría permiso tiene
+
+18
+00:01:18.214 --> 00:01:23.214
+que estar decidido antes. Nadie ve el
+coste, así que hace falta un tope que no
+
+19
+00:01:23.254 --> 00:01:29.054
+dependa de ti. Nadie vigila lo que entra,
+así que el disparador es una superficie de
+
+20
+00:01:29.295 --> 00:01:33.054
+ataque. Y nadie lee la salida en el
+momento, así que cada ejecución tiene que
+
+21
+00:01:33.094 --> 00:01:34.844
+dejar evidencia para después.
+
+22
+00:01:35.357 --> 00:01:38.648
+El plan. La anatomía de
+un encargo desatendido.
+
+23
+00:01:38.688 --> 00:01:43.077
+Tres formas de dispararlo. Las
+aprobaciones cuando nadie puede aprobar.
+
+24
+00:01:43.117 --> 00:01:44.977
+El aislamiento y las claves.
+
+25
+00:01:45.017 --> 00:01:49.117
+El coste. Y una ejecución de punta a
+punta, del webhook a la petición de
+
+26
+00:01:49.157 --> 00:01:52.703
+cambios, con lo que se lee por
+la mañana y su versión en GitHub.
+
+27
+00:01:57.963 --> 00:02:00.923
+Un encargo desatendido
+tiene seis piezas en fila.
+
+28
+00:02:00.963 --> 00:02:03.063
+Un disparador, que dice qué hacer.
+
+29
+00:02:03.103 --> 00:02:05.163
+Un lanzador, que prepara el sitio.
+
+30
+00:02:05.203 --> 00:02:07.803
+El agente, aislado y con límites.
+
+31
+00:02:07.843 --> 00:02:10.223
+Un juez, que decide si el trabajo vale.
+
+32
+00:02:10.263 --> 00:02:12.683
+Una entrega, que lo hace
+llegar a una persona.
+
+33
+00:02:12.723 --> 00:02:15.043
+Y un registro, que cuenta qué pasó.
+
+34
+00:02:15.083 --> 00:02:19.446
+Si falta una, no tienes un
+encargo: tienes un agente suelto.
+
+35
+00:02:20.443 --> 00:02:23.323
+El trabajo de hoy es el que
+dejamos pendiente en el veintiséis:
+
+36
+00:02:23.363 --> 00:02:25.475
+el cupón con el importe sin definir.
+
+37
+00:02:25.515 --> 00:02:29.470
+Damos por fusionada aquella petición
+de cambios, y en una rama nueva,
+
+38
+00:02:29.510 --> 00:02:32.770
+robot, lo convertimos en el ticket
+cero cero seis, con su rúbrica,
+
+39
+00:02:32.810 --> 00:02:36.889
+su prueba de aceptación y su etiqueta,
+escritas antes, como desde el
+
+40
+00:02:36.929 --> 00:02:40.275
+veinticuatro. Y una prueba
+oculta fuera de la tienda.
+
+41
+00:02:40.315 --> 00:02:44.445
+Verificar punto sh sale con uno: el
+importe sin definir devuelve NaN.
+
+42
+00:02:44.981 --> 00:02:49.063
+La pieza que más importa es el
+lanzador, y no es el agente:
+
+43
+00:02:49.103 --> 00:02:52.049
+es un script tuyo, lanzar punto sh.
+
+44
+00:02:52.089 --> 00:02:55.591
+Recibe el identificador de un
+ticket, nunca un texto libre.
+
+45
+00:02:55.631 --> 00:02:59.542
+Comprueba que existe y que está sin
+empezar, que no hay otro encargo en marcha
+
+46
+00:02:59.582 --> 00:03:03.540
+y que queda presupuesto. Crea
+un worktree desde la rama robot,
+
+47
+00:03:03.580 --> 00:03:07.791
+con una rama nueva para el trabajo, y
+escribe el manifiesto del vídeo anterior.
+
+48
+00:03:07.831 --> 00:03:12.301
+Y solo entonces arranca oh my pi, con
+la puerta del veinticuatro y sus topes.
+
+49
+00:03:13.032 --> 00:03:17.792
+El agente arranca con un perfil propio,
+robot, separado del perfil demo.
+
+50
+00:03:17.832 --> 00:03:21.292
+Un perfil de oh my pi tiene su
+configuración, sus sesiones y sus
+
+51
+00:03:21.332 --> 00:03:25.782
+estadísticas. Así, lo que el robot puede
+hacer está escrito en un sitio que solo
+
+52
+00:03:25.822 --> 00:03:28.312
+usa él, y lo que gasta se cuenta aparte.
+
+53
+00:03:28.352 --> 00:03:31.391
+El curso de Decoding AI hace
+lo mismo con cada despliegue:
+
+54
+00:03:31.431 --> 00:03:35.332
+una configuración propia y completa,
+sin heredar nada del portátil.
+
+55
+00:03:35.875 --> 00:03:39.565
+Cuando oh my pi termina,
+el juez no es el agente.
+
+56
+00:03:39.605 --> 00:03:42.475
+El lanzador comprueba que no
+ha quedado nada sin commitear,
+
+57
+00:03:42.515 --> 00:03:47.195
+ejecuta verificar punto sh desde la
+etiqueta de la rúbrica y la prueba oculta,
+
+58
+00:03:47.235 --> 00:03:50.282
+como en el veinticinco.
+Si todo pasa, entrega.
+
+59
+00:03:50.322 --> 00:03:54.055
+Si no, la rama se queda en local,
+con un informe que dice por qué.
+
+60
+00:03:54.305 --> 00:03:57.855
+Un robot que entrega trabajo sin verificar
+solo traslada el problema a quien revisa.
+
+61
+00:03:59.057 --> 00:04:01.621
+La entrega la hace el
+lanzador, no el agente.
+
+62
+00:04:01.661 --> 00:04:05.171
+El script sube la rama al repositorio
+de revisión del veintiséis y escribe la
+
+63
+00:04:05.211 --> 00:04:07.637
+petición con git request pull.
+
+64
+00:04:07.677 --> 00:04:11.381
+En el curso de Decoding AI es igual:
+el trabajo vuelve como una rama,
+
+65
+00:04:11.421 --> 00:04:13.948
+y quien la sube es el anfitrión.
+
+66
+00:04:14.230 --> 00:04:18.061
+Y el registro: un informe en JSON
+por ejecución, con quién lo disparó,
+
+67
+00:04:18.101 --> 00:04:21.511
+cuánto tardó, cuánto costó, qué
+dijo el juez y si se entregó.
+
+68
+00:04:21.551 --> 00:04:24.191
+A la mañana siguiente no
+hay que adivinar nada.
+
+69
+00:04:29.647 --> 00:04:36.047
+El primer disparador eres tú, a mano:
+lanzar punto sh, ticket cero cero seis.
+
+70
+00:04:36.087 --> 00:04:39.287
+Parece poco, pero es la prueba
+de que todo lo demás funciona.
+
+71
+00:04:39.327 --> 00:04:41.827
+Si a mano no sale bien, por cron tampoco.
+
+72
+00:04:41.867 --> 00:04:46.027
+Y los otros dos se limitan a llamar a este
+mismo script, con otro nombre en el campo
+
+73
+00:04:46.067 --> 00:04:47.167
+de quién lo disparó.
+
+74
+00:04:48.312 --> 00:04:53.286
+El segundo, el reloj. Una línea de
+cron, o en macOS un fichero de launchd,
+
+75
+00:04:53.326 --> 00:04:57.547
+que ejecuta el lanzador cada noche, y
+antes la batería de regresiones del vídeo
+
+76
+00:04:57.587 --> 00:05:01.157
+anterior: si se pone en
+rojo, el robot no sale.
+
+77
+00:05:01.197 --> 00:05:03.687
+No los instalamos: los enseñamos.
+
+78
+00:05:03.727 --> 00:05:04.957
+Tres avisos.
+
+79
+00:05:05.837 --> 00:05:10.677
+Cron no carga tu perfil de shell, así que
+la clave y las rutas las pone la propia
+
+80
+00:05:10.962 --> 00:05:13.597
+línea. Si el ordenador
+duerme, cron no ejecuta nada;
+
+81
+00:05:13.637 --> 00:05:15.448
+launchd lo lanza al despertar.
+
+82
+00:05:15.488 --> 00:05:18.487
+Y cada línea multiplica
+el gasto por cada día.
+
+83
+00:05:18.975 --> 00:05:23.528
+El tercero, un webhook: una dirección a
+la que otro sistema manda una petición,
+
+84
+00:05:23.568 --> 00:05:27.055
+por ejemplo tu gestor de incidencias
+cuando alguien etiqueta un ticket.
+
+85
+00:05:27.095 --> 00:05:31.532
+Nuestro receptor, webhook punto mjs, es
+un fichero de Node sin dependencias que
+
+86
+00:05:31.572 --> 00:05:35.705
+escucha solo en tu máquina. Comprueba
+la petición, contesta enseguida con un
+
+87
+00:05:35.745 --> 00:05:38.678
+identificador y lanza el
+trabajo en segundo plano.
+
+88
+00:05:38.718 --> 00:05:41.695
+Una petición web no debe
+quedarse abierta diez minutos.
+
+89
+00:05:42.426 --> 00:05:44.637
+Y lo comprueba todo antes de lanzar nada.
+
+90
+00:05:44.677 --> 00:05:47.776
+Exige un token en la cabecera,
+comparado en tiempo constante;
+
+91
+00:05:47.816 --> 00:05:49.976
+sin él, contesta no autorizado.
+
+92
+00:05:50.016 --> 00:05:54.016
+El curso de Decoding AI lo explica con
+una imagen que vale la pena recordar:
+
+93
+00:05:54.056 --> 00:05:58.044
+una dirección sin autenticación es un
+botón público para gastar tus tokens.
+
+94
+00:05:58.084 --> 00:06:02.230
+Después valida el cuerpo: solo acepta
+un identificador con forma de ticket.
+
+95
+00:06:02.270 --> 00:06:05.186
+Cualquier otra cosa es una petición
+incorrecta, y no se lanza nada.
+
+96
+00:06:05.953 --> 00:06:08.913
+Fíjate en lo que no acepta: texto libre.
+
+97
+00:06:08.953 --> 00:06:12.163
+El webhook no le pasa al agente
+lo que venga en la petición.
+
+98
+00:06:12.203 --> 00:06:16.623
+Le pasa un identificador, y el encargo
+sale de funcionalidades punto json,
+
+99
+00:06:16.663 --> 00:06:19.939
+que escribimos nosotros. Si
+aceptara el texto de una incidencia,
+
+100
+00:06:19.979 --> 00:06:23.733
+cualquiera que pueda abrir una incidencia
+le daría instrucciones a un agente con
+
+101
+00:06:23.773 --> 00:06:28.103
+acceso a tu código. Es el repositorio
+como superficie de ataque,
+
+102
+00:06:28.143 --> 00:06:30.923
+del vídeo cinco, con la
+puerta abierta a la red.
+
+103
+00:06:31.555 --> 00:06:33.745
+Y dos protecciones contra la repetición.
+
+104
+00:06:33.785 --> 00:06:38.272
+Un cerrojo: si ya hay un encargo en
+marcha, el siguiente recibe ocupado.
+
+105
+00:06:38.312 --> 00:06:42.183
+Y la idempotencia: si ese ticket
+ya tiene una rama del robot,
+
+106
+00:06:42.223 --> 00:06:45.955
+o no está sin empezar, la
+respuesta es conflicto.
+
+107
+00:06:45.995 --> 00:06:49.825
+Un webhook se puede reenviar por error, y
+un gestor de incidencias puede avisar dos
+
+108
+00:06:49.865 --> 00:06:53.315
+veces. Cada repetición
+sería otro encargo pagado.
+
+109
+00:06:58.657 --> 00:07:02.397
+En el diecinueve vimos que en oh my pi,
+sin interfaz, lo que pide aprobación
+
+110
+00:07:02.437 --> 00:07:05.034
+falla, y en el veintiuno
+lo usamos como red.
+
+111
+00:07:05.074 --> 00:07:07.788
+Pero el robot tiene que
+editar y ejecutar pruebas.
+
+112
+00:07:07.828 --> 00:07:12.057
+Si todo pide permiso, no hace nada;
+si nada lo pide, hace cualquier cosa.
+
+113
+00:07:12.097 --> 00:07:15.537
+La respuesta está en medio, y tiene
+que estar escrita antes de lanzarlo.
+
+114
+00:07:16.018 --> 00:07:20.288
+El perfil robot usa el modo
+write: lee y edita sin preguntar,
+
+115
+00:07:20.328 --> 00:07:24.508
+y lo que ejecuta código pide permiso,
+que sin interfaz significa rechazo.
+
+116
+00:07:24.548 --> 00:07:27.218
+Encima, patrones de bash
+como los del diecinueve.
+
+117
+00:07:27.258 --> 00:07:31.741
+Permitidos: init punto sh, npm
+test, node guion guion test,
+
+118
+00:07:31.781 --> 00:07:36.347
+verificar punto sh y los comandos
+de git que leen o commitean.
+
+119
+00:07:36.387 --> 00:07:41.748
+Denegados: git push, curl,
+wget, npm install y npx.
+
+120
+00:07:41.788 --> 00:07:46.378
+Todo lo demás, rechazado. Es una
+lista blanca, no una lista negra.
+
+121
+00:07:46.812 --> 00:07:49.942
+Tres ajustes más. Las órdenes compuestas:
+
+122
+00:07:49.982 --> 00:07:55.402
+con un ajuste del perfil, npm test y git
+status unidos con dos ampersand pasan si
+
+123
+00:07:55.442 --> 00:07:58.652
+pasan los dos trozos. Las
+carpetas restringidas:
+
+124
+00:07:58.692 --> 00:08:02.752
+la de las pruebas ocultas, la de
+tus claves y la del propio perfil;
+
+125
+00:08:02.792 --> 00:08:05.792
+cualquier acción dentro pide
+permiso, en cualquier modo.
+
+126
+00:08:05.869 --> 00:08:10.102
+Y eval, denegado: también ejecuta código,
+y los patrones de bash no le afectan.
+
+127
+00:08:10.914 --> 00:08:14.366
+Lo probamos con una orden directa
+al perfil robot, sin interfaz.
+
+128
+00:08:14.406 --> 00:08:17.719
+Npm test y git status, juntos: pasan.
+
+129
+00:08:17.759 --> 00:08:21.179
+Git push al repositorio de
+revisión: bloqueado por el patrón.
+
+130
+00:08:21.219 --> 00:08:25.113
+Cat de la prueba oculta: rechazado,
+porque cat no está en la lista.
+
+131
+00:08:25.153 --> 00:08:29.512
+Y leer ese fichero con read:
+rechazado, carpeta restringida.
+
+132
+00:08:29.552 --> 00:08:33.504
+Ojo con la letra pequeña: para bash, la
+carpeta restringida se mira por el sitio
+
+133
+00:08:33.544 --> 00:08:36.341
+donde se ejecuta, no por
+los ficheros que nombra.
+
+134
+00:08:36.381 --> 00:08:38.074
+Lo que paró al cat fue la lista.
+
+135
+00:08:38.546 --> 00:08:41.286
+Y un tropiezo que nos
+enseñó más que la teoría.
+
+136
+00:08:41.326 --> 00:08:44.446
+En el primer ensayo, el
+robot no pudo ejecutar nada.
+
+137
+00:08:44.486 --> 00:08:50.906
+La rutina de AGENTS punto md empieza con
+init punto sh, y no estaba en la lista.
+
+138
+00:08:50.946 --> 00:08:53.536
+Intentó también eval
+y lanzar un subagente:
+
+139
+00:08:53.576 --> 00:08:57.529
+rechazados. Editó el código, pero
+no pudo verificar ni hacer commit,
+
+140
+00:08:57.569 --> 00:09:01.735
+y el juez no entregó nada.
+El arreglo fueron dos líneas:
+
+141
+00:09:01.775 --> 00:09:06.253
+init punto sh en la lista, y en la
+orden, qué puede ejecutar y qué no.
+
+142
+00:09:06.673 --> 00:09:09.113
+Entonces, ¿dónde está
+la aprobación de verdad?
+
+143
+00:09:09.153 --> 00:09:11.920
+Se ha movido. Ya no es un
+diálogo por cada orden:
+
+144
+00:09:11.960 --> 00:09:16.993
+es la petición de cambios. El robot
+propone, el juez descarta lo que no pasa,
+
+145
+00:09:17.033 --> 00:09:19.233
+y una persona decide si fusiona.
+
+146
+00:09:19.273 --> 00:09:22.673
+Si el agente necesita una decisión
+que no puede tomar, no pregunta:
+
+147
+00:09:22.713 --> 00:09:25.553
+la escribe en el traspaso
+del veintitrés y para.
+
+148
+00:09:25.593 --> 00:09:29.133
+Una pregunta sin respuesta a las tres
+de la mañana es una sesión colgada.
+
+149
+00:09:34.466 --> 00:09:37.006
+Ahora la frase que más
+se repite en el curso:
+
+150
+00:09:37.046 --> 00:09:41.886
+aprobar no es aislar. Los patrones
+deciden qué órdenes se ejecutan;
+
+151
+00:09:41.926 --> 00:09:44.732
+no deciden qué puede
+hacer una orden permitida.
+
+152
+00:09:44.772 --> 00:09:49.206
+Npm test ejecuta el código de las pruebas,
+y ese código lo acaba de escribir el
+
+153
+00:09:49.246 --> 00:09:52.921
+agente. Si escribe una prueba
+que lee tus claves y las imprime,
+
+154
+00:09:52.961 --> 00:09:54.986
+npm test sigue estando permitido.
+
+155
+00:09:55.820 --> 00:09:59.080
+El worktree tampoco aísla: es
+otra carpeta del mismo disco,
+
+156
+00:09:59.120 --> 00:10:03.230
+con tu usuario. Lo que aísla es
+una frontera del sistema operativo,
+
+157
+00:10:03.270 --> 00:10:06.650
+como el contenedor del vídeo
+cinco: una sola carpeta montada,
+
+158
+00:10:06.690 --> 00:10:10.820
+la del trabajo, sin tu carpeta
+personal ni tus claves de SSH.
+
+159
+00:10:10.860 --> 00:10:14.388
+Un detalle práctico: dentro de un
+contenedor, un worktree no funciona,
+
+160
+00:10:14.428 --> 00:10:16.278
+porque apunta al repositorio principal.
+
+161
+00:10:16.318 --> 00:10:19.148
+Hace falta un clon, y que la
+entrega la haga el anfitrión,
+
+162
+00:10:19.188 --> 00:10:21.080
+que es lo que hace el
+curso de Decoding AI.
+
+163
+00:10:21.705 --> 00:10:25.873
+¿Y la clave del modelo? El agente la
+necesita, así que tiene que estar dentro,
+
+164
+00:10:25.913 --> 00:10:28.925
+y un proceso puede leer las
+variables de su entorno.
+
+165
+00:10:28.965 --> 00:10:33.302
+La redacción de secretos del diecinueve
+tapa la clave en lo que ve el modelo,
+
+166
+00:10:33.342 --> 00:10:37.595
+pero, según su documentación, antes de
+ejecutar una herramienta oh my pi vuelve a
+
+167
+00:10:37.635 --> 00:10:41.295
+poner el valor real. Protege lo
+que se lee, no lo que se ejecuta.
+
+168
+00:10:42.267 --> 00:10:45.627
+El curso de Decoding AI
+lo resume en un principio:
+
+169
+00:10:45.667 --> 00:10:49.847
+el sandbox tiene exactamente las
+credenciales que tú decides darle,
+
+170
+00:10:49.887 --> 00:10:51.514
+y hay que asumir que puede leerlas.
+
+171
+00:10:51.554 --> 00:10:55.687
+Así que dale credenciales pequeñas: una
+clave con su propio límite de gasto en el
+
+172
+00:10:55.727 --> 00:11:00.122
+proveedor, que puedas revocar sin tocar
+las demás, y solo en el paso que la usa,
+
+173
+00:11:00.162 --> 00:11:02.477
+como en los workflows de
+los vídeos diez y veintiuno.
+
+174
+00:11:03.290 --> 00:11:05.775
+oh my pi documenta una
+pieza para ir más lejos:
+
+175
+00:11:05.815 --> 00:11:11.077
+el auth gateway. Hace de intermediario: el
+agente le manda sus peticiones al modelo,
+
+176
+00:11:11.117 --> 00:11:15.050
+y el gateway pone la credencial por el
+camino, con un token propio para cada
+
+177
+00:11:15.090 --> 00:11:18.110
+cliente y la lista de
+modelos que puede usar.
+
+178
+00:11:18.150 --> 00:11:20.630
+El contenedor nunca ve
+la clave del proveedor.
+
+179
+00:11:20.670 --> 00:11:24.602
+No lo montamos hoy, porque necesita otro
+servidor y su propia seguridad de red,
+
+180
+00:11:24.642 --> 00:11:28.430
+pero si tu robot va a vivir en una
+máquina compartida, es por donde empezar.
+
+181
+00:11:30.166 --> 00:11:33.831
+Y la credencial para escribir en el
+repositorio, la que más duele si se
+
+182
+00:11:33.871 --> 00:11:36.651
+filtra, no la tiene nunca el agente.
+
+183
+00:11:36.691 --> 00:11:39.591
+La entrega la hace el
+lanzador, después del juez.
+
+184
+00:11:39.631 --> 00:11:44.256
+El agente no puede empujar porque no tiene
+con qué, y además el patrón se lo prohíbe.
+
+185
+00:11:44.296 --> 00:11:48.501
+Y el robot trabaja siempre desde nuestra
+rama base, nunca desde una rama que venga
+
+186
+00:11:48.541 --> 00:11:52.661
+de fuera: en el veintiuno vimos que oh my
+pi carga la configuración del repositorio
+
+187
+00:11:52.701 --> 00:11:53.761
+sin preguntar.
+
+188
+00:11:59.151 --> 00:12:03.991
+Cuando trabajas en la terminal, ves el
+pie con el coste y paras si se dispara.
+
+189
+00:12:04.031 --> 00:12:10.131
+El robot no tiene pie. Necesita topes
+que actúen solos, y oh my pi los trae.
+
+190
+00:12:10.171 --> 00:12:13.781
+Guion guion max time corta
+la sesión tras un tiempo.
+
+191
+00:12:13.821 --> 00:12:17.391
+Guion guion warn cost avisa
+una vez al llegar a un gasto.
+
+192
+00:12:17.431 --> 00:12:22.121
+Y guion guion max cost deja de enviar
+peticiones al modelo cuando la sesión,
+
+193
+00:12:22.161 --> 00:12:25.021
+subagentes incluidos, llega
+a una cantidad en dólares.
+
+194
+00:12:26.568 --> 00:12:30.740
+Lo forzamos con un tope ridículo,
+media décima de céntimo.
+
+195
+00:12:30.780 --> 00:12:35.074
+A los seis segundos, después de dos
+respuestas, el gasto acumulado pasa del
+
+196
+00:12:35.114 --> 00:12:37.910
+tope y oh my pi se para
+con el código tres.
+
+197
+00:12:37.950 --> 00:12:40.516
+Se pasa un poco, casi
+una décima de céntimo:
+
+198
+00:12:40.556 --> 00:12:44.660
+el tope se comprueba al terminar
+cada respuesta, así que la última se
+
+199
+00:12:45.118 --> 00:12:47.432
+paga entera. El lanzador lo
+distingue de los demás finales:
+
+200
+00:12:47.472 --> 00:12:50.398
+no es un fallo de la verificación
+ni de la infraestructura,
+
+201
+00:12:50.438 --> 00:12:52.230
+es el tope haciendo su trabajo.
+
+202
+00:12:52.270 --> 00:12:55.308
+El informe dice coste,
+y no se entrega nada.
+
+203
+00:12:55.708 --> 00:12:58.228
+El tope de tiempo lo vimos
+en el vídeo anterior:
+
+204
+00:12:58.268 --> 00:13:02.318
+una revisión que se quedó pensando
+acabó cortada, pero el corte llegó a los
+
+205
+00:13:02.358 --> 00:13:04.908
+dieciséis minutos con un tope de diez.
+
+206
+00:13:04.948 --> 00:13:06.868
+Un tope no es un reloj exacto.
+
+207
+00:13:06.908 --> 00:13:09.788
+Por eso el lanzador lleva los
+suyos, y el workflow de GitHub,
+
+208
+00:13:09.828 --> 00:13:11.648
+el suyo propio por encima.
+
+209
+00:13:12.496 --> 00:13:15.696
+¿Y Pi? No trae tope de coste ni de tiempo.
+
+210
+00:13:15.736 --> 00:13:19.459
+El tiempo lo pone el sistema, con
+la orden timeout delante de pi.
+
+211
+00:13:19.499 --> 00:13:22.632
+Y el coste, una extensión
+de unas veinte líneas:
+
+212
+00:13:22.672 --> 00:13:26.787
+tope punto ts escucha el final
+de cada respuesta, suma su coste,
+
+213
+00:13:26.827 --> 00:13:29.236
+y si pasa del límite, aborta.
+
+214
+00:13:29.276 --> 00:13:32.976
+La probamos con un tope mínimo:
+corta tras la primera respuesta.
+
+215
+00:13:33.016 --> 00:13:36.580
+Pero Pi sale con cero igualmente, así que
+el lanzador tiene que leer los eventos,
+
+216
+00:13:36.620 --> 00:13:37.815
+como en el vídeo diez.
+
+217
+00:13:38.224 --> 00:13:42.788
+Los topes por ejecución no bastan,
+porque el cron y el webhook multiplican.
+
+218
+00:13:42.828 --> 00:13:44.790
+El lanzador lleva un presupuesto diario:
+
+219
+00:13:44.830 --> 00:13:48.784
+antes de arrancar, suma el coste de los
+informes de hoy, y si ya llegó al límite,
+
+220
+00:13:48.824 --> 00:13:53.104
+no lanza y lo anota. Un webhook
+que alguien dispara cien veces,
+
+221
+00:13:53.144 --> 00:13:56.534
+o un cron mal escrito que corre cada
+minuto, se queda en lo que tú decidiste
+
+222
+00:13:56.574 --> 00:13:57.574
+gastar al día.
+
+223
+00:13:58.412 --> 00:14:00.772
+Y el número que importa no es
+lo que cuesta una ejecución,
+
+224
+00:14:00.812 --> 00:14:02.812
+sino el coste por entrega útil.
+
+225
+00:14:02.902 --> 00:14:05.710
+Nuestros dos ensayos costaron
+menos de un céntimo cada uno,
+
+226
+00:14:05.750 --> 00:14:07.806
+pero el primero no entregó nada.
+
+227
+00:14:07.846 --> 00:14:12.892
+Si de cada tres ejecuciones solo una pasa
+el juez, cada rama entregada te ha costado
+
+228
+00:14:12.932 --> 00:14:14.282
+tres. Los fallos también se pagan.
+
+229
+00:14:19.717 --> 00:14:23.167
+Lo juntamos. Arrancamos
+el receptor con su token.
+
+230
+00:14:23.207 --> 00:14:26.257
+Una petición sin token: no autorizado.
+
+231
+00:14:26.297 --> 00:14:28.579
+Con un identificador que no es un ticket:
+
+232
+00:14:28.619 --> 00:14:31.837
+petición incorrecta. Y
+ahora, ticket cero cero seis:
+
+233
+00:14:31.877 --> 00:14:35.597
+aceptado, con un identificador
+de ejecución, en milisegundos.
+
+234
+00:14:35.637 --> 00:14:41.157
+El trabajo empieza en segundo plano, y el
+registro del receptor dice qué ha lanzado.
+
+235
+00:14:42.046 --> 00:14:44.961
+Cincuenta y seis segundos después,
+el informe dice entregado.
+
+236
+00:14:45.001 --> 00:14:47.856
+Veintidós respuestas del
+modelo y menos de un céntimo:
+
+237
+00:14:47.896 --> 00:14:51.024
+unas nueve décimas. El juez, desde fuera:
+
+238
+00:14:51.064 --> 00:14:55.786
+verificar punto sh pasa desde la
+etiqueta, la prueba oculta pasa,
+
+239
+00:14:55.826 --> 00:14:59.116
+no queda nada sin commitear,
+y cambian cuatro ficheros:
+
+240
+00:14:59.156 --> 00:15:02.586
+funcionalidades, progreso,
+el carrito y su prueba.
+
+241
+00:15:02.626 --> 00:15:06.356
+Y la rama ya está en el repositorio
+de revisión, subida por el lanzador,
+
+242
+00:15:06.396 --> 00:15:07.406
+no por el agente.
+
+243
+00:15:07.896 --> 00:15:11.267
+La petición de cambios se
+lee como en el veintiséis:
+
+244
+00:15:11.307 --> 00:15:16.787
+desde qué commit, dónde está la rama, el
+commit del robot y los ficheros cambiados,
+
+245
+00:15:16.827 --> 00:15:19.806
+con la rúbrica y la
+aceptación fuera de la lista.
+
+246
+00:15:19.856 --> 00:15:22.656
+Repetimos la petición del
+webhook con el mismo ticket:
+
+247
+00:15:22.696 --> 00:15:24.296
+conflicto, ya tiene rama.
+
+248
+00:15:25.536 --> 00:15:29.783
+Por la mañana, la primera pregunta
+es: ¿qué ha pasado esta noche?
+
+249
+00:15:29.823 --> 00:15:34.616
+Resumen robot punto sh lee los informes
+y escribe una fila por ejecución:
+
+250
+00:15:34.674 --> 00:15:40.000
+cuándo, quién la disparó, el
+ticket, cómo terminó, cuánto tardó,
+
+251
+00:15:40.040 --> 00:15:42.344
+cuánto costó y si se entregó.
+
+252
+00:15:42.384 --> 00:15:45.056
+Al final, lo gastado
+frente al presupuesto.
+
+253
+00:15:45.096 --> 00:15:48.246
+Si todo está en verde, has
+terminado de mirar en diez segundos.
+
+254
+00:15:48.741 --> 00:15:53.541
+La columna más útil es la de cómo terminó,
+y por eso el lanzador traduce los códigos
+
+255
+00:15:53.581 --> 00:15:58.743
+de salida a palabras: entregado,
+verificación, coste, tiempo,
+
+256
+00:15:58.783 --> 00:16:04.141
+rechazado, presupuesto, ocupado e
+infraestructura, la del vídeo anterior.
+
+257
+00:16:04.181 --> 00:16:08.181
+Cada palabra pide una acción distinta, y
+ninguna es leerse la conversación entera.
+
+258
+00:16:08.677 --> 00:16:12.303
+Como el robot tiene su perfil,
+oh my pi lleva la cuenta aparte.
+
+259
+00:16:12.343 --> 00:16:17.167
+O eme pe stats con guion guion summary y
+el perfil robot da el resumen por modelo y
+
+260
+00:16:17.207 --> 00:16:19.667
+por carpeta, con los ensayos
+
+261
+00:16:20.125 --> 00:16:24.027
+incluidos. En el veinticinco vimos que
+las estadísticas no cuentan las sesiones
+
+262
+00:16:24.067 --> 00:16:26.847
+guardadas con guion guion session
+dir; con un perfil propio,
+
+263
+00:16:26.887 --> 00:16:29.917
+las sesiones van a su sitio
+y las estadísticas las ven.
+
+264
+00:16:29.957 --> 00:16:32.757
+Y cada ejecución es una
+grabación con su manifiesto:
+
+265
+00:16:32.797 --> 00:16:36.357
+las que acaban en rojo son las
+candidatas para minar punto sh.
+
+266
+00:16:36.812 --> 00:16:40.672
+¿Y en GitHub? El mismo esquema cabe en
+un workflow, que enseñamos como fichero,
+
+267
+00:16:40.712 --> 00:16:45.122
+sin ejecutarlo. Tres disparadores:
+schedule, el cron de GitHub,
+
+268
+00:16:45.162 --> 00:16:48.938
+en hora UTC; workflow
+dispatch, a mano desde la web;
+
+269
+00:16:48.978 --> 00:16:52.812
+y repository dispatch, un webhook hacia
+GitHub que otro sistema llama con su
+
+270
+00:16:52.852 --> 00:16:56.082
+propio token. Los tres
+acaban en el mismo trabajo.
+
+271
+00:16:57.158 --> 00:17:00.589
+El workflow está partido en dos
+trabajos, y esa es la lección.
+
+272
+00:17:00.629 --> 00:17:04.535
+El primero ejecuta oh my pi con permisos
+de solo lectura sobre el repositorio,
+
+273
+00:17:04.575 --> 00:17:09.512
+la clave del modelo solo en ese paso,
+los topes y el juez desde la etiqueta.
+
+274
+00:17:09.552 --> 00:17:13.651
+Su resultado es un parche y los
+eventos, guardados como artefactos.
+
+275
+00:17:13.691 --> 00:17:18.482
+El segundo, solo si el juez pasó, aplica
+el parche, crea la rama y abre la petición
+
+276
+00:17:18.522 --> 00:17:22.007
+como borrador. Solo ese puede
+escribir, y no ejecuta el modelo.
+
+277
+00:17:27.267 --> 00:17:31.757
+Los límites. Un robot nocturno
+es tan bueno como su juez:
+
+278
+00:17:31.797 --> 00:17:35.697
+si la rúbrica no cubre un caso, lo
+entregará con la misma seguridad.
+
+279
+00:17:35.737 --> 00:17:40.577
+Los patrones de bash no son una frontera,
+y el contenedor solo protege lo que no
+
+280
+00:17:40.777 --> 00:17:43.457
+montas. Una petición del robot
+es trabajo para ti por la mañana:
+
+281
+00:17:43.497 --> 00:17:46.732
+si no la revisas, no has
+delegado, has aplazado.
+
+282
+00:17:46.772 --> 00:17:49.307
+Y los topes cortan el gasto, no el error.
+
+283
+00:17:49.756 --> 00:17:54.318
+Repasemos. Un encargo desatendido
+tiene disparador, lanzador,
+
+284
+00:17:54.358 --> 00:17:58.326
+agente aislado, juez, entrega y registro.
+
+285
+00:17:58.370 --> 00:18:03.076
+El disparador pasa un identificador,
+nunca texto libre, y exige un token.
+
+286
+00:18:03.116 --> 00:18:06.306
+Lo que pediría permiso se decide
+antes, en un perfil propio:
+
+287
+00:18:06.346 --> 00:18:10.104
+lista blanca, carpetas
+restringidas y la puerta.
+
+288
+00:18:10.144 --> 00:18:12.526
+Y la aprobación de verdad
+es la petición de cambios.
+
+289
+00:18:13.126 --> 00:18:16.886
+Aprobar no es aislar: una
+frontera del sistema operativo,
+
+290
+00:18:16.926 --> 00:18:21.636
+credenciales pequeñas y revocables,
+y la de escritura, siempre fuera.
+
+291
+00:18:21.676 --> 00:18:26.596
+Topes por ejecución, en Pi con timeout y
+una extensión, y un presupuesto diario en
+
+292
+00:18:26.636 --> 00:18:30.466
+el lanzador. Y por la mañana, un
+resumen que se lee en diez segundos,
+
+293
+00:18:30.506 --> 00:18:32.986
+con las sesiones a mano para
+la batería de regresiones.
+
+294
+00:18:33.862 --> 00:18:37.635
+La práctica: elige una tarea
+pequeña y repetitiva de tu proyecto,
+
+295
+00:18:37.675 --> 00:18:39.342
+con verificación automática.
+
+296
+00:18:39.382 --> 00:18:44.477
+Escribe su lanzador con worktree,
+manifiesto, juez y entrega desde fuera.
+
+297
+00:18:44.517 --> 00:18:47.406
+Pruébalo a mano tres veces,
+con un tope de coste bajo.
+
+298
+00:18:47.446 --> 00:18:51.770
+Solo cuando las tres te dejen una rama que
+aprobarías, ponle un cron o un webhook,
+
+299
+00:18:51.810 --> 00:18:53.812
+y apunta lo que gasta en una semana.
+
+300
+00:18:54.305 --> 00:18:57.107
+Y aquí termina el curso de Pi y oh my pi.
+
+301
+00:18:57.147 --> 00:18:59.116
+Gracias por llegar hasta el final.
+
+302
+00:18:59.156 --> 00:19:03.425
+Empezamos con un agente pequeño en una
+terminal y terminamos con uno que trabaja
+
+303
+00:19:03.465 --> 00:19:07.525
+mientras duermes. Lo que no ha
+cambiado desde el vídeo uno:
+
+304
+00:19:07.565 --> 00:19:12.445
+no te fíes del resumen del agente, mide lo
+que cuesta, y que decida un programa que
+
+305
+00:19:12.485 --> 00:19:16.805
+hayas escrito tú. Nos vemos en la
+próxima formación de Código Sin Siesta.
