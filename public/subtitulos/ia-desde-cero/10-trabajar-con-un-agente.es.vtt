@@ -1,0 +1,747 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.376 --> 00:00:13.657
+Código Sin Siesta. IA desde cero.
+
+2
+00:00:13.697 --> 00:00:16.010
+Vídeo diez: trabajar con un agente.
+
+3
+00:00:21.477 --> 00:00:25.357
+A lo largo de esta ruta hemos
+desmontado un agente pieza a pieza:
+
+4
+00:00:25.397 --> 00:00:29.897
+el modelo que completa texto, el
+laboratorio, la ventana de contexto,
+
+5
+00:00:29.937 --> 00:00:34.307
+el bucle, las herramientas, las
+instrucciones, lo que cuesta y lo que
+
+6
+00:00:34.347 --> 00:00:38.637
+puede romper. En este último vídeo lo
+juntamos todo para trabajar de verdad.
+
+7
+00:00:39.551 --> 00:00:44.134
+Vamos a hacer la misma tarea dos veces,
+una mal pedida y otra bien pedida,
+
+8
+00:00:44.174 --> 00:00:47.634
+y a comparar lo que sale.
+La tarea es pequeña:
+
+9
+00:00:47.674 --> 00:00:50.613
+descuentos por cantidad en la
+lista de la compra del laboratorio.
+
+10
+00:00:50.653 --> 00:00:54.542
+Si compras tres o más unidades de un
+producto, esas unidades salen un diez por
+
+11
+00:00:54.582 --> 00:00:58.519
+ciento más baratas. Empezamos
+como empieza casi todo el mundo,
+
+12
+00:00:58.559 --> 00:01:00.745
+escribiendo dos palabras al agente build:
+
+13
+00:01:00.785 --> 00:01:01.874
+«añade descuentos».
+
+14
+00:01:02.500 --> 00:01:05.260
+Esto es lo que pasó de
+verdad en el laboratorio.
+
+15
+00:01:05.300 --> 00:01:09.700
+El agente leyó el README, la
+configuración, el código y las pruebas.
+
+16
+00:01:09.740 --> 00:01:12.704
+Luego intentó preguntarnos qué
+tipo de descuento queríamos.
+
+17
+00:01:12.744 --> 00:01:17.140
+En nuestra prueba no podía preguntar, así
+que supuso lo que le pareció más natural:
+
+18
+00:01:17.180 --> 00:01:19.660
+un porcentaje de descuento
+en cada producto.
+
+19
+00:01:19.700 --> 00:01:23.500
+Si trabajas en la pantalla de OpenCode,
+es posible que esa pregunta sí te llegue.
+
+20
+00:01:24.199 --> 00:01:28.142
+Después cambió el código, escribió
+tres pruebas nuevas, retocó el README,
+
+21
+00:01:28.182 --> 00:01:31.799
+que nadie le había pedido,
+y ejecutó ene pe eme test.
+
+22
+00:01:31.839 --> 00:01:36.239
+Pasaron las cinco pruebas. Terminó
+con un resumen impecable y una oferta:
+
+23
+00:01:36.279 --> 00:01:39.359
+si preferías otro tipo de
+descuento, se lo dices y lo ajusta.
+
+24
+00:01:40.048 --> 00:01:44.238
+Fíjate en lo que tenemos. Todo funciona,
+todo está probado y nada es lo que
+
+25
+00:01:44.278 --> 00:01:47.992
+queríamos: no hay ni rastro
+de descuentos por cantidad.
+
+26
+00:01:48.032 --> 00:01:51.498
+Y las pruebas no avisan, porque
+las ha escrito el mismo agente.
+
+27
+00:01:51.538 --> 00:01:54.668
+Comprueban lo que él entendió,
+no lo que tú tenías en la cabeza.
+
+28
+00:01:55.232 --> 00:01:59.032
+El agente no se equivocó. Hizo
+bien una tarea que no era la tuya.
+
+29
+00:01:59.072 --> 00:02:02.802
+Recuerda el primer vídeo: donde faltan
+datos, el modelo rellena con lo más
+
+30
+00:02:02.842 --> 00:02:06.852
+probable. Y dos palabras lo
+dejan casi todo por rellenar.
+
+31
+00:02:12.158 --> 00:02:15.798
+La segunda vez escribimos la
+petición con cuatro piezas.
+
+32
+00:02:15.838 --> 00:02:18.278
+Piensa en cómo le encargas un
+trabajo a un buen fontanero.
+
+33
+00:02:18.318 --> 00:02:20.138
+No le dices «arregla el baño».
+
+34
+00:02:20.178 --> 00:02:24.638
+Le dices qué grifo gotea, cuándo darás
+el trabajo por bueno y qué no debe tocar.
+
+35
+00:02:25.308 --> 00:02:28.334
+La primera pieza es el
+objetivo, con sus números:
+
+36
+00:02:28.374 --> 00:02:31.925
+tres o más unidades de un producto,
+un diez por ciento de descuento.
+
+37
+00:02:31.965 --> 00:02:35.068
+La segunda es el contexto: dónde
+está lo que hay que cambiar,
+
+38
+00:02:35.108 --> 00:02:39.555
+el fichero compra punto js. La tercera
+es la que casi siempre se olvida:
+
+39
+00:02:39.595 --> 00:02:44.018
+el criterio de terminado. Para nosotros,
+terminado es que el total aplique el
+
+40
+00:02:44.058 --> 00:02:48.051
+descuento, que haya pruebas nuevas para
+dos unidades, para tres y para un caso que
+
+41
+00:02:48.091 --> 00:02:51.108
+obligue a redondear, y
+que ene pe eme test pase.
+
+42
+00:02:51.554 --> 00:02:55.086
+La cuarta pieza son las
+reglas, lo que no se negocia.
+
+43
+00:02:55.126 --> 00:02:59.434
+Los precios siguen en céntimos
+enteros y se redondea al céntimo.
+
+44
+00:02:59.474 --> 00:03:03.054
+No se cambian las pruebas que ya
+existen ni ningún otro fichero.
+
+45
+00:03:03.094 --> 00:03:04.714
+Y nada de dependencias nuevas.
+
+46
+00:03:05.233 --> 00:03:11.590
+Objetivo, contexto, terminado y
+reglas: es la fórmula de la guía siete,
+
+47
+00:03:11.630 --> 00:03:16.137
+con una pieza que ahí casi no
+pesaba y aquí es la más importante.
+
+48
+00:03:16.177 --> 00:03:19.703
+El criterio de terminado es lo que te
+deja comprobar, sin creerte a nadie,
+
+49
+00:03:19.743 --> 00:03:21.533
+si el trabajo está hecho.
+
+50
+00:03:22.067 --> 00:03:26.347
+Y al final, una frase más: «antes
+de tocar nada, dame un plan».
+
+51
+00:03:26.387 --> 00:03:28.517
+Parece más trabajo, pero es un minuto.
+
+52
+00:03:28.557 --> 00:03:32.817
+Lo que te ahorra es una sesión entera
+deshaciendo una tarea que no era la tuya.
+
+53
+00:03:38.237 --> 00:03:42.157
+Esa petición la mandamos al agente
+plan, el que solo piensa y propone.
+
+54
+00:03:42.197 --> 00:03:44.677
+Lo eliges con mayúsculas tabulador.
+
+55
+00:03:44.717 --> 00:03:48.387
+Plan no edita los ficheros del proyecto,
+así que puedes leer su propuesta sabiendo
+
+56
+00:03:48.427 --> 00:03:50.297
+que todavía no ha cambiado nada.
+
+57
+00:03:51.061 --> 00:03:54.461
+Leyó el código y las pruebas, y
+devolvió un plan en tres partes:
+
+58
+00:03:54.501 --> 00:03:58.851
+cómo cambiar la función del total,
+las tres pruebas con sus números,
+
+59
+00:03:58.891 --> 00:04:03.296
+y ejecutar ene pe eme test. Por ejemplo,
+tres unidades a noventa y cinco céntimos
+
+60
+00:04:03.336 --> 00:04:06.451
+son doscientos ochenta y cinco; con el
+descuento quedan doscientos cincuenta y
+
+61
+00:04:06.491 --> 00:04:09.801
+seis y medio, que se redondean
+a doscientos cincuenta y siete.
+
+62
+00:04:10.305 --> 00:04:15.005
+Y lo más valioso estaba al final: dos
+supuestos, para que se los confirmáramos.
+
+63
+00:04:15.045 --> 00:04:18.235
+El segundo era el redondeo:
+el medio céntimo sube.
+
+64
+00:04:18.275 --> 00:04:20.782
+Ese nos valía. El primero, no.
+
+65
+00:04:20.822 --> 00:04:24.962
+Decía que, si añades pan dos
+veces, con dos unidades cada vez,
+
+66
+00:04:25.002 --> 00:04:27.094
+cada línea se trata por separado.
+
+67
+00:04:27.134 --> 00:04:29.815
+Es decir: cuatro panes,
+y ninguno con descuento.
+
+68
+00:04:30.293 --> 00:04:34.413
+Eso es revisar un plan. No
+es leerlo y decir que sí:
+
+69
+00:04:34.453 --> 00:04:37.613
+es buscar la decisión que
+el agente ha tomado por ti.
+
+70
+00:04:37.653 --> 00:04:41.893
+Le contestamos que agrupara por nombre
+y que añadiera una prueba para ese caso.
+
+71
+00:04:41.933 --> 00:04:45.146
+Si ese supuesto hubiera llegado
+al código sin que nadie lo leyera,
+
+72
+00:04:45.186 --> 00:04:47.813
+lo habría descubierto
+un cliente en la caja.
+
+73
+00:04:47.853 --> 00:04:52.263
+Con el plan corregido, pasamos a build con
+mayúsculas tabulador y le pedimos que lo
+
+74
+00:04:52.303 --> 00:04:53.343
+ejecutara.
+
+75
+00:04:58.716 --> 00:05:02.200
+Mientras build trabaja,
+no te vayas a por un café.
+
+76
+00:05:02.240 --> 00:05:07.664
+Mira cada paso: qué fichero lee, qué
+cambia y qué comando quiere ejecutar.
+
+77
+00:05:07.704 --> 00:05:10.854
+En el laboratorio, las ediciones
+y la shell piden permiso,
+
+78
+00:05:10.894 --> 00:05:14.316
+y cada petición es un momento
+para mirar antes de que pase.
+
+79
+00:05:15.691 --> 00:05:18.517
+Compara las dos sesiones por
+los ficheros que tocaron.
+
+80
+00:05:18.557 --> 00:05:22.701
+La mal pedida cambió tres: el
+código, las pruebas y el README.
+
+81
+00:05:23.141 --> 00:05:28.071
+La bien pedida cambió dos, el código
+y las pruebas, justo los que decía el
+
+82
+00:05:28.556 --> 00:05:32.471
+plan. Un fichero de más que nadie ha
+pedido es la primera señal de que el
+
+83
+00:05:32.511 --> 00:05:33.441
+agente va por su cuenta.
+
+84
+00:05:34.164 --> 00:05:37.036
+Si ves que se va por donde no
+es, no esperes a que acabe.
+
+85
+00:05:37.076 --> 00:05:40.830
+Pulsa escape: el agente se
+para y te devuelve el control.
+
+86
+00:05:40.870 --> 00:05:43.836
+Le explicas qué no te
+gusta y sigue desde ahí.
+
+87
+00:05:43.876 --> 00:05:47.837
+Si ya ha cambiado ficheros, barra
+undo los devuelve a como estaban,
+
+88
+00:05:47.877 --> 00:05:50.164
+aunque no deshace los
+comandos que haya ejecutado.
+
+89
+00:05:50.965 --> 00:05:54.615
+Y al final, lee el cambio. Aquí
+fueron unas cuarenta líneas:
+
+90
+00:05:54.655 --> 00:05:58.319
+una función que agrupa los productos
+por nombre, suma las unidades,
+
+91
+00:05:58.497 --> 00:06:01.570
+aplica el descuento a partir
+de tres y redondea al céntimo,
+
+92
+00:06:01.610 --> 00:06:04.619
+y cuatro pruebas nuevas. Se
+lee en un par de minutos.
+
+93
+00:06:04.927 --> 00:06:08.209
+Si un cambio es tan grande que no lo
+puedes leer, la tarea era demasiado
+
+94
+00:06:08.249 --> 00:06:10.109
+grande: pártela en trozos.
+
+95
+00:06:15.561 --> 00:06:19.261
+Build ejecutó ene pe eme
+test y pasaron seis pruebas:
+
+96
+00:06:19.301 --> 00:06:21.601
+las dos de siempre y las cuatro nuevas.
+
+97
+00:06:21.641 --> 00:06:25.761
+Ese era nuestro criterio de terminado, y
+es una comprobación que no depende de lo
+
+98
+00:06:25.801 --> 00:06:28.081
+que diga el agente: la hacen las pruebas.
+
+99
+00:06:29.326 --> 00:06:33.595
+Ahora, un experimento. Con la
+shell sin permiso, le preguntamos:
+
+100
+00:06:33.635 --> 00:06:37.302
+«¿pasan las pruebas?». No
+pudo ejecutarlas, y lo dijo.
+
+101
+00:06:37.342 --> 00:06:42.486
+Pero en lugar de pararse, leyó el código,
+repasó las seis pruebas haciendo las
+
+102
+00:06:42.644 --> 00:06:45.776
+cuentas a mano y concluyó
+que todas deberían pasar.
+
+103
+00:06:45.816 --> 00:06:48.366
+Es lo mismo que nos pasó
+al preparar el laboratorio:
+
+104
+00:06:48.406 --> 00:06:51.206
+si no le dejas ejecutar,
+el agente no se para;
+
+105
+00:06:51.246 --> 00:06:52.486
+deduce el resultado.
+
+106
+00:06:53.006 --> 00:06:56.106
+Esta vez fue honesto y dijo «deberían».
+
+107
+00:06:56.146 --> 00:06:59.226
+Pero quédate con la diferencia,
+porque no siempre será tan claro:
+
+108
+00:06:59.266 --> 00:07:03.361
+que un agente diga que las pruebas pasan
+no es lo mismo que haberlas ejecutado.
+
+109
+00:07:03.401 --> 00:07:07.777
+Si en su respuesta no ves la salida de
+ene pe eme test, no se ha verificado nada.
+
+110
+00:07:07.817 --> 00:07:09.316
+Pídeselo, o ejecútalo tú.
+
+111
+00:07:10.161 --> 00:07:14.281
+Las pruebas también enseñan por qué la
+lista guarda los precios en céntimos.
+
+112
+00:07:14.321 --> 00:07:19.548
+Añadimos una prueba con euros: dos panes a
+uno con veinte y una leche a cero noventa
+
+113
+00:07:19.589 --> 00:07:22.065
+y cinco. Tienen que salir
+tres con treinta y cinco.
+
+114
+00:07:22.105 --> 00:07:26.651
+Ene pe eme test falla: el total da tres
+con treinta y cuatro y una ristra de
+
+115
+00:07:26.691 --> 00:07:27.591
+nueves.
+
+116
+00:07:27.919 --> 00:07:30.659
+No es un fallo del
+agente ni de JavaScript.
+
+117
+00:07:30.699 --> 00:07:34.559
+Los ordenadores guardan los decimales en
+binario, y uno con veinte no cabe exacto,
+
+118
+00:07:34.599 --> 00:07:38.159
+igual que un tercio no se puede
+escribir exacto con decimales.
+
+119
+00:07:38.199 --> 00:07:40.579
+Es lo que se llama coma flotante.
+
+120
+00:07:40.619 --> 00:07:43.149
+Con dinero, la salida es
+contar en céntimos enteros.
+
+121
+00:07:43.591 --> 00:07:45.685
+Y hay una segunda trampa, distinta.
+
+122
+00:07:45.725 --> 00:07:50.341
+Con el código nuevo, tres panes a uno con
+veinte en euros dan tres justos en lugar
+
+123
+00:07:50.381 --> 00:07:54.241
+de tres con veinticuatro, porque el código
+redondea a la unidad dando por hecho que
+
+124
+00:07:54.281 --> 00:07:58.481
+la unidad es el céntimo. Por eso «precios
+en céntimos enteros» iba en las reglas de
+
+125
+00:07:58.521 --> 00:08:01.642
+la petición, y por eso merece
+estar en tu AGENTS punto md:
+
+126
+00:08:01.682 --> 00:08:03.771
+es justo lo que el
+agente no puede adivinar.
+
+127
+00:08:09.192 --> 00:08:15.212
+Repasemos el método. Pide con objetivo,
+contexto, criterio de terminado y reglas.
+
+128
+00:08:15.502 --> 00:08:18.272
+Planifica en plan y busca los supuestos.
+
+129
+00:08:18.480 --> 00:08:21.262
+Pasa a build y mira lo
+que hace, con escape a
+
+130
+00:08:21.887 --> 00:08:24.932
+mano. Verifica ejecutando, no
+preguntando, y si algo falla,
+
+131
+00:08:24.972 --> 00:08:28.689
+vuelta a corregir. Y antes de
+darlo por bueno, lee el cambio,
+
+132
+00:08:28.729 --> 00:08:31.142
+porque decir que pasa no es ejecutarlo.
+
+133
+00:08:31.569 --> 00:08:35.246
+Ahora fíjate en una cosa: casi
+nada de esto lo ha hecho el modelo.
+
+134
+00:08:35.286 --> 00:08:39.489
+El modelo escribe texto. Lo que le da
+las herramientas, pide los permisos,
+
+135
+00:08:39.529 --> 00:08:43.989
+separa plan de build, ejecuta las pruebas
+y te deja pararlo con escape es el
+
+136
+00:08:44.029 --> 00:08:47.312
+programa que lo rodea. Eso tiene nombre:
+
+137
+00:08:47.396 --> 00:08:50.329
+harness. OpenCode es un harness,
+y trabajar bien con un agente es,
+
+138
+00:08:50.369 --> 00:08:52.449
+en buena parte, saber usar el tuyo.
+
+139
+00:08:52.915 --> 00:08:56.115
+Aquí termina esta ruta,
+y tienes dos caminos.
+
+140
+00:08:56.155 --> 00:08:59.965
+Si quieres entender un agente por dentro,
+el curso de Pi empieza justo donde lo
+
+141
+00:09:00.005 --> 00:09:03.995
+dejamos, explicando qué es un
+harness, y acaba con el tuyo propio.
+
+142
+00:09:04.035 --> 00:09:06.825
+Si prefieres seguir con OpenCode
+en un proyecto más grande,
+
+143
+00:09:06.865 --> 00:09:09.795
+guiado por especificaciones,
+tienes el taller de OpenCode.
+
+144
+00:09:10.645 --> 00:09:13.447
+Te propongo la última
+práctica, en el laboratorio.
+
+145
+00:09:13.487 --> 00:09:17.817
+Cambia a la rama guía diez y
+pide «añade descuentos», a secas.
+
+146
+00:09:18.017 --> 00:09:19.967
+Mira qué hace y qué ficheros toca.
+
+147
+00:09:20.007 --> 00:09:24.307
+Después, devuelve la rama a como estaba
+con git reset guion guion hard y escribe
+
+148
+00:09:24.347 --> 00:09:29.049
+la petición entera, con objetivo,
+contexto, terminado y reglas.
+
+149
+00:09:29.089 --> 00:09:33.207
+Mándala a plan, busca al menos un supuesto
+que no te valga y corrígelo antes de pasar
+
+150
+00:09:33.247 --> 00:09:37.822
+a build. La tarea está terminada cuando
+ves con tus propios ojos la salida de ene
+
+151
+00:09:37.862 --> 00:09:39.867
+pe eme test, no cuando el
+agente te dice que pasa.
+
+152
+00:09:40.503 --> 00:09:42.123
+Gracias por llegar hasta aquí.
+
+153
+00:09:42.163 --> 00:09:44.903
+El siguiente paso es el
+vídeo uno del curso de Pi:
+
+154
+00:09:44.943 --> 00:09:46.803
+qué es un harness de agente.
+
+155
+00:09:46.843 --> 00:09:47.743
+Nos vemos allí.

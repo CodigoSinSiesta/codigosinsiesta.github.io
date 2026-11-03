@@ -24,10 +24,9 @@ const hermanas = (await getCollection('guias', (g) => g.data.ruta === guia.data.
 const idx = hermanas.findIndex((g) => g.id === guia.id);
 const anterior = idx > 0 ? hermanas[idx - 1] : null;
 const siguiente = idx < hermanas.length - 1 ? hermanas[idx + 1] : null;
-// Si la ruta empieza en el orden 0 (un tráiler), se numera por vídeo: el tráiler no cuenta.
-const conTrailer = hermanas[0]?.data.orden === 0;
-const numero = conTrailer ? guia.data.orden : idx + 1;
-const totalNumerados = conTrailer ? hermanas.length - 1 : hermanas.length;
+// El número es el orden de la guía; el total, el mayor orden (una ruta con huecos, como IA desde cero, dice «9/10»).
+const numero = guia.data.orden;
+const totalNumerados = Math.max(...hermanas.map((g) => g.data.orden));
 
 // TOC: solo H2/H3 con slug (los H1 son el título de página).
 // Quita el emoji inicial del texto; en el contenido se sustituye por un icono SVG.

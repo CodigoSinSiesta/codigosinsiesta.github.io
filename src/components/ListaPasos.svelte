@@ -3,34 +3,40 @@
   Persiste en localStorage `csi-progreso:<ruta>` (array JSON de claves).
   La clave de una guía es su id (sincroniza con ProgresoGuia en la página de guía);
   la de un paso manual (ensayo/deck/taller) es su href.
+  Un paso con `progreso` guarda en la ruta indicada (una guía prestada de otra ruta).
 -->
 <script>
   let { ruta, pasos = [] } = $props();
 
-  const KEY = `csi-progreso:${ruta}`;
-  let hechos = $state([]);
+  const KEY = (r) => `csi-progreso:${r}`;
+  const rutaDe = (paso) => paso.progreso ?? ruta;
+  const rutas = [...new Set([ruta, ...pasos.map(rutaDe)])];
+  let hechos = $state({});
 
-  function leer() {
+  function leer(r) {
     try {
-      return JSON.parse(localStorage.getItem(KEY) ?? '[]');
+      return JSON.parse(localStorage.getItem(KEY(r)) ?? '[]');
     } catch {
       return [];
     }
   }
 
   $effect(() => {
-    hechos = leer();
+    hechos = Object.fromEntries(rutas.map((r) => [r, leer(r)]));
   });
 
-  function toggle(clave) {
-    const lista = leer();
-    const nueva = lista.includes(clave) ? lista.filter((s) => s !== clave) : [...lista, clave];
-    localStorage.setItem(KEY, JSON.stringify(nueva));
-    hechos = nueva;
+  const hecho = (paso) => (hechos[rutaDe(paso)] ?? []).includes(paso.key);
+
+  function toggle(paso) {
+    const r = rutaDe(paso);
+    const lista = leer(r);
+    const nueva = lista.includes(paso.key) ? lista.filter((s) => s !== paso.key) : [...lista, paso.key];
+    localStorage.setItem(KEY(r), JSON.stringify(nueva));
+    hechos = { ...hechos, [r]: nueva };
   }
 
   const total = $derived(pasos.length);
-  const completadas = $derived(pasos.filter((p) => hechos.includes(p.key)).length);
+  const completadas = $derived(pasos.filter(hecho).length);
   const pct = $derived(total ? Math.round((completadas / total) * 100) : 0);
 
   const BADGE = { guia: 'módulo', ensayo: 'ensayo', deck: 'deck', taller: 'taller' };
@@ -45,14 +51,14 @@
 
 <ol class="pasos">
   {#each pasos as paso, i (paso.key)}
-    {@const done = hechos.includes(paso.key)}
+    {@const done = hecho(paso)}
     <li class="paso" class:done>
       <button
         class="check"
         class:done
         aria-pressed={done}
         title={done ? 'Marcar como pendiente' : 'Marcar como completado'}
-        onclick={() => toggle(paso.key)}
+        onclick={() => toggle(paso)}
       >
         {done ? '✓' : String(paso.numero ?? i + 1).padStart(2, '0')}
       </button>

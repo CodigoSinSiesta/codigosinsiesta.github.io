@@ -1,0 +1,617 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.270 --> 00:00:13.580
+Código Sin Siesta. IA desde cero.
+
+2
+00:00:13.620 --> 00:00:17.390
+Vídeo dos: tu laboratorio,
+un sitio donde equivocarte.
+
+3
+00:00:22.841 --> 00:00:26.551
+En el vídeo anterior vimos que un modelo
+de lenguaje completa texto y que se
+
+4
+00:00:26.591 --> 00:00:29.281
+equivoca con la misma
+seguridad con la que acierta.
+
+5
+00:00:29.321 --> 00:00:33.981
+Ahora vamos a darle manos. Un agente de
+programación es un programa que rodea al
+
+6
+00:00:34.021 --> 00:00:37.461
+modelo y le deja leer tus ficheros,
+cambiarlos y ejecutar comandos en tu
+
+7
+00:00:37.501 --> 00:00:38.401
+ordenador.
+
+8
+00:00:38.871 --> 00:00:42.011
+Piensa en dejarle las llaves
+de tu casa a alguien muy capaz,
+
+9
+00:00:42.051 --> 00:00:47.111
+muy rápido y con mucha iniciativa, que de
+vez en cuando se inventa cosas con total
+
+10
+00:00:47.287 --> 00:00:49.551
+seguridad. La mayoría de las
+veces te ordenará el salón.
+
+11
+00:00:49.591 --> 00:00:52.271
+Pero si un día se equivoca,
+lo hará con tus llaves.
+
+12
+00:00:52.706 --> 00:00:56.015
+Y eso es justo lo que pasa
+con OpenCode tal como viene.
+
+13
+00:00:56.055 --> 00:01:00.336
+Por defecto, ejecuta comandos, edita
+ficheros y sale de la carpeta del proyecto
+
+14
+00:01:00.376 --> 00:01:05.126
+sin preguntarte. Lo único que pregunta,
+de serie, es antes de leer un fichero de
+
+15
+00:01:05.166 --> 00:01:08.506
+configuración con secretos. Su
+propia documentación lo dice:
+
+16
+00:01:08.546 --> 00:01:11.646
+los comandos se ejecutan con
+todos los permisos de tu usuario.
+
+17
+00:01:12.490 --> 00:01:16.849
+Así que, antes de la primera pregunta,
+vamos a construir un sitio donde
+
+18
+00:01:16.889 --> 00:01:20.770
+equivocarse no cueste nada.
+Lo llamaremos el laboratorio,
+
+19
+00:01:20.810 --> 00:01:25.392
+y la regla de esta ruta es sencilla:
+todas las prácticas se hacen ahí dentro.
+
+20
+00:01:25.432 --> 00:01:29.365
+Nunca en tu ordenador directamente,
+y nunca con código de tu empresa.
+
+21
+00:01:34.626 --> 00:01:36.986
+El laboratorio es un contenedor.
+
+22
+00:01:37.026 --> 00:01:39.906
+Imagina una caja que tiene dentro
+su propio sistema operativo,
+
+23
+00:01:39.946 --> 00:01:42.406
+sus propios programas y su propio
+
+24
+00:01:43.032 --> 00:01:46.601
+usuario. Lo que pasa dentro de la
+caja se queda dentro de la caja:
+
+25
+00:01:46.641 --> 00:01:50.666
+el agente no ve tus documentos, ni tus
+claves, ni el resto de tu ordenador.
+
+26
+00:01:51.154 --> 00:01:53.914
+Solo hay una ventana entre
+la caja y tu ordenador:
+
+27
+00:01:53.954 --> 00:01:57.895
+la carpeta del proyecto. Lo que el
+agente cambie ahí lo verás también fuera,
+
+28
+00:01:57.935 --> 00:01:59.994
+porque es justo con lo que vas a trabajar.
+
+29
+00:02:00.034 --> 00:02:01.923
+Todo lo demás se queda al otro lado.
+
+30
+00:02:02.323 --> 00:02:06.763
+Además, dentro de la caja el agente
+trabaja con un usuario sin privilegios.
+
+31
+00:02:06.803 --> 00:02:09.973
+No puede hacerse administrador,
+ni instalar nada en el sistema,
+
+32
+00:02:10.013 --> 00:02:12.225
+ni dejarlo en un estado
+del que no se vuelve.
+
+33
+00:02:12.265 --> 00:02:15.163
+Si algo sale mal, se tira la
+caja y se crea otra igual.
+
+34
+00:02:15.601 --> 00:02:18.290
+Esa caja puede estar en
+tu ordenador o en la nube.
+
+35
+00:02:18.330 --> 00:02:21.110
+Si puedes instalar programas,
+la tendrás en tu ordenador.
+
+36
+00:02:21.150 --> 00:02:24.512
+Si no, GitHub te deja abrir la
+misma caja en una máquina suya,
+
+37
+00:02:24.552 --> 00:02:27.761
+desde el navegador. A eso
+lo llama un codespace.
+
+38
+00:02:27.801 --> 00:02:32.593
+Las dos son el mismo laboratorio; cambia
+dónde corre y qué modelo usa el agente.
+
+39
+00:02:37.853 --> 00:02:40.983
+Empecemos por la vía
+recomendada, la de tu ordenador.
+
+40
+00:02:41.023 --> 00:02:45.599
+Necesitas tres cosas: Docker Desktop,
+que es el programa que crea las cajas,
+
+41
+00:02:45.639 --> 00:02:49.047
+Visual Studio Code y su
+extensión Dev Containers.
+
+42
+00:02:49.087 --> 00:02:52.996
+Si usas Windows, Docker te pedirá activar
+una vez un componente del sistema,
+
+43
+00:02:53.036 --> 00:02:55.373
+y para eso hacen falta
+permisos de administrador.
+
+44
+00:02:55.873 --> 00:02:58.853
+Con eso instalado, clonas el
+repositorio del laboratorio,
+
+45
+00:02:58.893 --> 00:03:02.973
+lo abres en Visual Studio Code
+y eliges «Reopen in Container».
+
+46
+00:03:03.013 --> 00:03:07.375
+La primera vez tarda un poco: descarga la
+imagen, crea la caja e instala OpenCode
+
+47
+00:03:07.415 --> 00:03:08.065
+dentro.
+
+48
+00:03:08.085 --> 00:03:10.545
+Cuando termina verás dos mensajes.
+
+49
+00:03:10.585 --> 00:03:14.905
+El primero dice «Comprobado: sin sudo»,
+y significa que el usuario de la caja no
+
+50
+00:03:14.945 --> 00:03:16.745
+puede hacerse administrador.
+
+51
+00:03:16.785 --> 00:03:19.365
+El segundo dice «Laboratorio listo».
+
+52
+00:03:19.405 --> 00:03:23.695
+En la terminal escribes opencode guion
+guion version, y te responde con la
+
+53
+00:03:23.735 --> 00:03:25.633
+versión que fija el laboratorio.
+
+54
+00:03:26.033 --> 00:03:29.053
+En esta vía, el agente usa los
+modelos gratuitos de OpenCode.
+
+55
+00:03:29.093 --> 00:03:31.793
+No hace falta cuenta,
+ni clave, ni tarjeta:
+
+56
+00:03:31.833 --> 00:03:34.053
+el laboratorio arranca
+y ya puedes trabajar.
+
+57
+00:03:34.093 --> 00:03:37.873
+Y como no hay ninguna clave, dentro de la
+caja no hay ningún secreto que proteger.
+
+58
+00:03:43.169 --> 00:03:45.469
+No te fíes de lo que
+te cuento: compruébalo.
+
+59
+00:03:45.509 --> 00:03:49.569
+Son cuatro órdenes, y te aconsejo hacerlas
+la primera vez que abras el laboratorio.
+
+60
+00:03:50.313 --> 00:03:54.053
+La primera, who am i, te dice
+con qué usuario trabajas:
+
+61
+00:03:54.143 --> 00:03:56.753
+node, un usuario normal, sin privilegios.
+
+62
+00:03:57.386 --> 00:04:00.855
+La segunda intenta hacerse
+administrador con sudo.
+
+63
+00:04:00.895 --> 00:04:05.709
+Y falla. El mensaje dice que la bandera
+«no new privileges» está activada y que
+
+64
+00:04:05.749 --> 00:04:08.529
+eso impide ejecutar
+sudo como administrador.
+
+65
+00:04:08.569 --> 00:04:11.999
+Esa bandera es la que pone el laboratorio,
+y ningún programa de dentro de la caja
+
+66
+00:04:12.039 --> 00:04:12.939
+puede quitarla.
+
+67
+00:04:13.331 --> 00:04:16.408
+La tercera busca las
+carpetas de tu ordenador.
+
+68
+00:04:16.448 --> 00:04:19.891
+En un Mac, tus ficheros cuelgan
+de una carpeta llamada Users.
+
+69
+00:04:19.931 --> 00:04:22.171
+Dentro de la caja esa carpeta no existe:
+
+70
+00:04:22.211 --> 00:04:23.981
+el agente no puede leer lo que no ve.
+
+71
+00:04:24.405 --> 00:04:29.665
+Y la cuarta, ene pe eme test, ejecuta
+las pruebas del proyecto de juguete,
+
+72
+00:04:29.705 --> 00:04:32.525
+una lista de la compra. Pasan las dos.
+
+73
+00:04:32.565 --> 00:04:36.634
+Lo hicimos también al revés: le pedimos al
+agente que intentara hacerse administrador
+
+74
+00:04:36.674 --> 00:04:40.743
+y escribir en las carpetas del sistema,
+aprobándole todo automáticamente.
+
+75
+00:04:40.783 --> 00:04:44.595
+No pudo. Lo que lo frenó no
+fue el agente, fue la caja.
+
+76
+00:04:49.974 --> 00:04:53.244
+Si no puedes instalar Docker, por
+ejemplo en un ordenador del trabajo,
+
+77
+00:04:53.284 --> 00:04:56.074
+tienes la segunda vía: Codespaces.
+
+78
+00:04:56.114 --> 00:05:00.834
+Desde la página del laboratorio en GitHub
+eliges «Use this template» y luego «Open
+
+79
+00:05:00.874 --> 00:05:04.724
+in a codespace». Con una cuenta gratuita
+de GitHub tienes una cuota de horas cada
+
+80
+00:05:04.764 --> 00:05:05.664
+mes.
+
+81
+00:05:05.894 --> 00:05:08.654
+La caja es la misma, y las
+comprobaciones dan lo mismo:
+
+82
+00:05:08.694 --> 00:05:12.904
+usuario node, sudo bloqueado y
+nada de tu ordenador a la vista.
+
+83
+00:05:12.944 --> 00:05:15.144
+De hecho, aquí ni siquiera
+corre en tu ordenador.
+
+84
+00:05:15.629 --> 00:05:17.689
+Pero hay una diferencia importante.
+
+85
+00:05:17.729 --> 00:05:22.569
+Desde Codespaces, los modelos gratuitos
+de OpenCode llegan con el tope agotado:
+
+86
+00:05:22.609 --> 00:05:26.109
+en nuestras pruebas respondieron que se
+había alcanzado el límite gratuito a la
+
+87
+00:05:26.149 --> 00:05:30.699
+primera petición. Así que en esta
+vía usamos otro proveedor gratuito.
+
+88
+00:05:31.098 --> 00:05:33.318
+El que hemos probado es NVIDIA.
+
+89
+00:05:33.358 --> 00:05:38.368
+Te creas una cuenta en build punto nvidia
+punto com, verificas tu teléfono y generas
+
+90
+00:05:38.408 --> 00:05:43.198
+una clave gratuita. Esa clave la guardas
+en GitHub como un secreto de Codespaces
+
+91
+00:05:43.238 --> 00:05:47.678
+llamado NVIDIA underscore
+API underscore KEY.
+
+92
+00:05:47.718 --> 00:05:51.038
+Así entra en la caja sin
+escribirla nunca en el repositorio.
+
+93
+00:05:51.078 --> 00:05:56.228
+Dentro, eliges el modelo Laguna XS
+dos punto uno, que funciona bien para
+
+94
+00:05:56.268 --> 00:05:57.013
+programar.
+
+95
+00:05:57.033 --> 00:05:59.909
+Y si ya tienes GitHub
+Copilot, también vale:
+
+96
+00:05:59.949 --> 00:06:03.059
+desde OpenCode te conectas a
+Copilot y usas sus modelos.
+
+97
+00:06:03.949 --> 00:06:07.829
+Ten en cuenta una cosa. En esta vía,
+dentro de la caja sí hay secretos:
+
+98
+00:06:07.869 --> 00:06:12.439
+tu clave de NVIDIA o tu sesión de Copilot,
+y el permiso que GitHub da al codespace
+
+99
+00:06:12.479 --> 00:06:14.299
+para escribir en tu repositorio.
+
+100
+00:06:14.339 --> 00:06:18.729
+El agente puede leerlos. Por eso, al
+terminar, conviene borrar el codespace.
+
+101
+00:06:24.053 --> 00:06:26.813
+Y llegamos a lo más
+importante del laboratorio:
+
+102
+00:06:26.853 --> 00:06:31.113
+se puede romper sin miedo. Si el
+agente deja el proyecto hecho un lío,
+
+103
+00:06:31.153 --> 00:06:34.313
+lo devuelves a como estaba.
+Si la caja entera se estropea,
+
+104
+00:06:34.353 --> 00:06:35.813
+la tiras y creas otra.
+
+105
+00:06:36.609 --> 00:06:39.429
+Cada guía de esta ruta tiene
+su rama en el repositorio:
+
+106
+00:06:39.469 --> 00:06:43.079
+guía cero dos, guía cero
+tres, y así hasta la diez.
+
+107
+00:06:43.119 --> 00:06:46.789
+Para dejar una guía como al principio,
+cambias a su rama y la devuelves al estado
+
+108
+00:06:46.829 --> 00:06:49.939
+del repositorio con git
+reset guion guion hard.
+
+109
+00:06:50.708 --> 00:06:55.048
+Si lo que se ha estropeado es la caja, en
+tu ordenador eliges «Rebuild Container» y
+
+110
+00:06:55.088 --> 00:06:59.648
+se crea de nuevo, idéntica. En Codespaces,
+borras el codespace y abres otro desde la
+
+111
+00:06:59.688 --> 00:07:00.668
+plantilla.
+
+112
+00:07:01.823 --> 00:07:04.853
+Acostúmbrate a hacerlo. No es un fracaso,
+es la forma normal de trabajar con
+
+113
+00:07:04.893 --> 00:07:08.983
+agentes: probar, ver qué pasa
+y, si no te gusta, volver atrás.
+
+114
+00:07:14.301 --> 00:07:17.341
+Una última cosa antes
+de hablar con el agente.
+
+115
+00:07:17.381 --> 00:07:20.381
+Todo lo que le escribes viaja
+al proveedor del modelo.
+
+116
+00:07:20.421 --> 00:07:24.613
+Con los modelos gratuitos, algunos
+proveedores dicen que no guardan nada,
+
+117
+00:07:24.653 --> 00:07:27.871
+y otros pueden usar lo que les
+envías para mejorar sus modelos.
+
+118
+00:07:29.142 --> 00:07:32.089
+Por eso, la regla de la
+ruta tiene dos partes.
+
+119
+00:07:32.129 --> 00:07:35.197
+Todas las prácticas se
+hacen en el laboratorio.
+
+120
+00:07:35.237 --> 00:07:38.025
+Y en el laboratorio solo va
+el proyecto de prácticas:
+
+121
+00:07:38.065 --> 00:07:42.202
+nunca código de tu empresa, ni
+secretos, ni datos personales.
+
+122
+00:07:42.712 --> 00:07:44.753
+Te propongo la práctica de este vídeo.
+
+123
+00:07:44.793 --> 00:07:49.072
+Abre el laboratorio, por la vía que te
+encaje, y haz las cuatro comprobaciones:
+
+124
+00:07:49.112 --> 00:07:53.752
+con qué usuario trabajas, que sudo falla,
+que no ves las carpetas de tu ordenador y
+
+125
+00:07:53.792 --> 00:07:57.422
+que las pruebas pasan. Después,
+tíralo y vuelve a crearlo.
+
+126
+00:07:57.941 --> 00:08:00.741
+En el próximo vídeo abrimos
+OpenCode por primera vez:
+
+127
+00:08:00.781 --> 00:08:04.621
+qué hay en la pantalla, cómo elegir
+el modelo y cómo se le pide algo.
+
+128
+00:08:04.661 --> 00:08:05.561
+Nos vemos allí.

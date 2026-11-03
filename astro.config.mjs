@@ -9,6 +9,10 @@ export default defineConfig({
   site: 'https://codigosinsiesta.com',
   integrations: [svelte(), sitemap()],
   trailingSlash: 'ignore',
+  // Rutas retiradas: su contenido vive ahora en otra.
+  redirects: {
+    '/rutas/agentic-engineering': '/rutas/pi-oh-my-pi',
+  },
   markdown: {
     rehypePlugins: [rehypeHeadingIcons],
   },

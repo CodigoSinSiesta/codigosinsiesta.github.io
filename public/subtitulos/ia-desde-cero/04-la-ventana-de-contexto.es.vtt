@@ -1,0 +1,718 @@
+WEBVTT
+Kind: captions
+Language: es
+
+1
+00:00:10.260 --> 00:00:12.957
+Código Sin Siesta. IA desde cero.
+
+2
+00:00:12.997 --> 00:00:15.380
+Vídeo cuatro: la ventana de contexto.
+
+3
+00:00:20.891 --> 00:00:25.011
+En el vídeo uno dijimos que todo lo que el
+modelo puede tener delante a la vez tiene
+
+4
+00:00:25.051 --> 00:00:28.421
+un límite, y le pusimos
+nombre: la ventana de contexto.
+
+5
+00:00:28.461 --> 00:00:32.401
+Hoy toca entenderla, porque explica casi
+todo lo que te va a extrañar al trabajar
+
+6
+00:00:32.441 --> 00:00:35.689
+con un agente: por qué de repente
+olvida algo que le dijiste,
+
+7
+00:00:35.729 --> 00:00:40.641
+por qué una sesión larga acaba yendo
+peor y cuándo conviene empezar de cero.
+
+8
+00:00:41.199 --> 00:00:45.789
+Piensa en un escritorio. Encima puedes
+tener varios documentos abiertos a la vez:
+
+9
+00:00:45.829 --> 00:00:49.709
+el enunciado de la tarea, un
+par de ficheros, tus notas.
+
+10
+00:00:49.749 --> 00:00:52.919
+Mientras están sobre la mesa,
+los consultas cuando quieras.
+
+11
+00:00:52.959 --> 00:00:54.249
+Pero la mesa tiene un tamaño.
+
+12
+00:00:54.289 --> 00:00:57.799
+Si quieres abrir otro documento y ya
+no cabe, tienes que guardar alguno.
+
+13
+00:00:58.300 --> 00:01:01.250
+La ventana de contexto es ese escritorio.
+
+14
+00:01:01.290 --> 00:01:05.300
+Es todo lo que el modelo tiene delante
+en el momento de escribir su respuesta.
+
+15
+00:01:05.340 --> 00:01:08.740
+Y la regla es estricta: lo que
+está en la mesa existe para él,
+
+16
+00:01:08.780 --> 00:01:11.320
+y lo que no está, no existe.
+
+17
+00:01:11.360 --> 00:01:15.470
+No hay un cajón donde mire por su cuenta,
+ni una memoria aparte donde guarde lo de
+
+18
+00:01:15.510 --> 00:01:16.410
+ayer.
+
+19
+00:01:17.536 --> 00:01:19.760
+Esto conecta con lo que
+vimos en el vídeo uno:
+
+20
+00:01:19.800 --> 00:01:22.466
+el modelo se equivoca más
+cuando le falta información.
+
+21
+00:01:22.506 --> 00:01:27.040
+Si un fichero no está en el escritorio,
+no lo conoce, por mucho que esté en tu
+
+22
+00:01:27.080 --> 00:01:30.200
+proyecto. Y entonces hace
+lo que mejor sabe hacer:
+
+23
+00:01:30.240 --> 00:01:31.490
+se imagina cómo es.
+
+24
+00:01:37.470 --> 00:01:39.652
+Aquí viene la idea que más sorprende.
+
+25
+00:01:39.692 --> 00:01:42.316
+Cuando hablas con un agente,
+parece que te recuerda:
+
+26
+00:01:42.356 --> 00:01:46.710
+le preguntas algo, luego otra cosa, y
+responde teniendo en cuenta lo anterior.
+
+27
+00:01:46.750 --> 00:01:50.285
+Pero el modelo no guarda nada
+entre una petición y la siguiente.
+
+28
+00:01:50.325 --> 00:01:53.120
+Cada vez que le llega una,
+empieza con la mesa vacía.
+
+29
+00:01:53.646 --> 00:01:55.916
+¿Cómo es posible que parezca recordar?
+
+30
+00:01:55.956 --> 00:02:00.166
+Porque OpenCode, en cada petición, le
+vuelve a poner encima de la mesa toda la
+
+31
+00:02:00.206 --> 00:02:04.637
+conversación: lo que tú dijiste, lo
+que él respondió y todo lo que leyó.
+
+32
+00:02:04.677 --> 00:02:08.442
+Imagina a un compañero sin memoria al
+que, cada vez que le haces una pregunta,
+
+33
+00:02:08.482 --> 00:02:11.956
+le das primero el expediente
+entero, desde la primera página.
+
+34
+00:02:11.996 --> 00:02:14.455
+Responde bien, porque
+lo acaba de leer todo.
+
+35
+00:02:14.495 --> 00:02:15.886
+Pero lo ha leído otra vez.
+
+36
+00:02:16.359 --> 00:02:18.908
+Y esto pasa más veces de las que parece.
+
+37
+00:02:18.948 --> 00:02:23.549
+Cuando le pides que lea un fichero, el
+modelo hace una petición para pedir la
+
+38
+00:02:23.639 --> 00:02:27.428
+lectura, OpenCode lee el fichero,
+y luego hace otra petición,
+
+39
+00:02:27.468 --> 00:02:31.009
+con el fichero ya encima de
+la mesa, para responderte.
+
+40
+00:02:31.049 --> 00:02:35.309
+Una sola pregunta tuya pueden ser varias
+peticiones, y en cada una viaja todo.
+
+41
+00:02:36.130 --> 00:02:38.069
+De aquí salen dos consecuencias.
+
+42
+00:02:38.109 --> 00:02:42.544
+La primera: cuanto más larga es la
+conversación, más pesa cada petición,
+
+43
+00:02:42.584 --> 00:02:44.945
+porque cada una lleva todo lo anterior.
+
+44
+00:02:44.985 --> 00:02:49.385
+La segunda: lo que no esté en
+la conversación, no lo sabe.
+
+45
+00:02:49.425 --> 00:02:52.685
+Si cierras la sesión y abres otra,
+el expediente empieza en blanco.
+
+46
+00:02:58.032 --> 00:03:01.152
+Veamos qué hay encima de
+la mesa en cada petición.
+
+47
+00:03:01.192 --> 00:03:05.512
+Son cuatro cosas: el manual del
+agente, la lista de herramientas,
+
+48
+00:03:05.552 --> 00:03:09.232
+las instrucciones de tu proyecto y la
+conversación, con tu mensaje nuevo al
+
+49
+00:03:09.272 --> 00:03:11.412
+final. Vamos una a una.
+
+50
+00:03:11.912 --> 00:03:13.778
+Lo primero no lo escribes tú.
+
+51
+00:03:13.818 --> 00:03:15.922
+Es el manual de instrucciones del agente:
+
+52
+00:03:15.962 --> 00:03:20.592
+un texto largo que trae OpenCode y que le
+explica al modelo cómo debe trabajar y qué
+
+53
+00:03:20.632 --> 00:03:23.012
+normas sigue. Lo veremos
+con calma en la guía siete.
+
+54
+00:03:23.621 --> 00:03:28.177
+Lo segundo es la lista de herramientas que
+puede usar, cada una con su descripción:
+
+55
+00:03:28.217 --> 00:03:32.247
+leer un fichero, buscar,
+editar, ejecutar un comando.
+
+56
+00:03:32.517 --> 00:03:35.397
+Para pedir una herramienta, el
+modelo tiene que saber que existe,
+
+57
+00:03:35.437 --> 00:03:37.887
+así que esa lista también
+viaja en cada petición.
+
+58
+00:03:38.903 --> 00:03:40.583
+Lo comprobamos en el laboratorio.
+
+59
+00:03:40.623 --> 00:03:45.313
+En una sesión nueva le escribimos solo
+«hola», y medimos lo que le llegó al
+
+60
+00:03:45.378 --> 00:03:46.943
+modelo: varios miles de tokens.
+
+61
+00:03:46.983 --> 00:03:49.123
+Casi todo era el manual
+y las herramientas;
+
+62
+00:03:49.163 --> 00:03:51.463
+nuestro saludo era una parte diminuta.
+
+63
+00:03:51.503 --> 00:03:54.681
+Ese es el escritorio que ya está
+ocupado cuando te sientas a trabajar.
+
+64
+00:03:55.081 --> 00:03:58.121
+Lo tercero son las
+instrucciones de tu proyecto.
+
+65
+00:03:58.161 --> 00:04:03.391
+Si el proyecto tiene un fichero llamado
+AGENTS punto md, OpenCode también lo pone
+
+66
+00:04:03.431 --> 00:04:06.201
+encima de la mesa, y en cada petición.
+
+67
+00:04:06.241 --> 00:04:10.140
+El laboratorio todavía no tiene uno:
+lo escribirás tú en la guía siete.
+
+68
+00:04:11.209 --> 00:04:14.295
+Y lo cuarto, lo que más
+crece: la conversación.
+
+69
+00:04:14.335 --> 00:04:19.370
+Tus mensajes, sus respuestas y, sobre
+todo, lo que leen las herramientas.
+
+70
+00:04:19.410 --> 00:04:23.650
+Cada fichero que el agente abre entra
+en el escritorio y se queda ahí.
+
+71
+00:04:23.690 --> 00:04:25.670
+Un fichero pequeño apenas se nota.
+
+72
+00:04:25.710 --> 00:04:29.500
+Uno grande, o la salida larga de
+un comando, ocupa mucho de golpe.
+
+73
+00:04:34.824 --> 00:04:38.484
+El escritorio tiene un tamaño
+máximo, y depende del modelo.
+
+74
+00:04:38.524 --> 00:04:41.934
+Unos admiten mucho más que otros, y
+las cifras cambian con cada versión,
+
+75
+00:04:41.974 --> 00:04:43.884
+así que no te voy a dar ninguna.
+
+76
+00:04:43.924 --> 00:04:48.444
+Lo que importa es que el límite existe, y
+que una sesión con un agente se acerca a
+
+77
+00:04:48.484 --> 00:04:52.634
+él antes de lo que crees, porque todo
+lo que lee se queda encima de la mesa.
+
+78
+00:04:53.134 --> 00:04:55.774
+Pero hay algo más
+importante que el límite.
+
+79
+00:04:55.814 --> 00:05:00.834
+El modelo trabaja peor a medida que el
+contexto crece, sin necesidad de llegar al
+
+80
+00:05:01.076 --> 00:05:05.462
+límite. Piensa en una mochila a la que
+sigues metiendo cosas sin sacar nunca
+
+81
+00:05:05.502 --> 00:05:08.155
+nada. Al principio encuentras
+lo que buscas a la primera.
+
+82
+00:05:08.195 --> 00:05:11.504
+Con el tiempo, lo que necesitas
+está debajo de todo lo demás,
+
+83
+00:05:11.544 --> 00:05:13.484
+y cargas con peso que ya no sirve.
+
+84
+00:05:13.957 --> 00:05:16.429
+Con el contexto pasa algo parecido.
+
+85
+00:05:16.469 --> 00:05:20.671
+Una sesión larga acumula ruido:
+ficheros que leyó y ya no importan,
+
+86
+00:05:20.711 --> 00:05:24.037
+intentos que fallaron,
+caminos que se descartaron.
+
+87
+00:05:24.077 --> 00:05:28.387
+El modelo lo sigue teniendo todo delante,
+y todo compite por su atención con lo que
+
+88
+00:05:28.427 --> 00:05:32.197
+de verdad importa ahora. Por
+eso, en una sesión muy larga,
+
+89
+00:05:32.237 --> 00:05:36.567
+a veces repite pasos que ya hizo, se
+contradice o pierde de vista lo que le
+
+90
+00:05:36.607 --> 00:05:37.737
+pediste al principio.
+
+91
+00:05:38.518 --> 00:05:43.088
+Esa es la lección práctica: más
+contexto no siempre es mejor.
+
+92
+00:05:43.128 --> 00:05:46.848
+Lo que quieres no es una mesa llena, sino
+una mesa con lo que hace falta para la
+
+93
+00:05:46.888 --> 00:05:50.278
+tarea de ahora. Y para conseguirlo
+tienes dos herramientas.
+
+94
+00:05:55.651 --> 00:05:59.322
+La primera es la más sencilla:
+empezar una sesión nueva.
+
+95
+00:05:59.362 --> 00:06:03.772
+En OpenCode se hace con barra new,
+o con control equis y luego la ene.
+
+96
+00:06:03.812 --> 00:06:07.841
+Es despejar la mesa entera. El agente
+arranca otra vez solo con su manual,
+
+97
+00:06:07.881 --> 00:06:11.251
+sus herramientas y las
+instrucciones de tu proyecto.
+
+98
+00:06:11.291 --> 00:06:15.364
+La sesión anterior no se borra: puedes
+volver a ella con barra sessions.
+
+99
+00:06:16.146 --> 00:06:18.904
+¿Cuándo conviene? Cada
+vez que cambias de tarea.
+
+100
+00:06:18.944 --> 00:06:21.901
+Si acabas de arreglar un fallo y
+ahora quieres añadir otra cosa,
+
+101
+00:06:21.941 --> 00:06:23.854
+lo que leyó para el fallo ya no te sirve:
+
+102
+00:06:23.894 --> 00:06:27.834
+es peso en la mochila. Y también
+cuando notes que la sesión se enreda:
+
+103
+00:06:27.874 --> 00:06:31.964
+que repite, que se contradice o que
+vuelve a proponer algo que ya descartaste.
+
+104
+00:06:32.676 --> 00:06:35.946
+Lo que cuesta una sesión nueva es
+que hay que volver a ponerla al día.
+
+105
+00:06:35.986 --> 00:06:40.276
+No recuerda nada de la anterior, así que
+tendrá que leer otra vez los ficheros que
+
+106
+00:06:40.316 --> 00:06:44.546
+necesite. Por eso merece la pena guardar
+lo importante fuera de la conversación,
+
+107
+00:06:44.586 --> 00:06:48.346
+en ficheros del proyecto. Lo que está
+en un fichero lo puede volver a leer;
+
+108
+00:06:48.386 --> 00:06:50.976
+lo que solo estaba en la
+conversación, se ha ido.
+
+109
+00:06:52.065 --> 00:06:54.747
+La segunda herramienta es compactar.
+
+110
+00:06:54.787 --> 00:06:58.607
+OpenCode le pide al modelo un resumen
+de la conversación hasta ese momento,
+
+111
+00:06:58.647 --> 00:07:02.388
+y a partir de ahí, en lugar de toda
+la conversación, viaja el resumen.
+
+112
+00:07:02.548 --> 00:07:05.917
+Es como vaciar la mochila y quedarte
+con una nota de lo que llevabas.
+
+113
+00:07:05.957 --> 00:07:09.498
+Se hace con barra compact. Y,
+además, OpenCode compacta solo,
+
+114
+00:07:09.538 --> 00:07:12.548
+sin que se lo pidas, cuando la
+ventana se acerca al límite.
+
+115
+00:07:13.144 --> 00:07:16.907
+Compactar tiene un precio: un
+resumen siempre pierde detalles.
+
+116
+00:07:16.947 --> 00:07:20.917
+Un nombre exacto, un mensaje de error
+o una decisión que tomasteis a mitad de
+
+117
+00:07:20.957 --> 00:07:23.010
+camino pueden no sobrevivir.
+
+118
+00:07:23.050 --> 00:07:26.447
+Por eso, cuando la tarea cambia,
+una sesión nueva suele ser mejor que
+
+119
+00:07:26.487 --> 00:07:30.699
+compactar. Y cuando quieres seguir con la
+misma tarea pero la mesa está muy llena,
+
+120
+00:07:30.739 --> 00:07:32.267
+compactar te deja continuar.
+
+121
+00:07:37.653 --> 00:07:39.873
+No hace falta que me creas: se ve.
+
+122
+00:07:39.913 --> 00:07:43.793
+En la parte de abajo de la pantalla,
+OpenCode enseña cuánto contexto llevas
+
+123
+00:07:43.833 --> 00:07:46.713
+ocupado, en tokens y en
+porcentaje de la ventana.
+
+124
+00:07:46.753 --> 00:07:49.923
+Es el mismo número del que hemos hablado
+todo el vídeo, y a partir de ahora
+
+125
+00:07:49.963 --> 00:07:52.367
+conviene que lo tengas siempre a la vista.
+
+126
+00:07:52.716 --> 00:07:55.836
+Te propongo esta práctica en el
+laboratorio, con el agente plan,
+
+127
+00:07:55.876 --> 00:08:00.406
+que no edita ficheros. Abre una sesión
+nueva y ve pidiéndole que lea ficheros,
+
+128
+00:08:00.446 --> 00:08:04.056
+uno detrás de otro. Después de cada
+petición, mira el pie de la pantalla y
+
+129
+00:08:04.096 --> 00:08:06.126
+apunta cuánto contexto llevas.
+
+130
+00:08:06.628 --> 00:08:09.068
+Nosotros lo hicimos así
+al preparar el vídeo.
+
+131
+00:08:09.108 --> 00:08:14.348
+En una sesión nueva, le pedimos que leyera
+compra punto js y nos dijera qué hace.
+
+132
+00:08:14.388 --> 00:08:16.721
+Luego, que leyera las pruebas y el README.
+
+133
+00:08:16.761 --> 00:08:19.948
+Después, el fichero de
+configuración del contenedor.
+
+134
+00:08:19.988 --> 00:08:23.388
+El número sube cada vez
+que lee algo, y no baja.
+
+135
+00:08:23.428 --> 00:08:27.617
+Son ficheros pequeños; con los de un
+proyecto real, el salto es mucho mayor.
+
+136
+00:08:28.533 --> 00:08:32.807
+Ahora pregúntale cómo se llama la
+función que suma el total de la lista.
+
+137
+00:08:33.037 --> 00:08:37.527
+Lo responde al momento, sin abrir
+nada, porque el fichero sigue encima de
+
+138
+00:08:38.026 --> 00:08:42.667
+la mesa. Después abre una sesión nueva
+con barra new y hazle exactamente la misma
+
+139
+00:08:42.707 --> 00:08:47.127
+pregunta. El pie vuelve casi al principio,
+y el agente tiene que buscar y leer el
+
+140
+00:08:47.167 --> 00:08:49.266
+fichero otra vez para responder.
+
+141
+00:08:49.306 --> 00:08:52.707
+Si antes te pide permiso para
+ejecutar un comando, recházalo:
+
+142
+00:08:52.747 --> 00:08:53.765
+no le hace falta.
+
+143
+00:08:54.165 --> 00:08:57.786
+Repasemos. La ventana de
+contexto es el escritorio:
+
+144
+00:08:57.826 --> 00:09:00.535
+todo lo que el modelo
+tiene delante, y nada más.
+
+145
+00:09:00.845 --> 00:09:04.515
+No recuerda: OpenCode le
+reenvía todo en cada petición.
+
+146
+00:09:04.555 --> 00:09:08.293
+Tiene un límite, pero el trabajo
+empeora antes, a medida que se llena.
+
+147
+00:09:08.333 --> 00:09:11.445
+Y cuando la mochila pesa,
+sesión nueva o compactar.
+
+148
+00:09:12.510 --> 00:09:16.439
+En el próximo vídeo veremos qué hace el
+agente con todo eso encima de la mesa:
+
+149
+00:09:16.489 --> 00:09:20.369
+el bucle con el que deja de hablar y
+empieza a actuar, y las herramientas que
+
+150
+00:09:20.409 --> 00:09:22.799
+usa para hacerlo. Nos vemos
+en el siguiente vídeo.

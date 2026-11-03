@@ -16,18 +16,30 @@ const guias = (await getCollection('guias', (g) => g.data.ruta === ruta.slug)).s
 );
 
 // Cada paso lleva una `key` estable para el progreso: id de guía o href del paso.
+// Un paso que reutiliza una guía de otra ruta guarda su progreso en la ruta de la guía
+// (`progreso`), así marcarlo aquí o en la propia guía es lo mismo.
+const todasGuias = await getCollection('guias');
+const desdeGuia = (g: (typeof todasGuias)[number]) => ({
+  tipo: 'guia' as const,
+  titulo: g.data.title,
+  href: `/rutas/${g.data.ruta}/${g.id}`,
+  meta: g.data.duracion,
+  key: g.id,
+  progreso: g.data.ruta,
+});
 const pasos =
   guias.length > 0
     ? guias.map((g) => ({
-        tipo: 'guia' as const,
-        titulo: g.data.title,
-        href: `/rutas/${ruta.slug}/${g.id}`,
-        meta: g.data.duracion,
-        // Si la ruta empieza en el orden 0 (un tráiler), el número del paso es el del vídeo.
-        numero: guias[0].data.orden === 0 ? g.data.orden : undefined,
-        key: g.id,
+        ...desdeGuia(g),
+        // El número del paso es el de la guía (orden): así un tráiler va como 00 y los huecos de una ruta se ven.
+        numero: g.data.orden,
       }))
-    : ruta.pasos.map((p) => ({ ...p, key: p.href }));
+    : ruta.pasos.map((p) => {
+        if (!('guia' in p)) return { ...p, key: p.href };
+        const g = todasGuias.find((x) => x.id === p.guia);
+        if (!g) throw new Error(`La ruta ${ruta.slug} cita la guía ${p.guia}, que no existe`);
+        return desdeGuia(g);
+      });
 
 const tieneContrato =
   ruta.aprenderas?.length || ruta.requisitos?.length || ruta.noIncluye?.length;
@@ -40,6 +52,14 @@ const tieneContrato =
       <h1>{ruta.titulo}</h1>
       <p class="lead" style="max-width: 42rem;">{ruta.descripcion}</p>
       {ruta.paraQuien && <p class="meta" style="max-width: 42rem;">Para ti si: {ruta.paraQuien}</p>}
+      {
+        ruta.oculta && (
+          <p class="aviso-ruta">
+            Esta guía está en revisión y ya no aparece en el listado. Si buscas por dónde empezar, ve a{' '}
+            <a href="/rutas/ia-desde-cero">IA desde cero</a>.
+          </p>
+        )
+      }
 
       {
         ruta.porQue && (
@@ -99,6 +119,19 @@ const tieneContrato =
                     <h3>{e.titulo}</h3>
                     <p class="meta">{e.videos}</p>
                     <p>{e.descripcion}</p>
+                    {e.profundizar && (
+                      <div class="profundizar">
+                        <p class="profundizar__t">Para profundizar</p>
+                        <ul>
+                          {e.profundizar.map((l) => (
+                            <li>
+                              <span class="badge">{l.tipo}</span> <a href={l.href}>{l.titulo}</a>
+                              {l.meta && <span class="meta"> · {l.meta}</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </li>
               ))}
