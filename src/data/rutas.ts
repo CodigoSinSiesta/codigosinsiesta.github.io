@@ -1,3 +1,5 @@
+import { RUTA_CORTA_PI, type RutaCorta } from './ruta-corta-pi-oh-my-pi';
+
 export type TipoPaso = 'guia' | 'ensayo' | 'deck' | 'taller';
 
 export interface PasoManual {
@@ -56,6 +58,10 @@ export interface Ruta {
   equivalencias?: Equivalencia[];
   equivalenciasNota?: string;
   etapas?: Etapa[];
+  // Páginas de apoyo que se enlazan desde la portada de la ruta.
+  glosario?: string; // href del glosario del curso
+  rutaCorta?: RutaCorta; // selección para quien tiene poco tiempo
+  materiales?: { problemas: string; preguntas: string }; // problemas frecuentes y dudas, en el repo de materiales
   // Las rutas con guías propias (colección `guias`) dejan pasos vacío:
   // la página los genera desde la colección.
   pasos: Paso[];
@@ -213,6 +219,12 @@ export const RUTAS: Ruta[] = [
       'Un manual de Claude Code, Codex u opencode: usamos Pi para entender los conceptos y te señalamos dónde reaparecen',
       'Entrenar o ajustar modelos',
     ],
+    glosario: '/rutas/pi-oh-my-pi/glosario',
+    rutaCorta: RUTA_CORTA_PI,
+    materiales: {
+      problemas: 'https://github.com/CodigoSinSiesta/curso-pi-materiales/blob/main/PROBLEMAS.md',
+      preguntas: 'https://github.com/CodigoSinSiesta/curso-pi-materiales/issues/new/choose',
+    },
     pasos: [],
   },
 ];

@@ -1,0 +1,134 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { RUTAS } from '../../../data/rutas';
+import { GLOSARIO_PI, type Termino } from '../../../data/glosario-pi-oh-my-pi';
+import { enlaceCapitulo, indexarGuias } from '../../../lib/guias';
+
+// Glosario del curso. Los términos viven en src/data/glosario-pi-oh-my-pi.ts;
+// aquí solo se resuelven sus capítulos contra las guías (el build falla si alguno no existe).
+const ruta = RUTAS.find((r) => r.slug === 'pi-oh-my-pi')!;
+const indice = await indexarGuias(ruta.slug);
+
+const slug = (t: string) =>
+  t
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const quien = (t: Termino) => `El glosario («${t.termino}»)`;
+
+const terminos = [...GLOSARIO_PI]
+  .sort((a, b) => a.termino.localeCompare(b.termino, 'es', { sensitivity: 'base' }))
+  .map((t) => {
+    const explica = enlaceCapitulo(indice, t.explica, quien(t));
+    const primera = t.primera ? enlaceCapitulo(indice, t.primera, quien(t)) : null;
+    if (primera && primera.href === explica.href) {
+      throw new Error(`${quien(t)}: «primera» repite el capítulo de «explica»; quítala`);
+    }
+    const tambien = (t.tambien ?? []).map((r) => enlaceCapitulo(indice, r, quien(t)));
+    return {
+      ...t,
+      id: slug(t.termino),
+      donde: [
+        { etiqueta: 'Se explica en', enlace: explica },
+        ...(primera ? [{ etiqueta: 'Aparece antes en', enlace: primera }] : []),
+        ...tambien.map((e) => ({ etiqueta: 'Más en', enlace: e })),
+      ],
+      buscar: [t.termino, ...(t.sinonimos ?? []), t.definicion].join(' ').toLowerCase(),
+    };
+  });
+
+const ids = new Set(terminos.map((t) => t.id));
+if (ids.size !== terminos.length) throw new Error('El glosario tiene dos términos con el mismo nombre');
+---
+
+<Base
+  title={`Glosario · ${ruta.titulo}`}
+  description={`Los ${terminos.length} términos del curso de Pi y oh my pi: qué significan y en qué vídeo y minuto se explican.`}
+  activeHref="/rutas"
+>
+  <div class="container">
+    <section class="section">
+      <p class="eyebrow"><span><a href={`/rutas/${ruta.slug}`} style="color: inherit;">{ruta.titulo}</a> · glosario</span></p>
+      <h1>Glosario del curso</h1>
+      <p class="lead" style="max-width: 44rem;">
+        Los {terminos.length} términos que usa el curso, con el nombre que les damos y lo que significan. Cada enlace
+        te lleva al capítulo donde se explica y deja el vídeo en ese minuto.
+      </p>
+      <p class="meta" style="max-width: 44rem;">
+        Si un concepto se llama de otra forma en Pi, en oh my pi o en inglés, lo verás bajo el término como «también».
+      </p>
+
+      <div class="glosario-filtro" data-filtro hidden>
+        <label class="meta" for="glosario-buscar">Filtrar términos</label>
+        <input id="glosario-buscar" type="search" placeholder="compactación, /fork, sandbox…" autocomplete="off" />
+      </div>
+
+      <dl class="glosario">
+        {
+          terminos.map((t) => (
+            <div class="glosario__fila" id={t.id} data-buscar={t.buscar}>
+              <dt>
+                {t.termino}
+                {t.sinonimos?.length && <span class="glosario__sin">también: {t.sinonimos.join(' · ')}</span>}
+              </dt>
+              <dd class="glosario__def">
+                <p>{t.definicion}</p>
+              </dd>
+              <dd>
+                <ul class="glosario__donde">
+                  {t.donde.map(({ etiqueta, enlace }) => (
+                    <li>
+                      <span class="meta">{etiqueta}</span>
+                      <a href={enlace.href} title={`${enlace.tituloGuia} · ${enlace.capitulo.titulo}`}>
+                        vídeo {enlace.video} · {enlace.capitulo.etiqueta}
+                      </a>{' '}
+                      {enlace.capitulo.nombre}
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+      <p class="glosario__vacio meta" data-vacio hidden>Ningún término coincide.</p>
+
+      <p style="margin-top: 2.5rem;">
+        <a href={`/rutas/${ruta.slug}`}>← {ruta.titulo}</a>
+        {ruta.rutaCorta && (
+          <>
+            {' · '}
+            <a href={ruta.rutaCorta.href}>La ruta corta</a>
+          </>
+        )}
+      </p>
+    </section>
+  </div>
+</Base>
+
+<script>
+  // Filtro por texto (término, otros nombres y definición). Sin JS, el glosario se lee entero.
+  const caja = document.querySelector<HTMLElement>('[data-filtro]');
+  const input = document.querySelector<HTMLInputElement>('#glosario-buscar');
+  const filas = [...document.querySelectorAll<HTMLElement>('.glosario__fila')];
+  const vacio = document.querySelector<HTMLElement>('[data-vacio]');
+  const normalizar = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const textos = filas.map((f) => normalizar(f.dataset.buscar ?? ''));
+
+  if (caja && input) {
+    caja.hidden = false;
+    input.addEventListener('input', () => {
+      const q = normalizar(input.value.trim());
+      let visibles = 0;
+      filas.forEach((f, i) => {
+        const ok = !q || textos[i].includes(q);
+        f.hidden = !ok;
+        if (ok) visibles++;
+      });
+      if (vacio) vacio.hidden = visibles > 0;
+    });
+  }
+</script>

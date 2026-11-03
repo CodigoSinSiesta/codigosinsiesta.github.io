@@ -3,6 +3,9 @@ import Base from '../../layouts/Base.astro';
 import ListaPasos from '../../components/ListaPasos.svelte';
 import { getCollection } from 'astro:content';
 import { RUTAS } from '../../data/rutas';
+import { indexarGuias } from '../../lib/guias';
+import { resolverRutaCorta } from '../../lib/ruta-corta';
+import { horasYMinutos } from '../../lib/capitulos';
 
 export async function getStaticPaths() {
   return RUTAS.map((ruta) => ({ params: { slug: ruta.slug }, props: { ruta } }));
@@ -41,6 +44,11 @@ const pasos =
         return desdeGuia(g);
       });
 
+// Ruta corta: títulos y duraciones salen de las guías; el total, de su campo `duracion`.
+const rutaCorta = ruta.rutaCorta
+  ? resolverRutaCorta(ruta.rutaCorta, await indexarGuias(ruta.slug))
+  : null;
+
 const tieneContrato =
   ruta.aprenderas?.length || ruta.requisitos?.length || ruta.noIncluye?.length;
 ---
@@ -52,6 +60,31 @@ const tieneContrato =
       <h1>{ruta.titulo}</h1>
       <p class="lead" style="max-width: 42rem;">{ruta.descripcion}</p>
       {ruta.paraQuien && <p class="meta" style="max-width: 42rem;">Para ti si: {ruta.paraQuien}</p>}
+      {
+        (ruta.glosario || rutaCorta || ruta.materiales) && (
+          <ul class="ruta-atajos">
+            {rutaCorta && ruta.rutaCorta && (
+              <li>
+                <a href="#ruta-corta">¿Poco tiempo? La ruta corta</a>
+                <span class="meta"> · {rutaCorta.paradas.length} vídeos · {horasYMinutos(rutaCorta.minutos)}</span>
+              </li>
+            )}
+            {ruta.glosario && (
+              <li>
+                <a href={ruta.glosario}>Glosario del curso</a>
+                <span class="meta"> · cada término, con el vídeo y el minuto donde se explica</span>
+              </li>
+            )}
+            {ruta.materiales && (
+              <li>
+                <a href={ruta.materiales.problemas}>¿Algo no funciona? Problemas frecuentes</a>
+                <span class="meta"> · lo que ves, qué significa y cómo se arregla · </span>
+                <a href={ruta.materiales.preguntas}>pregunta tu duda</a>
+              </li>
+            )}
+          </ul>
+        )
+      }
       {
         ruta.oculta && (
           <p class="aviso-ruta">
@@ -173,6 +206,28 @@ const tieneContrato =
                 </ul>
               </div>
             )}
+          </div>
+        )
+      }
+
+      {
+        rutaCorta && ruta.rutaCorta && (
+          <div class="ruta-bloque" id="ruta-corta">
+            <h2>¿Poco tiempo? La ruta corta</h2>
+            <p class="lead" style="max-width: 42rem;">{ruta.rutaCorta.intro}</p>
+            <ol class="ruta-corta">
+              {rutaCorta.paradas.map((p) => (
+                <li class="ruta-corta__item">
+                  <span class="ruta-corta__n">{p.video}</span>
+                  <a href={p.href}>{p.titulo}</a>
+                  <span class="meta">{p.duracion}</span>
+                </li>
+              ))}
+            </ol>
+            <p class="ruta-corta__total">
+              Total: <strong>{horasYMinutos(rutaCorta.minutos)}</strong> de vídeo, frente a {ruta.duracion} del curso completo.{' '}
+              <a href={ruta.rutaCorta.href}>Por qué estos seis y qué te saltas →</a>
+            </p>
           </div>
         )
       }

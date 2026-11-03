@@ -4,6 +4,7 @@ import ProgresoGuia from '../../../components/ProgresoGuia.svelte';
 import { getCollection, render } from 'astro:content';
 import { RUTAS } from '../../../data/rutas';
 import { VIDEOS_BASE_URL } from '../../../data/site';
+import { capitulosDeGuia } from '../../../lib/capitulos';
 
 export async function getStaticPaths() {
   const guias = await getCollection('guias');
@@ -36,15 +37,7 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 // Guías con vídeo: los capítulos salen del resumen, cada «### título» seguido de su botón «Ir a» (data-t).
 // `peso` es lo que dura cada capítulo (el último, hasta la duración aproximada del frontmatter;
 // el script lo corrige cuando el vídeo carga su duración real).
-const mmss = (t: number) => `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
-const capitulos = guia.data.video
-  ? [...(guia.body ?? '').matchAll(/^###\s+(.+?)\s*\n+<p><button[^>]*data-t="(\d+)"/gm)].map(([, titulo, t]) => ({
-      titulo,
-      t: Number(t),
-      etiqueta: mmss(Number(t)),
-      slug: headings.find((h) => h.depth === 3 && h.text === titulo)?.slug,
-    }))
-  : [];
+const capitulos = guia.data.video ? capitulosDeGuia(guia.body ?? '', headings) : [];
 const totalAprox = (parseFloat(guia.data.duracion) || 0) * 60;
 const pesos = capitulos.map((c, i) =>
   Math.max(1, (capitulos[i + 1]?.t ?? Math.max(totalAprox, c.t + 60)) - (i === 0 ? 0 : c.t))
@@ -223,6 +216,16 @@ const secciones = headings.filter((h) => h.depth === 2 && h.text !== 'Resumen po
         ultimo.style.flexGrow = String(Math.max(1, reproductor.duration - inicio));
       }
     };
+
+    // Un enlace con ?t=SEGUNDOS (el glosario, la ruta corta) deja el vídeo en ese punto, sin reproducirlo.
+    const tInicial = Number(new URLSearchParams(location.search).get('t'));
+    if (tInicial > 0) {
+      const saltar = () => {
+        reproductor.currentTime = tInicial;
+      };
+      if (reproductor.readyState >= 1) saltar();
+      else reproductor.addEventListener('loadedmetadata', saltar, { once: true });
+    }
 
     reproductor.addEventListener('timeupdate', marcar);
     reproductor.addEventListener('seeked', marcar);
