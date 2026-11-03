@@ -126,12 +126,15 @@ Los permisos del laboratorio, para llevarte a tu proyecto: piden permiso antes d
     { "action": "shell", "resource": "*", "effect": "ask" },
     { "action": "edit", "resource": "*", "effect": "ask" },
     { "action": "external_directory", "resource": "*", "effect": "ask" },
-    { "action": "webfetch", "resource": "*", "effect": "ask" }
+    { "action": "webfetch", "resource": "*", "effect": "ask" },
+    { "action": "execute", "resource": "*", "effect": "ask" }
   ]
 }
 ```
 
 En OpenCode 2 la clave es `permissions`, una lista de reglas; `effect` puede ser `allow`, `ask` o `deny`, y `edit` cubre también `write`.
+
+> **La regla de `execute` no sale en el vídeo y es importante.** Es el permiso del *Code Mode* de OpenCode, una forma de ejecutar código sin pasar por la shell. En nuestras pruebas, con la shell denegada, el agente usó esa vía para ejecutar las pruebas del proyecto. Si solo pones la shell en «preguntar», te queda esa puerta abierta. El laboratorio ya la incluye.
 
 ## Fuentes
 

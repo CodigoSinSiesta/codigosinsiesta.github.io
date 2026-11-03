@@ -35,7 +35,7 @@ Si quieres que use una concreta, díselo en la petición («busca con grep dónd
 
 Estos son los nombres de la versión 2. Si lees tutoriales antiguos, en OpenCode 1 la shell se llamaba `bash` y los subagentes se lanzaban con `task`.
 
-La columna «En el laboratorio» sale del `opencode.json` del laboratorio, que pide permiso para cuatro acciones: `shell`, `edit` (que cubre también `write` y `patch`), `webfetch` y `external_directory`, que es cualquier acceso fuera de la carpeta del proyecto. Todo lo demás se ejecuta sin preguntar, salvo leer ficheros `.env`, que OpenCode pregunta siempre por defecto.
+La columna «En el laboratorio» sale del `opencode.json` del laboratorio, que pide permiso para cinco acciones: `shell`, `edit` (que cubre también `write` y `patch`), `webfetch`, `execute` y `external_directory`, que es cualquier acceso fuera de la carpeta del proyecto. Todo lo demás se ejecuta sin preguntar, salvo leer ficheros `.env`, que OpenCode pregunta siempre por defecto.
 
 | Herramienta | Para qué sirve | En el laboratorio |
 |---|---|---|
@@ -51,8 +51,9 @@ La columna «En el laboratorio» sale del `opencode.json` del laboratorio, que p
 | `question` | Te hace una o varias preguntas con opciones y espera tu respuesta. | Es ella la que te pregunta |
 | `skill` | Carga las instrucciones de una *skill*: un paquete de instrucciones para un tipo de tarea. | No pregunta |
 | `subagent` | Encarga una parte del trabajo a otro agente, en una sesión aparte. | No pregunta |
+| `execute` | *Code Mode*: el modelo escribe un pequeño programa en JavaScript que combina herramientas o ejecuta código, sin pasar por la shell. | **Pregunta** |
 
-Hay dos más que no verás en esta ruta: `execute` (Code Mode: el modelo combina herramientas escribiendo un pequeño programa en JavaScript) y una experimental para generar imágenes.
+Hay una más, experimental, para generar imágenes, que no verás en esta ruta. Ojo con `execute`: en nuestras pruebas, con la shell denegada, el agente la usó para ejecutar las pruebas del proyecto por otra vía. Por eso el laboratorio también la pone en «preguntar».
 
 Ojo: esta columna es **la configuración del laboratorio**. OpenCode 2, tal como viene, lo permite todo sin preguntar salvo leer un `.env`. Y una petición de permiso te deja **ver** lo que va a pasar, no te protege por sí sola: la barrera es el contenedor. La [guía 09](/rutas/ia-desde-cero/09-lo-que-puede-romper) cuenta la diferencia.
 
