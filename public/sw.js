@@ -18,7 +18,7 @@ const VIDEOS = 'csi-videos-v1';
 const PREFIJOS_PAGINA = ['/rutas', '/ensayos', '/talleres', '/descargas'];
 // /_astro/ lleva hash en el nombre (inmutable); el resto puede cambiar sin cambiar de URL.
 const PREFIJOS_INMUTABLES = ['/_astro/'];
-const PREFIJOS_REVALIDAR = ['/icons/', '/subtitulos/', '/pagefind/', '/favicon.svg', '/manifest.webmanifest'];
+const PREFIJOS_REVALIDAR = ['/icons/', '/subtitulos/', '/pagefind/', '/favicon', '/apple-touch-icon.png', '/manifest.webmanifest'];
 const TIEMPO_RED_MS = 4000;
 const PARALELO = 8;
 
