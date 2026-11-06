@@ -1,7 +1,7 @@
 // Descarga de vídeos para verlos sin conexión.
-// Los nombres de caché son los mismos que usa public/sw.js: si cambias uno, cambia el otro.
+// El nombre de caché es el mismo que usa public/sw.js: si cambias uno, cambia el otro.
+// Las páginas, los estilos y los subtítulos los guarda el propio service worker al instalarse.
 
-export const CACHE_PAGINAS = 'csi-paginas-v1';
 export const CACHE_VIDEOS = 'csi-videos-v1';
 
 export interface VideoDescargable {
@@ -9,9 +9,6 @@ export interface VideoDescargable {
   titulo: string;
   /** URL absoluta del vídeo en el bucket. */
   url: string;
-  /** Página de la guía, para que también abra sin conexión. */
-  href: string;
-  subtitulos?: string;
 }
 
 export interface Espacio {
@@ -59,26 +56,6 @@ export async function pedirPersistencia(): Promise<boolean> {
   }
 }
 
-/** La página de la guía, sus subtítulos y los ficheros /_astro/ que usa, para que abra sin red. */
-async function guardarPagina(video: VideoDescargable, signal: AbortSignal) {
-  const cache = await caches.open(CACHE_PAGINAS);
-  const res = await fetch(video.href, { signal });
-  if (!res.ok) return;
-  const html = await res.clone().text();
-  await cache.put(video.href, res);
-
-  const extra = new Set<string>(video.subtitulos ? [video.subtitulos] : []);
-  for (const m of html.matchAll(/(?:href|src)="(\/_astro\/[^"]+)"/g)) extra.add(m[1]);
-
-  await Promise.allSettled(
-    [...extra].map(async (ruta) => {
-      if (await cache.match(ruta)) return;
-      const r = await fetch(ruta, { signal });
-      if (r.ok) await cache.put(ruta, r);
-    })
-  );
-}
-
 /**
  * Descarga un vídeo a la caché. Se aborta con `signal`; un vídeo a medias no queda guardado.
  * `onProgreso` recibe los bytes leídos hasta el momento y el total (0 si el servidor no lo dice).
@@ -88,10 +65,6 @@ export async function descargarVideo(
   opciones: { signal: AbortSignal; onProgreso: (leidos: number, total: number) => void }
 ): Promise<void> {
   const { signal, onProgreso } = opciones;
-
-  await guardarPagina(video, signal).catch((e) => {
-    if (signal.aborted) throw e;
-  });
 
   const res = await fetch(video.url, { mode: 'cors', signal });
   if (!res.ok || !res.body) throw new Error(`El servidor respondió ${res.status}`);
