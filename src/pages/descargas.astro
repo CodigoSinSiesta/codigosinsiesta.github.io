@@ -19,8 +19,6 @@ const grupos = RUTAS.filter((ruta) => !ruta.oculta).map((ruta) => ({
       titulo: g.data.title,
       duracion: g.data.duracion,
       url: `${VIDEOS_BASE_URL}/${g.data.video}`,
-      href: `/rutas/${g.data.ruta}/${g.id}`,
-      subtitulos: g.data.subtitulos,
     })),
 })).filter((g) => g.videos.length > 0);
 ---

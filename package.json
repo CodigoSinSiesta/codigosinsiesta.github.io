@@ -7,7 +7,7 @@
   "packageManager": "pnpm@11.5.2",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist",
+    "build": "astro build && pagefind --site dist && node scripts/build-sw.mjs",
     "preview": "astro preview",
     "migrate:blog": "node scripts/migrate-blog.mjs"
   },

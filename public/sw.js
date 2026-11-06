@@ -1,11 +1,16 @@
 // Service worker de Código Sin Siesta.
 //
-// - Páginas y recursos propios: se guardan al visitarlos y se sirven sin conexión.
+// - Sitio: al instalarse guarda TODAS las páginas y recursos (la lista la genera scripts/build-sw.mjs
+//   tras el build), así que se navega sin conexión aunque no se haya visitado antes cada página.
 // - Vídeos: solo se guardan cuando el usuario los descarga desde /descargas (ver src/lib/offline.ts,
-//   que comparte los nombres de caché). Aquí solo se SIRVEN, resolviendo las peticiones Range.
+//   que comparte el nombre de caché). Aquí solo se SIRVEN, resolviendo las peticiones Range.
 //
 // Este dominio también aloja otros despliegues (/tecnoboletin/, decks...). Por eso solo se
 // intercepta lo que pertenece a este sitio; el resto pasa de largo.
+
+// Estas dos líneas las reescribe scripts/build-sw.mjs en dist/sw.js; en bruto valen para desarrollo.
+const VERSION = 'dev';
+const PRECACHE = [];
 
 const PAGINAS = 'csi-paginas-v1';
 const VIDEOS = 'csi-videos-v1';
@@ -13,26 +18,24 @@ const VIDEOS = 'csi-videos-v1';
 const PREFIJOS_PAGINA = ['/rutas', '/ensayos', '/talleres', '/descargas'];
 // /_astro/ lleva hash en el nombre (inmutable); el resto puede cambiar sin cambiar de URL.
 const PREFIJOS_INMUTABLES = ['/_astro/'];
-const PREFIJOS_REVALIDAR = ['/icons/', '/subtitulos/', '/favicon.svg', '/manifest.webmanifest'];
+const PREFIJOS_REVALIDAR = ['/icons/', '/subtitulos/', '/pagefind/', '/favicon.svg', '/manifest.webmanifest'];
 const TIEMPO_RED_MS = 4000;
+const PARALELO = 8;
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(PAGINAS);
-      // Mejor esfuerzo: que falle uno no debe impedir instalar el worker.
-      await Promise.allSettled(['/', '/descargas', '/favicon.svg'].map((u) => cache.add(u)));
-      await self.skipWaiting();
-    })()
-  );
+  event.waitUntil(precachear().then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      // Las cachés de páginas de versiones anteriores sobran; la de vídeos no se toca nunca.
-      for (const nombre of await caches.keys()) {
-        if (nombre.startsWith('csi-paginas-') && nombre !== PAGINAS) await caches.delete(nombre);
+      // Lo que ya no está en el sitio (páginas retiradas, restos de versiones anteriores) sobra.
+      // La caché de vídeos no se toca nunca.
+      const vigentes = new Set(PRECACHE);
+      const cache = await caches.open(PAGINAS);
+      for (const peticion of await cache.keys()) {
+        const { pathname } = new URL(peticion.url);
+        if (PRECACHE.length > 0 && !vigentes.has(pathname)) await cache.delete(peticion);
       }
       await self.clients.claim();
     })()
@@ -61,11 +64,41 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  const esPagina = url.pathname === '/' || PREFIJOS_PAGINA.some((p) => url.pathname.startsWith(p));
+  const esPagina =
+    url.pathname === '/' || PREFIJOS_PAGINA.some((p) => url.pathname === p || url.pathname.startsWith(`${p}/`));
   if (request.mode === 'navigate' && esPagina) {
+    // Las páginas se guardan con barra final (así las sirve Pages); /rutas/x pasa a /rutas/x/.
+    const ultimo = url.pathname.split('/').pop() ?? '';
+    if (!url.pathname.endsWith('/') && !ultimo.includes('.')) {
+      event.respondWith(Response.redirect(`${url.origin}${url.pathname}/${url.search}`, 302));
+      return;
+    }
     event.respondWith(redPrimero(request));
   }
 });
+
+// Guarda todo el sitio. Es todo o nada: si algo falla (p. ej. se corta la red a medias), la instalación
+// se rechaza y el navegador la reintenta en la siguiente visita, sin dejar una copia a medias.
+async function precachear() {
+  if (PRECACHE.length === 0) return;
+  const cache = await caches.open(PAGINAS);
+  const pendientes = [];
+  for (const ruta of PRECACHE) {
+    // Los ficheros con hash no cambian: no se vuelven a bajar en cada despliegue.
+    if (ruta.startsWith('/_astro/') && (await cache.match(ruta))) continue;
+    pendientes.push(ruta);
+  }
+  for (let i = 0; i < pendientes.length; i += PARALELO) {
+    await Promise.all(
+      pendientes.slice(i, i + PARALELO).map(async (ruta) => {
+        const respuesta = await fetch(ruta, { cache: 'reload' });
+        // Una respuesta que viene de una redirección no se puede servir como página.
+        if (!respuesta.ok || respuesta.redirected) throw new Error(`${ruta}: ${respuesta.status}`);
+        await cache.put(ruta, respuesta);
+      })
+    );
+  }
+}
 
 async function cachePrimero(request) {
   const cache = await caches.open(PAGINAS);
@@ -95,19 +128,17 @@ async function revalidar(request, event) {
 
 async function redPrimero(request) {
   const cache = await caches.open(PAGINAS);
+  const { pathname } = new URL(request.url);
   try {
     const respuesta = await Promise.race([
       fetch(request),
       new Promise((_, rechazar) => setTimeout(() => rechazar(new Error('lento')), TIEMPO_RED_MS)),
     ]);
-    if (respuesta.ok) cache.put(request, respuesta.clone());
+    if (respuesta.ok && !respuesta.redirected) cache.put(pathname, respuesta.clone());
     return respuesta;
   } catch {
-    return (
-      (await cache.match(request, { ignoreSearch: true })) ??
-      (await cache.match('/descargas')) ??
-      Response.error()
-    );
+    // Sin red (o red muy lenta): la copia guardada; si esa página no existe, el aviso de «no encontrada».
+    return (await cache.match(pathname)) ?? (await cache.match('/404.html')) ?? Response.error();
   }
 }
 
